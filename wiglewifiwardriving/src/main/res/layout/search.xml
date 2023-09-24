@@ -1,50 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mask="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/search_pane"
+    style="@style/NetworkViewOverlay">
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/query_address_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/query_address">
+        android:hint="@string/query_address"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/query_address"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/query_ssid_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/query_ssid">
+        android:hint="@string/query_ssid"
+        android:layout_below="@id/query_address_layout">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/query_ssid"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            />
+            android:inputType="text"/>
     </com.google.android.material.textfield.TextInputLayout>
     <TextView
+        android:id="@+id/query_bssid_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/query_bssid"
         android:layout_marginTop="4dip"
         android:layout_marginLeft="4dip"
         tools:ignore="RtlHardcoded"
+        android:layout_below="@id/query_ssid_layout"
         />
     <br.com.sapereaude.maskedEditText.MaskedEditText
         android:id="@+id/query_bssid"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:textAllCaps="true"
         mask:allowed_chars="1234567890ABCDEFabcdef%_"
         mask:mask="##:##:##:##:##:##"
         android:hint="CA1E234FECABE"
-        android:layout_weight="1"
+        android:layout_below="@id/query_bssid_layout"
         />
-</LinearLayout>
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/query_bssid"
+        android:weightSum="2">
+        <Spinner
+            android:id="@+id/type_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <Spinner
+            android:id="@+id/encryption_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</RelativeLayout>

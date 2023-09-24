@@ -5,15 +5,22 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.model.WiFiSecurityType;
 
 import java.util.List;
 
 import br.com.sapereaude.maskedEditText.MaskedEditText;
 
+/**
+ * Utilities for composing search QueryArgs from inputs
+ * @author bobzilla, arkasha
+ */
 public class SearchUtil {
 
     private SearchUtil() {}
@@ -114,19 +121,36 @@ public class SearchUtil {
                         Logging.error("setupButtons: bad id: " + id);
                 }
             } catch (Exception ex) {
-                fail = context.getString(R.string.problem_with_field) + " '" + field + "': " + ex.getMessage();
+                fail = context.getString(R.string.problem_with_field) + " '" + field + "': " + ex.getMessage(); //TODO: not language aware 1/2 - replace w/ templated message
                 break;
             }
         }
 
-        if (fail == null && !okValue) {
-            fail = "No query fields specified";
-        }
+        try {
+            final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
+            final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
 
-        if (null == fail) {
-            ListFragment.lameStatic.queryArgs = queryArgs;
-        }
+            field = context.getString(R.string.network_type);
+            if (null != networkTypeSpinner) {
+                queryArgs.setType((NetworkFilterType) networkTypeSpinner.getSelectedItem());
+                field = context.getString(R.string.crypto_security);
+                if (null != wifiEncryptionSpinner && (NetworkFilterType.ALL.equals(networkTypeSpinner.getSelectedItem()) || NetworkFilterType.WIFI.equals(networkTypeSpinner.getSelectedItem()))) {
+                    queryArgs.setCrypto((WiFiSecurityType) wifiEncryptionSpinner.getSelectedItem());
+                } else {
+                    queryArgs.setCrypto(null);
+                }
+            }
 
+            if (fail == null && !okValue) {
+                fail = "No query fields specified";
+            }
+
+            if (null == fail) {
+                ListFragment.lameStatic.queryArgs = queryArgs;
+            }
+        } catch (Exception e) {
+            fail = context.getString(R.string.problem_with_field) + " '" + field + "': " + e.getMessage(); //TODO: not language aware 2/2 - replace w/ templated message
+        }
         return fail;
     }
 }

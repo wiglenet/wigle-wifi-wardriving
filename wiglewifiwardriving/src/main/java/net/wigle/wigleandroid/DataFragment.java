@@ -11,7 +11,11 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
+import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.model.Pair;
+import net.wigle.wigleandroid.model.WiFiSecurityType;
+import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
+import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
@@ -39,7 +43,10 @@ import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -99,6 +106,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.data, container, false);
+        setupQueryInputs( view );
         setupQueryButtons( view );
         setupCsvButtons( view );
         setupKmlButtons(view);
@@ -110,25 +118,81 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         return view;
     }
 
+    private void setupQueryInputs( final View view ) {
+        final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
+        final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
+
+        NetworkTypeArrayAdapter adapter = new NetworkTypeArrayAdapter(getContext());
+        networkTypeSpinner.setAdapter(adapter);
+        networkTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0 || position == 1) {
+                    if (null != wifiEncryptionSpinner) {
+                        wifiEncryptionSpinner.setClickable(true);
+                        wifiEncryptionSpinner.setEnabled(true); //TODO: not working
+                    } else {
+                        Logging.error("Unable to disable the security type spinner");
+                    }
+                } else {
+                    if (null != wifiEncryptionSpinner) {
+                        wifiEncryptionSpinner.setSelection(0);
+                        wifiEncryptionSpinner.setClickable(false);
+                        wifiEncryptionSpinner.setEnabled(false); //TODO: not working
+                        Logging.info("TODO: need to clear wifi security in query");
+                    } else {
+                        Logging.error("Unable to disable the security type spinner");
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                if (null != wifiEncryptionSpinner) {
+                    wifiEncryptionSpinner.setClickable(true);
+                    wifiEncryptionSpinner.setEnabled(true); //TODO: not working
+                    Logging.info("TODO: need to clear wifi security in query");
+                } else {
+                    Logging.error("Unable to disable the security type spinner");
+                }
+            }
+        });
+
+        if (null != ListFragment.lameStatic.queryArgs && ListFragment.lameStatic.queryArgs.getType() != null) {
+            networkTypeSpinner.setSelection(ListFragment.lameStatic.queryArgs.getType().ordinal());
+        }
+        WiFiSecurityTypeArrayAdapter securityAdapter = new WiFiSecurityTypeArrayAdapter(getContext());
+        wifiEncryptionSpinner.setAdapter(securityAdapter);
+        if (null != ListFragment.lameStatic.queryArgs &&
+                ListFragment.lameStatic.queryArgs.getCrypto() != null) {
+            if (ListFragment.lameStatic.queryArgs.getType() != null &&
+                    (NetworkFilterType.ALL.equals(ListFragment.lameStatic.queryArgs.getType()) ||
+                            NetworkFilterType.WIFI.equals(ListFragment.lameStatic.queryArgs.getType()))) {
+                wifiEncryptionSpinner.setSelection(ListFragment.lameStatic.queryArgs.getCrypto().ordinal());
+            }
+        }
+
+    }
+
     private void setupQueryButtons( final View view ) {
         Button button = view.findViewById( R.id.search_button );
         button.setOnClickListener(buttonView -> {
 
-            final String fail = SearchUtil.setupQuery(view, getActivity(), true);
-            if (null != ListFragment.lameStatic.queryArgs) {
-                ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
-            }
-            if (fail != null) {
-                WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
-            } else {
-                // start db result activity
-                final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
-                startActivity(settingsIntent);
-            }
-        });
+        final String fail = SearchUtil.setupQuery(view, getActivity(), true);
+        if (null != ListFragment.lameStatic.queryArgs) {
+            ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
+        }
+        if (fail != null) {
+            WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
+        } else {
+            // start db result activity
+            final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
+            startActivity(settingsIntent);
+        }
+    });
 
-        button = view.findViewById( R.id.reset_button );
-        button.setOnClickListener(buttonView -> SearchUtil.clearWiFiBtFields(view));
+    button = view.findViewById( R.id.reset_button );
+    button.setOnClickListener(buttonView -> SearchUtil.clearWiFiBtFields(view));
 
     }
 

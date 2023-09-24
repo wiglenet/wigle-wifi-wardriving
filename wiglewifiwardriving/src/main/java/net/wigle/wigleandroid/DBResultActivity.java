@@ -1,11 +1,21 @@
 package net.wigle.wigleandroid;
 
+import static net.wigle.wigleandroid.model.Network.RSN_CAP;
+import static net.wigle.wigleandroid.model.Network.SAE_CAP;
+import static net.wigle.wigleandroid.model.Network.SUITE_B_192_CAP;
+import static net.wigle.wigleandroid.model.Network.WEP_CAP;
+import static net.wigle.wigleandroid.model.Network.WPA2_CAP;
+import static net.wigle.wigleandroid.model.Network.WPA3_CAP;
+import static net.wigle.wigleandroid.model.Network.WPA_CAP;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Location;
@@ -37,13 +47,18 @@ import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.NetworkFilterType;
+import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.model.WiFiSecurityType;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import org.json.JSONObject;
 
@@ -98,7 +113,9 @@ public class DBResultActivity extends AppCompatActivity {
             if ( address != null ) {
                 center = new LatLng(address.getLatitude(), address.getLongitude());
             }
-            setupMap( center, savedInstanceState );
+            final SharedPreferences prefs = this.getApplicationContext().
+                    getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            setupMap( center, savedInstanceState, prefs );
             if (queryArgs.searchWiGLE()) {
                 setupWiGLEQuery(queryArgs);
             } else {
@@ -117,9 +134,10 @@ public class DBResultActivity extends AppCompatActivity {
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }
 
-    private void setupMap( final LatLng center, final Bundle savedInstanceState ) {
+    private void setupMap(final LatLng center, final Bundle savedInstanceState, final SharedPreferences prefs) {
         mapView = new MapView( this );
         mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
         MapsInitializer.initialize(this);
 
         mapView.getMapAsync(googleMap -> {
@@ -150,9 +168,55 @@ public class DBResultActivity extends AppCompatActivity {
             limit = true;
         }
         if ( bssid != null && ! "".equals(bssid) ) {
-            sql += " AND bssid like ?"; // + DatabaseUtils.sqlEscapeString(bssid);
+            sql += " AND bssid LIKE ?"; // + DatabaseUtils.sqlEscapeString(bssid);
             params.add(bssid);
             limit = true;
+        }
+        if ( queryArgs.getType() != null && !NetworkFilterType.ALL.equals(queryArgs.getType())) {
+            switch (queryArgs.getType()) {
+                case BT:
+                    sql += " AND type IN ('B','E')";
+                    break;
+                case CELL:
+                    sql += " AND type IN ('G','C','L','D','N')";
+                    break;
+                case WIFI:
+                    sql += " AND type = ?";
+                    params.add(NetworkType.WIFI.getCode());
+                    break;
+                default:
+                    break;
+            }
+        }
+        if ( queryArgs.getType() != null && (NetworkFilterType.ALL.equals(queryArgs.getType())|| NetworkFilterType.WIFI.equals(queryArgs.getType()))) {
+            if (queryArgs.getCrypto() != null && !WiFiSecurityType.ALL.equals(queryArgs.getCrypto())) {
+                switch (queryArgs.getCrypto()) {
+                    case WPA3:
+                        sql += " AND (capabilities LIKE ? OR capabilities LIKE ? OR capabilities LIKE ?)";
+                        params.add(WPA3_CAP+"%");
+                        params.add("%"+SUITE_B_192_CAP+"%");
+                        params.add("%"+SAE_CAP+"%");
+                        break;
+                    case WPA2:
+                        sql += " AND (capabilities LIKE ? OR capabilities LIKE ?)";
+                        params.add(WPA2_CAP+"%");
+                        params.add(RSN_CAP+"%");
+                        break;
+                    case WPA:
+                        sql += " AND capabilities LIKE ?";
+                        params.add(WPA_CAP+" %");
+                        break;
+                    case WEP:
+                        sql += " AND capabilities LIKE ?";
+                        params.add(WEP_CAP+"%");
+                        break;
+                    case NONE:
+                        sql += " AND capabilities IN ('[]','[ESS]', '')"; //TODO: verify this
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
         if ( address != null ) {
             sql += " AND lastlat > ? AND lastlat < ? AND lastlon > ? AND lastlon < ?";

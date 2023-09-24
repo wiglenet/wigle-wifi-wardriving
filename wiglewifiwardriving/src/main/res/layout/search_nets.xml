@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <LinearLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/map_search"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
 
+
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_above="@id/search_type_group">
         <include layout="@layout/search"/>
+        </RelativeLayout>
         <RadioGroup
             android:id="@+id/search_type_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            style="@style/NetworkViewOverlay"
+            android:layout_above="@id/network_search_buttons">
             <RadioButton android:id="@+id/radio_search_local"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -25,11 +36,14 @@
                 />
         </RadioGroup>
         <LinearLayout
+            android:id="@+id/network_search_buttons"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="2">
-
+            android:weightSum="2"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            style="@style/NetworkViewOverlay">
             <Button
                 android:id="@+id/search_button"
                 android:layout_width="wrap_content"
@@ -37,7 +51,6 @@
                 android:layout_weight="1"
                 android:contentDescription="@string/tab_search"
                 android:text="@string/tab_search"/>
-
             <Button
                 android:id="@+id/reset_button"
                 android:layout_width="wrap_content"
@@ -45,5 +58,33 @@
                 android:layout_weight="1"
                 android:text="@string/reset_button"/>
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:id="@+id/search_lat_lon"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            style="@style/NetworkViewOverlay">
+            <TextView
+                android:id="@+id/search_lats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="18sp"
+                tools:text="34.120 : 34-555"/>
+            <TextView
+                android:id="@+id/search_lons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="18sp"
+                tools:text="-122.721 : -122.455"/>
+        </LinearLayout>
+    </RelativeLayout>

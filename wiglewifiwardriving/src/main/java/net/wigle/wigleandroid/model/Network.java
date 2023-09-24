@@ -61,15 +61,15 @@ public final class Network implements ClusterItem {
     private final long constructionTime = System.currentTimeMillis(); // again
 
     private static final String BAR_STRING = " | ";
-    private static final String WPA3_CAP = "[WPA3";
-    private static final String SAE_CAP = "SAE";
-    private static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
+    public static final String WPA3_CAP = "[WPA3";
+    public static final String SAE_CAP = "SAE";
+    public static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
     //private static final String OWE_CAP = "OWE";    //handles both OWE and OWE_TRANSITION
     //TODO: how we do distinguish between RSN-EAP-CCMP WPA2 and WPA3 implementations?
-    private static final String WPA2_CAP = "[WPA2";
-    private static final String RSN_CAP = "[RSN";
-    private static final String WPA_CAP = "[WPA";
-    private static final String WEP_CAP = "[WEP";
+    public static final String WPA2_CAP = "[WPA2";
+    public static final String RSN_CAP = "[RSN";
+    public static final String WPA_CAP = "[WPA";
+    public static final String WEP_CAP = "[WEP";
 
     // faster than enums
     public static final int CRYPTO_NONE = 0;
@@ -78,6 +78,35 @@ public final class Network implements ClusterItem {
     public static final int CRYPTO_WPA2 = 3;
     public static final int CRYPTO_WPA3 = 4;
 
+    public enum CryptoType {
+        None(CRYPTO_NONE), WEP(CRYPTO_WEP), WPA(CRYPTO_WPA), WPA2(CRYPTO_WPA2), WPA3(CRYPTO_WPA3);
+        private final int value;
+
+        CryptoType(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public String toString() {
+            switch (value) {
+                case CRYPTO_NONE:
+                    return "None";
+                case CRYPTO_WEP:
+                    return "WEP";
+                case CRYPTO_WPA:
+                    return "WPA";
+                case CRYPTO_WPA2:
+                    return "WPA2";
+                case CRYPTO_WPA3:
+                    return "WPA3";
+                default:
+                    return "Unknown";
+            }
+        }
+    }
     public enum NetworkBand {
         WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED
     }

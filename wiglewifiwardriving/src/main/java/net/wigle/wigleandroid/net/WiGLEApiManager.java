@@ -20,6 +20,8 @@ import com.google.gson.JsonSyntaxException;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.background.Status;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
+import net.wigle.wigleandroid.model.api.BtSearchResponse;
+import net.wigle.wigleandroid.model.api.CellSearchResponse;
 import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
@@ -41,6 +43,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -460,7 +463,7 @@ public class WiGLEApiManager {
             final Handler mainHandler = new Handler(Looper.getMainLooper());
 
             @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                onCallFailure("Unsuccessful WiGLE Search request: ", e,
+                onCallFailure("Unsuccessful WiGLE WiFi Search request: ", e,
                         completedListener, mainHandler, null);
             }
             @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
@@ -475,6 +478,113 @@ public class WiGLEApiManager {
                             try {
                                 WiFiSearchResponse r = new Gson().fromJson(responseBody.charStream(),
                                         WiFiSearchResponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+                mainHandler.post(completedListener::onTaskCompleted);
+            }
+        });
+    }
+
+    /**
+     * Search the WiGLE WiFi database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
+    public void searchCell(@NotNull final String urlEncodedQueryParams,
+                           @NotNull final AuthenticatedRequestCompletedListener<CellSearchResponse,
+                                   JSONObject> completedListener) {
+        if (null == authedClient) {
+            completedListener.onAuthenticationRequired();
+        }
+        final String httpUrl = UrlConfig.SEARCH_CELL_URL + "?" + urlEncodedQueryParams;
+
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .build();
+        if (authedClient == null) {
+            Logging.warn("searchWifi authedClient is null, returning");
+            return;
+        }
+        authedClient.newCall(request).enqueue(new Callback() {
+            final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+            @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                onCallFailure("Unsuccessful WiGLE Cell Search request: ", e,
+                        completedListener, mainHandler, null);
+            }
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
+                    } else {
+                        //TODO- consider caching implications here
+                        if (null != responseBody) {
+                            try {
+                                CellSearchResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        CellSearchResponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+                mainHandler.post(completedListener::onTaskCompleted);
+            }
+        });
+    }
+
+    /**
+     * Search the WiGLE WiFi database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
+    public void searchBt(@NotNull final String urlEncodedQueryParams,
+                           @NotNull final AuthenticatedRequestCompletedListener<BtSearchResponse,
+                                   JSONObject> completedListener) {
+        if (null == authedClient) {
+            completedListener.onAuthenticationRequired();
+        }
+        final String httpUrl = UrlConfig.SEARCH_BT_URL + "?" + urlEncodedQueryParams;
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .build();
+        if (authedClient == null) {
+            Logging.warn("searchWifi authedClient is null, returning");
+            return;
+        }
+        authedClient.newCall(request).enqueue(new Callback() {
+            final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+            @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                onCallFailure("Unsuccessful WiGLE BT Search request: ", e,
+                        completedListener, mainHandler, null);
+            }
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
+                    } else {
+                        //TODO- consider caching implications here
+                        if (null != responseBody) {
+                            try {
+                                BtSearchResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        BtSearchResponse.class);
                                 completedListener.onTaskSucceeded(r);
                             } catch (JsonSyntaxException e) {
                                 //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?

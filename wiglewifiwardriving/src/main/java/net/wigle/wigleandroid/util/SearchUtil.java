@@ -75,7 +75,7 @@ public class SearchUtil {
                         break;
                     case R.id.query_ssid:
                         field = context.getString(R.string.ssid);
-                        //TODO: validation on SSID max length
+                        //TODO: validation on SSID
                         queryArgs.setSSID(text);
                         okValue = true;
                         break;

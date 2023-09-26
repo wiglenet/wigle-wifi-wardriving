@@ -22,4 +22,20 @@ public enum WiFiSecurityType {
         }
     }
 
+    public static String webParameterValue(WiFiSecurityType type) {
+        switch (type) {
+            case NONE:
+                return "None";
+            case WEP:
+                return "WEP";
+            case WPA:
+                return "WPA";
+            case WPA2:
+                return "WPA2";
+            case WPA3:
+                return "WPA3";
+            default:
+                return null;
+        }
+    }
 }

@@ -209,7 +209,7 @@ public class SearchFragment extends Fragment {
 
         setupQueryButtons( view );
         final Location location = ListFragment.lameStatic.location;
-        LatLng centerPoint = new LatLng( location.getLatitude(), location.getLongitude() );
+        LatLng centerPoint = (null == location)?new LatLng(0.0,0.0):new LatLng(location.getLatitude(), location.getLongitude()); //TODO: choose a good default
         setupMap(this.getActivity().getApplicationContext(), view, centerPoint, savedInstanceState, prefs );
         return view;
     }

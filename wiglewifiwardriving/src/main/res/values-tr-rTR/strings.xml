@@ -449,4 +449,5 @@
     <string name="speech_new_bt">DB\'ye yeni Bluetooth</string>
     <string name="tts_new_bt">Yeni bluetooth</string>
     <string name="gnss_full">GNSS tam takibini kullanın (çok fazla pil tüketimi)</string>
+    <string name="search_area">Arama Alanı:</string>
 </resources>

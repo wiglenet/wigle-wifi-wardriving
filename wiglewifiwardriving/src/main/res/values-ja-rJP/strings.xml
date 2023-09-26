@@ -448,4 +448,5 @@
     <string name="speech_new_bt">DB への新しい Bluetooth</string>
     <string name="tts_new_bt">新しいBluetooth</string>
     <string name="gnss_full">GNSS 完全追跡を使用する (バッテリーの消耗が大きい)</string>
+    <string name="search_area">検索エリア:</string>
 </resources>

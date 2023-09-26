@@ -1,14 +1,19 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
+import android.location.Address;
+import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -30,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import net.wigle.wigleandroid.model.NetworkFilterType;
+import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
@@ -38,6 +44,8 @@ import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SearchUtil;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SearchFragment extends Fragment {
@@ -49,7 +57,6 @@ public class SearchFragment extends Fragment {
 
     private boolean mLocalSearch;
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         Logging.info("SEARCH: onCreate");
@@ -192,7 +199,7 @@ public class SearchFragment extends Fragment {
                 rb.setText(getText(R.string.search_wigle) + " " + getText(R.string.must_login));
                 rb.setEnabled(false);
             } else {
-                Logging.info("unable to get RB");
+                Logging.info("unable to get RadioButton");
             }
         } else {
             if ((ListFragment.lameStatic.queryArgs != null) && (ListFragment.lameStatic.queryArgs.searchWiGLE())) {
@@ -206,17 +213,21 @@ public class SearchFragment extends Fragment {
             }
         }
 
-
         setupQueryButtons( view );
-        final Location location = ListFragment.lameStatic.location;
-        LatLng centerPoint = (null == location)?new LatLng(0.0,0.0):new LatLng(location.getLatitude(), location.getLongitude()); //TODO: choose a good default
+        LatLng centerPoint = new LatLng(0.0,0.0);
+        if ((ListFragment.lameStatic.queryArgs != null) && (ListFragment.lameStatic.queryArgs.getLocationBounds() != null)) {
+            centerPoint = ListFragment.lameStatic.queryArgs.getLocationBounds().getCenter();
+        } else if (null != ListFragment.lameStatic.location) {
+            centerPoint = new LatLng(ListFragment.lameStatic.location.getLatitude(), ListFragment.lameStatic.location.getLongitude());
+        }
         setupMap(this.getActivity().getApplicationContext(), view, centerPoint, savedInstanceState, prefs );
+        setupAddressSearch(this.getActivity().getApplicationContext(), view);
         return view;
     }
 
 
     private void setupQueryButtons( final View view ) {
-        Button button = view.findViewById( R.id.search_button );
+        Button button = view.findViewById( R.id.perform_search_button);
         button.setOnClickListener(buttonView -> {
 
             RadioGroup rbg = view.findViewById(R.id.search_type_group);
@@ -244,11 +255,14 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void setupMap(final Context context, final View parentView, final LatLng center, final Bundle savedInstanceState, final SharedPreferences prefs ) {
+    @SuppressLint("DefaultLocale")
+    private void setupMap(final Context context, final View parentView, final LatLng center,
+                          final Bundle savedInstanceState, final SharedPreferences prefs ) {
         mapView = new MapView( context );
         try {
             mapView.onCreate(savedInstanceState);
-            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
+            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(),
+                    prefs, R.raw.night_style_json));
             MapsInitializer.initialize(context);
             if ((center != null)) {
                 mapView.getMapAsync(googleMap -> {
@@ -257,16 +271,22 @@ public class SearchFragment extends Fragment {
                             .target(center).zoom(DEFAULT_ZOOM).build();
                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     googleMap.setOnCameraMoveListener(() -> {
+                        if (null == ListFragment.lameStatic.queryArgs) {
+                            ListFragment.lameStatic.queryArgs = new QueryArgs();
+                        }
                         LatLngBounds curScreen = googleMap.getProjection()
                                 .getVisibleRegion().latLngBounds;
                         TextView v = parentView.findViewById(R.id.search_lats);
+                        ListFragment.lameStatic.queryArgs.setLocationBounds(curScreen);
                         if (null != v) {
-                            v.setText(String.format("%.5f : %.5f",curScreen.northeast.latitude , curScreen.southwest.latitude));
+                            //ALIBI: https://xkcd.com/2170/
+                            v.setText(String.format("%.4f : %.4f",curScreen.northeast.latitude , curScreen.southwest.latitude));
                         }
                         v = parentView.findViewById(R.id.search_lons);
                         if (null != v) {
-                            v.setText(String.format("%.5f : %.5f",curScreen.northeast.longitude, curScreen.southwest.longitude));
+                            v.setText(String.format("%.4f : %.4f",curScreen.northeast.longitude, curScreen.southwest.longitude));
                         }
+
                     });
                 });
             }
@@ -278,6 +298,45 @@ public class SearchFragment extends Fragment {
         rlView.addView( mapView );
     }
 
+    private void setupAddressSearch(final Context context, final View view) {
+        final SearchView searchView = view.findViewById(R.id.address_search_view);
+        if (!Geocoder.isPresent()) {
+            //ALIBI: no Geocoder present - don't offer search.
+            searchView.setVisibility(GONE);
+            return;
+        }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String location = searchView.getQuery().toString();
+                List<Address> addressList = null;
+                if (location != null || location.equals("")) {
+                    Geocoder geocoder = new Geocoder(context);
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        Logging.error("Geocoding failed: ",e);
+                    }
+                    Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
+                    if (null != address) {
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        mapView.getMapAsync(googleMap -> {
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                        });
+                    }
+                }
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Extending NetworkTypeArrayAdpater to disable "ALL" for non-WiGLE-searches (WiGLE doesn't offer a universal search, only typed)
+     */
     private class SearchNetworkTypeArrayAdapter extends NetworkTypeArrayAdapter {
 
         public SearchNetworkTypeArrayAdapter(final Context context) {

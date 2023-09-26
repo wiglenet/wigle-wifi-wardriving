@@ -449,4 +449,5 @@
     <string name="speech_new_bt">DB에 새로운 블루투스</string>
     <string name="tts_new_bt">새로운 블루투스</string>
     <string name="gnss_full">GNSS 전체 추적 사용(배터리 소모가 많음)</string>
+    <string name="search_area">검색 영역:</string>
 </resources>

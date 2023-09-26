@@ -13,7 +13,6 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.model.Pair;
-import net.wigle.wigleandroid.model.WiFiSecurityType;
 import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
@@ -44,7 +43,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -68,6 +66,8 @@ import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
 import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_FILE_PREFIX;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 /**
  * configure settings
@@ -119,6 +119,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     }
 
     private void setupQueryInputs( final View view ) {
+        final TextInputLayout addressLayout = view.findViewById(R.id.query_address_layout);
+        if (null != addressLayout) {
+            //ALIBI: keeping old-school address layout in the database tab for consistency's sake. Do we need this?
+            addressLayout.setVisibility(View.VISIBLE);
+        }
         final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
         final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
 
@@ -175,7 +180,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     }
 
     private void setupQueryButtons( final View view ) {
-        Button button = view.findViewById( R.id.search_button );
+        Button button = view.findViewById( R.id.perform_search_button);
         button.setOnClickListener(buttonView -> {
 
         final String fail = SearchUtil.setupQuery(view, getActivity(), true);

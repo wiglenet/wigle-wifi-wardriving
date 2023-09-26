@@ -449,4 +449,5 @@
     <string name="speech_new_bt">Ny bluetooth til DB</string>
     <string name="tts_new_bt">Ny bluetooth</string>
     <string name="gnss_full">Brug GNSS fuld sporing (stort batteriforbrug)</string>
+    <string name="search_area">Søgeområde:</string>
 </resources>

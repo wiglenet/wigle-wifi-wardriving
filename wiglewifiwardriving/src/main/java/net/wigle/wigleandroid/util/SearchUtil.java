@@ -5,6 +5,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import net.wigle.wigleandroid.ListFragment;
@@ -30,6 +32,14 @@ public class SearchUtil {
             final EditText editText = (EditText) view.findViewById(id);
             editText.setText("");
         }
+        final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
+        final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
+        final RadioButton local = view.findViewById(R.id.radio_search_local);
+        if (null != local) {
+            local.setChecked(true);
+        }
+        networkTypeSpinner.setSelection(0);
+        wifiEncryptionSpinner.setSelection(0);
         ListFragment.lameStatic.queryArgs = null;
     }
 
@@ -57,6 +67,13 @@ public class SearchUtil {
                 }
             }
             if (text.isEmpty()) {
+                if (id == R.id.query_address) {
+                    //TODO: this only works for the search UI, NOT for the database tab. :(
+                    //ALIBI: these aren't directly editable, so we have to persist them into the new queryArgs if set via the UI
+                    if (ListFragment.lameStatic.queryArgs.getLocationBounds() != null) {
+                        queryArgs.setLocationBounds(ListFragment.lameStatic.queryArgs.getLocationBounds());
+                    }
+                }
                 continue;
             }
 
@@ -114,7 +131,6 @@ public class SearchUtil {
                                 okValue = false;
                                 fail = context.getString(R.string.error_incomplete_octet);
                             }
-
                         }
                         break;
                     default:

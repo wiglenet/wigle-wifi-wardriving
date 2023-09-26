@@ -449,4 +449,5 @@
     <string name="speech_new_bt">Nije bluetooth nei DB</string>
     <string name="tts_new_bt">Nije bluetooth</string>
     <string name="gnss_full">Brûk GNSS folsleine tracking (grutte batterij drain)</string>
+    <string name="search_area">Zoekgebied:</string>
 </resources>

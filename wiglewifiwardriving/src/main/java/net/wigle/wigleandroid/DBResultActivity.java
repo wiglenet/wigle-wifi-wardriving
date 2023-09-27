@@ -33,7 +33,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -76,9 +75,9 @@ public class DBResultActivity extends ProgressThrobberActivity {
     private static final String API_LON1_PARAM = "longrange1";
     private static final String API_LON2_PARAM = "longrange2";
     private static final String API_BSSID_PARAM = "netid";
-    private static final String API_CELL_OP_PARAM = "cell_op"; //TODO
-    private static final String API_CELL_NET_PARAM = "cell_net"; //TODO
-    private static final String API_CELL_ID_PARAM = "cell_id"; //TODO
+    private static final String API_CELL_OP_PARAM = "cell_op";
+    private static final String API_CELL_NET_PARAM = "cell_net";
+    private static final String API_CELL_ID_PARAM = "cell_id";
     private static final String API_BT_NAME_PARAM = "name";
     private static final String API_BT_NAMELIKE_PARAM = "namelike";
     private static final String API_SSIDLIKE_PARAM = "ssidlike";
@@ -102,7 +101,6 @@ public class DBResultActivity extends ProgressThrobberActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         // set language
         MainActivity.setLocale( this );
         setContentView( R.layout.dbresult );
@@ -112,12 +110,10 @@ public class DBResultActivity extends ProgressThrobberActivity {
         setupList();
 
         QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
-        final TextView tv = findViewById( R.id.dbstatus );
         loadingImage = findViewById(R.id.search_throbber);
         errorImage = findViewById(R.id.search_error);
 
         if ( queryArgs != null ) {
-            tv.setText( getString(R.string.status_working));
             startAnimation();
 
             LatLng center = MappingFragment.DEFAULT_POINT;
@@ -133,9 +129,6 @@ public class DBResultActivity extends ProgressThrobberActivity {
             } else {
                 setupQuery(queryArgs);
             }
-        }
-        else {
-            tv.setText(getString(R.string.status_fail));
         }
     }
 
@@ -161,7 +154,6 @@ public class DBResultActivity extends ProgressThrobberActivity {
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
-
         final RelativeLayout rlView = findViewById( R.id.db_map_rl );
         rlView.addView( mapView );
     }
@@ -170,10 +162,36 @@ public class DBResultActivity extends ProgressThrobberActivity {
 
         final LatLngBounds bounds = queryArgs.getLocationBounds();
         String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
-        final String ssid = queryArgs.getSSID();
+        String ssid = queryArgs.getSSID();
         final String bssid = queryArgs.getBSSID();
         boolean limit = false;
         List<String> params = new ArrayList<>();
+        if (queryArgs.getType() != null && CELL.equals(queryArgs.getType())) {
+            boolean hasCellParams = false;
+            String cellSsid = "";
+            if (queryArgs.getCellOp() != null && !queryArgs.getCellOp().isEmpty()) {
+                cellSsid += queryArgs.getCellOp()+"_";
+                hasCellParams = true;
+            } else {
+                cellSsid += "%";
+            }
+            if (queryArgs.getCellNet() != null && !queryArgs.getCellNet().isEmpty()) {
+                cellSsid += queryArgs.getCellNet()+"_";
+                hasCellParams = true;
+            } else {
+                cellSsid += "%";
+            }
+            if (queryArgs.getCellId() != null && !queryArgs.getCellId().isEmpty()) {
+                cellSsid += queryArgs.getCellId();
+                hasCellParams = true;
+            } else {
+                cellSsid += "%";
+            }
+            if (hasCellParams) {
+                ssid = cellSsid;
+            }
+        }
+
         if ( ssid != null && ! "".equals(ssid) ) {
             sql += " AND ssid like ?"; // + DatabaseUtils.sqlEscapeString(ssid);
             params.add(ssid);
@@ -223,7 +241,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
                         params.add(WEP_CAP+"%");
                         break;
                     case NONE:
-                        sql += " AND capabilities IN ('[]','[ESS]', '')"; //TODO: verify this
+                        sql += " AND capabilities IN ('[]','[ESS]', '')"; //TODO: verify that these cases are complete
                         break;
                     default:
                         break;
@@ -320,8 +338,6 @@ public class DBResultActivity extends ProgressThrobberActivity {
 
     private void handleResults() {
         stopAnimation();
-        final TextView tv = findViewById(R.id.dbstatus);
-        tv.setText(getString(R.string.status_success));
         listAdapter.clear();
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
@@ -373,8 +389,6 @@ public class DBResultActivity extends ProgressThrobberActivity {
     }
 
     private void handleFailedRequest() {
-        final TextView tv = findViewById( R.id.dbstatus );
-        tv.setText( getString(R.string.search_empty)  );
         listAdapter.clear();
         WiGLEToast.showOverActivity(this, R.string.app_name,
                 getString(R.string.search_empty), Toast.LENGTH_LONG);
@@ -418,20 +432,23 @@ public class DBResultActivity extends ProgressThrobberActivity {
                         queryParams += API_BSSID_PARAM + "=" + (queryArgs.getBSSID());
                         break;
                     case CELL:
-                        //TODO: can't actually happen with input regex
-                        String parts[] = queryArgs.getBSSID().split("_");
-                        switch (parts.length) {
-                            case 0:
-                                break;
-                            case 1:
-                                queryParams += API_CELL_OP_PARAM + "=" + parts[0];
-                                break;
-                            case 2:
-                                queryParams += API_CELL_OP_PARAM + "=" + parts[0]+"&"+API_CELL_NET_PARAM + "=" + parts[1];
-                                break;
-                            case 3:
-                                queryParams += API_CELL_OP_PARAM + "=" + parts[0]+"&"+API_CELL_NET_PARAM + "=" + parts[1]+"&"+API_CELL_ID_PARAM + "=" + parts[2];
-                                break;
+                        boolean needSep = false;
+                        if (queryArgs.getCellOp() != null && queryArgs.getCellOp().length() > 0)   {
+                                queryParams += API_CELL_OP_PARAM + "=" + queryArgs.getCellOp();
+                                needSep = true;
+                        }
+                        if (queryArgs.getCellNet() != null && queryArgs.getCellNet().length() > 0)   {
+                            if (needSep) {
+                                queryParams += "&";
+                            }
+                            queryParams += API_CELL_NET_PARAM + "=" + queryArgs.getCellNet();
+                            needSep = true;
+                        }
+                        if (queryArgs.getCellId() != null && queryArgs.getCellId().length() > 0)   {
+                            if (needSep) {
+                                queryParams += "&";
+                            }
+                            queryParams += API_CELL_ID_PARAM + "=" + queryArgs.getCellId();
                         }
                         break;
                 }

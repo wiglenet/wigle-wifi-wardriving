@@ -17,9 +17,10 @@ public class QueryArgs {
     private LatLngBounds locationBounds;
     private String ssid;
     private String bssid;
-
+    private String cellOp;
+    private String cellNet;
+    private String cellId;
     private NetworkFilterType type;
-
     private WiFiSecurityType crypto;
 
     public void setSearchWiGLE(boolean searchWiGLE) {
@@ -68,6 +69,30 @@ public class QueryArgs {
         this.bssid = bssid;
     }
 
+    public String getCellOp() {
+        return cellOp;
+    }
+
+    public void setCellOp(String cellOp) {
+        this.cellOp = cellOp;
+    }
+
+    public String getCellNet() {
+        return cellNet;
+    }
+
+    public void setCellNet(String cellNet) {
+        this.cellNet = cellNet;
+    }
+
+    public String getCellId() {
+        return cellId;
+    }
+
+    public void setCellId(String cellId) {
+        this.cellId = cellId;
+    }
+
     public NetworkFilterType getType() {
         return type;
     }
@@ -94,6 +119,15 @@ public class QueryArgs {
         }
         if (null != bssid) {
             b.append(" bssid: ").append(bssid);
+        }
+        if (null != cellOp) {
+            b.append(" cell op: ").append(cellOp);
+        }
+        if (null != cellNet) {
+            b.append(" bssid: ").append(cellNet);
+        }
+        if (null != cellId) {
+            b.append(" cell ID: ").append(cellId);
         }
         if (null != type) {
             b.append(" type: ").append(type.toString());

@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -21,6 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -48,20 +51,22 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * The Search activity fragment - look up networks both locally on via the API on WiGLE.net
+ * @author bobzilla, arkasha
+ */
 public class SearchFragment extends Fragment {
 
     private static final int DEFAULT_ZOOM = 15;
     private AtomicBoolean finishing;
     private MapView mapView;
     private MapRender mapRender;
-
     private boolean mLocalSearch;
 
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         Logging.info("SEARCH: onCreate");
         super.onCreate(savedInstanceState);
-        //setHasOptionsMenu(true);
         // set language
         final Activity a = getActivity();
         if (null != a) {
@@ -117,9 +122,7 @@ public class SearchFragment extends Fragment {
         if (ListFragment.lameStatic.queryArgs != null) {
             for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid}) {
                 TextView tv = view.findViewById(id);
-                if (id == R.id.query_address && ListFragment.lameStatic.queryArgs.getAddress() != null) {
-                    tv.setText(ListFragment.lameStatic.queryArgs.getAddress().toString());
-                }
+                //ALIBI: excluding address since it's no longer directly used in this view
                 if (id == R.id.query_ssid && ListFragment.lameStatic.queryArgs.getSSID() != null) {
                     tv.setText(ListFragment.lameStatic.queryArgs.getSSID());
                 }
@@ -127,6 +130,7 @@ public class SearchFragment extends Fragment {
                     tv.setText(ListFragment.lameStatic.queryArgs.getBSSID());
                 }
             }
+            //ALIBI: not populating the spinners -> also not populating cell, since it can't begin selected.
         }
         final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
         final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
@@ -135,7 +139,7 @@ public class SearchFragment extends Fragment {
         networkTypeSpinner.setAdapter(adapter);
         networkTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View compontentView, int position, long id) {
                 if (position == 0 || position == 1) {
                     if (null != wifiEncryptionSpinner) {
                         wifiEncryptionSpinner.setClickable(true);
@@ -152,6 +156,20 @@ public class SearchFragment extends Fragment {
                         Logging.error("Unable to disable the security type spinner");
                     }
                 }
+                LinearLayout cell = view.findViewById(R.id.cell_netid_layout);
+                TextView macHint =  view.findViewById(R.id.query_bssid_layout);
+                EditText maskedMac = view.findViewById(R.id.query_bssid);
+                if (position == 3) {
+                    cell.setVisibility(VISIBLE);
+                    macHint.setVisibility(GONE);
+                    maskedMac.setVisibility(GONE);
+                    maskedMac.setText("");
+                } else {
+                    cell.setVisibility(GONE);
+                    macHint.setVisibility(VISIBLE);
+                    maskedMac.setVisibility(VISIBLE);
+                    SearchUtil.clearCellId(view);
+                }
             }
 
             @Override
@@ -159,6 +177,13 @@ public class SearchFragment extends Fragment {
                 if (null != wifiEncryptionSpinner) {
                     wifiEncryptionSpinner.setClickable(true);
                     wifiEncryptionSpinner.setEnabled(true);
+                    LinearLayout cell = view.findViewById(R.id.cell_netid_layout);
+                    TextView macHint =  view.findViewById(R.id.query_bssid_layout);
+                    EditText maskedMac = view.findViewById(R.id.query_bssid);
+                    cell.setVisibility(GONE);
+                    macHint.setVisibility(VISIBLE);
+                    maskedMac.setVisibility(VISIBLE);
+                    SearchUtil.clearCellId(view);
                 } else {
                     Logging.error("Unable to disable the security type spinner");
                 }
@@ -250,7 +275,7 @@ public class SearchFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View buttonView) {
-                SearchUtil.clearWiFiBtFields(view);
+                SearchUtil.clearSearchFields(view);
             }
         });
     }
@@ -321,7 +346,7 @@ public class SearchFragment extends Fragment {
                     if (null != address) {
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         mapView.getMapAsync(googleMap -> {
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
                         });
                     }
                 }

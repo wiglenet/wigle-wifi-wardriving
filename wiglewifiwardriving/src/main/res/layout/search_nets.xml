@@ -68,7 +68,7 @@
                 android:paddingStart="5dp"
                 android:paddingEnd="5dp"
                 android:textSize="14sp"
-                tools:text="@string/search_area"
+                android:text="@string/search_area"
                 />
             <TextView
                 android:id="@+id/search_lats"

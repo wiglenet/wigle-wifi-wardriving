@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import net.wigle.m8b.geodesy.mgrs;
 import net.wigle.m8b.geodesy.utm;
 import net.wigle.m8b.siphash.SipKey;
@@ -44,6 +47,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -71,6 +76,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 /**
  * configure settings
+ * @author bobzilla, arkasha
  */
 public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
@@ -149,14 +155,34 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         Logging.error("Unable to disable the security type spinner");
                     }
                 }
+                LinearLayout cell = view.findViewById(R.id.cell_netid_layout);
+                TextView macHint =  view.findViewById(R.id.query_bssid_layout);
+                EditText maskedMac = view.findViewById(R.id.query_bssid);
+                if (position == 3) {
+                    cell.setVisibility(VISIBLE);
+                    macHint.setVisibility(GONE);
+                    maskedMac.setVisibility(GONE);
+                    maskedMac.setText("");
+                } else {
+                    cell.setVisibility(GONE);
+                    macHint.setVisibility(VISIBLE);
+                    maskedMac.setVisibility(VISIBLE);
+                    SearchUtil.clearCellId(view);
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 if (null != wifiEncryptionSpinner) {
                     wifiEncryptionSpinner.setClickable(true);
-                    wifiEncryptionSpinner.setEnabled(true); //TODO: not working
-                    Logging.info("TODO: need to clear wifi security in query");
+                    wifiEncryptionSpinner.setEnabled(true);
+                    LinearLayout cell = view.findViewById(R.id.cell_netid_layout);
+                    TextView macHint =  view.findViewById(R.id.query_bssid_layout);
+                    EditText maskedMac = view.findViewById(R.id.query_bssid);
+                    cell.setVisibility(GONE);
+                    macHint.setVisibility(VISIBLE);
+                    maskedMac.setVisibility(VISIBLE);
+                    SearchUtil.clearCellId(view);
                 } else {
                     Logging.error("Unable to disable the security type spinner");
                 }
@@ -197,7 +223,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     });
 
     button = view.findViewById( R.id.reset_button );
-    button.setOnClickListener(buttonView -> SearchUtil.clearWiFiBtFields(view));
+    button.setOnClickListener(buttonView -> SearchUtil.clearSearchFields(view));
 
     }
 

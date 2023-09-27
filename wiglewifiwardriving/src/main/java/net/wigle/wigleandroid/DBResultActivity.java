@@ -162,33 +162,36 @@ public class DBResultActivity extends ProgressThrobberActivity {
 
         final LatLngBounds bounds = queryArgs.getLocationBounds();
         String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
-        String ssid = queryArgs.getSSID();
-        final String bssid = queryArgs.getBSSID();
+        final String ssid = queryArgs.getSSID();
+        String bssid = queryArgs.getBSSID();
         boolean limit = false;
         List<String> params = new ArrayList<>();
-        if (queryArgs.getType() != null && CELL.equals(queryArgs.getType())) {
+        if ((queryArgs.getType() != null) && CELL.equals(queryArgs.getType())) {
             boolean hasCellParams = false;
-            String cellSsid = "";
+            String cellId = "";
             if (queryArgs.getCellOp() != null && !queryArgs.getCellOp().isEmpty()) {
-                cellSsid += queryArgs.getCellOp()+"_";
+                cellId += queryArgs.getCellOp()+"_";
+                Logging.error(cellId);
                 hasCellParams = true;
             } else {
-                cellSsid += "%";
+                cellId += "%";
             }
             if (queryArgs.getCellNet() != null && !queryArgs.getCellNet().isEmpty()) {
-                cellSsid += queryArgs.getCellNet()+"_";
+                cellId += queryArgs.getCellNet()+"_";
+                Logging.error(cellId);
                 hasCellParams = true;
             } else {
-                cellSsid += "%";
+                cellId += "%";
             }
             if (queryArgs.getCellId() != null && !queryArgs.getCellId().isEmpty()) {
-                cellSsid += queryArgs.getCellId();
+                cellId += queryArgs.getCellId();
+                Logging.error(cellId);
                 hasCellParams = true;
             } else {
-                cellSsid += "%";
+                cellId += "%";
             }
             if (hasCellParams) {
-                ssid = cellSsid;
+                bssid = cellId;
             }
         }
 
@@ -259,7 +262,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
             sql += " LIMIT ?"; // + LIMIT;
             params.add(LIMIT+"");
         }
-
+        //DEBUG: Logging.error(sql);
         final TreeMap<Float,String> top = new TreeMap<>();
         final float[] results = new float[1];
         final long[] count = new long[1];
@@ -431,29 +434,35 @@ public class DBResultActivity extends ProgressThrobberActivity {
                     case BT:
                         queryParams += API_BSSID_PARAM + "=" + (queryArgs.getBSSID());
                         break;
-                    case CELL:
-                        boolean needSep = false;
-                        if (queryArgs.getCellOp() != null && queryArgs.getCellOp().length() > 0)   {
-                                queryParams += API_CELL_OP_PARAM + "=" + queryArgs.getCellOp();
-                                needSep = true;
-                        }
-                        if (queryArgs.getCellNet() != null && queryArgs.getCellNet().length() > 0)   {
-                            if (needSep) {
-                                queryParams += "&";
-                            }
-                            queryParams += API_CELL_NET_PARAM + "=" + queryArgs.getCellNet();
-                            needSep = true;
-                        }
-                        if (queryArgs.getCellId() != null && queryArgs.getCellId().length() > 0)   {
-                            if (needSep) {
-                                queryParams += "&";
-                            }
-                            queryParams += API_CELL_ID_PARAM + "=" + queryArgs.getCellId();
-                        }
+                    default:
                         break;
                 }
             } else {
                 queryParams += API_BSSID_PARAM + "=" + (queryArgs.getBSSID());
+            }
+        }
+
+        if (CELL.equals(queryArgs.getType())) {
+            if (!queryParams.isEmpty()) {
+                queryParams+="&";
+            }
+            boolean needSep = false;
+            if ((queryArgs.getCellOp() != null) && !queryArgs.getCellOp().isEmpty()) {
+                queryParams += API_CELL_OP_PARAM + "=" + queryArgs.getCellOp();
+                needSep = true;
+            }
+            if ((queryArgs.getCellNet() != null) && !queryArgs.getCellNet().isEmpty()) {
+                if (needSep) {
+                    queryParams += "&";
+                }
+                queryParams += API_CELL_NET_PARAM + "=" + queryArgs.getCellNet();
+                needSep = true;
+            }
+            if ((queryArgs.getCellId() != null) && !queryArgs.getCellId().isEmpty()) {
+                if (needSep) {
+                    queryParams += "&";
+                }
+                queryParams += API_CELL_ID_PARAM + "=" + queryArgs.getCellId();
             }
         }
 
@@ -480,6 +489,8 @@ public class DBResultActivity extends ProgressThrobberActivity {
         }
 
         final MainActivity.State s = MainActivity.getStaticState();
+        //DEBUG: Logging.error(queryParams);
+
         if (null != s) {
             if (null == queryArgs.getType() /*ALIBI: default to WiFi, but shouldn't happen*/ || WIFI.equals(queryArgs.getType())) {
                 s.apiManager.searchWiFi(queryParams, new AuthenticatedRequestCompletedListener<WiFiSearchResponse, JSONObject>() {

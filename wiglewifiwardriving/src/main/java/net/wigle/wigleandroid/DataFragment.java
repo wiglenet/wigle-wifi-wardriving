@@ -137,7 +137,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         networkTypeSpinner.setAdapter(adapter);
         networkTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View compontentView, int position, long id) {
                 if (position == 0 || position == 1) {
                     if (null != wifiEncryptionSpinner) {
                         wifiEncryptionSpinner.setClickable(true);

@@ -53,8 +53,29 @@ public class SearchUtil {
     public static String setupQuery(final View view, final Context context, final boolean local) {
         final QueryArgs queryArgs = new QueryArgs();
         String fail = null;
-        String fieldedField = null;
+        String errorField = null;
         boolean okValue = false;
+
+        try {
+            final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
+            final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
+
+            errorField = context.getString(R.string.network_type);
+            if (null != networkTypeSpinner) {
+                queryArgs.setType((NetworkFilterType) networkTypeSpinner.getSelectedItem());
+                //okValue = true; //ALIBI: these still result in runaway searches on their own
+                errorField = context.getString(R.string.crypto_security);
+                if (null != wifiEncryptionSpinner && (NetworkFilterType.ALL.equals(networkTypeSpinner.getSelectedItem()) || NetworkFilterType.WIFI.equals(networkTypeSpinner.getSelectedItem()))) {
+                    queryArgs.setCrypto((WiFiSecurityType) wifiEncryptionSpinner.getSelectedItem());
+                } else {
+                    queryArgs.setCrypto(null);
+                }
+            }
+
+        } catch (Exception e) {
+            Logging.error("Problem with type/encryption selection: ",e);
+        }
+        final boolean isCellSearch = (null != queryArgs.getType()) && NetworkFilterType.CELL.equals(queryArgs.getType());
 
         for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid, R.id.query_cell_op, R.id.query_cell_net, R.id.query_cell_id }) {
             if (fail != null) {
@@ -87,7 +108,7 @@ public class SearchUtil {
                 switch (id) { //TODO: need to fix switch/case before Gradle 8
                     case R.id.query_address:
                         //NB: only applies in Database view now
-                        fieldedField = context.getString(R.string.address);
+                        errorField = context.getString(R.string.address);
                         Geocoder gc = new Geocoder(context);
                         List<Address> addresses = gc.getFromLocationName(text, 1);
                         if (addresses.size() < 1) {
@@ -98,36 +119,36 @@ public class SearchUtil {
                         okValue = true;
                         break;
                     case R.id.query_ssid:
-                        fieldedField = context.getString(R.string.ssid);
+                        errorField = context.getString(R.string.ssid);
                         //TODO: validation of SSID
                         queryArgs.setSSID(text);
                         okValue = true;
                         break;
                     case R.id.query_cell_op:
-                        if (queryArgs.getType() != null && NetworkFilterType.CELL.equals(queryArgs.getType())) {
+                        if (isCellSearch) {
                             queryArgs.setCellOp(text);
                             //TODO: validation
                             okValue = true;
                             break;
                         }
                     case R.id.query_cell_net:
-                        if (queryArgs.getType() != null && NetworkFilterType.CELL.equals(queryArgs.getType())) {
+                        if (isCellSearch) {
                             queryArgs.setCellNet(text);
                             //TODO: validation
                             okValue = true;
                             break;
                         }
                     case R.id.query_cell_id:
-                        if (queryArgs.getType() != null && NetworkFilterType.CELL.equals(queryArgs.getType())) {
+                        if (isCellSearch) {
                             queryArgs.setCellId(text);
                             //TODO: validation
                             okValue = true;
                             break;
                         }
                     case R.id.query_bssid:
-                        fieldedField = context.getString(R.string.bssid);
+                        errorField = context.getString(R.string.bssid);
                         //ALIBI: bssid text only applies for BT/WiFi
-                        if (queryArgs.getType() != null && !NetworkFilterType.CELL.equals(queryArgs.getType())) {
+                        if (!isCellSearch) {
                             queryArgs.setBSSID(text);
                             if (local) {
                                 if (text.length() > 17 || (text.length() < 17 && !text.contains("%"))) {
@@ -167,36 +188,20 @@ public class SearchUtil {
                         Logging.error("setupQuery: bad id: " + id);
                 }
             } catch (Exception ex) {
-                fail = context.getString(R.string.problem_with_field) + " '" + fieldedField + "': " + ex.getMessage(); //TODO: not language aware 1/2 - replace w/ templated message
+                fail = context.getString(R.string.problem_with_field) + " '" + errorField + "': " + ex.getMessage(); //TODO: not language aware 1/2 - replace w/ templated message
                 break;
             }
         }
 
         try {
-            final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
-            final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
-
-            fieldedField = context.getString(R.string.network_type);
-            if (null != networkTypeSpinner) {
-                queryArgs.setType((NetworkFilterType) networkTypeSpinner.getSelectedItem());
-                okValue = true; //ALIBI: just filtering to type is a sufficient filter, I guess?
-                fieldedField = context.getString(R.string.crypto_security);
-                if (null != wifiEncryptionSpinner && (NetworkFilterType.ALL.equals(networkTypeSpinner.getSelectedItem()) || NetworkFilterType.WIFI.equals(networkTypeSpinner.getSelectedItem()))) {
-                    queryArgs.setCrypto((WiFiSecurityType) wifiEncryptionSpinner.getSelectedItem());
-                } else {
-                    queryArgs.setCrypto(null);
-                }
-            }
-
             if (fail == null && !okValue) {
                 fail = "No query fields specified";
             }
-
             if (null == fail) {
                 ListFragment.lameStatic.queryArgs = queryArgs;
             }
         } catch (Exception e) {
-            fail = context.getString(R.string.problem_with_field) + " '" + fieldedField + "': " + e.getMessage(); //TODO: not language aware 2/2 - replace w/ templated message
+            fail = context.getString(R.string.problem_with_field) + " '" + errorField + "': " + e.getMessage(); //TODO: not language aware 2/2 - replace w/ templated message
         }
         return fail;
     }

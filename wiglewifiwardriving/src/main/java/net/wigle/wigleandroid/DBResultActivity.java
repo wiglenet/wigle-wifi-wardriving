@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +106,7 @@ public class DBResultActivity extends AppCompatActivity {
             }
         }
         else {
-            tv.setText(getString(R.string.status_fail) + "...");
+            tv.setText(getString(R.string.status_fail));
         }
     }
 
@@ -214,14 +215,22 @@ public class DBResultActivity extends AppCompatActivity {
                     if (resultList.size() > 0) {
                         handler.post(() -> {
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            boolean hasValidPoints = false;
                             for (Network n : resultList) {
                                 listAdapter.add(n);
                                 mapRender.addItem(n);
                                 final LatLng ll = n.getPosition();
                                 //noinspection ConstantConditions
-                                if (ll != null) builder.include(ll);
+                                if (ll != null) {
+                                    builder.include(ll);
+                                    hasValidPoints = true;
+                                }
                             }
-                            mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+                            if (hasValidPoints) {
+                                mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+                            } else {
+                                handler.post(() -> handleFailedRequest());
+                            }
                             resultList.clear();
                         });
                     }
@@ -240,14 +249,16 @@ public class DBResultActivity extends AppCompatActivity {
         listAdapter.clear();
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        for (WiFiSearchResponse.WiFiNetwork net : searchResponse.getResults()) {
-            if (null != net) {
-                final Network n = WiFiSearchResponse.asNetwork(net);
-                listAdapter.add(n);
-                builder.include(n.getPosition());
+        if (null != searchResponse && null != searchResponse.getResults()) {
+            for (WiFiSearchResponse.WiFiNetwork net :searchResponse.getResults()) {
+                if (null != net) {
+                    final Network n = WiFiSearchResponse.asNetwork(net);
+                    listAdapter.add(n);
+                    builder.include(n.getPosition());
 
-                if (n.getLatLng() != null && mapRender != null) {
-                    mapRender.addItem(n);
+                    if (n.getLatLng() != null && mapRender != null) {
+                        mapRender.addItem(n);
+                    }
                 }
             }
         }
@@ -274,10 +285,14 @@ public class DBResultActivity extends AppCompatActivity {
         String queryParams = "";
         if (queryArgs.getSSID() != null && !queryArgs.getSSID().isEmpty()) {
 
-            if (queryArgs.getSSID().contains("%") || queryArgs.getSSID().contains("_")) {
-                queryParams+=API_SSIDLIKE_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
-            } else {
-                queryParams+=API_SSID_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
+            try {
+                if (queryArgs.getSSID().contains("%") || queryArgs.getSSID().contains("_")) {
+                        queryParams+=API_SSIDLIKE_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()), java.nio.charset.StandardCharsets.UTF_8.toString() );
+                } else {
+                    queryParams+=API_SSID_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()), java.nio.charset.StandardCharsets.UTF_8.toString());
+                }
+            } catch (UnsupportedEncodingException e) {
+                Logging.error("parameter encoding error for SSID: ", e);
             }
         }
 

@@ -95,6 +95,7 @@
     <string name="network_channel">Kanal:</string>
     <string name="network_observations">Gözlemler:</string>
     <string name="network_querying">(sorgulama&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Parolayı Göster</string>
     <string name="setting_db_marker">DB Marker (yükleme nerede başlıyor):</string>
     <string name="setting_high_up">En çok yüklenen:</string>

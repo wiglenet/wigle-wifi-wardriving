@@ -451,6 +451,7 @@ public class WifiReceiver extends BroadcastReceiver {
         int anqpOICount = 0;
         long[] roamingConsortiums = null;
         String concatenatedRcois = null;
+        String rcoiString = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (ie.getId() != EID_ROAMING_CONSORTIUM) {
@@ -482,20 +483,38 @@ public class WifiReceiver extends BroadcastReceiver {
             if (oi1Length > 0 && roamingConsortiums.length > 0) {
                 roamingConsortiums[0] =
                         getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
-                concatenatedRcois =  Long.toHexString(getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0)).toUpperCase();
+                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
+                if (rcoiInteger < 16777216) {
+                    rcoiString = String.format("%1$06X",rcoiInteger);
+                }
+                else {
+                    rcoiString = String.format("%1$010X",rcoiInteger);
+                }
+                concatenatedRcois =  rcoiString;
             }
             if (oi2Length > 0 && roamingConsortiums.length > 1) {
                 roamingConsortiums[1] =
                         getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
-                concatenatedRcois += " " + Long.toHexString(getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length)).toUpperCase();
-
+                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
+                if (rcoiInteger < 16777216) {
+                    rcoiString = String.format("%1$06X",rcoiInteger);
+                }
+                else {
+                    rcoiString = String.format("%1$010X",rcoiInteger);
+                }
+                concatenatedRcois += " " + rcoiString;
             }
             if (oi3Length > 0 && roamingConsortiums.length > 2) {
                 roamingConsortiums[2] =
                         getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
-                concatenatedRcois += " " + Long.toHexString(getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi1Length+oi2Length)).toUpperCase();
-            }
-
+                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
+                if (rcoiInteger < 16777216) {
+                    rcoiString = String.format("%1$06X",rcoiInteger);
+                }
+                else {
+                    rcoiString = String.format("%1$010X",rcoiInteger);
+                }
+                concatenatedRcois += " " + rcoiString;            }
         }
 // OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
         return concatenatedRcois;

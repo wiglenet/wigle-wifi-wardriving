@@ -494,7 +494,7 @@ public class WiGLEApiManager {
     }
 
     /**
-     * Search the WiGLE WiFi database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * Search the WiGLE Cell database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
      * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
      * @param completedListener the RequestCompletedListener instance to call on completion
      */
@@ -510,7 +510,7 @@ public class WiGLEApiManager {
                 .url(httpUrl)
                 .build();
         if (authedClient == null) {
-            Logging.warn("searchWifi authedClient is null, returning");
+            Logging.warn("searchCell authedClient is null, returning");
             return;
         }
         authedClient.newCall(request).enqueue(new Callback() {
@@ -548,7 +548,7 @@ public class WiGLEApiManager {
     }
 
     /**
-     * Search the WiGLE WiFi database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * Search the WiGLE BT database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
      * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
      * @param completedListener the RequestCompletedListener instance to call on completion
      */
@@ -563,7 +563,7 @@ public class WiGLEApiManager {
                 .url(httpUrl)
                 .build();
         if (authedClient == null) {
-            Logging.warn("searchWifi authedClient is null, returning");
+            Logging.warn("searchBt authedClient is null, returning");
             return;
         }
         authedClient.newCall(request).enqueue(new Callback() {

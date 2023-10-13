@@ -171,21 +171,18 @@ public class DBResultActivity extends ProgressThrobberActivity {
             String cellId = "";
             if (queryArgs.getCellOp() != null && !queryArgs.getCellOp().isEmpty()) {
                 cellId += queryArgs.getCellOp()+"_";
-                Logging.error(cellId);
                 hasCellParams = true;
             } else {
                 cellId += "%";
             }
             if (queryArgs.getCellNet() != null && !queryArgs.getCellNet().isEmpty()) {
                 cellId += queryArgs.getCellNet()+"_";
-                Logging.error(cellId);
                 hasCellParams = true;
             } else {
                 cellId += "%";
             }
             if (queryArgs.getCellId() != null && !queryArgs.getCellId().isEmpty()) {
                 cellId += queryArgs.getCellId();
-                Logging.error(cellId);
                 hasCellParams = true;
             } else {
                 cellId += "%";
@@ -237,7 +234,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
                         break;
                     case WPA:
                         sql += " AND capabilities LIKE ?";
-                        params.add(WPA_CAP+" %");
+                        params.add(WPA_CAP+"%");
                         break;
                     case WEP:
                         sql += " AND capabilities LIKE ?";

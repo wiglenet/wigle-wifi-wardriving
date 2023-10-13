@@ -137,16 +137,16 @@ task createMccMncDB (dependsOn: 'downloadFile') {
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 task downloadBtMemberFile (type: Download) {
-    println "downloading BT Member YAML data"
+    println "downloading BT Member UUID YAML data"
     download {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
         dest outputBtMemberUuidFile
         overwrite true
     }
+    println "downloading BT Company ID YAML data"
     download {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
         dest outputBtCoIdUuidFile
         overwrite true
     }
-
 }

@@ -460,10 +460,7 @@ public class WifiReceiver extends BroadcastReceiver {
     //
 
     public static String getConcatenatedRcois (ScanResult.InformationElement ie) {
-        int anqpOICount = 0;
-        long[] roamingConsortiums = null;
         String concatenatedRcois = null;
-        String rcoiString = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (ie.getId() != EID_ROAMING_CONSORTIUM) {
@@ -476,60 +473,34 @@ public class WifiReceiver extends BroadcastReceiver {
             // ElementID (1 Octet), Length (1 Octet), Number of OIs (1 Octet), OI #1 and #2 Lengths (1 Octet), OI#1 (variable), OI#2 (variable), OI#3 (variable)
             // where 1 octet "OI #1 and #2 Length" comprises: OI#1 Length [B0-B3], OI#2 Length [B4-B7]
             ByteBuffer data = ie.getBytes().order(ByteOrder.LITTLE_ENDIAN);
-            anqpOICount = data.get() & BYTE_MASK;
+            data.get(); // anqpOICount
             int oi12Length = data.get() & BYTE_MASK;
             int oi1Length = oi12Length & NIBBLE_MASK;
             int oi2Length = (oi12Length >>> 4) & NIBBLE_MASK;
             int oi3Length = ie.getBytes().limit() - 2 - oi1Length - oi2Length;
-            int oiCount = 0;
+
             if (oi1Length > 0) {
-                oiCount++;
-                if (oi2Length > 0) {
-                    oiCount++;
-                    if (oi3Length > 0) {
-                        oiCount++;
-                    }
-                }
+                final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
+                concatenatedRcois = formatRcoi(rcoiInteger);
             }
-            roamingConsortiums = new long[oiCount];
-            if (oi1Length > 0 && roamingConsortiums.length > 0) {
-                roamingConsortiums[0] =
-                        getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
-                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
-                if (rcoiInteger < 16777216) {
-                    rcoiString = String.format("%1$06X",rcoiInteger);
-                }
-                else {
-                    rcoiString = String.format("%1$010X",rcoiInteger);
-                }
-                concatenatedRcois =  rcoiString;
+            if (oi2Length > 0) {
+                final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
+                concatenatedRcois += " " + formatRcoi(rcoiInteger);
             }
-            if (oi2Length > 0 && roamingConsortiums.length > 1) {
-                roamingConsortiums[1] =
-                        getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
-                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
-                if (rcoiInteger < 16777216) {
-                    rcoiString = String.format("%1$06X",rcoiInteger);
-                }
-                else {
-                    rcoiString = String.format("%1$010X",rcoiInteger);
-                }
-                concatenatedRcois += " " + rcoiString;
+            if (oi3Length > 0) {
+                final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
+                concatenatedRcois += " " + formatRcoi(rcoiInteger);
             }
-            if (oi3Length > 0 && roamingConsortiums.length > 2) {
-                roamingConsortiums[2] =
-                        getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
-                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
-                if (rcoiInteger < 16777216) {
-                    rcoiString = String.format("%1$06X",rcoiInteger);
-                }
-                else {
-                    rcoiString = String.format("%1$010X",rcoiInteger);
-                }
-                concatenatedRcois += " " + rcoiString;            }
         }
-// OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
+        // OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
         return concatenatedRcois;
+    }
+
+    private static String formatRcoi(final long rcoi) {
+        if (rcoi < 16777216) {
+            return String.format("%1$06X", rcoi);
+        }
+        return String.format("%1$010X", rcoi);
     }
 
     public static long getInteger(ByteBuffer payload, ByteOrder bo, int size, int position) {

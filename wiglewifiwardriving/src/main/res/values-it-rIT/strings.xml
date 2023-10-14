@@ -95,6 +95,7 @@
     <string name="network_channel">Canale:</string>
     <string name="network_observations">Osservazioni:</string>
     <string name="network_querying">(ricerca&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Mostra Password</string>
     <string name="setting_db_marker">Segnalibro del database (da cui inizia il caricamento):</string>
     <string name="setting_high_up">Più alto ID caricato:</string>

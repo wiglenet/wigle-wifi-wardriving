@@ -95,6 +95,7 @@
     <string name="network_channel">Kanal:</string>
     <string name="network_observations">Bemerkungen:</string>
     <string name="network_querying">(frage ab&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Passwort anzeigen</string>
     <string name="setting_db_marker">DB Marker (Uploads ab …):</string>
     <string name="setting_high_up">Hochgeladen bis ID:</string>

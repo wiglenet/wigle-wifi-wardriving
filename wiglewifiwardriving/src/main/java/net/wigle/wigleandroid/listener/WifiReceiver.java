@@ -232,6 +232,18 @@ public class WifiReceiver extends BroadcastReceiver {
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
                     network = new Network( result );
+
+                    // Roaming Consortium Organizational Identifiers
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        String rcois = null;
+                        for ( ScanResult.InformationElement info : result.getInformationElements()) {
+                            if (info.getId() == net.wigle.wigleandroid.listener.WifiReceiver.EID_ROAMING_CONSORTIUM) {
+                                rcois = net.wigle.wigleandroid.listener.WifiReceiver.getConcatenatedRcois(info);
+                            }
+                        }
+                        network.setRcois(rcois);
+                    }
+
                     networkCache.put( network.getBssid(), network );
                 }
                 else {
@@ -459,7 +471,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         + ie.getId());
             }
             // RCOI length handling from https://android.googlesource.com/platform/frameworks/opt/net/wifi/+/6f5af9b7f69b15369238bd2642c46638ba1f0255/service/java/com/android/server/wifi/util/InformationElementUtil.java#206
-            
+
             // Roaming Consortium (OI) element format defined in IEEE 802.11 clause 9.4.2.95
             // ElementID (1 Octet), Length (1 Octet), Number of OIs (1 Octet), OI #1 and #2 Lengths (1 Octet), OI#1 (variable), OI#2 (variable), OI#3 (variable)
             // where 1 octet "OI #1 and #2 Length" comprises: OI#1 Length [B0-B3], OI#2 Length [B4-B7]

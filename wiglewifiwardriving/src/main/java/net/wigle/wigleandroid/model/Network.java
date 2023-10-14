@@ -122,16 +122,6 @@ public final class Network implements ClusterItem {
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
                 scanResult.level,  NetworkType.WIFI, null, null, null);
-
-        String rcois = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            for ( ScanResult.InformationElement info : scanResult.getInformationElements()) {
-                if (info.getId() == net.wigle.wigleandroid.listener.WifiReceiver.EID_ROAMING_CONSORTIUM) {
-                    rcois = net.wigle.wigleandroid.listener.WifiReceiver.getConcatenatedRcois(info);
-                }
-            }
-        }
-        this.concatenatedRcois = rcois;
     }
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type) {
@@ -140,29 +130,25 @@ public final class Network implements ClusterItem {
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId,  null);
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null);
     }
 
+    // for WiFiSearchResponse
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-        final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null);
+                    final int level, final NetworkType type, final LatLng latLng ) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng);
     }
 
-    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null);
-    }
-
-    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-        final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng, final String concatenatedRcois ) {
+    private Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId,
+                    final LatLng latLng ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        this.bleMfgrId = bleMfgrId;
-        this.concatenatedRcois = concatenatedRcois;
+        if (bleMfgrId != null) this.bleMfgrId = bleMfgrId;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
         } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
@@ -272,6 +258,15 @@ public final class Network implements ClusterItem {
 
     public String getRcois() {
         return concatenatedRcois;
+    }
+
+    public String getRcoisOrBlank() {
+        final String result = concatenatedRcois;
+        return result == null ? "" : result;
+    }
+
+    public void setRcois(final String concatenatedRcois) {
+        this.concatenatedRcois = concatenatedRcois;
     }
 
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
@@ -410,8 +405,18 @@ public final class Network implements ClusterItem {
         return bleServiceUuids;
     }
 
+    public String getBleServiceUuidsAsString() {
+        final List<String> current = bleServiceUuids;
+        return current == null ? "" : String.join(" ",current);
+    }
+
     public Integer getBleMfgrId() {
         return bleMfgrId;
+    }
+
+    public int getBleMfgrIdAsInt() {
+        final Integer current = bleMfgrId;
+        return current == null ? 0 : current;
     }
 
     public String getBleMfgr() {

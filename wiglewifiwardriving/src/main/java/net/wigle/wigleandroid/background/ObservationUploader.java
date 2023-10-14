@@ -44,6 +44,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -64,7 +65,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private final boolean writeEntireDb;
     private final boolean writeRun;
 
-    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type";
+    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,Frequency,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,RCOIs,MfgrId,Type";
 
     private static class CountStats {
         int byteCount;
@@ -377,7 +378,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
 
         // name, version, header
-        final String header = "WigleWifi-1.4"
+        final String header = "WigleWifi-1.6"
                 + ",appRelease=" + pi.versionName
                 + ",model=" + android.os.Build.MODEL
                 + ",release=" + android.os.Build.VERSION.RELEASE
@@ -385,6 +386,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 + ",display=" + android.os.Build.DISPLAY
                 + ",board=" + android.os.Build.BOARD
                 + ",brand=" + android.os.Build.BRAND
+                + ",star=Sol" // assuming for now
+                + ",body=3"
+                + ",subBody=0"
                 + NEWLINE
                 + CSV_COLUMN_HEADERS
                 + NEWLINE;
@@ -452,11 +456,15 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     date.setTime( cursor.getLong(7) );
                     FileAccess.singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
                     charBuffer.append( COMMA );
-                    Integer channel = network.getChannel();
-                    if ( channel == null ) {
-                        channel = network.getFrequency();
+                    final Integer channel = network.getChannel();
+                    if ( channel != null ) {
+                        FileAccess.singleCopyNumberFormat(numberFormat, stringBuffer, charBuffer, fp, channel);
                     }
-                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
+                    charBuffer.append( COMMA );
+                    final int frequency = network.getFrequency();
+                    if ( frequency != 0 ) {
+                        FileAccess.singleCopyNumberFormat(numberFormat, stringBuffer, charBuffer, fp, frequency);
+                    }
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
                     charBuffer.append( COMMA );
@@ -467,6 +475,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
+                    charBuffer.append( COMMA );
+                    charBuffer.append(network.getRcoisOrBlank());
+                    charBuffer.append( COMMA );
+                    final int mfgrid = cursor.getInt(8);
+                    if (mfgrid != 0) {
+                        FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, mfgrid );
+                    }
                     charBuffer.append( COMMA );
                     charBuffer.append( network.getType().name() );
                     charBuffer.append( NEWLINE );

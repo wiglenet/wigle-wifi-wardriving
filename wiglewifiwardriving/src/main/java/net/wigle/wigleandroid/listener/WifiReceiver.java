@@ -504,17 +504,19 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     public static long getInteger(ByteBuffer payload, ByteOrder bo, int size, int position) {
-        byte[] octets = new byte[size];
         payload.position(position + 2);
-        payload.get(octets);
         long value = 0;
         if (bo == ByteOrder.LITTLE_ENDIAN) {
+            final byte[] octets = new byte[size];
+            payload.get(octets);
+
             for (int n = octets.length - 1; n >= 0; n--) {
                 value = (value << Byte.SIZE) | (octets[n] & BYTE_MASK);
             }
         }
         else {
-            for (byte octet : octets) {
+            for (int i = 0; i < size; i++) {
+                final byte octet = payload.get();
                 value = (value << Byte.SIZE) | (octet & BYTE_MASK);
             }
         }

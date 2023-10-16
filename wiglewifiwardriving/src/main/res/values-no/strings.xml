@@ -95,6 +95,7 @@
     <string name="network_channel">Channel:</string>
     <string name="network_observations">Observasjoner:</string>
     <string name="network_querying">(Querying&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Vis passord</string>
     <string name="setting_db_marker">DB Marker (hvor opplastninger start fra):</string>
     <string name="setting_high_up">Høyeste lastet id:</string>

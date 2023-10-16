@@ -95,6 +95,7 @@
     <string name="network_channel">Kanaal:</string>
     <string name="network_observations">Oantal kearen sjoen:</string>
     <string name="network_querying">(query uitvoeren&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Wachtwurd weergeven</string>
     <string name="setting_db_marker">DB Marker (de upload start by):</string>
     <string name="setting_high_up">Heechste upload ID:</string>

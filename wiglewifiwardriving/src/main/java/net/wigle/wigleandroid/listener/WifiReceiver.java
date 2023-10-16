@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.listener;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -11,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.lang.String;
 
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -62,6 +65,8 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Primary receiver logic for WiFi and Cell nets.
@@ -431,6 +436,108 @@ public class WifiReceiver extends BroadcastReceiver {
             doAnnouncement( preQueueSize, newWifiCount, newCellCount, ListFragment.lameStatic.newBt, now );
         }
     }
+
+    public static final int NIBBLE_MASK = 0x0f;
+    public static final int BYTE_MASK = 0xff;
+
+    public static final int EID_ROAMING_CONSORTIUM = 111;
+
+    // get any Roaming Consortium Organizational identifiers from beacon and concatenate
+    // @param ScanResult.InformationElement
+    // @return a string of concatenated RCOIS with " " delimiter
+    //
+
+    public static String getConcatenatedRcois (ScanResult.InformationElement ie) {
+        int anqpOICount = 0;
+        long[] roamingConsortiums = null;
+        String concatenatedRcois = null;
+        String rcoiString = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (ie.getId() != EID_ROAMING_CONSORTIUM) {
+                throw new IllegalArgumentException("Element id is not ROAMING_CONSORTIUM, : "
+                        + ie.getId());
+            }
+            // RCOI length handling from https://android.googlesource.com/platform/frameworks/opt/net/wifi/+/6f5af9b7f69b15369238bd2642c46638ba1f0255/service/java/com/android/server/wifi/util/InformationElementUtil.java#206
+            
+            // Roaming Consortium (OI) element format defined in IEEE 802.11 clause 9.4.2.95
+            // ElementID (1 Octet), Length (1 Octet), Number of OIs (1 Octet), OI #1 and #2 Lengths (1 Octet), OI#1 (variable), OI#2 (variable), OI#3 (variable)
+            // where 1 octet "OI #1 and #2 Length" comprises: OI#1 Length [B0-B3], OI#2 Length [B4-B7]
+            ByteBuffer data = ie.getBytes().order(ByteOrder.LITTLE_ENDIAN);
+            anqpOICount = data.get() & BYTE_MASK;
+            int oi12Length = data.get() & BYTE_MASK;
+            int oi1Length = oi12Length & NIBBLE_MASK;
+            int oi2Length = (oi12Length >>> 4) & NIBBLE_MASK;
+            int oi3Length = ie.getBytes().limit() - 2 - oi1Length - oi2Length;
+            int oiCount = 0;
+            if (oi1Length > 0) {
+                oiCount++;
+                if (oi2Length > 0) {
+                    oiCount++;
+                    if (oi3Length > 0) {
+                        oiCount++;
+                    }
+                }
+            }
+            roamingConsortiums = new long[oiCount];
+            if (oi1Length > 0 && roamingConsortiums.length > 0) {
+                roamingConsortiums[0] =
+                        getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
+                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
+                if (rcoiInteger < 16777216) {
+                    rcoiString = String.format("%1$06X",rcoiInteger);
+                }
+                else {
+                    rcoiString = String.format("%1$010X",rcoiInteger);
+                }
+                concatenatedRcois =  rcoiString;
+            }
+            if (oi2Length > 0 && roamingConsortiums.length > 1) {
+                roamingConsortiums[1] =
+                        getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
+                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
+                if (rcoiInteger < 16777216) {
+                    rcoiString = String.format("%1$06X",rcoiInteger);
+                }
+                else {
+                    rcoiString = String.format("%1$010X",rcoiInteger);
+                }
+                concatenatedRcois += " " + rcoiString;
+            }
+            if (oi3Length > 0 && roamingConsortiums.length > 2) {
+                roamingConsortiums[2] =
+                        getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
+                long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
+                if (rcoiInteger < 16777216) {
+                    rcoiString = String.format("%1$06X",rcoiInteger);
+                }
+                else {
+                    rcoiString = String.format("%1$010X",rcoiInteger);
+                }
+                concatenatedRcois += " " + rcoiString;            }
+        }
+// OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
+        return concatenatedRcois;
+    }
+
+    public static long getInteger(ByteBuffer payload, ByteOrder bo, int size, int position) {
+        byte[] octets = new byte[size];
+        payload.position(position + 2);
+        payload.get(octets);
+        long value = 0;
+        if (bo == ByteOrder.LITTLE_ENDIAN) {
+            for (int n = octets.length - 1; n >= 0; n--) {
+                value = (value << Byte.SIZE) | (octets[n] & BYTE_MASK);
+            }
+        }
+        else {
+            for (byte octet : octets) {
+                value = (value << Byte.SIZE) | (octet & BYTE_MASK);
+            }
+        }
+        return value;
+    }
+
 
     /**
      * trigger for cell collection and logging

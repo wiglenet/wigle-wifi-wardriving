@@ -95,6 +95,7 @@
     <string name="network_channel">Канал:</string>
     <string name="network_observations">Наблюдения:</string>
     <string name="network_querying">(осуществляется запрос&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Показывать пароль</string>
     <string name="setting_db_marker">Настройки ID маркера в БД (там, где начинаются добавления):</string>
     <string name="setting_high_up">Текущий ID в БД:</string>

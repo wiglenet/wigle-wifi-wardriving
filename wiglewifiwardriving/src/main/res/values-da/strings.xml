@@ -95,6 +95,7 @@
     <string name="network_channel">Kanal:</string>
     <string name="network_observations">Observationer:</string>
     <string name="network_querying">(Forspøger)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Vis adgangskode</string>
     <string name="setting_db_marker">DB Marker (hvor uploads starter fra):</string>
     <string name="setting_high_up">Højeste uploadet id:</string>

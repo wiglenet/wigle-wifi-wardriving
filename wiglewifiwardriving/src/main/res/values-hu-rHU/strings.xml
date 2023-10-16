@@ -95,6 +95,7 @@
     <string name="network_channel">Csatorna:</string>
     <string name="network_observations">Megfigyelések:</string>
     <string name="network_querying">(lekérés&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Jelszó megjelenítése</string>
     <string name="setting_db_marker">Adatbázis-jelölő (ahol a feltöltés kezdődik):</string>
     <string name="setting_high_up">Legmagasabb feltöltésazonosító:</string>

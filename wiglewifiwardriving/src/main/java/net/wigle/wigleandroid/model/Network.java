@@ -8,6 +8,7 @@ import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
 import android.os.ParcelUuid;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +17,7 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.listener.WifiReceiver;
 
 /**
  * network data. not thread-safe.
@@ -110,17 +112,30 @@ public final class Network implements ClusterItem {
     public enum NetworkBand {
         WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED
     }
+
+    private String concatenatedRcois;
+
     /**
      * convenience constructor
      * @param scanResult a result from a wifi scan
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null, null);
+                scanResult.level,  NetworkType.WIFI, null, null, null);
+
+        String rcois = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            for ( ScanResult.InformationElement info : scanResult.getInformationElements()) {
+                if (info.getId() == net.wigle.wigleandroid.listener.WifiReceiver.EID_ROAMING_CONSORTIUM) {
+                    rcois = net.wigle.wigleandroid.listener.WifiReceiver.getConcatenatedRcois(info);
+                }
+            }
+        }
+        this.concatenatedRcois = rcois;
     }
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
@@ -130,11 +145,16 @@ public final class Network implements ClusterItem {
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
         final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-        final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng ) {
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null);
+    }
+
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+        final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng, final String concatenatedRcois ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
@@ -142,6 +162,7 @@ public final class Network implements ClusterItem {
         this.level = level;
         this.type = type;
         this.bleMfgrId = bleMfgrId;
+        this.concatenatedRcois = concatenatedRcois;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
         } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
@@ -247,6 +268,10 @@ public final class Network implements ClusterItem {
     }
     public void setCapabilities( final String capabilities ) {
         this.capabilities = capabilities;
+    }
+
+    public String getRcois() {
+        return concatenatedRcois;
     }
 
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.

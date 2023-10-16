@@ -205,6 +205,32 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/passpoint_row"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/channel_row"
+                android:orientation="horizontal"
+                android:paddingHorizontal="1dp"
+                android:paddingBottom="2dp">
+                <TextView
+                    android:id="@+id/na_rcoi_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/na_rcoi"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp"
+                    android:text="@string/network_rcois"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/na_rcois"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/na_rcoi_label"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:id="@+id/cell_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

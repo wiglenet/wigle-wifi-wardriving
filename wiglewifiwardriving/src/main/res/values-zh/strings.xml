@@ -95,6 +95,7 @@
     <string name="network_channel">信道：</string>
     <string name="network_observations">观察：</string>
     <string name="network_querying">（querying&#8230;）</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">显示密码</string>
     <string name="setting_db_marker">数据库标记（开始上传从）：</string>
     <string name="setting_high_up">最高上传ID：</string>

@@ -194,6 +194,15 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             tv = findViewById( R.id.na_cap );
             tv.setText( network.getCapabilities().replace("][", "]  [") );
 
+            tv = findViewById( R.id.na_rcois );
+            if (network.getRcois() != null) {
+                tv.setText( network.getRcois() );
+            }
+            else {
+                TextView row = findViewById(R.id.na_rcoi_label);
+                row.setVisibility(View.INVISIBLE);
+            }
+
             if ( NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
                     final String operatorCode = bssid.substring(0, bssid.indexOf("_"));

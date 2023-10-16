@@ -130,6 +130,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             //ALIBI: keeping old-school address layout in the database tab for consistency's sake. Do we need this?
             addressLayout.setVisibility(View.VISIBLE);
         }
+        //ALIBI: query bounds are always null (at least until addr. input) since this view has no map
+        ListFragment.lameStatic.queryArgs.setLocationBounds(null);
         final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
         final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
 
@@ -141,7 +143,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 if (position == 0 || position == 1) {
                     if (null != wifiEncryptionSpinner) {
                         wifiEncryptionSpinner.setClickable(true);
-                        wifiEncryptionSpinner.setEnabled(true); //TODO: not working
+                        wifiEncryptionSpinner.setEnabled(true);
                     } else {
                         Logging.error("Unable to disable the security type spinner");
                     }
@@ -149,7 +151,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     if (null != wifiEncryptionSpinner) {
                         wifiEncryptionSpinner.setSelection(0);
                         wifiEncryptionSpinner.setClickable(false);
-                        wifiEncryptionSpinner.setEnabled(false); //TODO: not working
+                        wifiEncryptionSpinner.setEnabled(false);
                         Logging.info("TODO: need to clear wifi security in query");
                     } else {
                         Logging.error("Unable to disable the security type spinner");

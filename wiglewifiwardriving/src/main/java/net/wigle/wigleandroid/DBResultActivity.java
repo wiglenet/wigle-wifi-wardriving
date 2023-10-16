@@ -93,6 +93,8 @@ public class DBResultActivity extends ProgressThrobberActivity {
     private BtSearchResponse btSearchResponse;
     private CellSearchResponse cellSearchResponse;
 
+    private boolean queryFailed;
+
     @Override
     public void onCreate( final Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -223,18 +225,18 @@ public class DBResultActivity extends ProgressThrobberActivity {
                 switch (queryArgs.getCrypto()) {
                     case WPA3:
                         sql += " AND (capabilities LIKE ? OR capabilities LIKE ? OR capabilities LIKE ?)";
-                        params.add(WPA3_CAP+"%");
+                        params.add("%"+WPA3_CAP+"%");
                         params.add("%"+SUITE_B_192_CAP+"%");
                         params.add("%"+SAE_CAP+"%");
                         break;
                     case WPA2:
                         sql += " AND (capabilities LIKE ? OR capabilities LIKE ?)";
-                        params.add(WPA2_CAP+"%");
-                        params.add(RSN_CAP+"%");
+                        params.add("%"+WPA2_CAP+"%");
+                        params.add("%"+RSN_CAP+"%");
                         break;
                     case WPA:
                         sql += " AND capabilities LIKE ?";
-                        params.add(WPA_CAP+"%");
+                        params.add("%"+WPA_CAP+"-%");
                         break;
                     case WEP:
                         sql += " AND capabilities LIKE ?";
@@ -322,13 +324,13 @@ public class DBResultActivity extends ProgressThrobberActivity {
                             if (hasValidPoints) {
                                 mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
                             } else {
-                                handler.post(() -> handleFailedRequest());
+                                handler.post(() -> handleEmptyResult());
                             }
                             resultList.clear();
                         });
                     }
                 } else {
-                    handler.post(() -> handleFailedRequest());
+                    handler.post(() -> handleEmptyResult());
                 }
             }
         }, ListFragment.lameStatic.dbHelper);
@@ -386,6 +388,13 @@ public class DBResultActivity extends ProgressThrobberActivity {
             }
         }
         resultList.clear();
+    }
+
+    private void handleEmptyResult() {
+        listAdapter.clear();
+        WiGLEToast.showOverActivity(this, R.string.app_name,
+                getString(R.string.search_empty), Toast.LENGTH_LONG);
+        stopAnimation();
     }
 
     private void handleFailedRequest() {
@@ -489,6 +498,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
         //DEBUG: Logging.error(queryParams);
 
         if (null != s) {
+            queryFailed = false;
             if (null == queryArgs.getType() /*ALIBI: default to WiFi, but shouldn't happen*/ || WIFI.equals(queryArgs.getType())) {
                 s.apiManager.searchWiFi(queryParams, new AuthenticatedRequestCompletedListener<WiFiSearchResponse, JSONObject>() {
                     @Override
@@ -505,7 +515,11 @@ public class DBResultActivity extends ProgressThrobberActivity {
                         if (null != searchResponse) {
                             handleResults();
                         } else {
-                            handleFailedRequest();
+                            if (queryFailed) {
+                                handleFailedRequest();
+                            } else {
+                                handleEmptyResult();
+                            }
                         }
                     }
 
@@ -517,6 +531,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
                     @Override
                     public void onTaskFailed(int status, JSONObject error) {
                         searchResponse = null;
+                        queryFailed = true;
                     }
                 });
             } else if (BT.equals(queryArgs.getType())) {
@@ -535,7 +550,11 @@ public class DBResultActivity extends ProgressThrobberActivity {
                         if (null != btSearchResponse) {
                             handleResults();
                         } else {
-                            handleFailedRequest();
+                            if (queryFailed) {
+                                handleFailedRequest();
+                            } else {
+                                handleEmptyResult();
+                            }
                         }
                     }
 
@@ -547,6 +566,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
                     @Override
                     public void onTaskFailed(int status, JSONObject error) {
                         btSearchResponse = null;
+                        queryFailed = true;
                     }
                 });
             } else if (CELL.equals(queryArgs.getType())) { //TODO: failing
@@ -565,7 +585,11 @@ public class DBResultActivity extends ProgressThrobberActivity {
                         if (null != cellSearchResponse) {
                             handleResults();
                         } else {
-                            handleFailedRequest();
+                            if (queryFailed) {
+                                handleFailedRequest();
+                            } else {
+                                handleEmptyResult();
+                            }
                         }
                     }
 
@@ -577,6 +601,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
                     @Override
                     public void onTaskFailed(int status, JSONObject error) {
                         cellSearchResponse = null;
+                        queryFailed = true;
                     }
                 });
             } else {

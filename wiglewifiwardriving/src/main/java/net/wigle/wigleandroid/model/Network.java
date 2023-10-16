@@ -68,7 +68,7 @@ public final class Network implements ClusterItem {
     //TODO: how we do distinguish between RSN-EAP-CCMP WPA2 and WPA3 implementations?
     public static final String WPA2_CAP = "[WPA2";
     public static final String RSN_CAP = "[RSN";
-    public static final String WPA_CAP = "[WPA";
+    public static final String WPA_CAP = "[WPA-";
     public static final String WEP_CAP = "[WEP";
 
     // faster than enums

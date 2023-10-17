@@ -3,13 +3,12 @@ package net.wigle.wigleandroid;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
@@ -23,7 +22,7 @@ import java.util.List;
  * Created by arkasha on 8/1/17.
  */
 
-public class MapFilterActivity extends AppCompatActivity {
+public class MapFilterActivity extends ScreenChildActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -60,7 +60,7 @@ public class DashboardFragment extends Fragment {
     finishing = new AtomicBoolean( false );
     final Configuration conf = getResources().getConfiguration();
     Locale locale = null;
-    if (null != conf && null != conf.getLocales()) {
+    if (null != conf) {
         locale = conf.getLocales().get(0);
     }
     if (null == locale) {

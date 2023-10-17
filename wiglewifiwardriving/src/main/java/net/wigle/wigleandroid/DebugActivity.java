@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 
 /**
  * display latest logs.
@@ -16,7 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
  * @author bobzilla
  *
  */
-public class DebugActivity extends AppCompatActivity {
+public class DebugActivity extends ScreenChildActivity {
     private static final int MENU_EXIT = 11;
     private static final int MENU_EMAIL = 12;
 

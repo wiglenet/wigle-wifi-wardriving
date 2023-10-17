@@ -2542,4 +2542,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return state.btMfgrIds.get(i);
     }
 
+    public boolean hasWakeLock() {
+        if (null != state) {
+            return state.screenLocked;
+        }
+        return false;
+    }
 }

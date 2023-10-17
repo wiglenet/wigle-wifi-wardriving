@@ -3,7 +3,6 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keepScreenOn="true"
     android:weightSum="2">
     
     <LinearLayout
@@ -11,7 +10,6 @@
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:layout_width="0dp"
-        android:keepScreenOn="true"
         android:paddingRight="10dp">
         <include layout="@layout/dashtop"/>
     </LinearLayout>
@@ -19,8 +17,7 @@
         android:orientation="horizontal"
         android:layout_weight="1"
         android:layout_height="fill_parent"
-        android:layout_width="0dp"
-        android:keepScreenOn="true" >
+        android:layout_width="0dp">
         <include layout="@layout/dashbottom"/>
     </LinearLayout>
 </LinearLayout>

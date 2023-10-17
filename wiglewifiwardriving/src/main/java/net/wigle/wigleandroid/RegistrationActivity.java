@@ -3,20 +3,20 @@ package net.wigle.wigleandroid;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import net.wigle.wigleandroid.background.WiGLERegistrationInterface;
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.UrlConfig;
 
 /**
  * Created by arkasha on 1/8/18.
  */
 
-public class RegistrationActivity extends AppCompatActivity {
+public class RegistrationActivity extends ScreenChildActivity {
 
     public static final String AGENT = "WiGLE WiFi Registrant";
 

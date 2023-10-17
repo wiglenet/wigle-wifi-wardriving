@@ -3,12 +3,12 @@ package net.wigle.wigleandroid;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -22,12 +22,11 @@ import br.com.sapereaude.maskedEditText.MaskedEditText;
  * Created by arkasha on 8/31/17.
  */
 
-public class MacFilterActivity extends AppCompatActivity {
+public class MacFilterActivity extends ScreenChildActivity {
 
     private String filterKey;
     List<String> listItems=new ArrayList<>();
     AddressFilterAdapter filtersAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

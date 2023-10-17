@@ -27,7 +27,6 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -60,12 +59,13 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
 @SuppressWarnings("deprecation")
-public class NetworkActivity extends AppCompatActivity implements DialogListener {
+public class NetworkActivity extends ScreenChildActivity implements DialogListener {
     private static final int MENU_RETURN = 11;
     private static final int MENU_COPY = 12;
     private static final int NON_CRYPTO_DIALOG = 130;
@@ -101,13 +101,11 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         }
 
         // set language
-        MainActivity.setLocale(this);
         numberFormat = NumberFormat.getNumberInstance(MainActivity.getLocale(this, this.getResources().getConfiguration()));
         if (numberFormat instanceof DecimalFormat) {
             numberFormat.setMinimumFractionDigits(0);
             numberFormat.setMaximumFractionDigits(2);
         }
-
         MainActivity.setLocale( this );
         setContentView(R.layout.network);
         networkActivity = this;

@@ -5,19 +5,19 @@ import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import java.util.Objects;
 
-public class SpeechActivity extends AppCompatActivity {
+public class SpeechActivity extends ScreenChildActivity {
     private static final int MENU_RETURN = 12;
 
     // used for shutting extraneous activities down on an error

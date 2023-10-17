@@ -8,7 +8,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +23,7 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.PolylineRoute;
 import net.wigle.wigleandroid.ui.GpxRecyclerAdapter;
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
@@ -40,7 +40,7 @@ import java.util.Locale;
 import static android.view.View.GONE;
 import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 
-public class GpxManagementActivity extends AppCompatActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
+public class GpxManagementActivity extends ScreenChildActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
 
     private final NumberFormat numberFormat;
     private final int DEFAULT_MAP_PADDING = 25;

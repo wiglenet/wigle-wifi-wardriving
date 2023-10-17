@@ -1,10 +1,8 @@
 package net.wigle.wigleandroid.ui;
 
-import android.app.Activity;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import net.wigle.wigleandroid.R;
@@ -13,7 +11,7 @@ import net.wigle.wigleandroid.util.Logging;
 /**
  * Loading "throbber" image parent class for network-based fragments.
  */
-public abstract class ProgressThrobberActivity extends AppCompatActivity {
+public abstract class ProgressThrobberActivity extends ScreenChildActivity {
     protected ImageView loadingImage;
     protected ImageView errorImage;
     protected boolean animating = false;

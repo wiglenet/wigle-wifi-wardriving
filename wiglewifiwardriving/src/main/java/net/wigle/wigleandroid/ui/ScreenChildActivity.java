@@ -18,7 +18,7 @@ public class ScreenChildActivity extends AppCompatActivity {
         final MainActivity ma = MainActivity.getMainActivity();
         if (null != ma) {
             if (ma.hasWakeLock()) {
-                //NB: chances to the parent activity state won't be reflected here.
+                //NB: changes to the parent activity state won't be reflected here.
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }

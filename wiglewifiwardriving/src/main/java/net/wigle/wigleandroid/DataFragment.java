@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import net.wigle.m8b.geodesy.mgrs;
 import net.wigle.m8b.geodesy.utm;
 import net.wigle.m8b.siphash.SipKey;
@@ -11,7 +14,10 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
+import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.model.Pair;
+import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
+import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
@@ -39,7 +45,11 @@ import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -62,8 +72,11 @@ import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_FILE_PREFIX;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 /**
  * configure settings
+ * @author bobzilla, arkasha
  */
 public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
@@ -99,6 +112,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.data, container, false);
+        setupQueryInputs( view );
         setupQueryButtons( view );
         setupCsvButtons( view );
         setupKmlButtons(view);
@@ -110,25 +124,108 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         return view;
     }
 
-    private void setupQueryButtons( final View view ) {
-        Button button = view.findViewById( R.id.search_button );
-        button.setOnClickListener(buttonView -> {
+    private void setupQueryInputs( final View view ) {
+        final TextInputLayout addressLayout = view.findViewById(R.id.query_address_layout);
+        if (null != addressLayout) {
+            //ALIBI: keeping old-school address layout in the database tab for consistency's sake. Do we need this?
+            addressLayout.setVisibility(View.VISIBLE);
+        }
+        //ALIBI: query bounds are always null (at least until addr. input) since this view has no map
+        ListFragment.lameStatic.queryArgs.setLocationBounds(null);
+        final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
+        final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
 
-            final String fail = SearchUtil.setupQuery(view, getActivity(), true);
-            if (null != ListFragment.lameStatic.queryArgs) {
-                ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
+        NetworkTypeArrayAdapter adapter = new NetworkTypeArrayAdapter(getContext());
+        networkTypeSpinner.setAdapter(adapter);
+        networkTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View compontentView, int position, long id) {
+                if (position == 0 || position == 1) {
+                    if (null != wifiEncryptionSpinner) {
+                        wifiEncryptionSpinner.setClickable(true);
+                        wifiEncryptionSpinner.setEnabled(true);
+                    } else {
+                        Logging.error("Unable to disable the security type spinner");
+                    }
+                } else {
+                    if (null != wifiEncryptionSpinner) {
+                        wifiEncryptionSpinner.setSelection(0);
+                        wifiEncryptionSpinner.setClickable(false);
+                        wifiEncryptionSpinner.setEnabled(false);
+                        Logging.info("TODO: need to clear wifi security in query");
+                    } else {
+                        Logging.error("Unable to disable the security type spinner");
+                    }
+                }
+                LinearLayout cell = view.findViewById(R.id.cell_netid_layout);
+                TextView macHint =  view.findViewById(R.id.query_bssid_layout);
+                EditText maskedMac = view.findViewById(R.id.query_bssid);
+                if (position == 3) {
+                    cell.setVisibility(VISIBLE);
+                    macHint.setVisibility(GONE);
+                    maskedMac.setVisibility(GONE);
+                    maskedMac.setText("");
+                } else {
+                    cell.setVisibility(GONE);
+                    macHint.setVisibility(VISIBLE);
+                    maskedMac.setVisibility(VISIBLE);
+                    SearchUtil.clearCellId(view);
+                }
             }
-            if (fail != null) {
-                WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
-            } else {
-                // start db result activity
-                final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
-                startActivity(settingsIntent);
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                if (null != wifiEncryptionSpinner) {
+                    wifiEncryptionSpinner.setClickable(true);
+                    wifiEncryptionSpinner.setEnabled(true);
+                    LinearLayout cell = view.findViewById(R.id.cell_netid_layout);
+                    TextView macHint =  view.findViewById(R.id.query_bssid_layout);
+                    EditText maskedMac = view.findViewById(R.id.query_bssid);
+                    cell.setVisibility(GONE);
+                    macHint.setVisibility(VISIBLE);
+                    maskedMac.setVisibility(VISIBLE);
+                    SearchUtil.clearCellId(view);
+                } else {
+                    Logging.error("Unable to disable the security type spinner");
+                }
             }
         });
 
-        button = view.findViewById( R.id.reset_button );
-        button.setOnClickListener(buttonView -> SearchUtil.clearWiFiBtFields(view));
+        if (null != ListFragment.lameStatic.queryArgs && ListFragment.lameStatic.queryArgs.getType() != null) {
+            networkTypeSpinner.setSelection(ListFragment.lameStatic.queryArgs.getType().ordinal());
+        }
+        WiFiSecurityTypeArrayAdapter securityAdapter = new WiFiSecurityTypeArrayAdapter(getContext());
+        wifiEncryptionSpinner.setAdapter(securityAdapter);
+        if (null != ListFragment.lameStatic.queryArgs &&
+                ListFragment.lameStatic.queryArgs.getCrypto() != null) {
+            if (ListFragment.lameStatic.queryArgs.getType() != null &&
+                    (NetworkFilterType.ALL.equals(ListFragment.lameStatic.queryArgs.getType()) ||
+                            NetworkFilterType.WIFI.equals(ListFragment.lameStatic.queryArgs.getType()))) {
+                wifiEncryptionSpinner.setSelection(ListFragment.lameStatic.queryArgs.getCrypto().ordinal());
+            }
+        }
+
+    }
+
+    private void setupQueryButtons( final View view ) {
+        Button button = view.findViewById( R.id.perform_search_button);
+        button.setOnClickListener(buttonView -> {
+
+        final String fail = SearchUtil.setupQuery(view, getActivity(), true);
+        if (null != ListFragment.lameStatic.queryArgs) {
+            ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
+        }
+        if (fail != null) {
+            WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
+        } else {
+            // start db result activity
+            final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
+            startActivity(settingsIntent);
+        }
+    });
+
+    button = view.findViewById( R.id.reset_button );
+    button.setOnClickListener(buttonView -> SearchUtil.clearSearchFields(view));
 
     }
 

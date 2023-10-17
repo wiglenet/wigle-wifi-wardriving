@@ -450,4 +450,5 @@
     <string name="speech_new_bt">Uusi bluetooth DB:lle</string>
     <string name="tts_new_bt">Uusi bluetooth</string>
     <string name="gnss_full">Käytä täydellistä GNSS-seurantaa (suuri akun tyhjennys)</string>
+    <string name="search_area">Hakualue:</string>
 </resources>

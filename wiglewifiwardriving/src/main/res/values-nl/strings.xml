@@ -450,4 +450,5 @@
     <string name="speech_new_bt">Nieuwe Bluetooth naar DB</string>
     <string name="tts_new_bt">Nieuwe Bluetooth</string>
     <string name="gnss_full">Gebruik GNSS volledige tracking (groot batterijverbruik)</string>
+    <string name="search_area">Zoekgebied:</string>
 </resources>

@@ -450,4 +450,5 @@
     <string name="speech_new_bt">Bluetooth nou la DB</string>
     <string name="tts_new_bt">Bluetooth nou</string>
     <string name="gnss_full">Utilizați urmărirea completă GNSS (descarcare mare a bateriei)</string>
+    <string name="search_area">Zona de căutare:</string>
 </resources>

@@ -113,7 +113,7 @@
         <item name="android:background">#AA000000</item>
     </style>
     <style name="NetworkViewOverlay">
-        <item name="android:background">#AA000000</item>
+        <item name="android:background">#AA353535</item>
     </style>
     <style name="NetDetailSsid">
         <item name="android:textSize">24sp</item>

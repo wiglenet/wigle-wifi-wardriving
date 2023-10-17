@@ -450,4 +450,5 @@
     <string name="speech_new_bt">新的蓝牙连接数据库</string>
     <string name="tts_new_bt">新蓝牙</string>
     <string name="gnss_full">使用 GNSS 全程跟踪（电池消耗大）</string>
+    <string name="search_area">搜尋區域：</string>
 </resources>

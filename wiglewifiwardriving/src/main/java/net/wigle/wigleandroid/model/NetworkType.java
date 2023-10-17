@@ -12,7 +12,7 @@ public enum NetworkType {
     NR("N"),
     BT("B"),
     BLE("E"),
-    NFC("N");
+    NFC("F");
 
     private static final Map<String,NetworkType> types = new HashMap<>();
 

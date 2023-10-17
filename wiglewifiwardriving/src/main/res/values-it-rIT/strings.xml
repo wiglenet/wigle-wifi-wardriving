@@ -450,4 +450,5 @@
     <string name="speech_new_bt">Nuovo Bluetooth su DB</string>
     <string name="tts_new_bt">Nuovo Bluetooth</string>
     <string name="gnss_full">Utilizza il rilevamento completo GNSS (grande consumo della batteria)</string>
+    <string name="search_area">Area di ricerca:</string>
 </resources>

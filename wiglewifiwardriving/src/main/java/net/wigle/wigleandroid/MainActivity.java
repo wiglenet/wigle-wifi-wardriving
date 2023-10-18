@@ -29,6 +29,7 @@ import android.media.MediaPlayer;
 import android.net.TrafficStats;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -327,6 +328,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         }
 
+        @SuppressLint("HardwareIds")
         final String id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // DO NOT turn these into |=, they will cause older dalvik verifiers to freak out
@@ -500,43 +502,41 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void setupPermissions() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            final List<String> permissionsNeeded = new ArrayList<>();
-            final List<String> permissionsList = new ArrayList<>();
-            if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                permissionsNeeded.add(mainActivity.getString(R.string.gps_permission));
+        final List<String> permissionsNeeded = new ArrayList<>();
+        final List<String> permissionsList = new ArrayList<>();
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permissionsNeeded.add(mainActivity.getString(R.string.gps_permission));
+        }
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
+        }
+        addPermission(permissionsList, Manifest.permission.BLUETOOTH);
+        addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+        addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
+        addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
+        addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
+        if (!permissionsList.isEmpty()) {
+            // The permission is NOT already granted.
+            // Check if the user has been asked about this permission already and denied
+            // it. If so, we want to give more explanation about why the permission is needed.
+            // 20170324 rksh: disabled due to
+            // https://stackoverflow.com/questions/35453759/android-screen-overlay-detected-message-if-user-is-trying-to-grant-a-permissio
+            /*String message = mainActivity.getString(R.string.please_allow);
+            for (int i = 0; i < permissionsNeeded.size(); i++) {
+                if (i > 0) message += ", ";
+                message += permissionsNeeded.get(i);
             }
-            if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
-            }
-            addPermission(permissionsList, Manifest.permission.BLUETOOTH);
-            addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
-            addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
-            addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
-            addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
-            if (!permissionsList.isEmpty()) {
-                // The permission is NOT already granted.
-                // Check if the user has been asked about this permission already and denied
-                // it. If so, we want to give more explanation about why the permission is needed.
-                // 20170324 rksh: disabled due to
-                // https://stackoverflow.com/questions/35453759/android-screen-overlay-detected-message-if-user-is-trying-to-grant-a-permissio
-                /*String message = mainActivity.getString(R.string.please_allow);
-                for (int i = 0; i < permissionsNeeded.size(); i++) {
-                    if (i > 0) message += ", ";
-                    message += permissionsNeeded.get(i);
-                }
 
-                if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    message = mainActivity.getString(R.string.allow_storage);
-                } */
+            if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                message = mainActivity.getString(R.string.allow_storage);
+            } */
 
-                Logging.info("no permission for " + permissionsNeeded);
+            Logging.info("no permission for " + permissionsNeeded);
 
-                // Fire off an async request to actually get the permission
-                // This will show the standard permission request dialog UI
-                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
-                        PERMISSIONS_REQUEST);
-            }
+            // Fire off an async request to actually get the permission
+            // This will show the standard permission request dialog UI
+            requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                    PERMISSIONS_REQUEST);
         }
     }
 
@@ -1704,41 +1704,43 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     // dynamically detect BTLE feature - prevents occasional NPEs
                     boolean hasLeSupport = getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
                     if (hasLeSupport) {
-                        //initialize the two global maps.
-                        try (BufferedReader reader = new BufferedReader(
-                                new InputStreamReader((getAssets().open("btmember.yaml"))))) {
-                            Constructor constructor = new Constructor(new LoaderOptions());
-                            Yaml yaml = new Yaml(constructor);
-                            final HashMap<String,Object> data = yaml.load(reader);
-                            final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
-                            state.btVendors = new HashMap<>();
-                            if (null != entries) {
-                                for (LinkedHashMap<String, Object> entry : entries) {
-                                    state.btVendors.put((Integer) entry.get("uuid"), (String) entry.get("name"));
+                        //initialize the two global maps for BT mfgr/service UUID lookups
+                        AsyncTask.execute(() -> {
+                            try (BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader((getAssets().open("btmember.yaml"))))) {
+                                Constructor constructor = new Constructor(new LoaderOptions());
+                                Yaml yaml = new Yaml(constructor);
+                                final HashMap<String, Object> data = yaml.load(reader);
+                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
+                                state.btVendors = new HashMap<>();
+                                if (null != entries) {
+                                    for (LinkedHashMap<String, Object> entry : entries) {
+                                        state.btVendors.put((Integer) entry.get("uuid"), (String) entry.get("name"));
+                                    }
+                                    Logging.info("BLE members initialized: " + entries.size() + " entries");
                                 }
-                                Logging.info("BLE members initialized: "+entries.size()+" entries");
+                            } catch (IOException e) {
+                                Logging.error("Failed to load BLE member yaml:", e);
                             }
-                        } catch (IOException e) {
-                            Logging.error("Failed to load BLE member yaml:",e);
-                        }
-
-                        try (BufferedReader reader = new BufferedReader(
-                                new InputStreamReader((getAssets().open("btco.yaml"))))) {
-                            Constructor constructor = new Constructor(new LoaderOptions());
-                            Yaml yaml = new Yaml(constructor);
-                            final HashMap<String, Object> data = yaml.load(reader);
-                            final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("company_identifiers");
-                            state.btMfgrIds = new HashMap<>();
-                            if (null != entries) {
-                                for (LinkedHashMap<String, Object> entry : entries) {
-                                    state.btMfgrIds.put((Integer) entry.get("value"), (String) entry.get("name"));
+                            try (BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader((getAssets().open("btco.yaml"))))) {
+                                Constructor constructor = new Constructor(new LoaderOptions());
+                                Yaml yaml = new Yaml(constructor);
+                                final HashMap<String, Object> data = yaml.load(reader);
+                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("company_identifiers");
+                                state.btMfgrIds = new HashMap<>();
+                                if (null != entries) {
+                                    for (LinkedHashMap<String, Object> entry : entries) {
+                                        state.btMfgrIds.put((Integer) entry.get("value"), (String) entry.get("name"));
+                                    }
+                                    Logging.info("BLE mfgrs initialized: "+entries.size()+" entries");
                                 }
-                                Logging.info("BLE mfgrs initialized: "+entries.size()+" entries");
+                            } catch (IOException e) {
+                                Logging.error("Failed to load BLE mfgr yaml: ",e);
                             }
-                        } catch (IOException e) {
-                            Logging.error("Failed to load BLE mfgr yaml: ",e);
-                        }
+                        });
                     }
+
                     // bluetooth scan listener
                     // this receiver is the main workhorse of bluetooth scanning
                     state.bluetoothReceiver = new BluetoothReceiver(state.dbHelper,
@@ -2214,7 +2216,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
         return mDrawerToggle.onOptionsItemSelected(item);

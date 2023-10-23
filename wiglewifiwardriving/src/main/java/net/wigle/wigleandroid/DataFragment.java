@@ -131,7 +131,9 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             addressLayout.setVisibility(View.VISIBLE);
         }
         //ALIBI: query bounds are always null (at least until addr. input) since this view has no map
-        ListFragment.lameStatic.queryArgs.setLocationBounds(null);
+        if (null != ListFragment.lameStatic && null != ListFragment.lameStatic.queryArgs) {
+            ListFragment.lameStatic.queryArgs.setLocationBounds(null);
+        }
         final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
         final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
 

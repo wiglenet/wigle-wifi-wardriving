@@ -37,7 +37,10 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
-    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_1";
+
+    // NOTIFICATION_CHANNEL_ID must be updated for any channel change to take effect on an
+    // existing device.
+    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_9";
 
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
@@ -351,6 +354,7 @@ public final class WigleService extends Service {
 
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     title, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setSound(null, null); // turns off notification sound
             channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
 
@@ -419,6 +423,7 @@ public final class WigleService extends Service {
 
         final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                 title, NotificationManager.IMPORTANCE_HIGH);
+        channel.setSound(null, null); // turns off notification sound
         channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(channel);
 

@@ -351,7 +351,6 @@ public final class WigleService extends Service {
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager == null) return null;
-
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     title, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setSound(null, null); // turns off notification sound
@@ -422,7 +421,7 @@ public final class WigleService extends Service {
         if (notificationManager == null) return null;
 
         final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                title, NotificationManager.IMPORTANCE_HIGH);
+                title, NotificationManager.IMPORTANCE_DEFAULT);
         channel.setSound(null, null); // turns off notification sound
         channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(channel);

@@ -25,6 +25,10 @@ import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.UrlConfig;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.DuplicateHeaderMode;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,8 +46,10 @@ import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -60,15 +66,30 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private static final String COMMA = ",";
     private static final String NEWLINE = "\n";
 
+    private static final String ENCODING = "UTF-8";
+
+    private static final CSVFormat CSV_FORMAT;
+
     private final boolean justWriteFile;
     private final boolean writeEntireDb;
     private final boolean writeRun;
 
-    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type";
+    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,Frequency,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,RCOIs,MfgrId,Type";
 
     private static class CountStats {
         int byteCount;
         int lineCount;
+    }
+
+    static {
+        // Use the default (RFC4180) settings, except no carriage return on line end
+        final CSVFormat.Builder builder = CSVFormat.Builder.create();
+        builder.setDelimiter(',');
+        builder.setQuote('"');
+        builder.setRecordSeparator("\n"); // only change from default, not "\r\n"
+        builder.setIgnoreEmptyLines(true);
+        builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL);
+        CSV_FORMAT = builder.build();
     }
 
     public ObservationUploader(final FragmentActivity context,
@@ -376,27 +397,37 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final PackageManager pm = context.getPackageManager();
         final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
 
-        // name, version, header
-        final String header = "WigleWifi-1.4"
-                + ",appRelease=" + pi.versionName
-                + ",model=" + android.os.Build.MODEL
-                + ",release=" + android.os.Build.VERSION.RELEASE
-                + ",device=" + android.os.Build.DEVICE
-                + ",display=" + android.os.Build.DISPLAY
-                + ",board=" + android.os.Build.BOARD
-                + ",brand=" + android.os.Build.BRAND
-                + NEWLINE
-                + CSV_COLUMN_HEADERS
-                + NEWLINE;
-        FileAccess.writeFos( fos, header );
+        // print header
+        final StringBuffer headerBuffer = new StringBuffer();
+        //noinspection resource
+        final CSVPrinter headerPrinter = new CSVPrinter(headerBuffer, CSV_FORMAT);
+        headerPrinter.printRecord(
+                "WigleWifi-1.6",
+                "appRelease=" + pi.versionName,
+                "model=" + android.os.Build.MODEL,
+                "release=" + android.os.Build.VERSION.RELEASE,
+                "device=" + android.os.Build.DEVICE,
+                "display=" + android.os.Build.DISPLAY,
+                "board=" + android.os.Build.BOARD,
+                "brand=" + android.os.Build.BRAND,
+                "star=Sol", // assuming for now
+                "body=3",
+                "subBody=0"
+        );
+        headerBuffer.append(CSV_COLUMN_HEADERS).append(NEWLINE);
+        final byte[] headerBytes = headerBuffer.toString().getBytes(ENCODING);
+        fos.write( headerBytes );
+        countStats.byteCount = headerBytes.length;
+        // Logging.debug("headerBuffer: " + headerBuffer);
 
-        // assume header is all byte per char
-        countStats.byteCount = header.length();
-
+        // print body
         if ( total > 0 ) {
-            CharBuffer charBuffer = CharBuffer.allocate( 1024 );
             ByteBuffer byteBuffer = ByteBuffer.allocate( 1024 ); // this ensures hasArray() is true
-            final CharsetEncoder encoder = Charset.forName( MainActivity.ENCODING ).newEncoder();
+            CharBuffer charBuffer = CharBuffer.allocate( 1024 );
+            //noinspection resource
+            final CSVPrinter printer = new CSVPrinter(charBuffer, CSV_FORMAT);
+
+            final CharsetEncoder encoder = Charset.forName( ENCODING ).newEncoder();
             // don't stop when a goofy character is found
             encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
             final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
@@ -409,6 +440,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             final StringBuffer stringBuffer = new StringBuffer();
             final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
             final Date date = new Date();
+
             // loop!
             for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
                 if ( wasInterrupted() ) {
@@ -430,11 +462,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 }
 
                 countStats.lineCount++;
-                String ssid = network.getSsid();
-                if (ssid.contains(COMMA)) {
-                    // comma isn't a legal ssid character, but just in case
-                    ssid = ssid.replaceAll( COMMA, "_" );
-                }
                 // ListActivity.debug("writing network: " + ssid );
 
                 // reset the buffers
@@ -442,34 +469,55 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 byteBuffer.clear();
                 // fill in the line
                 try {
-                    charBuffer.append( network.getBssid() );
-                    charBuffer.append( COMMA );
-                    // ssid can be unicode
-                    charBuffer.append( ssid );
-                    charBuffer.append( COMMA );
-                    charBuffer.append( network.getCapabilities() );
-                    charBuffer.append( COMMA );
+                    // MAC
+                    printer.print( network.getBssid() );
+                    // SSID, can be unicode
+                    printer.print( network.getSsid() );
+                    // AuthMode
+                    printer.print( network.getCapabilities() );
+                    // FirstSeen
+                    charBuffer.append( COMMA ); // prepend COMMA before any non-printer.prints
                     date.setTime( cursor.getLong(7) );
                     FileAccess.singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
+                    // Channel
                     charBuffer.append( COMMA );
-                    Integer channel = network.getChannel();
-                    if ( channel == null ) {
-                        channel = network.getFrequency();
+                    final Integer channel = network.getChannel();
+                    if ( channel != null ) {
+                        FileAccess.singleCopyNumberFormat(numberFormat, stringBuffer, charBuffer, fp, channel);
                     }
-                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
+                    // Frequency
+                    charBuffer.append( COMMA );
+                    final int frequency = network.getFrequency();
+                    if ( frequency != 0 ) {
+                        FileAccess.singleCopyNumberFormat(numberFormat, stringBuffer, charBuffer, fp, frequency);
+                    }
+                    // RSSI
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
+                    // CurrentLatitude
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
+                    // CurrentLongitude
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
+                    // AltitudeMeters
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
+                    // AccuracyMeters
                     charBuffer.append( COMMA );
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
+                    // RCOIs
+                    printer.print(network.getRcoisOrBlank());
+                    // MfgrId
                     charBuffer.append( COMMA );
-                    charBuffer.append( network.getType().name() );
-                    charBuffer.append( NEWLINE );
+                    final int mfgrid = cursor.getInt(8);
+                    if (mfgrid != 0) {
+                        FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, mfgrid );
+                    }
+                    // Type
+                    printer.print( network.getType().name() );
+                    // newline
+                    printer.println();
                 }
                 catch ( BufferOverflowException ex ) {
                     Logging.info("buffer overflow: " + ex, ex );
@@ -494,27 +542,22 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     Logging.error("exception flushing: " + ex, ex);
                     continue;
                 }
-                // byteBuffer = encoder.encode( charBuffer );  (old way)
 
                 // figure out where in the byteBuffer to stop
                 final int end = byteBuffer.position();
                 final int offset = byteBuffer.arrayOffset();
-                //if ( end == 0 ) {
-                // if doing the encode without giving a long-term byteBuffer (old way), the output
-                // byteBuffer position is zero, and the limit and capacity are how long to write for.
-                //  end = byteBuffer.limit();
-                //}
-
-                // MainActivity.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: "
-                // + byteBuffer.limit()
-                //     + " capacity: " + byteBuffer.capacity() + " pos: " + byteBuffer.position() +
-                // " end: " + end
-                //     + " result: " + result );
+                // do the write
                 final long writeStart = System.currentTimeMillis();
                 fos.write(byteBuffer.array(), offset, end+offset );
                 fileWriteMillis += System.currentTimeMillis() - writeStart;
 
                 countStats.byteCount += end;
+
+                // debug logging
+                // byte[] dst = new byte[end];
+                // System.arraycopy(byteBuffer.array(), offset, dst, 0, end);
+                // final String out = new String(dst, ENCODING);
+                // Logging.debug("bytes! " + out);
 
                 // update UI
                 final int percentDone = (countStats.lineCount * 1000) / total;

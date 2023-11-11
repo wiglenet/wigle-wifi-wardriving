@@ -198,7 +198,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                 throw new InterruptedException( "we were interrupted" );
             }
 
-            // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,typecode
+            // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,typecode,rcois,mfgrid,service
             final String bssid = cursor.getString(0);
             final String ssid = cursor.getString(1);
             final int frequency = cursor.getInt(2);
@@ -208,6 +208,10 @@ public class KmlWriter extends AbstractBackgroundTask {
             final double lastlon = cursor.getDouble(6);
             final int bestlevel = cursor.getInt(7);
             final String typecode = cursor.getString( 8);
+            final String rcois = cursor.getString(9);
+            final int mfgrid = cursor.getInt(10);
+            final String service = cursor.getString(11);
+
             final String date = sdf.format(new Date(lasttime));
 
             final NetworkType type = NetworkType.typeForCode(typecode);
@@ -259,6 +263,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
                         + "Time: " + date + "\n"                 // NOTE: server side contains server timezone
                         + "Signal: " + bestlevel + "\n"
+                        + "RoamingCOIs: " + rcois + "\n"
                         + "Type: " + type.name() + "\n"
                         + encStatus
                         + "]]>"
@@ -294,6 +299,8 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
                         + "Time: " + date + "\n"                 // NOTE: server side contains server timezone
                         + "Signal: " + bestlevel + "\n"
+                        + "ManufacturerId: " + mfgrid + "\n"
+                        + "Service: " + service + "\n"
                         + "Type: " + type.name()
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");

@@ -1,3 +1,13 @@
+* 2.81 (11/11/2023)
+Bluetooth is now in text-to-speech
+Roaming Consortium ID's added to local DB and file upload (thanks MarkG!)
+Added GNSS full tracking option (impacts battery, use with power source)
+Upload file at 1.6 version with UTF-8 support
+Distance now shown on list view
+Refactor DB search fragments
+Silence notification sounds
+Various bug fixes
+
 * 2.79 - 2.80 (09/07/2023)
 Bluetooth device manufacturer information displayed (thanks XenoKovah for insight)
 Stop multiple notification alerts on older devices

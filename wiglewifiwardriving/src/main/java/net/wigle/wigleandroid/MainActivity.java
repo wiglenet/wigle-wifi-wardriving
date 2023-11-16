@@ -163,8 +163,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
         WiGLEApiManager apiManager;
-        Map<Integer, String> btVendors;
-        Map<Integer, String> btMfgrIds;
+        Map<Integer, String> btVendors = Collections.emptyMap();
+        Map<Integer, String> btMfgrIds = Collections.emptyMap();
     }
 
     private State state;
@@ -2537,17 +2537,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public String getBleVendor(final int i) {
-        return state.btVendors.get(i);
+        final State s = state;
+        return s == null ? null : s.btVendors.get(i);
     }
 
     public String getBleMfgr(final int i) {
-        return state.btMfgrIds.get(i);
+        final State s = state;
+        return s == null ? null : s.btMfgrIds.get(i);
     }
 
     public boolean hasWakeLock() {
-        if (null != state) {
-            return state.screenLocked;
-        }
-        return false;
+        final State s = state;
+        return s != null && s.screenLocked;
     }
 }

@@ -69,6 +69,7 @@ dependencies {
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'

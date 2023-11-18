@@ -29,9 +29,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.wigle.wigleandroid.DataFragment.BackupTask;
 import net.wigle.wigleandroid.ErrorReportActivity;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.background.BackupRunnable;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -1452,7 +1452,7 @@ public final class DatabaseHelper extends Thread {
     }
 
 
-    public Pair<Boolean,String> copyDatabase(final BackupTask task) {
+    public Pair<Boolean,String> copyDatabase(final BackupRunnable task) {
         File file = context.getDatabasePath(DATABASE_NAME);
         String outputFilename = "backup-" + System.currentTimeMillis() + SQL_EXT;
 
@@ -1472,7 +1472,7 @@ public final class DatabaseHelper extends Thread {
                 read += bytesRead;
                 int percent = (int)( (read*100)/total );
                 // MainActivity.info("percent: " + percent + " read: " + read + " total: " + total );
-                task.progress( percent );
+                task.setProgress( percent );
             }
             output.close();
             input.close();

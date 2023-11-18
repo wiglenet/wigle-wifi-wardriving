@@ -2393,14 +2393,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     /**
-     * pure-background upload method fo intent-based uploads
+     * pure-background upload method for intent-based uploads
      */
     public void backgroundUploadFile(){
         Logging.info( "background upload file" );
         final State state = getState();
         setTransferring();
         state.observationUploader = new ObservationUploader(this,
-                ListFragment.lameStatic.dbHelper, null, false, false, false);
+                ListFragment.lameStatic.dbHelper,
+                (json, isCache) -> { transferComplete();},
+                false, false, false);
         try {
             state.observationUploader.startDownload(null);
         } catch (WiGLEAuthException x) {

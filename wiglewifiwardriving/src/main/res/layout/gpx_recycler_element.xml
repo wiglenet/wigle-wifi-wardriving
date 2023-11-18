@@ -18,7 +18,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="start"
-        tools:ignore="RelativeOverlap" />
+        tools:ignore="RelativeOverlap"
+        tools:text="11/15/01 14:33 - 16:03 (867)"/>
     <ImageButton
         android:id="@+id/share_route"
         android:background="@android:drawable/ic_menu_share"

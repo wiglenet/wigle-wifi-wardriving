@@ -6,6 +6,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
+ * An in-app progress panel
+ * TODO: since multiple tasks can be in-progress at once, this should eventually become a list
  * Created by arkasha on 5/22/17.
  */
 

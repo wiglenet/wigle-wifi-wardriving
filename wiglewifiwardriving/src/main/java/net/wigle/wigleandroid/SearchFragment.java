@@ -338,7 +338,7 @@ public class SearchFragment extends Fragment {
                     Geocoder geocoder = new Geocoder(context);
                     try {
                         List<Address> addressList = geocoder.getFromLocationName(location, 1);
-                        if (null != addressList) {
+                        if (null != addressList && addressList.size() > 0) {
                             Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
                             if (null != address) {
                                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());

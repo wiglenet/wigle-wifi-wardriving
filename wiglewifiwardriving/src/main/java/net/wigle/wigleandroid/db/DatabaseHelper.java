@@ -144,10 +144,15 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
         + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
+
+    private static final String LOCATED_WIFI_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
+            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND " + NetworkFilter.WIFI.getFilter()
+            + " AND instr(bssid, '_') <= 0";
     //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
 
-    private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;
-    public static final String LOCATED_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_NETS_QUERY_STEM;
+    public static final String LOCATED_WIFI_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_WIFI_QUERY_STEM;
+
+    private static final String LOCATED_WIFI_COUNT_QUERY = "SELECT count(*)" +LOCATED_WIFI_QUERY_STEM;
 
     private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
@@ -1324,10 +1329,9 @@ public final class DatabaseHelper extends Thread {
             return count;
         }
     }
-
-    public long getNetsWithLocCountFromDB() throws DBException {
+    public long getWiFiNetsWthLocCountFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null)) {
+        try (Cursor cursor = db.rawQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
         }

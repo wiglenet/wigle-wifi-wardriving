@@ -1,9 +1,10 @@
 package net.wigle.wigleandroid.background;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.widget.TextView;
+import android.view.WindowManager;
 
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
@@ -21,14 +22,22 @@ public class BackupRunnable extends ProgressRunnable implements Runnable, AlertS
     private Pair<Boolean,String> dbResult;
 
     MainActivity mainActivity;
-    public BackupRunnable(final FragmentActivity activity, final boolean showProgress, final MainActivity mainActivity) {
-        super(activity, showProgress);
+    public BackupRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress, final MainActivity mainActivity) {
+        super(activity, executorService, showProgress);
         this.mainActivity = mainActivity;
     }
 
     @Override
     protected void onPreExecute() {
-        mainActivity.setTransferring();
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //ALIBI: Android like killing long-running tasks like this if you let the screen shut off
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                setProgressStatus(R.string.backup_preparing);
+                mainActivity.setTransferring();
+            }
+        });
     }
 
     @Override
@@ -36,42 +45,44 @@ public class BackupRunnable extends ProgressRunnable implements Runnable, AlertS
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 mainActivity.transferComplete();
-
-                Logging.info("DB backup postExe");
                 final Context c = activity.getApplicationContext();
-                final TextView tv = activity.findViewById(R.id.backup_db_text);
-                if (tv != null) {
-                    tv.setText(activity.getString(R.string.backup_db_text));
-                }
-                if (null != result) { //launch task will exist with bg thread enqueued with null return
+                if (null != result) {
                     if (null != dbResult && dbResult.getFirst()) {
                         // fire share intent
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE Database Backup");
                         intent.setType("application/xsqlite-3");
 
-                        //TODO: verify local-only storage case/gpx_paths.xml
                         if (null == c) {
                             Logging.error("null context in DB backup postExec");
                         } else {
-                            final File backupFile = new File(dbResult.getSecond());
-                            Logging.info("backupfile: " + backupFile.getAbsolutePath()
-                                    + " exists: " + backupFile.exists() + " read: " + backupFile.canRead());
-                            final Uri fileUri = FileProvider.getUriForFile(c,
-                                    MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                            ".sqliteprovider", new File(dbResult.getSecond()));
+                            MainActivity ma = MainActivity.getMainActivity();
+                            if (null != ma) {
+                                final File backupFile = new File(dbResult.getSecond());
+                                Logging.info("backupfile: " + backupFile.getAbsolutePath()
+                                        + " exists: " + backupFile.exists() + " read: " + backupFile.canRead());
+                                final Uri fileUri = FileProvider.getUriForFile(c,
+                                        ma.getApplicationContext().getPackageName() +
+                                                ".sqliteprovider", new File(dbResult.getSecond()));
 
-                            intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
+                                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                                //intent.setClipData(ClipData.newRawUri("", fileUri));
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
+                            } else {
+                                Logging.error("null MainActivity DB backup postExec");
+                            }
                         }
                     } else {
                         Logging.error("null or empty DB result in DB backup postExec");
                         WiGLEToast.showOverFragment(activity, R.string.error_general,
                                 activity.getString(R.string.error_general));
                     }
+                } else {
+                    Logging.error("Null result in postExecute - unable to share sqlite backup.");
                 }
             }
         });
@@ -88,8 +99,17 @@ public class BackupRunnable extends ProgressRunnable implements Runnable, AlertS
 
     @Override
     public void run() {
+        String result = null;
         onPreExecute();
-        dbResult = ListFragment.lameStatic.dbHelper.copyDatabase(this);
-        onPostExecute(dbResult.toString());
+        try {
+            setProgressStatus(R.string.backup_in_progress);
+            dbResult = ListFragment.lameStatic.dbHelper.copyDatabase(this);
+            result = dbResult.toString();
+        } catch (Exception e) {
+            Logging.error("Failed to backup SQLite DB: ",e);
+            result = "ERROR";
+        } finally {
+            onPostExecute(result);
+        }
     }
 }

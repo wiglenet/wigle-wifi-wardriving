@@ -38,13 +38,12 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
 import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.concurrent.Future;
 
 /**
  * configure database settings
@@ -461,9 +460,12 @@ public final class DataFragment extends Fragment implements DialogListener {
             case BACKUP_DIALOG: {
                 MainActivity ma = MainActivity.getMainActivity(DataFragment.this);
                 if (ma != null) {
-                    ExecutorService es = Executors.newFixedThreadPool(1);
-                    es.submit(new BackupRunnable(this.getActivity(), true, ma));
-                    es.shutdown();
+                    try {
+                        BackupRunnable backupRunnable = new BackupRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true, ma);
+                        Future<?> bFuture = ListFragment.lameStatic.executorService.submit(backupRunnable);
+                    } catch (IllegalArgumentException e) {
+                        WiGLEToast.showOverFragment(this.getActivity(), R.string.backup_in_progress, getString(R.string.duplicate_job));
+                    }
                 } else {
                     Logging.error("null mainActivity - can't create backup dialog.");
                 }
@@ -572,19 +574,24 @@ public final class DataFragment extends Fragment implements DialogListener {
      */
     private boolean exportM8bFile() {
         final long totalDbNets = ListFragment.lameStatic.dbHelper.getNetworkCount();
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        es.submit(new MagicEightBallRunnable(this.getActivity(), true, totalDbNets));
-        es.shutdown();
-
+        try {
+            MagicEightBallRunnable m8bRunnable = new MagicEightBallRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true, totalDbNets);
+            Future<?> mFuture = ListFragment.lameStatic.executorService.submit(m8bRunnable);
+        } catch (IllegalArgumentException e) {
+            WiGLEToast.showOverFragment(this.getActivity(), R.string.m8b_failed, getString(R.string.duplicate_job));
+        }
         return true;
     }
 
     private boolean exportRouteGpxFile() {
         final long totalRoutePoints = ListFragment.lameStatic.dbHelper.getCurrentRoutePointCount();
         if (totalRoutePoints > 1) {
-            ExecutorService es = Executors.newFixedThreadPool(1);
-            es.submit(new GpxExportRunnable(this.getActivity(), true, totalRoutePoints));
-            es.shutdown();
+            try {
+                GpxExportRunnable gpxRunnable = new GpxExportRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true, totalRoutePoints);
+                Future<?> gFuture = ListFragment.lameStatic.executorService.submit(gpxRunnable);
+            } catch (IllegalArgumentException e) {
+                WiGLEToast.showOverFragment(this.getActivity(), R.string.gpx_failed, getString(R.string.duplicate_job));
+            }
         } else {
             Logging.error("no points to create route");
             WiGLEToast.showOverFragment(getActivity(), R.string.gpx_failed,

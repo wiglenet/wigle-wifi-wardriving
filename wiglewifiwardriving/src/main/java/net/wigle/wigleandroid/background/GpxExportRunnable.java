@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.view.WindowManager;
 
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
@@ -43,12 +44,12 @@ public class GpxExportRunnable extends ProgressRunnable implements Runnable, Ale
     private long routeId = -1;
     private final long totalCount;
 
-    public GpxExportRunnable(final FragmentActivity activity, final boolean showProgress, final long totalPoints) {
-        super(activity, showProgress);
+    public GpxExportRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress, final long totalPoints) {
+        super(activity, executorService, showProgress);
         this.totalCount = totalPoints;
     }
     public GpxExportRunnable(final FragmentActivity activity, final boolean showProgress, final long totalPoints, final long routeId) {
-        super(activity, showProgress);
+        super(activity, null, showProgress);
         this.totalCount = totalPoints;
         this.routeId = routeId;
     }
@@ -161,7 +162,9 @@ public class GpxExportRunnable extends ProgressRunnable implements Runnable, Ale
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                pp.setMessage(activity.getString(R.string.gpx_preparing));
+                //ALIBI: Android like killing long-running tasks like this if you let the screen shut off
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                setProgressStatus(R.string.gpx_preparing);
                 pp.setIndeterminate();
             }});
     }
@@ -176,6 +179,7 @@ public class GpxExportRunnable extends ProgressRunnable implements Runnable, Ale
                               }
                           });
             // fire share intent?
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             Intent intent = new Intent(Intent.ACTION_SEND);
             final String fileName = (gpxDestFile != null && !gpxDestFile.getName().isEmpty()) ? gpxDestFile.getName() : "WiGLE.gpx";
             intent.putExtra(Intent.EXTRA_SUBJECT, fileName);

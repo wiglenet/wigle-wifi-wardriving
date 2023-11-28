@@ -44,6 +44,7 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.background.UniqueTaskExecutorService;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -130,6 +131,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;
+        public UniqueTaskExecutorService executorService;
     }
     public static final LameStatic lameStatic = new LameStatic();
 
@@ -149,6 +151,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
+        lameStatic.executorService = new UniqueTaskExecutorService(1);
     }
 
     /**

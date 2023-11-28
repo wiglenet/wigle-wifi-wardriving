@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -14,13 +15,15 @@ import android.widget.TextView;
 public class ProgressPanel {
 
     private final LinearLayout container;
-    private final TextView label;
+    private final TextView progressLabel;
     private final ProgressBar progressBar;
+    private final TextView queueLabel;
 
-    public ProgressPanel(LinearLayout layout, TextView label, ProgressBar progressBar) {
+    public ProgressPanel(LinearLayout layout, TextView progressLabel, ProgressBar progressBar, TextView queueLabel) {
         this.container = layout;
-        this.label = label;
+        this.progressLabel = progressLabel;
         this.progressBar = progressBar;
+        this.queueLabel = queueLabel;
     }
 
     public void show() {
@@ -34,7 +37,7 @@ public class ProgressPanel {
     }
 
     public void setMessage(final String text) {
-        if (null != label) label.setText(text);
+        if (null != progressLabel) progressLabel.setText(text);
     }
 
     public void setProgress(final int progress) {
@@ -47,4 +50,14 @@ public class ProgressPanel {
             progressBar.setIndeterminate(true);
         }
     }
+
+    public void hideQueue() {
+        queueLabel.setVisibility(View.GONE);
+    }
+
+    public void setQueue(final CharSequence text) {
+        queueLabel.setVisibility(View.VISIBLE);
+        queueLabel.setText(text);
+    }
+
 }

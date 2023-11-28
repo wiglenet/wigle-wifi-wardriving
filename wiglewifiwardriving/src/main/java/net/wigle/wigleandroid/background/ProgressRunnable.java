@@ -1,7 +1,10 @@
 package net.wigle.wigleandroid.background;
 
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
 import android.os.Message;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -13,55 +16,58 @@ import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.util.Logging;
 
+import java.util.concurrent.Future;
+
 public abstract class ProgressRunnable implements AlertSettable {
     protected ProgressPanel pp;
     protected final Object lock = new Object();
     protected final BackgroundGuiHandler handler;
     protected final FragmentActivity activity;
+    protected final UniqueTaskExecutorService executorService;
     private int lastSentPercent = -1;
+    private int lastTaskQueueDepth = -1;
 
-    protected ProgressRunnable(final FragmentActivity activity, final boolean showProgress) {
+    protected ProgressRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress) {
         this.activity = activity;
+        this.executorService = executorService;
         if (showProgress) activateProgressPanel(activity);
         this.handler = new BackgroundGuiHandler(activity, lock, pp, this);
     }
     protected void activateProgressPanel(final FragmentActivity context) {
         final LinearLayout progressLayout = context.findViewById(R.id.inline_status_bar);
-        final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
-        final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
+        //ALIBI: test and avoid re-init if panel is already showing.
+        if (null == progressLayout || VISIBLE != progressLayout.getVisibility()) {
+            final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
+            final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
+            final TextView queueLabel = context.findViewById(R.id.inline_progress_queue_status);
+            if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
+                pp = new ProgressPanel(progressLayout, progressLabel, progressBar, queueLabel);
+                pp.show();
+                final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
+                taskCancelButton.setVisibility(View.GONE);
+                //taskCancelButton.setOnClickListener(v -> {
+                // TODO: make these subclasses cancellable, link to cancel button
+                //  });
+                //ALIBI: this will get replaced as soon as the progress is set for the first time
+                progressBar.setIndeterminate(true);
 
-        if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
-            pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
-            pp.show();
-            final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
-            taskCancelButton.setOnClickListener(v -> {
-
-                //TODO: uhg, now we need a task queue
-                //if (null != latestTask) {
-                //    latestTask.setInterrupted();
-                //}
-                clearProgressDialog();
-                //updateTransferringState(false, uploadButton, importObservedButton);
-            });
-            //ALIBI: this will get replaced as soon as the progress is set for the first time
-            progressBar.setIndeterminate(true);
-
-            //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
-            // setting global state to make sure they get set on show
-            //updateTransferringState(true, uploadButton, importObservedButton);
-            pp.setMessage(context.getString(R.string.status_working));
-            pp.setIndeterminate();
-        } else {
-            Logging.warn("Progress panel is null");
+                //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
+                // setting global state to make sure they get set on show
+                //updateTransferringState(true, uploadButton, importObservedButton);
+                pp.setMessage(context.getString(R.string.status_working));
+                pp.setIndeterminate();
+            } else {
+                Logging.warn("Progress panel is null");
+            }
         }
     }
 
     @Override
     public final void clearProgressDialog() {
-        if (null != pp) {
+        if (null != pp && (executorService == null || executorService.getQueue().size() == 0) ) {
             pp.hide();
+            pp = null;
         }
-        pp = null;
     }
 
     //TODO: do we ever need this?
@@ -78,12 +84,25 @@ public abstract class ProgressRunnable implements AlertSettable {
             public void run() {
                 //DEBUG: Logging.info("progress: "+percent);
                 if (100 == percent) {
-                    pp.hide();
+                    if (null != pp && (executorService == null || executorService.getQueue().size() == 0) ) {
+                        pp.hide();
+                    }
                     return;
                 }
                 if (percent > lastSentPercent) {
                     pp.setProgress(percent);
                     lastSentPercent = percent;
+                }
+                if (null != executorService) {
+                    final int curSize = executorService.getQueue().size();
+                    if (curSize != lastTaskQueueDepth) {
+                        if (curSize == 0) {
+                            pp.hideQueue();
+                        } else {
+                            pp.setQueue(activity.getString(R.string.queued_jobs, curSize));
+                        }
+                        lastTaskQueueDepth = executorService.getQueue().size();
+                    }
                 }
             }
         });
@@ -93,13 +112,15 @@ public abstract class ProgressRunnable implements AlertSettable {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                pp.show();
-                pp.setMessage(activity.getString(id));
-                pp.setIndeterminate();
+                if (pp != null) {
+                    pp.show();
+                    pp.setMessage(activity.getString(id));
+                } else {
+                    Logging.error("Null panel on setProgressStatus");
+                }
             }});
     }
 
     protected abstract void onPreExecute();
     protected abstract void onPostExecute(final String result);
-
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:id="@+id/inline_status_bar"
     android:visibility="gone"
+    tools:visibility="visible"
     android:layout_alignParentBottom="true"
     android:paddingTop="2dp"
     android:paddingBottom="2dp">
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content">
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="6">
             <TextView
@@ -34,13 +34,21 @@
                 android:paddingStart="1dp"
                 android:paddingEnd="0dp"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Performing Task"/>
             <ProgressBar
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/inline_status_progress"
                 />
+            <TextView
+                android:id="@+id/inline_progress_queue_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="@string/queued_jobs"
+                tools:visibility="visible"/>
         </LinearLayout>
         <Button
             android:layout_width="wrap_content"

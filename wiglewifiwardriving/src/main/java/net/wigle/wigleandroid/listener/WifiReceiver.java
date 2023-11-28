@@ -159,7 +159,7 @@ public class WifiReceiver extends BroadcastReceiver {
             // ignore, happens on some vm's
             Logging.info("exception getting scan results: " + ex, ex);
         }
-        Logging.info("wifi receive, results: " + (results == null ? null : results.size()));
+        Logging.debug("wifi receive, results: " + (results == null ? null : results.size()));
 
         long nonstopScanRequestTime = Long.MIN_VALUE;
         final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
@@ -968,7 +968,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 lastScanResponseTime = now;
             } else {
                 final long sinceLastScan = now - lastScanResponseTime;
-                Logging.info("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
+                Logging.debug("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(
                         PreferenceKeys.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );

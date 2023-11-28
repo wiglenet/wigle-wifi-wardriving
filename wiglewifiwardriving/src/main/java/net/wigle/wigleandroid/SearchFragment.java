@@ -334,20 +334,22 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 String location = searchView.getQuery().toString();
-                List<Address> addressList = null;
                 if (location != null || location.equals("")) {
                     Geocoder geocoder = new Geocoder(context);
                     try {
-                        addressList = geocoder.getFromLocationName(location, 1);
+                        List<Address> addressList = geocoder.getFromLocationName(location, 1);
+                        if (null != addressList && addressList.size() > 0) {
+                            Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
+                            if (null != address) {
+                                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                                mapView.getMapAsync(googleMap -> {
+                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+                                });
+                                return true;
+                            }
+                        }
                     } catch (IOException e) {
                         Logging.error("Geocoding failed: ",e);
-                    }
-                    Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
-                    if (null != address) {
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mapView.getMapAsync(googleMap -> {
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-                        });
                     }
                 }
                 return false;

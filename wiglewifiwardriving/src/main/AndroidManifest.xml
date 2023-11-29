@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    android:versionCode="281"
-    android:versionName="2.81">
+    android:versionCode="282"
+    android:versionName="2.82">
 
     <supports-screens
         android:anyDensity="true"

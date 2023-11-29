@@ -1,4 +1,4 @@
-* 2.81 (11/11/2023)
+* 2.81 - 2.82 (11/28/2023)
 Bluetooth is now in text-to-speech
 Roaming Consortium ID's added to local DB and file upload (thanks MarkG!)
 Added GNSS full tracking option (impacts battery, use with power source)

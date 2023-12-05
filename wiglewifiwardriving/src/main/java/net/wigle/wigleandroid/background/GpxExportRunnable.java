@@ -166,6 +166,10 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
                 activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 setProgressStatus(R.string.gpx_preparing);
                 setProgressIndeterminate();
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    ma.setTransferring();
+                }
             }});
     }
 
@@ -180,23 +184,29 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
                           });
             // fire share intent?
             activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
+                ma.transferComplete();
+            }
+
             Intent intent = new Intent(Intent.ACTION_SEND);
             final String fileName = (gpxDestFile != null && !gpxDestFile.getName().isEmpty()) ? gpxDestFile.getName() : "WiGLE.gpx";
             intent.putExtra(Intent.EXTRA_SUBJECT, fileName);
             intent.setType("application/gpx");
 
             //TODO: verify local-only storage case/gpx_paths.xml
-            final MainActivity main = MainActivity.getMainActivity();
-            final Context context = main.getApplicationContext();
-            if (null != context && main != null) {
-                final Uri fileUri = FileProvider.getUriForFile(context,
-                        main.getApplicationContext().getPackageName() +
-                                ".gpxprovider", gpxDestFile);
+            if (ma != null) {
+                final Context context = ma.getApplicationContext();
+                if (null != context) {
+                    final Uri fileUri = FileProvider.getUriForFile(context,
+                            ma.getApplicationContext().getPackageName() +
+                                    ".gpxprovider", gpxDestFile);
 
-                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
+                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
+                }
             } else {
                 Logging.error("Unable to initiate GPX export - null context");
             }

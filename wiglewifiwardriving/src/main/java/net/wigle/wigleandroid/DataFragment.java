@@ -458,16 +458,11 @@ public final class DataFragment extends Fragment implements DialogListener {
                 break;
             }
             case BACKUP_DIALOG: {
-                MainActivity ma = MainActivity.getMainActivity(DataFragment.this);
-                if (ma != null) {
-                    try {
-                        BackupRunnable backupRunnable = new BackupRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true, ma);
-                        Future<?> bFuture = ListFragment.lameStatic.executorService.submit(backupRunnable);
-                    } catch (IllegalArgumentException e) {
-                        WiGLEToast.showOverFragment(this.getActivity(), R.string.backup_in_progress, getString(R.string.duplicate_job));
-                    }
-                } else {
-                    Logging.error("null mainActivity - can't create backup dialog.");
+                try {
+                    BackupRunnable backupRunnable = new BackupRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true);
+                    Future<?> bFuture = ListFragment.lameStatic.executorService.submit(backupRunnable);
+                } catch (IllegalArgumentException e) {
+                    WiGLEToast.showOverFragment(this.getActivity(), R.string.backup_in_progress, getString(R.string.duplicate_job));
                 }
                 break;
             }

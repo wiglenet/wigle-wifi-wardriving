@@ -221,7 +221,11 @@ public class MagicEightBallRunnable extends ProgressPanelRunnable implements Run
                 //ALIBI: Android like killing long-running tasks like this if you let the screen shut off
                 activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 setProgressStatus(R.string.m8b_sizing);
-                setProgressIndeterminate();;
+                setProgressIndeterminate();
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    ma.setTransferring();
+                }
             }});
     }
 
@@ -231,6 +235,11 @@ public class MagicEightBallRunnable extends ProgressPanelRunnable implements Run
             @Override
             public void run() {
                 activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    ma.transferComplete();
+                }
 
                 if (null != result) { //launch task will exist with bg thread enqueued with null return
                     clearProgressDialog();
@@ -243,7 +252,6 @@ public class MagicEightBallRunnable extends ProgressPanelRunnable implements Run
                     if (null != activity) {
                         Context c = activity.getApplicationContext();
                         if (null != c) {
-                            MainActivity ma = MainActivity.getMainActivity();
                             if (null != ma) {
                                 final Uri fileUri = FileProvider.getUriForFile(c,
                                         ma.getApplicationContext().getPackageName() +

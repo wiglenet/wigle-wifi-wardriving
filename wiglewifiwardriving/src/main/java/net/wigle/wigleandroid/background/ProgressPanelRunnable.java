@@ -16,20 +16,13 @@ import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.util.Logging;
 
-import java.util.concurrent.Future;
-
-public abstract class ProgressRunnable implements AlertSettable {
+public abstract class ProgressPanelRunnable extends AbstractProgressRunnable implements AlertSettable {
     protected ProgressPanel pp;
     protected final Object lock = new Object();
     protected final BackgroundGuiHandler handler;
-    protected final FragmentActivity activity;
-    protected final UniqueTaskExecutorService executorService;
-    private int lastSentPercent = -1;
-    private int lastTaskQueueDepth = -1;
 
-    protected ProgressRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress) {
-        this.activity = activity;
-        this.executorService = executorService;
+    protected ProgressPanelRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress) {
+        super(executorService, activity);
         if (showProgress) activateProgressPanel(activity);
         this.handler = new BackgroundGuiHandler(activity, lock, pp, this);
     }
@@ -70,14 +63,7 @@ public abstract class ProgressRunnable implements AlertSettable {
         }
     }
 
-    //TODO: do we ever need this?
-    protected final void sendBundledMessage(final int what, final Bundle bundle) {
-        final Message msg = new Message();
-        msg.what = what;
-        msg.setData(bundle);
-        handler.sendMessage(msg);
-    }
-
+    @Override
     protected void onProgressUpdate(Integer percent) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -108,6 +94,7 @@ public abstract class ProgressRunnable implements AlertSettable {
         });
     }
 
+    @Override
     protected void setProgressStatus(final int id) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -121,6 +108,27 @@ public abstract class ProgressRunnable implements AlertSettable {
             }});
     }
 
-    protected abstract void onPreExecute();
-    protected abstract void onPostExecute(final String result);
+    //TODO: do we ever need this?
+    protected final void sendBundledMessage(final int what, final Bundle bundle) {
+        final Message msg = new Message();
+        msg.what = what;
+        msg.setData(bundle);
+        handler.sendMessage(msg);
+    }
+
+    @Override
+    protected void reactivateProgressBar(final int id) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                pp.show();
+                setProgressStatus(id);
+                pp.setIndeterminate();
+            }});
+    }
+
+    @Override
+    protected void setProgressIndeterminate() {
+        pp.setIndeterminate();
+    }
 }

@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.background;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,7 +17,7 @@ import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
 
-public class BackupRunnable extends ProgressRunnable implements Runnable, AlertSettable{
+public class BackupRunnable extends ProgressPanelRunnable implements Runnable, AlertSettable{
     private Pair<Boolean,String> dbResult;
 
     MainActivity mainActivity;

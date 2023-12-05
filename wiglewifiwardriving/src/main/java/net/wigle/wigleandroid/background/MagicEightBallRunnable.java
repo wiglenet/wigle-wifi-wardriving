@@ -43,7 +43,7 @@ import java.util.TreeMap;
 /**
  * M8b export - writes files and launches share intent. Checks available memory and limits database query accordingly, but can still be the victim of OOM
  */
-public class MagicEightBallRunnable extends ProgressRunnable implements Runnable, AlertSettable {
+public class MagicEightBallRunnable extends ProgressPanelRunnable implements Runnable, AlertSettable {
     private final long totalCount;
     private static final int SLICE_BITS = 30;
     private static final long M8B_MEM_RECORD_SiZE = 280L; //ALIBI: profiling-based constant to avoid OOM in mjg size
@@ -139,7 +139,7 @@ public class MagicEightBallRunnable extends ProgressRunnable implements Runnable
             @Override
             public void complete() {
                 Logging.info("m8b source export complete...");
-                reactivateProgressBar();
+                reactivateProgressBar(R.string.exporting_m8b_final);
 
                 try (M8bFileRecord output = getM8bOutputFile()) {
                     if (output != null && output.getFileChannel() != null && output.getFileOutputPath() != null) {
@@ -194,7 +194,9 @@ public class MagicEightBallRunnable extends ProgressRunnable implements Runnable
                         }
                         bb.clear();
                     } else {
-                        Logging.error("Failed to open file/channel: "+output.toString());
+                        if (output != null) {
+                            Logging.error("Failed to open file/channel: " + output.toString());
+                        }
                     }
                 } catch (FileNotFoundException e) {
                     Logging.error("Failed create file for m8b writer", e);
@@ -211,16 +213,6 @@ public class MagicEightBallRunnable extends ProgressRunnable implements Runnable
         request.run(); //ALIBI: we're in a background thread, we don't need to use the external executor/thread
     }
 
-    protected void reactivateProgressBar() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pp.show();
-                setProgressStatus(R.string.exporting_m8b_final);
-                pp.setIndeterminate();
-            }});
-    }
-
     @Override
     protected void onPreExecute() {
         activity.runOnUiThread(new Runnable() {
@@ -229,7 +221,7 @@ public class MagicEightBallRunnable extends ProgressRunnable implements Runnable
                 //ALIBI: Android like killing long-running tasks like this if you let the screen shut off
                 activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 setProgressStatus(R.string.m8b_sizing);
-                pp.setIndeterminate();
+                setProgressIndeterminate();;
             }});
     }
 

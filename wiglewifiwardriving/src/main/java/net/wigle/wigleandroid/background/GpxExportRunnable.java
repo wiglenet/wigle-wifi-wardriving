@@ -31,7 +31,7 @@ import java.util.Locale;
 /**
  * GPX route export - writes files and launches share intent.
  */
-public class GpxExportRunnable extends ProgressRunnable implements Runnable, AlertSettable {
+public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable, AlertSettable {
 
     public static final int EXPORT_GPX_DIALOG = 130;
 
@@ -165,7 +165,7 @@ public class GpxExportRunnable extends ProgressRunnable implements Runnable, Ale
                 //ALIBI: Android like killing long-running tasks like this if you let the screen shut off
                 activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 setProgressStatus(R.string.gpx_preparing);
-                pp.setIndeterminate();
+                setProgressIndeterminate();
             }});
     }
 

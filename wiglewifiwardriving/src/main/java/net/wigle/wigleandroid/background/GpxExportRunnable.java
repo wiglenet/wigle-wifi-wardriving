@@ -56,36 +56,27 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
 
     @Override
     public void run() {
-        // TODO: android R FS changes
         onPreExecute();
-        final boolean hasSD = FileUtility.hasSD();
         final String name = df.format(new Date());
         final String nameStr = "<name>" + name + "</name><trkseg>\n";
         try {
-            if ( hasSD ) {
-                final String basePath = FileUtility.getGpxPath();
-                if (null == basePath) {
-                    Logging.error("Unable to determine external GPX path");
-                    return;
-                }
-                final File path = new File( basePath );
+            final String basePath = FileUtility.getGpxPath(activity.getApplication());
+            if (null == basePath) {
+                Logging.error("Unable to determine external GPX path");
+                return;
+            }
+            final File path = new File( basePath );
+            if (!path.exists()) {
                 //noinspection ResultOfMethodCallIgnored
                 path.mkdirs();
-                if (!path.exists()) {
-                    Logging.info("Got '!exists': " + path);
-                }
-                String openString = basePath + name +  GPX_EXT;
-                //DEBUG: MainActivity.info("Opening file: " + openString);
-                gpxDestFile = new File( openString );
-
-            } else {
-                if (null != activity) {
-                    gpxDestFile = new File(activity.getApplication().getFilesDir(),
-                            name + GPX_EXT);
-                } else {
-                    Logging.error("set destination file due to null Activity in GPX export");
-                }
             }
+            if (!path.exists()) {
+                Logging.info("Got '!exists': " + path);
+            }
+            String openString = basePath + name +  GPX_EXT;
+            //DEBUG: MainActivity.info("Opening file: " + openString);
+            gpxDestFile = new File( openString );
+
             try (FileWriter writer = new FileWriter(gpxDestFile, false)) {
                 writer.append(GPX_HEADER_A);
                 String creator = "WiGLE WiFi ";

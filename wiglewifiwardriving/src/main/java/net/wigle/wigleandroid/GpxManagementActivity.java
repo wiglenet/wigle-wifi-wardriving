@@ -55,8 +55,12 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     private long exportRouteId = -1L;
 
     public GpxManagementActivity() {
-
-        this.dbHelper = MainActivity.getStaticState().dbHelper;
+        final MainActivity.State s = MainActivity.getStaticState();
+        if (null != s) {
+            this.dbHelper = s.dbHelper;
+        } else {
+            this.dbHelper = null;
+        }
         Locale locale = Locale.getDefault();
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(1);

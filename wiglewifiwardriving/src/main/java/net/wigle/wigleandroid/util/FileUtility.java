@@ -22,7 +22,6 @@ public class FileUtility {
     private final static String APP_SUB_DIR = "/"+APP_DIR+"/";
     private static final String GPX_DIR = APP_SUB_DIR+"gpx/";
     private final static String KML_DIR = "app_kml";
-    private final static String KML_DIR_BASE = "kml";
     private static final String M8B_DIR = APP_SUB_DIR+"m8b/";
     private final static String SQLITE_BACKUPS_DIR = "sqlite";
 
@@ -188,11 +187,12 @@ public class FileUtility {
     /**
      * return the m8b dir if we're using external storage
      * @return external file location if we're using external/otherwise null
-     * //TODO: useful to return the true path if !hasSD?
      */
-    public static String getM8bPath() {
+    public static String getM8bPath(final Context context) {
         if ( hasSD() ) {
             return safeFilePath(Environment.getExternalStorageDirectory()) + M8B_DIR;
+        } else if (context != null) {
+            return safeFilePath(context.getCacheDir());
         }
         return null;
     }
@@ -200,11 +200,12 @@ public class FileUtility {
     /**
      * return the GPX dir if we're using external storage
      * @return external file location if we're using external/otherwise null
-     * //TODO: useful to return the true path if !hasSD?
      */
-    public static String getGpxPath() {
+    public static String getGpxPath(final Context context) {
         if ( hasSD() ) {
             return safeFilePath(Environment.getExternalStorageDirectory()) + GPX_DIR;
+        } else if (context != null) {
+            return safeFilePath(context.getCacheDir());
         }
         return null;
     }

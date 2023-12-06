@@ -277,46 +277,31 @@ public class MagicEightBallRunnable extends ProgressPanelRunnable implements Run
     }
 
     private M8bFileRecord getM8bOutputFile() throws FileNotFoundException {
-        final boolean hasSD = FileUtility.hasSD();
         File m8bDestFile;
-        if (hasSD) {
-            final String basePath = FileUtility.getM8bPath();
-            if (null != basePath) {
-                final File path = new File(basePath);
+        final String basePath = FileUtility.getM8bPath(activity.getApplication());
+        if (null != basePath) {
+            final File path = new File(basePath);
+            if (!path.exists()) {
                 //noinspection ResultOfMethodCallIgnored
                 path.mkdirs();
-                if (!path.exists()) {
-                    Logging.info("Got '!exists': " + path);
-                }
-                String openString = basePath + M8B_FILE_PREFIX + M8B_EXT;
-                //DEBUG: MainActivity.info("Opening file: " + openString);
-                m8bDestFile = new File(openString);
-                if (m8bDestFile.exists()) {
-                    //ALIBI: cleanup old
-                    final boolean deleted = m8bDestFile.delete();
-                    if (deleted) {
-                        Logging.info("deleted old EXT m8b intermediate file.");
-                    }
-                }
-                return new M8bFileRecord(new FileOutputStream(m8bDestFile, false).getChannel(), m8bDestFile);
-            } else {
-                Logging.error("Unable to determine m8b output base path.");
-                return null;
             }
-        } else {
-            if (activity == null) {
-                return null;
+            if (!path.exists()) {
+                Logging.info("Got '!exists': " + path);
             }
-            m8bDestFile = new File(activity.getApplication().getCacheDir(),
-                    M8B_FILE_PREFIX + M8B_EXT);
+            String openString = basePath + M8B_FILE_PREFIX + M8B_EXT;
+            //DEBUG: MainActivity.info("Opening file: " + openString);
+            m8bDestFile = new File(openString);
             if (m8bDestFile.exists()) {
                 //ALIBI: cleanup old
                 final boolean deleted = m8bDestFile.delete();
                 if (deleted) {
-                    Logging.info("deleted old m8b intermediate file.");
+                    Logging.info("deleted old m8b file: "+openString);
                 }
             }
             return new M8bFileRecord(new FileOutputStream(m8bDestFile, false).getChannel(), m8bDestFile);
+        } else {
+            Logging.error("Unable to determine m8b output base path.");
+            return null;
         }
     }
 

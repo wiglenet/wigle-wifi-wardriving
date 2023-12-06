@@ -16,13 +16,19 @@ import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.util.Logging;
 
-public abstract class ProgressPanelRunnable extends AbstractProgressRunnable implements AlertSettable {
+public abstract class ProgressPanelRunnable implements AlertSettable {
     protected ProgressPanel pp;
     protected final Object lock = new Object();
     protected final BackgroundGuiHandler handler;
 
-    protected ProgressPanelRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress) {
-        super(executorService, activity);
+    protected final UniqueTaskExecutorService executorService;
+    protected final FragmentActivity activity;
+    protected int lastSentPercent = -1;
+    protected int lastTaskQueueDepth = -1;
+
+    protected ProgressPanelRunnable(final FragmentActivity fragmentActivity, final UniqueTaskExecutorService executorService, final boolean showProgress) {
+        this.executorService = executorService;
+        this.activity = fragmentActivity;
         if (showProgress) activateProgressPanel(activity);
         this.handler = new BackgroundGuiHandler(activity, lock, pp, this);
     }
@@ -63,7 +69,6 @@ public abstract class ProgressPanelRunnable extends AbstractProgressRunnable imp
         }
     }
 
-    @Override
     protected void onProgressUpdate(Integer percent) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -94,7 +99,6 @@ public abstract class ProgressPanelRunnable extends AbstractProgressRunnable imp
         });
     }
 
-    @Override
     protected void setProgressStatus(final int id) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -108,15 +112,6 @@ public abstract class ProgressPanelRunnable extends AbstractProgressRunnable imp
             }});
     }
 
-    //TODO: do we ever need this?
-    protected final void sendBundledMessage(final int what, final Bundle bundle) {
-        final Message msg = new Message();
-        msg.what = what;
-        msg.setData(bundle);
-        handler.sendMessage(msg);
-    }
-
-    @Override
     protected void reactivateProgressBar(final int id) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -127,8 +122,19 @@ public abstract class ProgressPanelRunnable extends AbstractProgressRunnable imp
             }});
     }
 
-    @Override
     protected void setProgressIndeterminate() {
         pp.setIndeterminate();
     }
+
+    protected abstract void onPreExecute();
+    protected abstract void onPostExecute(final String result);
+
+    //TODO: do we ever need this?
+    protected final void sendBundledMessage(final int what, final Bundle bundle) {
+        final Message msg = new Message();
+        msg.what = what;
+        msg.setData(bundle);
+        handler.sendMessage(msg);
+    }
+
 }

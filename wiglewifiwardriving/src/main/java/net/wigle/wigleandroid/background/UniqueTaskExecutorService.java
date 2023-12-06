@@ -24,14 +24,14 @@ public class UniqueTaskExecutorService extends ThreadPoolExecutor {
         if (jobClasses.contains(task.getClass())) {
             throw new IllegalArgumentException("instance of "+task.getClass()+" already in queue");
         }
-        Logging.error("===>SUBMITTED: "+task.getClass());
+        Logging.debug("===>SUBMITTED: "+task.getClass());
         jobClasses.add(task.getClass());
         return super.submit(task);
     }
 
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
-        Logging.error("===>EXECUTING: "+r.getClass());
+        Logging.debug("===>EXECUTING: "+r.getClass());
         current = r;
     }
 
@@ -39,7 +39,7 @@ public class UniqueTaskExecutorService extends ThreadPoolExecutor {
     protected void afterExecute(Runnable r, Throwable t) {
         jobClasses.remove(r.getClass());
         current = null;
-        Logging.error("<===EXECUTED: "+r.getClass());
+        Logging.debug("<===EXECUTED: "+r.getClass());
         super.afterExecute(r, t);
     }
 }

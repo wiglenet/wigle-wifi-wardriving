@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-path name="m8b" path="wiglewifi/m8b"/>
-    <files-path name="m8b-internal" path="./"/>
+    <cache-path name="m8b-internal" path="./"/>
 </paths>

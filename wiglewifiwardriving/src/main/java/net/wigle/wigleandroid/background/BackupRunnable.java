@@ -20,10 +20,8 @@ import java.io.File;
 public class BackupRunnable extends ProgressPanelRunnable implements Runnable, AlertSettable{
     private Pair<Boolean,String> dbResult;
 
-    MainActivity mainActivity;
-    public BackupRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress, final MainActivity mainActivity) {
+    public BackupRunnable(final FragmentActivity activity, final UniqueTaskExecutorService executorService, final boolean showProgress) {
         super(activity, executorService, showProgress);
-        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -34,7 +32,10 @@ public class BackupRunnable extends ProgressPanelRunnable implements Runnable, A
                 //ALIBI: Android like killing long-running tasks like this if you let the screen shut off
                 activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 setProgressStatus(R.string.backup_preparing);
-                mainActivity.setTransferring();
+                MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    ma.setTransferring();
+                }
             }
         });
     }
@@ -45,7 +46,10 @@ public class BackupRunnable extends ProgressPanelRunnable implements Runnable, A
             @Override
             public void run() {
                 activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                mainActivity.transferComplete();
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    ma.transferComplete();
+                }
                 final Context c = activity.getApplicationContext();
                 if (null != result) {
                     if (null != dbResult && dbResult.getFirst()) {
@@ -57,7 +61,6 @@ public class BackupRunnable extends ProgressPanelRunnable implements Runnable, A
                         if (null == c) {
                             Logging.error("null context in DB backup postExec");
                         } else {
-                            MainActivity ma = MainActivity.getMainActivity();
                             if (null != ma) {
                                 final File backupFile = new File(dbResult.getSecond());
                                 Logging.info("backupfile: " + backupFile.getAbsolutePath()

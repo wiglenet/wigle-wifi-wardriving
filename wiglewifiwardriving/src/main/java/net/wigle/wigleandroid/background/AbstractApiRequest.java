@@ -244,7 +244,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         // if we have cached data, and are meant to use it, call the handler with that
         if (useCacheIfPresent) {
             final JSONObject cache = getCached();
-            if (cache != null) listener.requestComplete(cache, true);
+            if (cache != null && listener != null) listener.requestComplete(cache, true);
             if (cacheOnly) return;
         }
 

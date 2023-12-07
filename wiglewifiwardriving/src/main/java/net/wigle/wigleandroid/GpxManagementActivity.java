@@ -190,9 +190,12 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     private boolean exportRouteGpxFile(long runId) {
         final long totalRoutePoints = ListFragment.lameStatic.dbHelper.getRoutePointCount(runId);
         if (totalRoutePoints > 1) {
-            ExecutorService es = Executors.newFixedThreadPool(1);
-            es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
-            es.shutdown();
+            ExecutorService es = ListFragment.lameStatic.executorService;
+            if (null != es) {
+                es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
+            } else {
+                Logging.error("null LameStatic ExecutorService - unable to submit route export");
+            }
         } else {
             Logging.error("no points to create route");
             WiGLEToast.showOverFragment(this, R.string.gpx_failed,

@@ -59,56 +59,52 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
         onPreExecute();
         final String name = df.format(new Date());
         final String nameStr = "<name>" + name + "</name><trkseg>\n";
-        try {
-            final String basePath = FileUtility.getGpxPath(activity.getApplication());
-            if (null == basePath) {
-                Logging.error("Unable to determine external GPX path");
-                return;
-            }
-            final File path = new File( basePath );
-            if (!path.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                path.mkdirs();
-            }
-            if (!path.exists()) {
-                Logging.info("Got '!exists': " + path);
-            }
-            String openString = basePath + name +  GPX_EXT;
-            //DEBUG: MainActivity.info("Opening file: " + openString);
-            gpxDestFile = new File( openString );
+        final String basePath = FileUtility.getGpxPath(activity.getApplication());
+        if (null == basePath) {
+            Logging.error("Unable to determine external GPX path");
+            return;
+        }
+        final File path = new File( basePath );
+        if (!path.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            path.mkdirs();
+        }
+        if (!path.exists()) {
+            Logging.info("Got '!exists': " + path);
+        }
+        String openString = basePath + name +  GPX_EXT;
+        //DEBUG: MainActivity.info("Opening file: " + openString);
+        gpxDestFile = new File( openString );
 
-            try (FileWriter writer = new FileWriter(gpxDestFile, false)) {
-                writer.append(GPX_HEADER_A);
-                String creator = "WiGLE WiFi ";
-                try {
-                    if (null != activity) {
-                        final PackageManager pm = activity.getApplicationContext().getPackageManager();
-                        final PackageInfo pi = pm.getPackageInfo(activity.getApplicationContext().getPackageName(), 0);
-                        creator += pi.versionName;
-                    } else {
-                        Logging.error("unable to get packageManager due to null Activity in GPX export");
-                    }
-                } catch (Exception ex) {
-                    creator += "(unknown)";
-                }
-                writer.append(creator);
-                writer.append(GPX_HEADER_B);
-                writer.append(nameStr);
-
-                Cursor cursor;
-                if (routeId == -1) {
-                    cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
+        try (FileWriter writer = new FileWriter(gpxDestFile, false)) {
+            writer.append(GPX_HEADER_A);
+            String creator = "WiGLE WiFi ";
+            try {
+                if (null != activity) {
+                    final PackageManager pm = activity.getApplicationContext().getPackageManager();
+                    final PackageInfo pi = pm.getPackageInfo(activity.getApplicationContext().getPackageName(), 0);
+                    creator += pi.versionName;
                 } else {
-                    cursor = ListFragment.lameStatic.dbHelper.routeIterator(routeId);
+                    Logging.error("unable to get packageManager due to null Activity in GPX export");
                 }
-                long segmentCount = writeSegmentsWithCursor(writer, cursor, df, totalCount);
-                Logging.info("wrote " + segmentCount + " segments");
-                writer.append(GPX_FOOTER);
-                writer.flush();
-                writer.close();
-                cursor.close();
-                return;
+            } catch (Exception ex) {
+                creator += "(unknown)";
             }
+            writer.append(creator);
+            writer.append(GPX_HEADER_B);
+            writer.append(nameStr);
+
+            Cursor cursor;
+            if (routeId == -1) {
+                cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
+            } else {
+                cursor = ListFragment.lameStatic.dbHelper.routeIterator(routeId);
+            }
+            long segmentCount = writeSegmentsWithCursor(writer, cursor, df, totalCount);
+            Logging.info("wrote " + segmentCount + " segments");
+            writer.append(GPX_FOOTER);
+            writer.flush();
+            cursor.close();
         } catch (IOException | DBException | InterruptedException e) {
             Logging.error("Error writing GPX", e);
         } finally {
@@ -166,41 +162,36 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
 
     @Override
     protected void onPostExecute(String result) {
-        if (null != result) { //launch task will exist with bg thread enqueued with null return
-            activity.runOnUiThread(new Runnable() {
-                              @Override
-                              public void run() {
-                                  clearProgressDialog();
-                              }
-                          });
-            // fire share intent?
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            final MainActivity ma = MainActivity.getMainActivity();
-            if (null != ma) {
-                ma.transferComplete();
-            }
+            activity.runOnUiThread(() -> {
+                activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                clearProgressDialog();
+                if (null != result) { //launch task will exist with bg thread enqueued with null return
+                    final MainActivity ma = MainActivity.getMainActivity();
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    final String fileName = (gpxDestFile != null && !gpxDestFile.getName().isEmpty()) ? gpxDestFile.getName() : "WiGLE.gpx";
+                    intent.putExtra(Intent.EXTRA_SUBJECT, fileName);
+                    intent.setType("application/gpx");
+                    if (ma != null) {
+                        ma.transferComplete();
+                        final Context context = ma.getApplicationContext();
+                        if (null != context) {
+                            final Uri fileUri = FileProvider.getUriForFile(context,
+                                    ma.getApplicationContext().getPackageName() +
+                                            ".gpxprovider", gpxDestFile);
 
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            final String fileName = (gpxDestFile != null && !gpxDestFile.getName().isEmpty()) ? gpxDestFile.getName() : "WiGLE.gpx";
-            intent.putExtra(Intent.EXTRA_SUBJECT, fileName);
-            intent.setType("application/gpx");
-
-            //TODO: verify local-only storage case/gpx_paths.xml
-            if (ma != null) {
-                final Context context = ma.getApplicationContext();
-                if (null != context) {
-                    final Uri fileUri = FileProvider.getUriForFile(context,
-                            ma.getApplicationContext().getPackageName() +
-                                    ".gpxprovider", gpxDestFile);
-
-                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
+                            intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
+                        } else {
+                            Logging.error("Unable to initiate GPX export - null context");
+                        }
+                    } else {
+                        Logging.error("Unable to initiate GPX export - null MainActivity");
+                    }
+                } else {
+                    Logging.error("null result in GPX export post-execution");
                 }
-            } else {
-                Logging.error("Unable to initiate GPX export - null context");
-            }
-        }
+            });
     }
 }

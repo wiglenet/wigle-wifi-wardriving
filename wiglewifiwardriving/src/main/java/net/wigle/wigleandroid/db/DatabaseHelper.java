@@ -13,10 +13,10 @@ import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.hasSD;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -71,7 +71,6 @@ public final class DatabaseHelper extends Thread {
     private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
-    private static final String INTERNAL_DB_PATH = "databases/";
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
@@ -1464,8 +1463,7 @@ public final class DatabaseHelper extends Thread {
             file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
         }
         Pair<Boolean,String> result;
-        try {
-            InputStream input = new FileInputStream(file);
+        try (InputStream input = Files.newInputStream(file.toPath())){
             FileOutputStream output = FileUtility.createFile(context, outputFilename, false);
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -1479,11 +1477,9 @@ public final class DatabaseHelper extends Thread {
                 task.setProgress( percent );
             }
             output.close();
-            input.close();
             final File outputFile = new File(FileUtility.getBackupPath(context), outputFilename);
             result = new Pair<>(Boolean.TRUE, outputFile.getAbsolutePath());
-        }
-        catch ( IOException ex ) {
+        } catch ( IOException ex ) {
             Logging.error("backup failure: " + ex, ex);
             result = new Pair<>(Boolean.FALSE, "ERROR: " + ex);
         }

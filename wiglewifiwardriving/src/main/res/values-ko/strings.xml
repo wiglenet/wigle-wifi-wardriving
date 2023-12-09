@@ -451,4 +451,6 @@
     <string name="tts_new_bt">새로운 블루투스</string>
     <string name="gnss_full">GNSS 전체 추적 사용(배터리 소모가 많음)</string>
     <string name="search_area">검색 영역:</string>
+    <string name="queued_jobs">(%1$d개의 대기 중인 작업)</string>
+    <string name="duplicate_job">이 유형의 작업이 이미 실행 중이거나 실행 대기 중입니다.</string>
 </resources>

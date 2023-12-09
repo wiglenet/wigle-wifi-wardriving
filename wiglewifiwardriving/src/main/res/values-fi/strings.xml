@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Uusi bluetooth</string>
     <string name="gnss_full">Käytä täydellistä GNSS-seurantaa (suuri akun tyhjennys)</string>
     <string name="search_area">Hakualue:</string>
+    <string name="queued_jobs">(%1$d jonossa olevaa tehtävää)</string>
+    <string name="duplicate_job">Tämäntyyppinen työ on jo käynnissä tai odottaa suorittamistaan.</string>
 </resources>

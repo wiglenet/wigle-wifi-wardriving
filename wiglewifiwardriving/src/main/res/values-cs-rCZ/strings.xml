@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Nové bluetooth</string>
     <string name="gnss_full">Použít úplné sledování GNSS (velká spotřeba baterie)</string>
     <string name="search_area">Oblast hledání:</string>
+    <string name="queued_jobs">(%1$d úkolů ve frontě)</string>
+    <string name="duplicate_job">Úloha tohoto typu již běží nebo čeká na spuštění.</string>
 </resources>

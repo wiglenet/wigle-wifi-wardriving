@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Новый блютуз</string>
     <string name="gnss_full">Используйте полное отслеживание GNSS (большой расход заряда батареи)</string>
     <string name="search_area">Область поиска:</string>
+    <string name="queued_jobs">(%1$d задач в очереди)</string>
+    <string name="duplicate_job">Задание этого типа уже запущено или ожидает запуска.</string>
 </resources>

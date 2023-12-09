@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Nije bluetooth</string>
     <string name="gnss_full">Brûk GNSS folsleine tracking (grutte batterij drain)</string>
     <string name="search_area">Zoekgebied:</string>
+    <string name="queued_jobs">(%1$d taken in de wachtrij)</string>
+    <string name="duplicate_job">Een taak van dit type is al actief of wacht op uitvoering.</string>
 </resources>

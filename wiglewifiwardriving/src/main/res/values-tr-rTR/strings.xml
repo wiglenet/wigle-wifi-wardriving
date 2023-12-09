@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Yeni bluetooth</string>
     <string name="gnss_full">GNSS tam takibini kullanın (çok fazla pil tüketimi)</string>
     <string name="search_area">Arama Alanı:</string>
+    <string name="queued_jobs">(%1$d sıraya alınmış görev)</string>
+    <string name="duplicate_job">Bu türde bir iş zaten çalışıyor veya çalıştırılmayı bekliyor.</string>
 </resources>

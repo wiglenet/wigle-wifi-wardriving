@@ -84,7 +84,7 @@ import groovy.json.JsonSlurper
 import java.sql.SQLException
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
-task downloadFile (type: Download) {
+tasks.register('downloadFile', Download) {
     println "downloading mcc/mnc data"
     download {
         src 'https://api.wigle.net/api/v2/cell/mccMnc'
@@ -93,14 +93,15 @@ task downloadFile (type: Download) {
     }
 }
 
-task createMccMncDB (dependsOn: 'downloadFile') {
+tasks.register('createMccMncDB') {
+    dependsOn 'downloadFile'
     ext.loadScript = { sql, file ->
         println("Applying " + file)
         String[] sqlcmds = file.text.split(";")
-        sqlcmds.collect{it.trim()}.findAll{!it.isEmpty() && !it.startsWith("--")}.each{
+        sqlcmds.collect { it.trim() }.findAll { !it.isEmpty() && !it.startsWith("--") }.each {
             try {
                 sql.execute(it)
-            } catch(SQLException e) {
+            } catch (SQLException e) {
                 System.err << "Invalid SQL statement: " + it
                 e.printStackTrace(System.err)
                 throw new GradleException('Preformulated MCC/MNC Database SQL Failure.')
@@ -109,15 +110,15 @@ task createMccMncDB (dependsOn: 'downloadFile') {
     }
 
     delete outputMxcDbFile
-    def sql = Sql.newInstance("jdbc:sqlite:$outputMxcDbFile",'','','org.sqlite.JDBC')
-    new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) {loadScript(sql, it)}
+    def sql = Sql.newInstance("jdbc:sqlite:$outputMxcDbFile", '', '', 'org.sqlite.JDBC')
+    new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) { loadScript(sql, it) }
     def inputFile = new File("$mxcDictionaryFile")
     def mccMap = new JsonSlurper().parseText(inputFile.text)
     def insertSql = 'INSERT OR REPLACE INTO wigle_mcc_mnc (mcc, mnc, type, countryName, countryCode, brand, operator, status, bands, notes) VALUES (?,?,?,?,?,?,?,?,?,?)'
     def myKeyNames = ['mcc', 'mnc']
     mccMap.each { mcc, mncMap ->
         //DEBUG: println "mcc: $mcc"
-        mncMap.each {mnc, value ->
+        mncMap.each { mnc, value ->
             //DEBUG: println "\tmnc: $mnc"
             //DEBUG: println "\t\tvalue: $value"
             def type = value?.type

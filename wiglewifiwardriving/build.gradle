@@ -90,7 +90,6 @@ task downloadFile (type: Download) {
         src 'https://api.wigle.net/api/v2/cell/mccMnc'
         dest "../$mxcDictionaryFile"
         overwrite true
-        acceptAnyCertificate true /* horrible, but alternative is update trust store <=> letsencrypt */
     }
 }
 

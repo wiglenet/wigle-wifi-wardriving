@@ -450,4 +450,6 @@
     <string name="tts_new_bt">新しいBluetooth</string>
     <string name="gnss_full">GNSS 完全追跡を使用する (バッテリーの消耗が大きい)</string>
     <string name="search_area">検索エリア:</string>
+    <string name="queued_jobs">(%1$d キューに入れられたタスク)</string>
+    <string name="duplicate_job">このタイプのジョブはすでに実行中か、実行を待機しています。</string>
 </resources>

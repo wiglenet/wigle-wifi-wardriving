@@ -451,4 +451,6 @@
     <string name="tts_new_bt">بلوتوث جديد</string>
     <string name="gnss_full">استخدم التتبع الكامل GNSS (استنزاف كبير للبطارية)</string>
     <string name="search_area">منطقة البحث:</string>
+    <string name="queued_jobs">(%1$d مهمة في قائمة الانتظار)</string>
+    <string name="duplicate_job">هناك مهمة من هذا النوع قيد التشغيل بالفعل أو في انتظار التشغيل.</string>
 </resources>

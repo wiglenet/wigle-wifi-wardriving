@@ -13,10 +13,10 @@ import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.hasSD;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,9 +29,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.wigle.wigleandroid.DataFragment.BackupTask;
 import net.wigle.wigleandroid.ErrorReportActivity;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.background.BackupRunnable;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -71,7 +71,6 @@ public final class DatabaseHelper extends Thread {
     private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
-    private static final String INTERNAL_DB_PATH = "databases/";
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
@@ -144,10 +143,15 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
         + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
+
+    private static final String LOCATED_WIFI_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
+            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND " + NetworkFilter.WIFI.getFilter()
+            + " AND instr(bssid, '_') <= 0";
     //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
 
-    private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;
-    public static final String LOCATED_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_NETS_QUERY_STEM;
+    public static final String LOCATED_WIFI_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_WIFI_QUERY_STEM;
+
+    private static final String LOCATED_WIFI_COUNT_QUERY = "SELECT count(*)" +LOCATED_WIFI_QUERY_STEM;
 
     private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
@@ -1324,10 +1328,9 @@ public final class DatabaseHelper extends Thread {
             return count;
         }
     }
-
-    public long getNetsWithLocCountFromDB() throws DBException {
+    public long getWiFiNetsWthLocCountFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null)) {
+        try (Cursor cursor = db.rawQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
         }
@@ -1452,7 +1455,7 @@ public final class DatabaseHelper extends Thread {
     }
 
 
-    public Pair<Boolean,String> copyDatabase(final BackupTask task) {
+    public Pair<Boolean,String> copyDatabase(final BackupRunnable task) {
         File file = context.getDatabasePath(DATABASE_NAME);
         String outputFilename = "backup-" + System.currentTimeMillis() + SQL_EXT;
 
@@ -1460,8 +1463,7 @@ public final class DatabaseHelper extends Thread {
             file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
         }
         Pair<Boolean,String> result;
-        try {
-            InputStream input = new FileInputStream(file);
+        try (InputStream input = Files.newInputStream(file.toPath())){
             FileOutputStream output = FileUtility.createFile(context, outputFilename, false);
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -1472,14 +1474,12 @@ public final class DatabaseHelper extends Thread {
                 read += bytesRead;
                 int percent = (int)( (read*100)/total );
                 // MainActivity.info("percent: " + percent + " read: " + read + " total: " + total );
-                task.progress( percent );
+                task.setProgress( percent );
             }
             output.close();
-            input.close();
             final File outputFile = new File(FileUtility.getBackupPath(context), outputFilename);
             result = new Pair<>(Boolean.TRUE, outputFile.getAbsolutePath());
-        }
-        catch ( IOException ex ) {
+        } catch ( IOException ex ) {
             Logging.error("backup failure: " + ex, ex);
             result = new Pair<>(Boolean.FALSE, "ERROR: " + ex);
         }

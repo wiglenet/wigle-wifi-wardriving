@@ -450,4 +450,6 @@
     <string name="tts_new_bt">Nueva bluetooth</string>
     <string name="gnss_full">Utilice seguimiento completo GNSS (gran consumo de batería)</string>
     <string name="search_area">Área de búsqueda:</string>
+    <string name="queued_jobs">(%1$d tareas en cola)</string>
+    <string name="duplicate_job">Un trabajo de este tipo ya se está ejecutando o esperando a ejecutarse.</string>
 </resources>

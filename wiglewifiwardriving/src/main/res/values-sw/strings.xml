@@ -450,4 +450,6 @@
     <string name="tts_new_bt">Bluetooth mpya</string>
     <string name="gnss_full">Tumia ufuatiliaji kamili wa GNSS (kukimbia kwa betri kubwa)</string>
     <string name="search_area">Eneo la Utafutaji:</string>
+    <string name="queued_jobs">(Kazi %1$d zilizowekwa kwenye foleni)</string>
+    <string name="duplicate_job">Kazi ya aina hii tayari inaendeshwa au inasubiri kufanya kazi.</string>
 </resources>

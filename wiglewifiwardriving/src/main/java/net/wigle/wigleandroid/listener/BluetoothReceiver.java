@@ -848,7 +848,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             long diff = responseClockTime - lastLeBatchResponseTime.longValue();
             lastLeBatchResponseTime.set(responseClockTime);
             if (diff < MIN_LE_BATCH_GAP_MILLIS) {
-                Logging.info("Tried to update BTLE batch in improbably short time: " + diff + " ("+results.size()+" results)");
+                Logging.debug("Tried to update BTLE batch in improbably short time: " + diff + " ("+results.size()+" results)");
                 return;
             }
             //DEBUG: Logging.error("LE Batch results: " + results.size());

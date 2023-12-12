@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Ny bluetooth</string>
     <string name="gnss_full">Brug GNSS fuld sporing (stort batteriforbrug)</string>
     <string name="search_area">Søgeområde:</string>
+    <string name="queued_jobs">(%1$d opgaver i kø)</string>
+    <string name="duplicate_job">Et job af denne type kører allerede eller venter på at køre.</string>
 </resources>

@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import androidx.fragment.app.FragmentActivity;
+
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -150,14 +152,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     private void activateProgressPanel(final FragmentActivity context) {
         final LinearLayout progressLayout = context.findViewById(R.id.inline_status_bar);
         final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
+        final TextView queueLabel = context.findViewById(R.id.inline_progress_queue_status);
         final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
         final Button importObservedButton = context.findViewById(R.id.import_observed_button);
         final Button uploadButton = context.findViewById(R.id.upload_button);
 
         if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
-            pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
+            pp = new ProgressPanel(progressLayout, progressLabel, progressBar, queueLabel);
             pp.show();
             final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
+            taskCancelButton.setVisibility(View.VISIBLE);
             taskCancelButton.setOnClickListener(v -> {
                 if (null != latestTask) {
                     latestTask.setInterrupted();

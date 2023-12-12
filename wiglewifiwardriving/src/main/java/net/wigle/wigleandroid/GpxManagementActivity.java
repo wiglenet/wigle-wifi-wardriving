@@ -1,5 +1,4 @@
 package net.wigle.wigleandroid;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -19,6 +18,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 
+import net.wigle.wigleandroid.background.GpxExportRunnable;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.PolylineRoute;
@@ -27,7 +27,6 @@ import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
-import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -36,9 +35,11 @@ import net.wigle.wigleandroid.util.RouteExportSelector;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.view.View.GONE;
-import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
+import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
 public class GpxManagementActivity extends ScreenChildActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
 
@@ -51,11 +52,15 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     private Polyline routePolyline;
     private final String CURRENT_ROUTE_LINE_TAG = "currentRoutePolyline";
     private SharedPreferences prefs;
-    private ProgressDialog pd;
     private long exportRouteId = -1L;
 
     public GpxManagementActivity() {
-        this.dbHelper = MainActivity.getStaticState().dbHelper;
+        final MainActivity.State s = MainActivity.getStaticState();
+        if (null != s) {
+            this.dbHelper = s.dbHelper;
+        } else {
+            this.dbHelper = null;
+        }
         Locale locale = Locale.getDefault();
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(1);
@@ -185,8 +190,12 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     private boolean exportRouteGpxFile(long runId) {
         final long totalRoutePoints = ListFragment.lameStatic.dbHelper.getRoutePointCount(runId);
         if (totalRoutePoints > 1) {
-            new AsyncGpxExportTask(this, this,
-                    pd, runId).execute(totalRoutePoints);
+            ExecutorService es = ListFragment.lameStatic.executorService;
+            if (null != es) {
+                es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
+            } else {
+                Logging.error("null LameStatic ExecutorService - unable to submit route export");
+            }
         } else {
             Logging.error("no points to create route");
             WiGLEToast.showOverFragment(this, R.string.gpx_failed,

@@ -451,4 +451,6 @@
     <string name="tts_new_bt">Új bluetooth</string>
     <string name="gnss_full">Használja a GNSS teljes követést (nagy akkumulátorlemerülés)</string>
     <string name="search_area">Keresési terület:</string>
+    <string name="queued_jobs">(%1$d sorban álló feladat)</string>
+    <string name="duplicate_job">Egy ilyen típusú feladat már fut, vagy futásra vár.</string>
 </resources>

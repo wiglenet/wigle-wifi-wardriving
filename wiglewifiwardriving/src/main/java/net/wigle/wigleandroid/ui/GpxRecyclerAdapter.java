@@ -26,9 +26,8 @@ import net.wigle.wigleandroid.util.RouteExportSelector;
 
 import java.text.DateFormat;
 
-import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
-
 public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.ViewHolder>  {
+    public static final int EXPORT_GPX_DIALOG = 130;
 
     private final Context context;
     private final FragmentActivity fragmentActivity;

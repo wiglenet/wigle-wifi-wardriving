@@ -451,4 +451,6 @@
     <string name="tts_new_bt">新蓝牙</string>
     <string name="gnss_full">使用 GNSS 全程跟踪（电池消耗大）</string>
     <string name="search_area">搜尋區域：</string>
+    <string name="queued_jobs">（%1$d 個排隊任務）</string>
+    <string name="duplicate_job">這種類型的作業已經在運作或正在等待執行。</string>
 </resources>

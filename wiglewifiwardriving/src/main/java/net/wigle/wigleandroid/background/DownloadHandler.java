@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import java.text.NumberFormat;
 
 /**
@@ -25,5 +27,5 @@ public abstract class DownloadHandler extends Handler {
     }
 
     @Override
-    abstract public void handleMessage(final Message msg);
+    abstract public void handleMessage(@NonNull final Message msg);
 }

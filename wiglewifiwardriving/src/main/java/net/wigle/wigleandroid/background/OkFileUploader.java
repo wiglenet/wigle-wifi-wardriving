@@ -23,7 +23,6 @@ import okhttp3.Response;
  * 2. configurability (we can set all sorts of options and failure handling on OkHttp)
  * 3. ability to get better debugging data and handle gracefully in case of failure. (byzantine failures, SSL problems)
  * Also: "deleted code is debugged code." -orn
- *
  * NOTE: OkHttp is the underlying implementation in HttpUrlConnection beginning in android 4.4, but this is included for compat with android versions below that
  *
  * @author arkasha
@@ -108,7 +107,11 @@ public class OkFileUploader {
                 Logging.error("Failed to upload file:"+response.code()+" "+response.message());
                 return null;
             } else {
-                return response.body().string();
+                if (null != response.body()) {
+                    return response.body().string();
+                } else {
+                    return null;
+                }
             }
         }
     }

@@ -21,10 +21,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -59,7 +60,7 @@ public class CsvDownloader extends AbstractProgressApiRequest {
             final File compressed = FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT);
             if (null != compressed) {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                        new GZIPInputStream(new FileInputStream(compressed)), StandardCharsets.UTF_8))) {
+                        new GZIPInputStream(Files.newInputStream(compressed.toPath())), StandardCharsets.UTF_8))) {
                     String line;
                     boolean headerOneChecked = false;
                     boolean headerTwoChecked = false;
@@ -147,7 +148,7 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                 FileInputStream in = new FileInputStream(intermediate);
                 final String compressedFile = intermediate.getCanonicalPath() + FileUtility.GZ_EXT;
 
-                GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(compressedFile));
+                GZIPOutputStream out = new GZIPOutputStream(Files.newOutputStream(Paths.get(compressedFile)));
 
                 byte[] buf = new byte[1024];
                 int len;

@@ -2,10 +2,10 @@
 buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'de.undercouch:gradle-download-task:5.5.0'
     }
 
 }
 plugins {
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
+    id "de.undercouch.download" version "5.5.0"
 }

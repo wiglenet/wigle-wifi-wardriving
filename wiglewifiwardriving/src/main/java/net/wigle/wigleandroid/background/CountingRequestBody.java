@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.background;
 
+import androidx.annotation.NonNull;
+
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.IOException;
@@ -50,7 +52,7 @@ public class CountingRequestBody extends RequestBody
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
+    public void writeTo(@NonNull BufferedSink sink) throws IOException {
         countingSink = new CountingSink(sink);
         BufferedSink bufferedSink = Okio.buffer(countingSink);
 
@@ -71,7 +73,7 @@ public class CountingRequestBody extends RequestBody
         }
 
         @Override
-        public void write(Buffer source, long byteCount) throws IOException {
+        public void write(@NonNull Buffer source, long byteCount) throws IOException {
             super.write(source, byteCount);
             bytesWritten += byteCount;
             listener.onRequestProgress(bytesWritten, contentLength());

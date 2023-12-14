@@ -20,10 +20,10 @@ import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,7 +39,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private final Context context;
     private final boolean hasSD;
     private SQLiteDatabase db;
-    private SharedPreferences prefs;
+    private final SharedPreferences prefs;
 
     // query when you just need opname
     private static final String OPERATOR_FOR_MCC_MNC = "SELECT operator FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
@@ -110,7 +110,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                     assetInputData = context.getAssets().open(MXC_DB_NAME);
                     final File outputFile = getMxcFile();
                     Logging.info("Installing mxc file at: " + outputFile);
-                    mxcOutput = new FileOutputStream(outputFile);
+                    mxcOutput = Files.newOutputStream(outputFile.toPath());
 
                     byte[] buffer = new byte[1024];
                     int length;
@@ -169,7 +169,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
 
-                    MccMncRecord operator = new MccMncRecord(
+                    return new MccMncRecord(
                             cursor.getString(cursor.getColumnIndex("type")),
                             cursor.getString(cursor.getColumnIndex("countryName")),
                             cursor.getString(cursor.getColumnIndex("countryCode")),
@@ -180,7 +180,6 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndex("status")),
                             cursor.getString(cursor.getColumnIndex("bands")),
                             cursor.getString(cursor.getColumnIndex("notes")));
-                    return operator;
                 }
             } else {
                 Logging.error("unable to open mcc/mnc database for record.");
@@ -235,7 +234,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 db.close();
             }
         }
-        return operator;
+        return null;
     }
 
     private boolean openDataBase() throws SQLException {

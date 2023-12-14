@@ -71,61 +71,66 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                 System.out.println("Error: root should be object: quiting.");
                 return null;
             }
-            Integer total = 0;
+            int total = 0;
             while (jp.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = jp.getCurrentName();
                 current = jp.nextToken();
-                if (fieldName.equals("success")) {
-                    if (current.isBoolean()) {
-                        if (current == JsonToken.VALUE_TRUE) {
-                            Logging.info("successful load");
-                        } else {
-                            Logging.error("MyObserved success: false");
-                            status = Status.EXCEPTION;
-                            bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: success: false");
+                switch (fieldName) {
+                    case "success":
+                        if (current.isBoolean()) {
+                            if (current == JsonToken.VALUE_TRUE) {
+                                Logging.info("successful load");
+                            } else {
+                                Logging.error("MyObserved success: false");
+                                status = Status.EXCEPTION;
+                                bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: success: false");
+                            }
                         }
-                    }
-                } else if (fieldName.equals("count")) {
-                    total = jp.getIntValue();
-                    Logging.info("received " + total + " observations");
-                    if (total > 0) {
-                        status = Status.SUCCESS;
-                    }
-                } else if (fieldName.equals("results")) {
-                    if (current == JsonToken.START_ARRAY) {
-                        // For each of the records in the array
-                        int i = 0;
-                        while (jp.nextToken() != JsonToken.END_ARRAY) {
-                            String netId = jp.getValueAsString();
-                            //DEBUG: MainActivity.info(netId);
-                            final String ssid = "";
-                            final int frequency = 0;
-                            final String capabilities = "";
-                            final int level = 0;
-                            final Network network = new Network(netId, ssid, frequency,
-                                capabilities, level, NetworkType.WIFI);
-                            final Location location = new Location("wigle");
-                            final boolean newForRun = true;
-                            ListFragment.lameStatic.dbHelper.blockingAddExternalObservation(
-                                network, location, newForRun);
+                        break;
+                    case "count":
+                        total = jp.getIntValue();
+                        Logging.info("received " + total + " observations");
+                        if (total > 0) {
+                            status = Status.SUCCESS;
+                        }
+                        break;
+                    case "results":
+                        if (current == JsonToken.START_ARRAY) {
+                            // For each of the records in the array
+                            int i = 0;
+                            while (jp.nextToken() != JsonToken.END_ARRAY) {
+                                String netId = jp.getValueAsString();
+                                //DEBUG: MainActivity.info(netId);
+                                final String ssid = "";
+                                final int frequency = 0;
+                                final String capabilities = "";
+                                final int level = 0;
+                                final Network network = new Network(netId, ssid, frequency,
+                                        capabilities, level, NetworkType.WIFI);
+                                final Location location = new Location("wigle");
+                                final boolean newForRun = true;
+                                ListFragment.lameStatic.dbHelper.blockingAddExternalObservation(
+                                        network, location, newForRun);
 
-                            if ((i % 1000) == 0) {
-                                Logging.info("lineCount: " + i + " of " + total);
+                                if ((i % 1000) == 0) {
+                                    Logging.info("lineCount: " + i + " of " + total);
+                                }
+                                if (total == 0) {
+                                    total = 1;
+                                }
+                                final int percentDone = (i * 1000) / total;
+                                sendPercentTimesTen(percentDone, bundle);
+                                i++;
                             }
-                            if (total == 0) {
-                                total = 1;
-                            }
-                            final int percentDone = (i * 1000) / total;
-                            sendPercentTimesTen(percentDone, bundle);
-                            i++;
+                        } else {
+                            System.out.println("Error: records should be an array: skipping.");
+                            jp.skipChildren();
                         }
-                    } else {
-                        System.out.println("Error: records should be an array: skipping.");
+                        break;
+                    default:
+                        System.out.println("Unprocessed property: " + fieldName);
                         jp.skipChildren();
-                    }
-                } else {
-                    System.out.println("Unprocessed property: " + fieldName);
-                    jp.skipChildren();
+                        break;
                 }
             }
         } catch (InterruptedException e) {

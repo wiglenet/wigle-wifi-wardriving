@@ -150,7 +150,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
      * override base startDownload - but instead perform an upload
      * TODO: a misnomer, really
      * @param fragment the fragment from which the upload was started
-     * @throws WiGLEAuthException
      */
     @Override
     public void startDownload(final Fragment fragment) throws WiGLEAuthException {

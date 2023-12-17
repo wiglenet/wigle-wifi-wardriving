@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ru.egslava</groupId>
+  <artifactId>MaskedEditText</artifactId>
+  <version>1.0.5</version>
+  <packaging>aar</packaging>
+  <name>edittext-mask</name>
+  <description># MaskedEditText
+[ ![Download](https://api.bintray.com/packages/egorenkov/maven/edittext-mask/images/download.svg) ](https://bintray.com/egorenkov/maven/edittext-mask/_latestVersion)
+
+This project derives from [toshikurauchi/MaskedEditText](https://github.com/toshikurauchi/MaskedEditText), but it's been a little bit adapted for gradle build system and has two additional features
+
+1. filter allowed chars
+2. filter denied chars
+3. user can use chars from mask in his input (in original version of this library user couldn't use digit '7' in the '+7(XXX)XXX-XX-XX' pattern).
+
+So it allows you to use masks for phones, urls, etc.
+
+Enjoy!
+
+*********************************
+## en_US
+
+MakedEditText is a simple Android EditText with customizable input mask support.
+
+For instance, you need user specified his phone in format +7(XXX)XXX-XX-XX. You also know user should have the only possibility to write digits but minuses, brackets and "+7" should appear automatically.
+
+### Usage
+
+Add _xmlns:mask="http://schemas.android.com/apk/res/com.your.app.package"_ to your layout xml root.
+Also you need to download project and plug it in as a library (project doesn't have a maven repository) so you can start using the library:
+
+      &lt;br.com.sapereaude.maskedEditText.MaskedEditText
+        android:id="@+id/phone_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:typeface="monospace"
+        mask:allowed_chars="1234567890"
+        mask:mask="+7(###)###-##-##"
+        />    
+Where _mask_ is the input mask you want and '#' is an editable position (will be replaced by a whitespace on screen).
+
+You can optionally set the representation character (in case you don't want to use '#'):
+
+    &lt;br.com.sapereaude.maskedEditText.MaskedEditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        mask:mask="ccc.ccc.ccc-cc"
+        mask:char_representation="c"
+    />
+
+You can also change the mask and the representation character programatically:
+
+	MaskedEditText editText = (MaskedEditText) findViewById(R.id.my_edit_text)
+	// Setting the representation character to '$'
+	editText.setCharRepresentation('$');
+	// Logging the representation character
+	Log.i("Representation character", editText.getCharRepresentation());
+	// Setting the mask
+	editText.setMask("##/##/####");
+	// Logging the mask
+	Log.i("Mask", editText.getMask());
+
+*************************************************************************************************
+## ru_RU
+
+MarkedEditText - это всего лишь EditText, но с возможностью задавать произвольную маску.
+
+Например, нужно ввести телефон в формате +7(XXX)XXX-XX-XX. Причём можно ввести только цифры, а скобочки, дефисы и "+7" должны подставляться самостоятельно.
+
+### Использование
+
+Добавить _xmlns:mask="http://schemas.android.com/apk/res-auto"_ в корневой элемент файла разметки. Кроме того, нужно скачать проект и добавить его в зависимости к основному проекту, после чего элемент можно начать использовать:
+
+      &lt;br.com.sapereaude.maskedEditText.MaskedEditText
+        android:id="@+id/phone_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:typeface="monospace"
+        mask:allowed_chars="1234567890"
+        mask:mask="+7(###)###-##-##"
+        />
+
+_mask_ задаёт требуемую маску, символ '#' задаёт редактируемую позицию (и будет заменён на пробел на экране).
+
+Если использовать '#' нельзя, то можно попробовать использовать другой символ:
+
+    &lt;br.com.sapereaude.maskedEditText.MaskedEditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        mask:mask="ccc.ccc.ccc-cc"
+        mask:char_representation="c"
+    />
+
+Кроме того, всё тоже самое можно сделать и программно:
+
+	MaskedEditText editText = (MaskedEditText) findViewById(R.id.my_edit_text)
+	// Setting the representation character to '$'
+	editText.setCharRepresentation('$');
+	// Logging the representation character
+	Log.i("Representation character", editText.getCharRepresentation());
+	// Setting the mask
+	editText.setMask("##/##/####");
+	// Logging the mask
+	Log.i("Mask", editText.getMask());
+</description>
+  <url>https://github.com/egslava/edittext-mask</url>
+  <inceptionYear>2017</inceptionYear>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>egslava</id>
+      <name>Slava Egorenkov</name>
+      <email>egslava@gmail.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>https://github.com/egslava/edittext-mask.git</connection>
+    <developerConnection>https://github.com/egslava/edittext-mask.git</developerConnection>
+    <url>https://github.com/egslava/edittext-mask</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>com.android.support</groupId>
+      <artifactId>appcompat-v7</artifactId>
+      <version>25.2.0</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -39,6 +39,7 @@ dependencies {
 }
 
 // make a driver copy, per https://stackoverflow.com/questions/51676049/cannot-change-strategy-of-configuration-sqlite
+// NOTE: this continues to result in warnings: Configuration 'driver' was resolved during configuration time.\n This is a build performance and scalability issue.
 URLClassLoader loader = GroovyObject.class.classLoader
 def driverCopy = configurations.driver.copy()
 driverCopy.each {File file -> loader.addURL(file.toURI().toURL())}
@@ -48,7 +49,7 @@ ext {
     outputMxcDbFile = layout.projectDirectory.file("src/main/assets/mmcmnc.sqlite")
     mxcDictionaryFile = inputMxcSqlDir.file("mcc-mnc-dict.json")
     outputBtMemberUuidFile = layout.projectDirectory.file("src/main/assets/btmember.yaml")
-    outputBtCoIdUuidFile = layout.projectDirectory.file("src/main/assets/btco.yaml")
+    outputBtCoIdFile = layout.projectDirectory.file("src/main/assets/btco.yaml")
 }
 
 dependencies {
@@ -64,10 +65,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'ru.egslava:MaskedEditText:1.0.5'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation (name:'MaskedEditText-1.0.5', ext:'aar')
     implementation 'com.goebl:simplify:1.0.0'
-    implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
+    implementation "com.appmattus.certificatetransparency:certificatetransparency-android:2.5.19"
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
@@ -85,6 +86,7 @@ import java.sql.SQLException
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 tasks.register('downloadFile', Download) {
+    println "===MCC/MNC DB Creation==="
     download.run {
         src 'https://api.wigle.net/api/v2/cell/mccMnc'
         dest mxcDictionaryFile
@@ -92,7 +94,7 @@ tasks.register('downloadFile', Download) {
     }
     File test = new File(mxcDictionaryFile.toString())
     if (test.exists()) {
-        println "Downloaded: $mxcDictionaryFile"
+        println "Wrote $mxcDictionaryFile"
     } else {
         throw new IOException("Failed to download mcc-mnc file: $mxcDictionaryFile")
     }
@@ -123,10 +125,7 @@ tasks.register('createMccMncDB') {
     def insertSql = 'INSERT OR REPLACE INTO wigle_mcc_mnc (mcc, mnc, type, countryName, countryCode, brand, operator, status, bands, notes) VALUES (?,?,?,?,?,?,?,?,?,?)'
     def myKeyNames = ['mcc', 'mnc']
     mccMap.each { mcc, mncMap ->
-        //DEBUG: println "mcc: $mcc"
         mncMap.each { mnc, value ->
-            //DEBUG: println "\tmnc: $mnc"
-            //DEBUG: println "\t\tvalue: $value"
             def type = value?.type
             def countryName = value?.countryName
             def countryCode = value?.countryCode
@@ -139,31 +138,36 @@ tasks.register('createMccMncDB') {
             sql.executeInsert insertSql, params, myKeyNames
         }
     }
+    println "MCC/MNC Database created: $outputMxcDbFile"
     sql.close()
 }
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 tasks.register('downloadBtMemberFile', Download) {
-    println "downloading BT Member UUID YAML data"
+    println "===BT Member UUID YAML Data==="
     download.run {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
         dest outputBtMemberUuidFile.toString()
         overwrite true
     }
-    println "Downloaded: $outputBtMemberUuidFile"
-    println "downloading BT Company ID YAML data"
+    File testUuid = new File(outputBtMemberUuidFile.toString())
+    if (testUuid.exists()) {
+        println "Wrote $outputBtMemberUuidFile"
+    } else {
+        throw new IOException("Failed to download BT UUID file: $outputBtMemberUuidFile")
+    }
+    println "===BT Company ID YAML Data==="
     download.run {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
-        dest outputBtCoIdUuidFile
+        dest outputBtCoIdFile
         overwrite true
     }
-    println "Downloaded: $outputBtCoIdUuidFile"
-    File test = new File(outputBtCoIdUuidFile.toString())
-    if (test.exists()) {
-        println "Downloaded: $outputBtCoIdUuidFile"
+    File testMfgrId = new File(outputBtCoIdFile.toString())
+    if (testMfgrId.exists()) {
+        println "Wrote $outputBtCoIdFile"
     } else {
-        throw new IOException("Failed to download BT co. ID file: $outputBtCoIdUuidFile")
+        throw new IOException("Failed to download BT co. ID file: $outputBtCoIdFile")
     }
 }
 
-build.dependsOn createMccMncDB, downloadBtMemberFile
+build.dependsOn downloadFile, createMccMncDB, downloadBtMemberFile

@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.util;
 
+import android.annotation.SuppressLint;
 import android.telephony.TelephonyManager;
 
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class CellNetworkLegend {
         NETWORK_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
     }
 
+    @SuppressLint("MissingPermission")
     public static String getNetworkTypeName(TelephonyManager tele) {
         return NETWORK_TYPE_LEGEND.get(tele.getNetworkType());
     }

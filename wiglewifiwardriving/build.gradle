@@ -44,11 +44,11 @@ def driverCopy = configurations.driver.copy()
 driverCopy.each {File file -> loader.addURL(file.toURI().toURL())}
 
 ext {
-    inputMxcSqlDir = "etc/mccmncsqlite"
-    outputMxcDbFile = "$projectDir/src/main/assets/mmcmnc.sqlite"
-    mxcDictionaryFile = "$inputMxcSqlDir/mcc-mnc-dict.json"
-    outputBtMemberUuidFile = "$projectDir/src/main/assets/btmember.yaml"
-    outputBtCoIdUuidFile = "$projectDir/src/main/assets/btco.yaml"
+    inputMxcSqlDir = layout.projectDirectory.dir("etc/mccmncsqlite")
+    outputMxcDbFile = layout.projectDirectory.file("src/main/assets/mmcmnc.sqlite")
+    mxcDictionaryFile = inputMxcSqlDir.file("mcc-mnc-dict.json")
+    outputBtMemberUuidFile = layout.projectDirectory.file("src/main/assets/btmember.yaml")
+    outputBtCoIdUuidFile = layout.projectDirectory.file("src/main/assets/btco.yaml")
 }
 
 dependencies {
@@ -85,12 +85,18 @@ import java.sql.SQLException
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 tasks.register('downloadFile', Download) {
-    println "downloading mcc/mnc data"
-    download {
+    download.run {
         src 'https://api.wigle.net/api/v2/cell/mccMnc'
-        dest "../$mxcDictionaryFile"
+        dest mxcDictionaryFile
         overwrite true
     }
+    File test = new File(mxcDictionaryFile.toString())
+    if (test.exists()) {
+        println "Downloaded: $mxcDictionaryFile"
+    } else {
+        throw new IOException("Failed to download mcc-mnc file: $mxcDictionaryFile")
+    }
+
 }
 
 tasks.register('createMccMncDB') {
@@ -112,7 +118,7 @@ tasks.register('createMccMncDB') {
     delete outputMxcDbFile
     def sql = Sql.newInstance("jdbc:sqlite:$outputMxcDbFile", '', '', 'org.sqlite.JDBC')
     new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) { loadScript(sql, it) }
-    def inputFile = new File("$mxcDictionaryFile")
+    def inputFile = new File(mxcDictionaryFile.toString())
     def mccMap = new JsonSlurper().parseText(inputFile.text)
     def insertSql = 'INSERT OR REPLACE INTO wigle_mcc_mnc (mcc, mnc, type, countryName, countryCode, brand, operator, status, bands, notes) VALUES (?,?,?,?,?,?,?,?,?,?)'
     def myKeyNames = ['mcc', 'mnc']
@@ -137,17 +143,27 @@ tasks.register('createMccMncDB') {
 }
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
-task downloadBtMemberFile (type: Download) {
+tasks.register('downloadBtMemberFile', Download) {
     println "downloading BT Member UUID YAML data"
-    download {
+    download.run {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
-        dest outputBtMemberUuidFile
+        dest outputBtMemberUuidFile.toString()
         overwrite true
     }
+    println "Downloaded: $outputBtMemberUuidFile"
     println "downloading BT Company ID YAML data"
-    download {
+    download.run {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
         dest outputBtCoIdUuidFile
         overwrite true
     }
+    println "Downloaded: $outputBtCoIdUuidFile"
+    File test = new File(outputBtCoIdUuidFile.toString())
+    if (test.exists()) {
+        println "Downloaded: $outputBtCoIdUuidFile"
+    } else {
+        throw new IOException("Failed to download BT co. ID file: $outputBtCoIdUuidFile")
+    }
 }
+
+build.dependsOn createMccMncDB, downloadBtMemberFile

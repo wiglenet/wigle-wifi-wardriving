@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:background="#00FFFFFF">
 <LinearLayout
-	android:id="@+id/linearlayout"
+	android:id="@+id/settingslayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"

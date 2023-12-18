@@ -200,6 +200,7 @@ public class NetworkListUtil {
                 resource = drawable.av_settop_f;
                 break;
             case BluetoothClass.Device.AUDIO_VIDEO_UNCATEGORIZED:
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER:
                 resource = drawable.av_receiver_f;
                 break;
             case BluetoothClass.Device.AUDIO_VIDEO_VCR:
@@ -211,12 +212,6 @@ public class NetworkListUtil {
             case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_CONFERENCING:
                 resource = drawable.av_conference;
                 break;
-            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER:
-                resource = drawable.av_receiver_f;
-                break;
-            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_GAMING_TOY:
-                resource = drawable.av_toy;
-                break;
             case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_MONITOR:
                 resource = drawable.av_monitor;
                 break;
@@ -224,6 +219,7 @@ public class NetworkListUtil {
                 resource = drawable.comp_desk_f;
                 break;
             case BluetoothClass.Device.COMPUTER_HANDHELD_PC_PDA:
+            case BluetoothClass.Device.PHONE_SMART:
                 resource = drawable.comp_handheld;
                 break;
             case BluetoothClass.Device.COMPUTER_LAPTOP:
@@ -241,12 +237,10 @@ public class NetworkListUtil {
             case BluetoothClass.Device.COMPUTER_WEARABLE:
                 resource = drawable.comp_ar_f;
                 break;
-            case BluetoothClass.Device.HEALTH_BLOOD_PRESSURE:
-                resource = drawable.med_heart;
-                break;
             case BluetoothClass.Device.HEALTH_DATA_DISPLAY:
                 resource = drawable.med_heart_display_o;
                 break;
+            case BluetoothClass.Device.HEALTH_BLOOD_PRESSURE:
             case BluetoothClass.Device.HEALTH_PULSE_OXIMETER:
             case BluetoothClass.Device.HEALTH_PULSE_RATE:
                 resource = drawable.med_heart;
@@ -271,26 +265,20 @@ public class NetworkListUtil {
             case BluetoothClass.Device.PHONE_MODEM_OR_GATEWAY:
                 resource = drawable.tel_modem;
                 break;
-            case BluetoothClass.Device.PHONE_SMART:
-                resource = drawable.comp_handheld;
-                break;
             case BluetoothClass.Device.PHONE_UNCATEGORIZED:
                 resource = drawable.tel_phone_2;
                 break;
             case BluetoothClass.Device.TOY_CONTROLLER:
                 resource = drawable.toy_controller_f;
                 break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_GAMING_TOY:
             case BluetoothClass.Device.TOY_DOLL_ACTION_FIGURE:
-                resource = drawable.av_toy;
-                break;
             case BluetoothClass.Device.TOY_GAME:
+            case BluetoothClass.Device.TOY_UNCATEGORIZED:
                 resource = drawable.av_toy;
                 break;
             case BluetoothClass.Device.TOY_ROBOT:
                 resource = drawable.toy_robot;
-                break;
-            case BluetoothClass.Device.TOY_UNCATEGORIZED:
-                resource = drawable.av_toy;
                 break;
             case BluetoothClass.Device.TOY_VEHICLE:
                 resource = drawable.toy_vehicle;

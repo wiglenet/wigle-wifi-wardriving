@@ -105,7 +105,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         }
 
         // don't let the textbox have focus to start with, so we don't see a keyboard right away
-        final LinearLayout linearLayout = view.findViewById(R.id.linearlayout);
+        final LinearLayout linearLayout = view.findViewById(R.id.settingslayout);
         linearLayout.setFocusableInTouchMode(true);
         linearLayout.requestFocus();
         updateView(view);

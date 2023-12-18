@@ -676,17 +676,17 @@ public final class MappingFragment extends Fragment {
                     tv = view.findViewById(R.id.heading);
                     final Location gpsLocation = safelyGetLast(getContext(), LocationManager.GPS_PROVIDER);
                     if (BuildConfig.DEBUG && HeadingManager.DEBUG) {
-                        tv.setText(String.format("heading: %3.2f", ((headingManager != null) ? headingManager.getHeading(gpsLocation) : -1f)));
+                        tv.setText(String.format(Locale.ROOT, "heading: %3.2f", ((headingManager != null) ? headingManager.getHeading(gpsLocation) : -1f)));
                         if (null != ListFragment.lameStatic.location) {
                             tv = view.findViewById(R.id.bearing);
                             if (gpsLocation.hasAccuracy() && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
-                                tv.setText(String.format("bearing: %3.2f +/- %3.2f", ListFragment.lameStatic.location.getBearing(), ListFragment.lameStatic.location.getBearingAccuracyDegrees()));
+                                tv.setText(String.format(Locale.ROOT,"bearing: %3.2f +/- %3.2f", ListFragment.lameStatic.location.getBearing(), ListFragment.lameStatic.location.getBearingAccuracyDegrees()));
                             } else {
-                                tv.setText(String.format("bearing: %3.2f", ListFragment.lameStatic.location.getBearing()));
+                                tv.setText(String.format(Locale.ROOT,"bearing: %3.2f", ListFragment.lameStatic.location.getBearing()));
                             }
                         }
                         tv = view.findViewById(R.id.selectedbh);
-                        tv.setText(String.format("chose: %3.2f", getBearing(getContext())));
+                        tv.setText(String.format(Locale.ROOT,"chose: %3.2f", getBearing(getContext())));
                     } else {
                         final View v =view.findViewById(R.id.debug);
                         if (null != v) {

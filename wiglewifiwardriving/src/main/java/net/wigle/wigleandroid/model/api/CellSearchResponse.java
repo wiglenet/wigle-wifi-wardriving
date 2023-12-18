@@ -6,6 +6,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 
 import java.util.List;
+import java.util.Locale;
 
 public class CellSearchResponse {
     private boolean success;
@@ -96,7 +97,7 @@ public class CellSearchResponse {
     public static Network asNetwork(CellNetwork wNet) {
         final LatLng l = new LatLng(wNet.getTrilat(),wNet.getTrilong());
         return new Network(wNet.getId(), wNet.getSsid(),
-                0, wNet.getAttributes().toUpperCase()+" [SEARCH]",
+                0, wNet.getAttributes().toUpperCase(Locale.ROOT)+" [SEARCH]",
                 0, NetworkType.valueOf(wNet.getGentype()) /*TODO: check*/, l);
     }
 }

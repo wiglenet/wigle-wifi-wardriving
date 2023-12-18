@@ -7,6 +7,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class BtSearchResponse {
     private boolean success;
@@ -96,7 +97,7 @@ public class BtSearchResponse {
     public static Network asNetwork(BtNetwork wNet) {
         final LatLng l = new LatLng(wNet.getTrilat(),wNet.getTrilong());
         return new Network(wNet.getNetid(), wNet.getName(),
-                wNet.getDevice(), Arrays.toString(wNet.getCapabilities()).toUpperCase()+" [SEARCH]",
+                wNet.getDevice(), Arrays.toString(wNet.getCapabilities()).toUpperCase(Locale.ROOT)+" [SEARCH]",
                 0, NetworkType.valueOf(wNet.getType()), l);
     }
 }

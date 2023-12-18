@@ -66,8 +66,6 @@ import android.telephony.gsm.GsmCellLocation;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import androidx.annotation.RequiresApi;
-
 /**
  * Primary receiver logic for WiFi and Cell nets.
  * Monolithic - candidate for refactor.
@@ -1067,8 +1065,8 @@ public class WifiReceiver extends BroadcastReceiver {
                     "\n\tSystem ID:" + systemIdInt +
                     "\n\tNetwork Key: " + networkKey;
 
-            res += "\n\tLat: " + new Double(cellIdentC.getLatitude()) / 4.0d / 60.0d / 60.0d;
-            res += "\n\tLon: " + new Double(cellIdentC.getLongitude()) / 4.0d / 60.0d / 60.0d;
+            res += "\n\tLat: " + (double) cellIdentC.getLatitude() / 4.0d / 60.0d / 60.0d;
+            res += "\n\tLon: " + (double) cellIdentC.getLongitude() / 4.0d / 60.0d / 60.0d;
             res += "\n\tSignal: " + cellStrengthC.getCdmaLevel();
 
             int rssi = cellStrengthC.getEvdoDbm() != 0 ? cellStrengthC.getEvdoDbm() : cellStrengthC.getCdmaDbm();

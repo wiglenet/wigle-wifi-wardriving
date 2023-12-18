@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="162dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:id="@+id/notif_lg">
     <TextView
@@ -140,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="left"
+            android:gravity="start"
             android:layout_marginEnd="10dp"
             android:background="@drawable/notification_border">
             <ImageView
@@ -169,7 +168,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="left"
+            android:gravity="start"
             android:background="@drawable/notification_border">
             <ImageView
                 android:layout_width="22dp"

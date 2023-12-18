@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -139,7 +140,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GpxRecyclerAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull GpxRecyclerAdapter.ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         if (!dataValid) {
             throw new IllegalStateException("Invalid cursor / dataValid flag onBindViewHolder");
         }

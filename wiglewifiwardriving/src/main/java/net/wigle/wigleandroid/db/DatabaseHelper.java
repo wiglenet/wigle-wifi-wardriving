@@ -13,6 +13,7 @@ import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.hasSD;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1463,7 +1464,7 @@ public final class DatabaseHelper extends Thread {
             file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
         }
         Pair<Boolean,String> result;
-        try (InputStream input = Files.newInputStream(file.toPath())){
+        try (InputStream input = new FileInputStream(file)){
             FileOutputStream output = FileUtility.createFile(context, outputFilename, false);
             byte[] buffer = new byte[1024];
             int bytesRead;

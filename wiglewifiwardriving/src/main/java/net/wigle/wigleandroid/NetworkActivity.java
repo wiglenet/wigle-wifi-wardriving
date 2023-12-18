@@ -572,7 +572,8 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         return new ArrayList<>(Arrays.asList(values));
     }
 
-    private int getExistingSsid( final String ssid ) {
+    @SuppressLint("MissingPermission")
+    private int getExistingSsid(final String ssid ) {
         final WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         final String quotedSsid = "\"" + ssid + "\"";
         int netId = -2;

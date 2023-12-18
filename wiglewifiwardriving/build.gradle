@@ -85,7 +85,7 @@ import groovy.json.JsonSlurper
 import java.sql.SQLException
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
-tasks.register('downloadFile', Download) {
+tasks.register('downloadFile') {
     println "===MCC/MNC DB Creation==="
     download.run {
         src 'https://api.wigle.net/api/v2/cell/mccMnc'
@@ -143,7 +143,7 @@ tasks.register('createMccMncDB') {
 }
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
-tasks.register('downloadBtMemberFile', Download) {
+tasks.register('downloadBtMemberFile') {
     println "===BT Member UUID YAML Data==="
     download.run {
         src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'

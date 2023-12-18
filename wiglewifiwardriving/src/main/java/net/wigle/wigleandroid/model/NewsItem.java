@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.model;
 
-import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -123,11 +122,7 @@ public final class NewsItem {
         for (int i = 0; i < format_search.length; i++) {
             htmlBreaks = htmlBreaks.replaceAll(format_search[i], format_replace[i]);
         }
-        if (Build.VERSION.SDK_INT >= 24) {
-            return Html.fromHtml(htmlBreaks,
-                    Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            return Html.fromHtml(htmlBreaks);
-        }
+        return Html.fromHtml(htmlBreaks,
+                Html.FROM_HTML_MODE_LEGACY);
     }
 }

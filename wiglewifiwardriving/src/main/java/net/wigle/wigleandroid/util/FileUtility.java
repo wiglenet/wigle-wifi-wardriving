@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid.util;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 
@@ -48,11 +47,7 @@ public class FileUtility {
     public static long getFreeBytes(File path) {
         try {
             StatFs stats = new StatFs(path.getAbsolutePath());
-            if (Build.VERSION.SDK_INT >= 18) {
-                return stats.getAvailableBlocksLong() * stats.getBlockSizeLong();
-            } else {
-                return (long) (stats.getAvailableBlocks() * stats.getBlockSize());
-            }
+            return stats.getAvailableBlocksLong() * stats.getBlockSizeLong();
         } catch (Exception ex) {
             // if we can't determine free space, be optimistic. Possibly because of missing permission?
             Logging.error("Unable to determine free space: ",ex);

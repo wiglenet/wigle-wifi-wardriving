@@ -36,7 +36,7 @@ public class GsmOperator {
         mcc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentG.getMccString():cellIdentG.getMcc()+"";
         mnc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentG.getMncString():determineMnc(cellIdentG.getMnc(), mcc);
 
-        fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
+        fcn = cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
 
         if (MainActivity.DEBUG_CELL_DATA) {
             String res = "GSM Cell:" +
@@ -49,17 +49,11 @@ public class GsmOperator {
                     "\n\toperator: " + getOperatorString() +
                     "\n\tARFCN: " + fcn;
 
-            if (android.os.Build.VERSION.SDK_INT >= 24) {
-                res += "\n\tBSIC: " + cellIdentG.getBsic();
-            }
+            res += "\n\tBSIC: " + cellIdentG.getBsic();
         }
         if (!validCellId(this.cellId, "GSM") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    Logging.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
-                } else {
-                    Logging.info("Discarding GSM cell with invalid ID");
-                }
+                Logging.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
             }
             throw new GsmOperatorException("invalid GSM Cell Identity values: "+getOperatorKeyString());
         }
@@ -71,7 +65,7 @@ public class GsmOperator {
         mcc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentL.getMccString():cellIdentL.getMcc()+"";
         mnc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentL.getMncString():determineMnc(cellIdentL.getMnc(), mcc);
 
-        fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentL.getEarfcn() != Integer.MAX_VALUE ? cellIdentL.getEarfcn() : 0;
+        fcn = cellIdentL.getEarfcn() != Integer.MAX_VALUE ? cellIdentL.getEarfcn() : 0;
         if (MainActivity.DEBUG_CELL_DATA) {
             String res = "LTE Cell: " +
                     "\n\tCI: " + cellId +
@@ -93,11 +87,7 @@ public class GsmOperator {
 
         if (!validCellId(this.cellId, "LTE") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
-                } else {
-                    Logging.info("Discarding LTE cell with invalid ID");
-                }
+                Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
             }
             throw new GsmOperatorException("invalid LTE Cell Identity values "+getOperatorKeyString());
         }
@@ -110,7 +100,7 @@ public class GsmOperator {
         mcc = cellIdentN.getMccString();
         mnc = cellIdentN.getMncString();
 
-        fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentN.getNrarfcn() != Integer.MAX_VALUE ? cellIdentN.getNrarfcn() : 0;
+        fcn = cellIdentN.getNrarfcn() != Integer.MAX_VALUE ? cellIdentN.getNrarfcn() : 0;
         if (MainActivity.DEBUG_CELL_DATA) {
             String res = "NR Cell: " +
                     "\n\tNCI: " + cellId +
@@ -131,11 +121,7 @@ public class GsmOperator {
 
         if (!validCellId(this.cellId, "NR") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    Logging.info("Discarding NR cell with invalid ID for NRARFCN: " + cellIdentN.getNrarfcn());
-                } else {
-                    Logging.info("Discarding NR cell with invalid ID");
-                }
+                Logging.info("Discarding NR cell with invalid ID for NRARFCN: " + cellIdentN.getNrarfcn());
             }
             throw new GsmOperatorException("invalid NR Cell Identity values "+getOperatorKeyString());
         }
@@ -147,7 +133,7 @@ public class GsmOperator {
         mcc = android.os.Build.VERSION.SDK_INT >= 28 ? cellIdentW.getMccString() : cellIdentW.getMcc() + "";
         mnc = android.os.Build.VERSION.SDK_INT >= 28 ? cellIdentW.getMncString() : determineMnc(cellIdentW.getMnc(), mcc);
 
-        fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentW.getUarfcn() != Integer.MAX_VALUE ? cellIdentW.getUarfcn() : 0;
+        fcn = cellIdentW.getUarfcn() != Integer.MAX_VALUE ? cellIdentW.getUarfcn() : 0;
 
         if (MainActivity.DEBUG_CELL_DATA) {
             String res = "WCDMA Cell:" +
@@ -164,11 +150,7 @@ public class GsmOperator {
 
         if (!validCellId(this.cellId, "WCDMA") || !validXac(xac) || !validMccMnc(mcc, mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    Logging.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
-                } else {
-                    Logging.info("Discarding WCDMA cell with invalid ID");
-                }
+                Logging.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
             }
             throw new GsmOperatorException("invalid WCDMA Cell Identity values "+getOperatorKeyString());
         }
@@ -206,10 +188,7 @@ public class GsmOperator {
 
     private boolean validXac(final int lacOrTac) {
         //TODO: seeing values of 65535 - value limit, but almost certainly invalid
-        if ((lacOrTac > 0) && (lacOrTac < Integer.MAX_VALUE)) {
-            return true;
-        }
-        return false;
+        return (lacOrTac > 0) && (lacOrTac < Integer.MAX_VALUE);
     }
 
     private String determineMnc(final int mncInt, final String mcc) {
@@ -240,17 +219,14 @@ public class GsmOperator {
             if (validMccMncValues(mccInt, mncInt)) {
                 return true;
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
         return false;
     }
 
     private boolean validMccMncValues(final int mcc, final int mnc) {
-        if ((mcc > 0) && (mcc < 1000) && (mnc > 0) && (mnc < 1000)) {
-            return true;
-        }
-        return false;
+        return (mcc > 0) && (mcc < 1000) && (mnc > 0) && (mnc < 1000);
     }
 
     /**

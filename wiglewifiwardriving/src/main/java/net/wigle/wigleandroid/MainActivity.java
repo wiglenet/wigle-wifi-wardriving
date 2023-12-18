@@ -512,9 +512,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
         addPermission(permissionsList, Manifest.permission.BLUETOOTH);
         addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
-        addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
-        addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
-        addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
+        }
         if (!permissionsList.isEmpty()) {
             // The permission is NOT already granted.
             // Check if the user has been asked about this permission already and denied

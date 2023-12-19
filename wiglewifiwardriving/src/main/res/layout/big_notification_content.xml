@@ -20,7 +20,8 @@
         android:weightSum="3"
         android:paddingTop="2dp"
         android:layout_height="108dp"
-        android:layout_below="@+id/notif_title">
+        android:layout_below="@+id/notif_title"
+        android:baselineAligned="false">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -133,7 +134,8 @@
         android:orientation="horizontal"
         android:weightSum="2"
         android:paddingTop="10dp"
-        android:layout_below="@+id/notif_nets">
+        android:layout_below="@+id/notif_nets"
+        android:baselineAligned="false">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"

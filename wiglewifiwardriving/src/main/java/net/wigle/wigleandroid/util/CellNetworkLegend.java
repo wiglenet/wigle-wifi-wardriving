@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.util;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.telephony.TelephonyManager;
 
 import java.util.Collections;
@@ -19,17 +20,21 @@ public class CellNetworkLegend {
         initMap.put(TelephonyManager.NETWORK_TYPE_EVDO_A, "CDMA - EvDo rev. A");
         initMap.put(TelephonyManager.NETWORK_TYPE_EVDO_B, "CDMA - EvDo rev. B");
         initMap.put(TelephonyManager.NETWORK_TYPE_GPRS, "GPRS");
-        initMap.put(TelephonyManager.NETWORK_TYPE_GSM, "GSM");
         initMap.put(TelephonyManager.NETWORK_TYPE_HSDPA, "HSDPA");
         initMap.put(TelephonyManager.NETWORK_TYPE_HSPA, "HSPA");
         initMap.put(TelephonyManager.NETWORK_TYPE_HSPAP, "HSPA+");
         initMap.put(TelephonyManager.NETWORK_TYPE_HSUPA, "HSUPA");
         initMap.put(TelephonyManager.NETWORK_TYPE_IDEN, "iDEN");
-        initMap.put(TelephonyManager.NETWORK_TYPE_IWLAN, "IWLAN");
         initMap.put(TelephonyManager.NETWORK_TYPE_LTE, "LTE");
-        initMap.put(TelephonyManager.NETWORK_TYPE_TD_SCDMA, "TD_SCDMA");
+        if (Build.VERSION.SDK_INT >= 25) {
+            initMap.put(TelephonyManager.NETWORK_TYPE_IWLAN, "IWLAN");
+            initMap.put(TelephonyManager.NETWORK_TYPE_TD_SCDMA, "TD_SCDMA");
+            initMap.put(TelephonyManager.NETWORK_TYPE_GSM, "GSM");
+        }
         initMap.put(TelephonyManager.NETWORK_TYPE_UMTS, "UMTS");
-        initMap.put(TelephonyManager.NETWORK_TYPE_NR, "5G NR");
+        if (Build.VERSION.SDK_INT >= 29) {
+            initMap.put(TelephonyManager.NETWORK_TYPE_NR, "5G NR");
+        }
         initMap.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, "UNKNOWN");
 
         NETWORK_TYPE_LEGEND = Collections.unmodifiableMap(initMap);

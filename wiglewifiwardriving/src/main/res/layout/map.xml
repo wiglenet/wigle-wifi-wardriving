@@ -132,7 +132,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:orientation="vertical"
-        android:background="#AA333333">
+        android:background="#AA333333"
+        tools:ignore="RelativeOverlap">
         <TextView
             android:id="@+id/heading"
             android:layout_width="wrap_content"
@@ -170,7 +171,8 @@
         android:id="@+id/info"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        tools:ignore="RelativeOverlap">
         <TextView
             android:id="@+id/rundistance"
             android:layout_width="wrap_content"

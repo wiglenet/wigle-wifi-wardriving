@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Locale;
 
 import static android.view.View.GONE;
 import static net.wigle.wigleandroid.UploadsFragment.disableListButtons;
@@ -157,11 +158,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                         ib.setOnClickListener(v -> Logging.info("not available yet - nothing to do for " + transId));
                     }
                 }
-                if (disableListButtons) {
-                    ib.setEnabled(false);
-                } else {
-                    ib.setEnabled(true);
-                }
+                ib.setEnabled(!disableListButtons);
             } else {
                 Logging.error("no user set - no download controls to offer.");
                 ib.setVisibility(GONE);
@@ -205,11 +202,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                         }
                     }
                 });
-                if (disableListButtons) {
-                    share.setEnabled(false);
-                } else {
-                    share.setEnabled(true);
-                }
+                share.setEnabled(!disableListButtons);
 
 
                 view.setVisibility(View.VISIBLE);
@@ -241,11 +234,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                         }
                     }
                 });
-                if (disableListButtons) {
-                    view.setEnabled(false);
-                } else {
-                    view.setEnabled(true);
-                }
+                view.setEnabled(!disableListButtons);
             } else {
                 share.setVisibility(View.INVISIBLE);
                 share.setEnabled(false);
@@ -265,7 +254,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 percentDoneSuffix = ")";
                 figure = upload.getWait();
             }
-            tv.setText(String.format("%s%d%s",percentDonePrefix, figure, percentDoneSuffix));
+            tv.setText(String.format(Locale.ROOT,"%s%d%s",percentDonePrefix, figure, percentDoneSuffix));
 
             tv = row.findViewById(R.id.upload_row_status);
             tv.setText(upload.getHumanReadableStatus());

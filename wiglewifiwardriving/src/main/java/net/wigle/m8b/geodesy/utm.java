@@ -11,6 +11,8 @@ package net.wigle.m8b.geodesy;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
+import android.annotation.SuppressLint;
+
 /**
  * Convert between Universal Transverse Mercator coordinates and WGS 84 latitude/longitude points.
  *
@@ -179,7 +181,8 @@ public class utm {
     }
     
 
-    public String toString() {
+    @SuppressLint("DefaultLocale")
+	public String toString() {
 	return String.format("%1$02d %2$s %3$.6f %4$.6f",zone,hemisphere,easting,northing);
     }
 

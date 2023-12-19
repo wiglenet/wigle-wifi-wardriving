@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mask="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -42,7 +41,8 @@
         android:weightSum="7"
         android:layout_below="@id/query_ssid_layout"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:baselineAligned="false">
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/query_cell_op_layout"
             android:layout_width="0dp"

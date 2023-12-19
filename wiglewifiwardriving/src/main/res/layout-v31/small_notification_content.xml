@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:orientation="horizontal"
@@ -21,13 +22,15 @@
         android:weightSum="4"
         android:paddingTop="2dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/notif_title">
+        android:layout_below="@+id/notif_title"
+        android:baselineAligned="false">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="start">
+            android:gravity="start"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:layout_width="13dp"
                 android:layout_height="wrap_content"
@@ -51,7 +54,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="start">
+            android:gravity="start"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:layout_width="13dp"
                 android:layout_height="wrap_content"
@@ -72,7 +76,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="start">
+            android:gravity="start"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:layout_width="14dp"
                 android:layout_height="wrap_content"
@@ -93,7 +98,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="start">
+            android:gravity="start"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:layout_width="12dp"
                 android:paddingTop="2dp"

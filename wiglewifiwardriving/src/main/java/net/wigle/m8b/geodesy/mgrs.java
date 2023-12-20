@@ -75,8 +75,7 @@ public final class mgrs {
 	
 	return m;
     }
-
-    @SuppressLint("DefaultLocale")
+	@SuppressLint("DefaultLocale")
 	public String toString() {
 	return String.format("%02d%c%c%c%s%s",zone,band,e100k,n100k,String.format("%05d",(int)easting).substring(0,2),String.format("%05d",(int)northing).substring(0,2));
     }

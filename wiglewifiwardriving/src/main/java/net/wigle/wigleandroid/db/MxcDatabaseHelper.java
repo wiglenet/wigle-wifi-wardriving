@@ -113,11 +113,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                     assetInputData = context.getAssets().open(MXC_DB_NAME);
                     final File outputFile = getMxcFile();
                     Logging.info("Installing mxc file at: " + outputFile);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        mxcOutput = Files.newOutputStream(outputFile.toPath());
-                    } else {
-                        mxcOutput = new FileOutputStream(outputFile);
-                    }
+                    mxcOutput = new FileOutputStream(outputFile);
                     byte[] buffer = new byte[1024];
                     int length;
                     while ((length = assetInputData.read(buffer)) > 0) {

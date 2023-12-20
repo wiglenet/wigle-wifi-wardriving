@@ -945,6 +945,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     }
                     Logging.error("Bluetooth LE scan error: " + errorCode);
                     scanning.set(false);
+                default:
+                    Logging.error("Bluetooth LE scan error: " + errorCode);
+                    break;
             }
         }
 

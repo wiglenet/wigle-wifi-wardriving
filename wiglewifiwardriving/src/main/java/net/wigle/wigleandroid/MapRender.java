@@ -2,7 +2,6 @@ package net.wigle.wigleandroid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,7 +10,6 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -32,13 +30,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 
-public class MapRender implements ClusterManager.OnClusterClickListener<Network>,
-        ClusterManager.OnClusterInfoWindowClickListener<Network>,
-        ClusterManager.OnClusterItemClickListener<Network>,
-        ClusterManager.OnClusterItemInfoWindowClickListener<Network> {
+public class MapRender {
 
     private final ClusterManager<Network> mClusterManager;
     private final NetworkRenderer networkRenderer;
@@ -58,6 +55,8 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     private static final float CUSTOM_ICON_ALPHA = 0.80f;
     // a % of the cache size can be labels
     private static final int MAX_LABELS = MainActivity.getNetworkCache().maxSize() / 15;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private class NetworkRenderer extends DefaultClusterRenderer<Network> {
         final IconGenerator iconFactory;
@@ -168,23 +167,15 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
 
         private void setupRelabelingTask() {
             // setup camera change listener to fire the asynctask
-            map.setOnCameraIdleListener(new OnCameraIdleListener() {
-                @Override
-                public void onCameraIdle() {
-                    new DynamicallyAddMarkerTask().execute(map.getProjection().getVisibleRegion().latLngBounds);
-                }
-            });
-        }
-
-        private class DynamicallyAddMarkerTask extends AsyncTask<LatLngBounds, Integer, Void> {
-            @Override
-            protected Void doInBackground(LatLngBounds... bounds) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+            map.setOnCameraIdleListener(() -> executor.execute(() -> {
                 final Collection<Network> nets = MainActivity.getNetworkCache().values();
                 final ArrayList<String> ssids = new ArrayList<>(nets.size());
                 for (final Network network : nets) {
                     final Marker marker = NetworkRenderer.this.getMarker(network);
                     if (marker != null && network.getLatLng() != null) {
-                        final boolean inBounds = bounds[0].contains(network.getLatLng());
+                        final boolean inBounds = bounds.contains(network.getLatLng());
                         if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
                             // MainActivity.info("sendupdate: " + network.getBssid());
                             ssids.add(network.getBssid());
@@ -194,15 +185,9 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
                 if (!ssids.isEmpty()) {
                     sendUpdateNetwork(ssids);
                 }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                mClusterManager.cluster();
-            }
+                handler.post(mClusterManager::cluster);
+            }));
         }
-
     }
 
     public MapRender(final Context context, final GoogleMap map, final boolean isDbResult) {
@@ -216,13 +201,15 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         map.setOnCameraIdleListener(mClusterManager);
 
         MarkerManager.Collection markerCollection = mClusterManager.getMarkerCollection();
-        markerCollection.setOnInfoWindowClickListener(mClusterManager);
-        markerCollection.setOnMarkerClickListener(mClusterManager);
+        markerCollection.setOnInfoWindowClickListener(marker -> {
+            return;
+        });
+        markerCollection.setOnMarkerClickListener(marker -> false);
 
-        mClusterManager.setOnClusterClickListener(this);
-        mClusterManager.setOnClusterInfoWindowClickListener(this);
-        mClusterManager.setOnClusterItemClickListener(this);
-        mClusterManager.setOnClusterItemInfoWindowClickListener(this);
+        mClusterManager.setOnClusterItemClickListener(item -> false);
+        mClusterManager.setOnClusterItemInfoWindowClickListener(item -> {
+            return;
+        });
 
         if (!isDbResult) {
             // setup the relabeling background task
@@ -262,28 +249,6 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
                         prefs, MappingFragment.MAP_DIALOG_PREFIX, network);
             }
         }
-        return false;
-    }
-
-    @Override
-    public void onClusterItemInfoWindowClick(Network item) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean onClusterItemClick(Network item) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void onClusterInfoWindowClick(Cluster<Network> cluster) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean onClusterClick(Cluster<Network> cluster) {
-        // TODO Auto-generated method stub
         return false;
     }
 

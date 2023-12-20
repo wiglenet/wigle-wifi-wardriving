@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.db;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -20,6 +22,7 @@ import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -110,8 +113,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                     assetInputData = context.getAssets().open(MXC_DB_NAME);
                     final File outputFile = getMxcFile();
                     Logging.info("Installing mxc file at: " + outputFile);
-                    mxcOutput = Files.newOutputStream(outputFile.toPath());
-
+                    mxcOutput = new FileOutputStream(outputFile);
                     byte[] buffer = new byte[1024];
                     int length;
                     while ((length = assetInputData.read(buffer)) > 0) {
@@ -151,12 +153,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         //ALIBI: pre-created during build
     }
 
+    @SuppressLint("Range")
     public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
-        // ALIBI: old, incompatible DB implementation
-        if (android.os.Build.VERSION.SDK_INT <= 19) {
-            return null;
-        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");
@@ -198,14 +197,10 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    @SuppressLint("Range")
     public String networkNameForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
         String operator = null;
-
-        // ALIBI: old, incompatible DB implementation
-        if (android.os.Build.VERSION.SDK_INT <= 19) {
-            return null;
-        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");

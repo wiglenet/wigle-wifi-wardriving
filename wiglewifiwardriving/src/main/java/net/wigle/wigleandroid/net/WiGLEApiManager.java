@@ -13,7 +13,7 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.babylon.certificatetransparency.CTInterceptorBuilder;
+import com.appmattus.certificatetransparency.CTInterceptorBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -43,7 +43,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -92,7 +91,7 @@ public class WiGLEApiManager {
     private final OkHttpClient unauthedClient;
     private final Context context;
 
-    private static final CTInterceptorBuilder ctIB = new com.babylon.certificatetransparency.CTInterceptorBuilder();
+    private static final CTInterceptorBuilder ctIB = new CTInterceptorBuilder();
 
     // certificate transparency interceptor
     private final static Interceptor certTransparencyInterceptor = ctIB.includeHost(API_DOMAIN).setLogger(

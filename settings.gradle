@@ -6,7 +6,11 @@ pluginManagement {
             url "https://maven.google.com/"
             name 'Google'
         }
-        jcenter()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        flatDir {
+            dirs 'lib'
+        }
     }
 }
 dependencyResolutionManagement {
@@ -17,7 +21,11 @@ dependencyResolutionManagement {
             url "https://maven.google.com/"
             name 'Google'
         }
-        jcenter()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        flatDir {
+            dirs 'lib'
+        }
     }
 }
 include ':wiglewifiwardriving'

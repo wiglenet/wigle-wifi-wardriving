@@ -214,14 +214,6 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         networkRenderer = new NetworkRenderer(context, map, mClusterManager);
         mClusterManager.setRenderer(networkRenderer);
         map.setOnCameraIdleListener(mClusterManager);
-        mClusterManager.setOnClusterItemClickListener(item -> {
-            // Listen for clicks on a cluster item here
-            return false;
-        });
-        mClusterManager.setOnClusterClickListener(item -> {
-            // Listen for clicks on a cluster here
-            return false;
-        });
 
         MarkerManager.Collection markerCollection = mClusterManager.getMarkerCollection();
         markerCollection.setOnInfoWindowClickListener(mClusterManager);

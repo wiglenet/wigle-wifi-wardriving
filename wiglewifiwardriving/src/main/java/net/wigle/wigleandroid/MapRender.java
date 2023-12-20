@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.google.maps.android.collections.MarkerManager;
 import com.google.maps.android.ui.IconGenerator;
 
 import net.wigle.wigleandroid.model.Network;
@@ -105,9 +106,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
                 final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
                 if (bounds == null || network.getLatLng() == null) return false;
                 // if on screen, and room in labeled networks, we can show the label
-                if (bounds.contains(network.getLatLng()) && MapRender.this.labeledNetworks.size() <= MAX_LABELS) {
-                    return false;
-                }
+                return !bounds.contains(network.getLatLng()) || MapRender.this.labeledNetworks.size() > MAX_LABELS;
             }
             return true;
         }
@@ -215,8 +214,19 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         networkRenderer = new NetworkRenderer(context, map, mClusterManager);
         mClusterManager.setRenderer(networkRenderer);
         map.setOnCameraIdleListener(mClusterManager);
-        map.setOnMarkerClickListener(mClusterManager);
-        map.setOnInfoWindowClickListener(mClusterManager);
+        mClusterManager.setOnClusterItemClickListener(item -> {
+            // Listen for clicks on a cluster item here
+            return false;
+        });
+        mClusterManager.setOnClusterClickListener(item -> {
+            // Listen for clicks on a cluster here
+            return false;
+        });
+
+        MarkerManager.Collection markerCollection = mClusterManager.getMarkerCollection();
+        markerCollection.setOnInfoWindowClickListener(mClusterManager);
+        markerCollection.setOnMarkerClickListener(mClusterManager);
+
         mClusterManager.setOnClusterClickListener(this);
         mClusterManager.setOnClusterInfoWindowClickListener(this);
         mClusterManager.setOnClusterItemClickListener(this);
@@ -255,11 +265,9 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
                 && ! isDbResult;
         if (network.getPosition() != null && !hideNets) {
             if (!showNewDBOnly || network.isNew()) {
-                if (FilterMatcher.isOk(ssidMatcher,
+                return FilterMatcher.isOk(ssidMatcher,
                         null /*ALIBI: we *can* use the filter from the list filter view here ...*/,
-                        prefs, MappingFragment.MAP_DIALOG_PREFIX, network)) {
-                    return true;
-                }
+                        prefs, MappingFragment.MAP_DIALOG_PREFIX, network);
             }
         }
         return false;

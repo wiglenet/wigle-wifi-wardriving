@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -520,17 +521,17 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             final Button hideOuiButton = findViewById( R.id.hide_oui_button );
             final Button disableLogMacButton = findViewById( R.id.disable_log_mac_button );
             if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
-                    (hideAddresses.contains(network.getBssid().toUpperCase())) ) {
+                    (hideAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT))) ) {
                 hideMacButton.setEnabled(false);
             }
 
             if ( (null == network.getBssid()) || (network.getBssid().length() < 8) ||
-                    (hideAddresses.contains(network.getBssid().toUpperCase().substring(0, 8)))) {
+                    (hideAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT).substring(0, 8)))) {
                 hideOuiButton.setEnabled(false);
             }
 
             if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
-                    (blockAddresses.contains(network.getBssid().toUpperCase())) ) {
+                    (blockAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT))) ) {
                 disableLogMacButton.setEnabled(false);
             }
 

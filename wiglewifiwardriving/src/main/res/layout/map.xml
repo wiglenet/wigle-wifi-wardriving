@@ -31,7 +31,8 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 app:srcCompat="@drawable/ic_wifi_sm"
                 android:layout_width="wrap_content"
@@ -53,7 +54,8 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 app:srcCompat="@drawable/ic_cell_sm"
                 android:layout_width="wrap_content"
@@ -80,7 +82,8 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 app:srcCompat="@drawable/ic_bt_sm"
                 android:layout_width="wrap_content"
@@ -103,12 +106,13 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="5">
+            android:layout_weight="5"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run DB"
+                android:contentDescription="DB nets"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
@@ -128,7 +132,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:orientation="vertical"
-        android:background="#AA333333">
+        android:background="#AA333333"
+        tools:ignore="RelativeOverlap">
         <TextView
             android:id="@+id/heading"
             android:layout_width="wrap_content"
@@ -166,7 +171,8 @@
         android:id="@+id/info"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        tools:ignore="RelativeOverlap">
         <TextView
             android:id="@+id/rundistance"
             android:layout_width="wrap_content"

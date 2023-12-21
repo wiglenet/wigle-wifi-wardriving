@@ -3,15 +3,11 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-
     <include layout="@layout/sitestatstop"/>
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="2dip"
         style="@style/DividerColor" />
-
     <include layout="@layout/sitestatsbottom"/>
-
 </LinearLayout>

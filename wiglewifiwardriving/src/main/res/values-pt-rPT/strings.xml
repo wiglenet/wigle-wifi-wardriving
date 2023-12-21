@@ -33,7 +33,7 @@
     <string name="kml_export_text">Exportar base de dados inteira para ficheiro KML</string>
     <string name="backup_db_button">Base de dados de backup</string>
     <string name="backup_db_text">Faça um backup da base de dados</string>
-    <string name="backup_preparing">A preparar para fazer backup da base de dados...</string>
+    <string name="backup_preparing">A preparar para fazer backup da base de dados…</string>
     <string name="backup_in_progress">A fazer backup da base de dados…</string>
     <string name="import_observed_button">Importar Observada</string>
     <string name="import_observed_text">Importar as minhas redes observadas do WiGLE</string>
@@ -78,7 +78,7 @@
     <string name="filter_show_wep">Mostrar WEP</string>
     <string name="filter_show_wpa">Mostrar WPA</string>
     <string name="filter_enabled">Filtro ativado</string>
-    <string name="list_waiting_gps">(A aguardar sincronização GPS...)</string>
+    <string name="list_waiting_gps">(A aguardar sincronização GPS…)</string>
     <string name="list_scanning_off">(Digitalização desligada)</string>
     <string name="list_short_lat">Lat: %1$s</string>
     <string name="list_short_lon">Lon: %1$s</string>
@@ -93,7 +93,7 @@
     <string name="network_capa">Capacidades:</string>
     <string name="network_channel">Canal:</string>
     <string name="network_observations">Observações:</string>
-    <string name="network_querying">(a questionar...)</string>
+    <string name="network_querying">(a questionar…)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Mostrar palavra-passe</string>
     <string name="setting_db_marker">Marcador de base de dados (de onde começam os uploads):</string>
@@ -311,13 +311,13 @@
     <string name="setting_activate_prompt">visite https://wigle.net/activate para obter o seu código de utilizador</string>
     <string name="upload_queued">Na fila</string>
     <string name="upload_parsing">A analisar…</string>
-    <string name="upload_trilaterating">A trilaterar...</string>
-    <string name="upload_stats">Estatísticas finais ...</string>
+    <string name="upload_trilaterating">A trilaterar…</string>
+    <string name="upload_stats">Estatísticas finais…</string>
     <string name="upload_success">Concluído</string>
     <string name="upload_failed">Falhou</string>
     <string name="upload_unknown">Desconhecido</string>
-    <string name="upload_archive">A arquivar...</string>
-    <string name="upload_catalog">A catalogar...</string>
+    <string name="upload_archive">A arquivar…</string>
+    <string name="upload_catalog">A catalogar…</string>
     <string name="upload_geoindex">A geocodificar…</string>
     <string name="auth_username">Autenticar utilizador</string>
     <string name="deauthorize">Desautorizar (sair)</string>
@@ -344,10 +344,10 @@
     <string name="settings_scan_head">Configurações de digitalização</string>
     <string name="ssid_filter_head">Filtragem SSID</string>
     <string name="mac_oui_filter_head">Filtragem MAC/OUI</string>
-    <string name="display_filter_button">Excluir MAC/OUI da exibição...</string>
+    <string name="display_filter_button">Excluir MAC/OUI da exibição…</string>
     <string name="add_oui_filter_button">Adicionar filtro OUI</string>
     <string name="add_mac_filter_button">Adicionar filtro MAC</string>
-    <string name="log_filter_button">Excluir MAC/OUI do registo...</string>
+    <string name="log_filter_button">Excluir MAC/OUI do registo…</string>
     <string name="mac_filter_app_name">Endereços de filtro</string>
     <string name="hide_mac">Esconder MAC</string>
     <string name="hide_oui">Esconder OUI</string>

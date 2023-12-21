@@ -2,16 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
+    android:layout_height="fill_parent"
+    android:baselineAligned="false">
     <include layout="@layout/dashtop"/>
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="2dip"
         style="@style/DividerColor" />
-
     <include layout="@layout/dashbottom"/>
-
 </LinearLayout>

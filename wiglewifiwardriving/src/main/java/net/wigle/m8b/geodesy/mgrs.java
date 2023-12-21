@@ -9,6 +9,8 @@ package net.wigle.m8b.geodesy;
 /* www.movable-type.co.uk/scripts/geodesy/docs/module-mgrs.html                                   */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+import android.annotation.SuppressLint;
+
 /**
  * Convert between Universal Transverse Mercator (UTM) coordinates and Military Grid Reference
  * System (MGRS/NATO) grid references.
@@ -73,8 +75,8 @@ public final class mgrs {
 	
 	return m;
     }
-
-    public String toString() {
+	@SuppressLint("DefaultLocale")
+	public String toString() {
 	return String.format("%02d%c%c%c%s%s",zone,band,e100k,n100k,String.format("%05d",(int)easting).substring(0,2),String.format("%05d",(int)northing).substring(0,2));
     }
 

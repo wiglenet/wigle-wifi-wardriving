@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
-import android.os.ParcelUuid;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -17,7 +15,6 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.util.Logging;
-import net.wigle.wigleandroid.listener.WifiReceiver;
 
 /**
  * network data. not thread-safe.
@@ -92,6 +89,7 @@ public final class Network implements ClusterItem {
             return value;
         }
 
+        @NonNull
         public String toString() {
             switch (value) {
                 case CRYPTO_NONE:
@@ -392,7 +390,7 @@ public final class Network implements ClusterItem {
                 return bleMfgr;
             }
         }
-        final String lookup = getBssid().replace(":", "").toUpperCase();
+        final String lookup = getBssid().replace(":", "").toUpperCase(Locale.ROOT);
         if (oui != null && lookup.length() >= 9) {
             retval = oui.getOui(lookup.substring(0, 9));
             if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
@@ -457,7 +455,7 @@ public final class Network implements ClusterItem {
     public static Integer frequencyMHzForWiFiChannel(final int channel, final NetworkBand band) {
         NetworkBand bandGuess = band;
         //This isn't sustainable - in SDK 31 and up, android handles this for us, but we need to figure out how to get back to bands from previously incomplete records.
-        if (band == NetworkBand.UNDEFINED.UNDEFINED) {
+        if (band == NetworkBand.UNDEFINED) {
             if (channel <= 14) {
                 bandGuess = NetworkBand.WIFI_2_4_GHZ;
             } else if (channel >= 237 && channel <= 255 ) {

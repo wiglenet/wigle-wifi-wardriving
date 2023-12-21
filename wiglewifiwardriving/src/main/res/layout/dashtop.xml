@@ -47,12 +47,12 @@
                     android:textSize="38sp"
                     android:paddingEnd="10dp"
                     tools:text="8,888,888"
-                    />
+                    tools:ignore="RtlSymmetry" />
                 <TextView
                     android:id="@+id/runcaption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/runnets"
+                    android:layout_toEndOf="@+id/runnets"
                     android:paddingTop="8dp"
                     android:textColor="#AAAAAA"
                     android:textSize="16sp"
@@ -73,11 +73,11 @@
                     android:textSize="44sp"
                     android:paddingEnd="10dp"
                     tools:text="8,888,888"
-                    />
+                    tools:ignore="RtlSymmetry" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|left"
+                    android:layout_gravity="top|start"
                     android:layout_toEndOf="@+id/newwifi"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_wifi"
@@ -98,11 +98,11 @@
                     android:textSize="44sp"
                     android:paddingEnd="10dp"
                     tools:text="8,888,888"
-                    />
+                    tools:ignore="RtlSymmetry" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|left"
+                    android:layout_gravity="top|start"
                     android:layout_toEndOf="@+id/newbt"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_bt"
@@ -123,11 +123,11 @@
                     android:textSize="44sp"
                     android:paddingEnd="10dp"
                     tools:text="8,888,888"
-                    />
+                    tools:ignore="RtlSymmetry" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|left"
+                    android:layout_gravity="top|start"
                     android:layout_toEndOf="@+id/newcells"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_cells"
@@ -145,7 +145,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/fixtype"
+                android:layout_toStartOf="@+id/fixtype"
                 android:paddingTop="2dp"
                 android:textColor="#46AA00"
                 android:textSize="20sp"
@@ -157,50 +157,50 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/fixmeta"
-                android:paddingRight="4dp"
+                android:layout_toStartOf="@+id/fixmeta"
+                android:paddingEnd="4dp"
                 android:paddingTop="8dp"
                 app:tint="#46AA00"
-                />
+                tools:ignore="RtlSymmetry" />
             <TextView
                 android:id="@+id/fixmeta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
-                android:paddingRight="4dp"
+                android:paddingEnd="4dp"
                 android:paddingTop="2dp"
                 android:textColor="#46AA00"
                 android:textSize="20sp"
                 android:visibility="invisible"
                 tools:text="(88)"
-                />
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/contype"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/fixmeta"
-                android:layout_toLeftOf="@+id/concount"
-                android:paddingRight="4dp"
+                android:layout_toStartOf="@+id/concount"
+                android:paddingEnd="4dp"
                 android:paddingTop="2dp"
                 android:textColor="#46AA00"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:visibility="invisible"
-                />
+                tools:ignore="RtlSymmetry" />
             <TextView
                 android:id="@+id/concount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_below="@+id/fixmeta"
-                android:paddingRight="4dp"
+                android:paddingEnd="4dp"
                 android:paddingTop="2dp"
                 android:textColor="#46AA00"
                 android:textSize="16sp"
                 android:visibility="invisible"
-                />
+                tools:ignore="RtlSymmetry" />
         </RelativeLayout>
     </RelativeLayout>
 
@@ -217,8 +217,13 @@
             android:text="@string/dash_time_run"
             android:textSize="30sp"
             style="@style/InvertedText"
+            android:scrollHorizontally="true"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:gravity="start"
-            />
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/run_dur"
+            tools:ignore="RtlSymmetry" />
         <TextView
             android:id="@+id/run_dur"
             android:layout_width="wrap_content"
@@ -229,7 +234,7 @@
             style="@style/InvertedText"
             android:gravity="end"
             tools:text="24:58:58"
-            />
+            tools:ignore="RtlSymmetry" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -244,7 +249,12 @@
             android:textSize="30sp"
             style="@style/NonInvertedText"
             android:gravity="start"
-            />
+            android:scrollHorizontally="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/scan_dur"
+            tools:ignore="RtlSymmetry" />
         <TextView
             android:id="@+id/scan_dur"
             android:layout_width="wrap_content"
@@ -255,6 +265,6 @@
             style="@style/NonInvertedText"
             android:gravity="end"
             tools:text="24:58:58"
-            />
+            tools:ignore="RtlSymmetry" />
     </RelativeLayout>
 </LinearLayout>

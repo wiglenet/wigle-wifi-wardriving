@@ -930,7 +930,11 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         }
                     }
                     break;
-                default:
+                case ScanCallback.SCAN_FAILED_SCANNING_TOO_FREQUENTLY:
+                    Logging.error("scan failed due to too-frequent scan requests.");
+                    break;
+                case ScanCallback.SCAN_FAILED_INTERNAL_ERROR:
+                case ScanCallback.SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES:
                     //ALIBI: catch-all - as of API 33, this subsumes:
                     //   SCAN_FAILED_OUT_OF_HARDWARE_RESOURCESl SCAN_FAILED_SCANNING_TOO_FREQUENTLY
                     if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
@@ -941,6 +945,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     }
                     Logging.error("Bluetooth LE scan error: " + errorCode);
                     scanning.set(false);
+                default:
+                    Logging.error("Bluetooth LE scan error: " + errorCode);
+                    break;
             }
         }
 

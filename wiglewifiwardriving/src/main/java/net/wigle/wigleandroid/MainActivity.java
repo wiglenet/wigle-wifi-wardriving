@@ -512,9 +512,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
         addPermission(permissionsList, Manifest.permission.BLUETOOTH);
         addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
-        addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
-        addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
-        addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
+        }
         if (!permissionsList.isEmpty()) {
             // The permission is NOT already granted.
             // Check if the user has been asked about this permission already and denied
@@ -750,31 +755,30 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private static Class classForFragmentNavId(final int navId) {
-        switch (navId) {
-            case R.id.nav_list:
-                return ListFragment.class;
-            case R.id.nav_dash:
-                return DashboardFragment.class;
-            case R.id.nav_data:
-                return DataFragment.class;
-            case R.id.nav_search:
-                return SearchFragment.class;
-            case R.id.nav_map:
-                return MappingFragment.class;
-            case R.id.nav_user_stats:
-                return UserStatsFragment.class;
-            case R.id.nav_rank:
-                return RankStatsFragment.class;
-            case R.id.nav_site_stats:
-                return SiteStatsFragment.class;
-            case R.id.nav_news:
-                return NewsFragment.class;
-            case R.id.nav_uploads:
-                return UploadsFragment.class;
-            case R.id.nav_settings:
-                return SettingsFragment.class;
-            default:
-                return ListFragment.class;
+        if (navId == R.id.nav_list) {
+            return ListFragment.class;
+        } else if (navId == R.id.nav_dash) {
+            return DashboardFragment.class;
+        } else if (navId == R.id.nav_data) {
+            return DataFragment.class;
+        } else if (navId == R.id.nav_search) {
+            return SearchFragment.class;
+        } else if (navId == R.id.nav_map) {
+            return MappingFragment.class;
+        } else if (navId == R.id.nav_user_stats) {
+            return UserStatsFragment.class;
+        } else if (navId == R.id.nav_rank) {
+            return RankStatsFragment.class;
+        } else if (navId == R.id.nav_site_stats) {
+            return SiteStatsFragment.class;
+        } else if (navId == R.id.nav_news) {
+            return NewsFragment.class;
+        } else if (navId == R.id.nav_uploads) {
+            return UploadsFragment.class;
+        } else if (navId == R.id.nav_settings) {
+            return SettingsFragment.class;
+        } else {
+            return ListFragment.class;
         }
     }
 

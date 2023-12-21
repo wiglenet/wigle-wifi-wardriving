@@ -3,7 +3,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+	android:layout_height="wrap_content">
 	<LinearLayout android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -44,7 +44,8 @@
 	<LinearLayout android:orientation="horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:paddingTop="2dp">
+			android:paddingTop="2dp"
+		android:baselineAligned="false">
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -60,7 +61,6 @@
 			<TextView android:id="@+id/discovered_wifi_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_weight="0"
 				style="@style/WiFiColor"
 				android:textSize="17sp"
 				android:gravity="start"
@@ -86,7 +86,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="2"
-			android:gravity="end">
+			android:gravity="end"
+			tools:ignore="UseCompoundDrawables">
 			<ImageView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -108,7 +109,8 @@
 	<LinearLayout android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:paddingVertical="2dp">
+		android:paddingVertical="2dp"
+		android:baselineAligned="false">
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -119,7 +121,8 @@
 				android:layout_height="wrap_content"
 				android:src="@drawable/ic_bt_sm"
 				android:paddingEnd="4dp"
-				android:paddingStart="1dp"/>
+				android:paddingStart="1dp"
+				android:contentDescription="@string/total_bt" />
 			<TextView android:id="@+id/total_bt_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -149,7 +152,8 @@
 				android:layout_height="wrap_content"
 				android:src="@drawable/cell"
 				android:paddingEnd="4dp"
-				android:paddingStart="1dp"/>
+				android:paddingStart="1dp"
+				android:contentDescription="@string/total_cell" />
 			<TextView android:id="@+id/total_cell_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -170,6 +174,5 @@
 				tools:text="8,888,888"/>
 		  </LinearLayout>
 	</LinearLayout>
-
 </LinearLayout>
 

@@ -68,7 +68,7 @@
                 android:text="cell new vs. run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_cell"
                 android:textSize="15sp"
@@ -97,7 +97,7 @@
                 android:text="bt new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_bt"
                 android:textSize="15sp"

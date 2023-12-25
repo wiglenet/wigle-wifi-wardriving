@@ -301,6 +301,9 @@ public class UploadsFragment extends ProgressThrobberFragment {
                         }, REFRESH_IN_PROGRESS_DELAY_MS, REFRESH_IN_PROGRESS_DELAY_MS);
                     }
                 } else {
+                    //ALIBI: this will get called (and refresh cancelled) even if an upload is pending once you've scrolled away from the 0th page.
+                    //this is desirable, since if someone's looking back through their history, they probably don't want the list updated out from underneath them by the refresh.
+                    //if we implement a more surgical Upload list item update, we can do away with this behavior.
                     if (refreshTimer != null) {
                         refreshTimer.cancel();
                         refreshTimer = null;

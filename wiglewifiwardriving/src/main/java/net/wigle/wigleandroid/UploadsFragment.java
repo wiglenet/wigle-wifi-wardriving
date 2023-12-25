@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import static net.wigle.wigleandroid.model.Upload.Status.IN_PROGRESS;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -10,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.core.view.MenuItemCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +45,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UploadsFragment extends ProgressThrobberFragment {
@@ -53,7 +59,6 @@ public class UploadsFragment extends ProgressThrobberFragment {
 
     private int currentPage = 0;
     private final AtomicBoolean busy = new AtomicBoolean(false);
-
     private AtomicBoolean finishing;
     private UploadsListAdapter listAdapter;
     private final AtomicBoolean lockListAdapter = new AtomicBoolean(false);
@@ -61,8 +66,11 @@ public class UploadsFragment extends ProgressThrobberFragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView queueDepth;
     private UploadsResponse latestResponse;
-
+    private static final long REFRESH_IN_PROGRESS_DELAY_MS = 30000; //30s
     private static final Map<Upload.Status, String> uploadStatusMap;
+
+    private Timer refreshTimer;
+
     static {
         Map<Upload.Status, String> statusMap = new HashMap<>();
         statusMap.put(Upload.Status.QUEUED, "upload_queued");
@@ -117,7 +125,7 @@ public class UploadsFragment extends ProgressThrobberFragment {
         if (null != a) {
             busy.set(false);
             startAnimation(); //animation only applies for first page.
-            downloadUploads(0);
+            downloadUploads(0, false);
         }
         return rootView;
     }
@@ -131,11 +139,11 @@ public class UploadsFragment extends ProgressThrobberFragment {
             if (null != listAdapter) {
                 listAdapter.clear();
             }
-            downloadUploads(0);
+            downloadUploads(0, false);
         });
     }
 
-    private void downloadUploads(final int page) {
+    private void downloadUploads(final int page, final boolean update) {
         if (busy.compareAndSet(false, true)) {
             final int pageStart = page * ROW_COUNT;
             final MainActivity.State s = MainActivity.getStaticState();
@@ -146,6 +154,9 @@ public class UploadsFragment extends ProgressThrobberFragment {
                             busy.set(false);
                             stopAnimation();
                             if (latestResponse != null) {
+                                if (update) {
+                                    listAdapter.clear();
+                                }
                                 handleUploads(latestResponse);
                             } else {
                                 swipeRefreshLayout.setRefreshing(false);
@@ -234,7 +245,7 @@ public class UploadsFragment extends ProgressThrobberFragment {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 currentPage++;
-                downloadUploads(currentPage);
+                downloadUploads(currentPage, false);
                 return true;
             }
         });
@@ -268,8 +279,35 @@ public class UploadsFragment extends ProgressThrobberFragment {
                     queueDepth.setText(queueDepthTitle);
                 }
                 //listAdapter.clear(); //TODO: should we clear on update and scroll up to keep this from getting crazy?
+                boolean refresh = false;
                 for (final Upload result : response.getResults()) {
+                    if (IN_PROGRESS.contains(result.getStatus())) {
+                        if ( !refresh) {
+                            refresh = true;
+                        }
+                    }
                     listAdapter.add(result);
+                }
+                if (refresh) {
+                    final Handler handler = new Handler(Looper.getMainLooper());
+                    if (null == refreshTimer) {
+                        refreshTimer = new Timer();
+                        refreshTimer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                downloadUploads(0, true);
+                                handler.post(() -> listAdapter.notifyDataSetChanged());
+                            }
+                        }, REFRESH_IN_PROGRESS_DELAY_MS, REFRESH_IN_PROGRESS_DELAY_MS);
+                    }
+                } else {
+                    //ALIBI: this will get called (and refresh cancelled) even if an upload is pending once you've scrolled away from the 0th page.
+                    //this is desirable, since if someone's looking back through their history, they probably don't want the list updated out from underneath them by the refresh.
+                    //if we implement a more surgical Upload list item update, we can do away with this behavior.
+                    if (refreshTimer != null) {
+                        refreshTimer.cancel();
+                        refreshTimer = null;
+                    }
                 }
             } finally {
                 lockListAdapter.set(false);
@@ -284,6 +322,10 @@ public class UploadsFragment extends ProgressThrobberFragment {
     @Override
     public void onDestroy() {
         Logging.info( "UPLOADS: onDestroy" );
+        if (null != refreshTimer) {
+            refreshTimer.cancel();
+            refreshTimer = null;
+        }
         finishing.set( true );
 
         super.onDestroy();
@@ -319,7 +361,7 @@ public class UploadsFragment extends ProgressThrobberFragment {
     }
 
     @Override
-    public void onConfigurationChanged( final Configuration newConfig ) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
         Logging.info("UPLOADS: config changed");
         super.onConfigurationChanged( newConfig );
     }

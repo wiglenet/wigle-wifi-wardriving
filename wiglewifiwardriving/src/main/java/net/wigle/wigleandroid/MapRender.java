@@ -80,7 +80,7 @@ public class MapRender {
 
             markerOptions.title(network.getSsid());
             final String newString = network.isNew() ? " (new)" : "";
-            markerOptions.snippet(network.getBssid() + newString + " - " + network.getChannel() + " - " + network.getCapabilities());
+            markerOptions.snippet(network.getBssid() + newString + "\n\t" + network.getChannel() + "\n\t" + network.getCapabilities());
         }
 
         private BitmapDescriptor getIcon(final Network network) {

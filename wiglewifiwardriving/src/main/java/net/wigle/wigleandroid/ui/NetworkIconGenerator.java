@@ -45,6 +45,10 @@ public class NetworkIconGenerator {
     public static final int STYLE_CELL = 3;
     public static final int STYLE_BT = 4;
     public static final int STYLE_WIFI = 5;
+    public static final int STYLE_CELL_NEW = 6;
+    public static final int STYLE_BT_NEW = 7;
+    public static final int STYLE_WIFI_NEW = 8;
+
 
     /**
      * Creates a new IconGenerator with the default style.
@@ -60,7 +64,7 @@ public class NetworkIconGenerator {
         setStyle(STYLE_DEFAULT);
     }
 
-    public Bitmap makeIcon(@NonNull Network network) {
+    public Bitmap makeIcon(@NonNull Network network, final boolean isNew) {
         if (this.mTextView != null) {
             final String ssid = network.getSsid();
             if (null != ssid && !ssid.isEmpty()) {
@@ -71,7 +75,7 @@ public class NetworkIconGenerator {
             mTextView.setGravity(Gravity.CENTER_HORIZONTAL);
             mTextView.setCompoundDrawablePadding(mContext.getResources().getDimensionPixelSize(R.dimen.map_label_image_padding));
             mTextView.setCompoundDrawablesWithIntrinsicBounds(getIconId(network.getType(), network.getCrypto()), 0, 0, 0);
-            setStyle(styleForNetworkType(network.getType()));
+            setStyle(styleForNetworkType(network.getType(), isNew));
         }
         return this.makeIcon();
     }
@@ -182,10 +186,16 @@ public class NetworkIconGenerator {
     private static int getStyleColor(int style) {
         switch (style) {
             case STYLE_CELL:
+                return -869072896; //CC330000
+            case STYLE_CELL_NEW:
                 return -866844672; //CC550000
             case STYLE_BT:
+                return -872410829; //CC001133
+            case STYLE_BT_NEW:
                 return -872406443; //CC002255
             case STYLE_WIFI:
+                return -871288064; //CC113300
+            case STYLE_WIFI_NEW:
                 return -870165248; //CC225500
             case STYLE_DEFAULT:
             case STYLE_WHITE:
@@ -203,6 +213,9 @@ public class NetworkIconGenerator {
             case 3:
             case 4:
             case 5:
+            case 6:
+            case 7:
+            case 8:
                 return R.style.amu_Bubble_TextAppearance_Light;//style.amu_Bubble_TextAppearance_Light;
         }
     }
@@ -240,18 +253,27 @@ public class NetworkIconGenerator {
         }
     }
 
-    private int styleForNetworkType(NetworkType t) {
+    private int styleForNetworkType(NetworkType t, final boolean isNew) {
         switch (t) {
             case BT:
             case BLE:
+                if (isNew) {
+                    return STYLE_BT_NEW;
+                }
                 return STYLE_BT;
             case CDMA:
             case GSM:
             case WCDMA:
             case LTE:
             case NR:
+                if (isNew) {
+                    return STYLE_CELL_NEW;
+                }
                 return STYLE_CELL;
             case WIFI:
+                if (isNew) {
+                    return STYLE_WIFI_NEW;
+                }
                 return STYLE_WIFI;
             default:
                 return STYLE_DEFAULT;

@@ -19,7 +19,6 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.collections.MarkerManager;
-import com.google.maps.android.ui.IconGenerator;
 
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.NetworkIconGenerator;
@@ -36,6 +35,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 
+/**
+ * Custom map rendering: clustering, label decisions, MapUtils functionality
+ */
 public class MapRender {
 
     private final ClusterManager<Network> mClusterManager;
@@ -50,12 +52,20 @@ public class MapRender {
 
     private static final String MESSAGE_BSSID = "messageBssid";
     private static final String MESSAGE_BSSID_LIST = "messageBssidList";
-    private static final BitmapDescriptor DEFAULT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-    private static final BitmapDescriptor DEFAULT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
-    private static final float DEFAULT_ICON_ALPHA = 0.75f;
-    private static final float CUSTOM_ICON_ALPHA = 0.80f;
+    //ALIBI: placeholder while we sort out "bubble" icons for BT, BLE, Cell, Cell NR, WiFi encryption types.
+    private static final BitmapDescriptor DEFAULT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+    private static final BitmapDescriptor DEFAULT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA);
+    private static final BitmapDescriptor CELL_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+    private static final BitmapDescriptor CELL_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE);
+    private static final BitmapDescriptor BT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+    private static final BitmapDescriptor BT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
+    private static final BitmapDescriptor WIFI_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+    private static final BitmapDescriptor WIFI_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
+
+    private static final float DEFAULT_ICON_ALPHA = 0.7f;
+    private static final float CUSTOM_ICON_ALPHA = 0.75f;
     // a % of the cache size can be labels
-    private static final int MAX_LABELS = MainActivity.getNetworkCache().maxSize() / 15;
+    private static final int MAX_LABELS = MainActivity.getNetworkCache().maxSize() / 10;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -87,17 +97,37 @@ public class MapRender {
         private BitmapDescriptor getIcon(final Network network) {
             if (showDefaultIcon(network)) {
                 MapRender.this.labeledNetworks.remove(network);
-                return network.isNew() ? DEFAULT_ICON_NEW : DEFAULT_ICON;
+                switch (network.getType()) {
+                    case CDMA:
+                    case GSM:
+                    case WCDMA:
+                    case LTE:
+                    case NR:
+                        if (network.isNew()) {
+                            return CELL_ICON_NEW;
+                        }
+                        return CELL_ICON;
+                    case BT:
+                    case BLE:
+                        if (network.isNew()) {
+                            return BT_ICON_NEW;
+                        }
+                        return BT_ICON;
+                    case WIFI:
+                        if (network.isNew()) {
+                            return WIFI_ICON_NEW;
+                        }
+                        return WIFI_ICON;
+                    default:
+                        if (network.isNew()) {
+                            return WIFI_ICON_NEW;
+                        }
+                        return DEFAULT_ICON;
+                }
             }
 
             MapRender.this.labeledNetworks.add(network);
-            if ( network.isNew() ) {
-                iconFactory.setStyle(IconGenerator.STYLE_WHITE);
-            }
-            else {
-                iconFactory.setStyle(IconGenerator.STYLE_BLUE);
-            }
-            return BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(network));
+            return BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(network, network.isNew()));
         }
 
         private boolean showDefaultIcon(final Network network) {

@@ -22,6 +22,7 @@ import com.google.maps.android.collections.MarkerManager;
 import com.google.maps.android.ui.IconGenerator;
 
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.ui.NetworkIconGenerator;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -59,11 +60,11 @@ public class MapRender {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private class NetworkRenderer extends DefaultClusterRenderer<Network> {
-        final IconGenerator iconFactory;
+        final NetworkIconGenerator iconFactory;
 
         public NetworkRenderer(Context context, GoogleMap map, ClusterManager<Network> clusterManager) {
             super(context, map, clusterManager);
-            iconFactory = new IconGenerator(context);
+            iconFactory = new NetworkIconGenerator(context);
         }
 
         @Override
@@ -96,7 +97,7 @@ public class MapRender {
             else {
                 iconFactory.setStyle(IconGenerator.STYLE_BLUE);
             }
-            return BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(network.getSsid()));
+            return BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(network));
         }
 
         private boolean showDefaultIcon(final Network network) {

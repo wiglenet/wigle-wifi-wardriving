@@ -224,9 +224,9 @@ public class NetworkIconGenerator {
     private int getIconId(NetworkType type, int crypto) {
         switch (type) {
             case BT:
-                return R.drawable.ic_bt;
+                return R.drawable.bt_white;
             case BLE:
-                return R.drawable.ic_btle;
+                return R.drawable.btle_white;
             case GSM:
             case LTE:
             case CDMA:

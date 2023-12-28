@@ -377,11 +377,11 @@ public class UploadsFragment extends ProgressThrobberFragment {
         item.setIcon(android.R.drawable.ic_menu_myplaces);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon( R.drawable.wiglewifi_small_black_white );
+        item.setIcon( R.drawable.wiglewifi_planet_ico );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon(R.drawable.wiglewifi_small_black_white);
+        item.setIcon(R.drawable.wiglewifi_planet_ico);
 
         super.onCreateOptionsMenu(menu, inflater);
     }

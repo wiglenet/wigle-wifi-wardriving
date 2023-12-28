@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -23,6 +24,7 @@ public class NetworkBubbleDrawable extends Drawable {
     private final Drawable mMask;
     private int mColor = -1;
 
+    @SuppressLint("UseCompatLoadingForDrawables") //ALIBI: lifted from the original
     public NetworkBubbleDrawable(Resources res) {
         this.mMask = res.getDrawable(R.drawable.amu_bubble_mask);
         this.mShadow = res.getDrawable(R.drawable.amu_bubble_shadow);

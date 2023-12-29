@@ -50,7 +50,7 @@
                 />
             <item
                 android:id="@+id/nav_site_stats"
-                android:icon="@android:drawable/ic_menu_info_details"
+                android:icon="@drawable/wiglewifi_planet_ico"
                 android:title="@string/site_stats_app_name"
                 />
         </group>

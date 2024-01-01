@@ -221,7 +221,7 @@ public class SearchFragment extends Fragment {
 
             rb = view.findViewById(R.id.radio_search_wigle);
             if (null != rb) {
-                rb.setText(getText(R.string.search_wigle) + " " + getText(R.string.must_login));
+                rb.setText(String.format("%s %s",getText(R.string.search_wigle), getText(R.string.must_login)));
                 rb.setEnabled(false);
             } else {
                 Logging.info("unable to get RadioButton");

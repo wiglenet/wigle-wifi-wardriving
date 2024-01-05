@@ -3,6 +3,7 @@ package net.wigle.wigleandroid;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 
@@ -343,12 +344,11 @@ public class RankStatsFragment extends ProgressThrobberFragment {
         item.setIcon(android.R.drawable.ic_menu_myplaces);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon( R.drawable.wiglewifi_planet_ico );
+        item.setIcon(R.drawable.ic_planet_small_white);
         MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon(R.drawable.wiglewifi_planet_ico);
-
+        item.setIcon(R.drawable.ic_planet_small_white);
         item = menu.add(0, MENU_RANK_SWAP, 0, getRankSwapString());
         item.setIcon(android.R.drawable.ic_menu_sort_alphabetically);
 

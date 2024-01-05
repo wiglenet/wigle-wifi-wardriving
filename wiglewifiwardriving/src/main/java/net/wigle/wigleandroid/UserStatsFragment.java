@@ -293,11 +293,11 @@ public class UserStatsFragment extends AuthenticatedFragment {
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon( R.drawable.wiglewifi_planet_ico );
+        item.setIcon( R.drawable.ic_planet_small_white );
         MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon(R.drawable.wiglewifi_planet_ico);
+        item.setIcon(R.drawable.ic_planet_small_white);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
         item.setIcon(android.R.drawable.ic_menu_sort_by_size);

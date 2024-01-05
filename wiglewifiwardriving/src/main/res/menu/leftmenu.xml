@@ -6,63 +6,76 @@
             android:id="@+id/nav_list"
             android:icon="@android:drawable/ic_menu_sort_by_size"
             android:title="@string/tab_list"
+            android:contentDescription="@string/tab_list"
             />
         <item
             android:id="@+id/nav_map"
             android:icon="@android:drawable/ic_menu_mapmode"
             android:title="@string/tab_map"
+            android:contentDescription="@string/tab_map"
             />
         <item
             android:id="@+id/nav_dash"
             android:icon="@android:drawable/ic_menu_directions"
             android:title="@string/tab_dash"
+            android:contentDescription="@string/tab_dash"
             />
         <item
             android:id="@+id/nav_data"
             android:icon="@android:drawable/ic_menu_save"
             android:title="@string/tab_data"
+            android:contentDescription="@string/tab_data"
             />
         <item
             android:id="@+id/nav_search"
             android:icon="@android:drawable/ic_menu_search"
             android:title="@string/tab_search"
+            android:contentDescription="@string/tab_search"
             />
         <item
             android:id="@+id/nav_news"
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="@string/tab_news"
+            android:contentDescription="@string/tab_news"
             />
         <item
             android:id="@+id/nav_stats"
             android:icon="@android:drawable/ic_menu_today"
-            android:title="@string/tab_stats"/>
+            android:title="@string/tab_stats"
+            android:contentDescription="@string/tab_stats"/>
         <group
             android:id="@+id/stats_group">
             <item
                 android:id="@+id/nav_user_stats"
                 android:icon="@android:drawable/ic_menu_myplaces"
                 android:title="@string/user_stats_app_name"
+                android:contentDescription="@string/user_stats_app_name"
                 />
             <item
                 android:id="@+id/nav_rank"
                 android:icon="@android:drawable/ic_menu_sort_alphabetically"
                 android:title="@string/tab_rank"
+                android:contentDescription="@string/tab_rank"
                 />
             <item
                 android:id="@+id/nav_site_stats"
-                android:icon="@drawable/wiglewifi_planet_ico"
+                android:icon="@drawable/ic_planet_small_white"
+                app:tint="?attr/colorControlNormal"
                 android:title="@string/site_stats_app_name"
+                android:contentDescription="@string/site_stats_app_name"
                 />
         </group>
         <item
             android:id="@+id/nav_uploads"
             android:icon="@android:drawable/ic_menu_upload"
             android:title="@string/tab_uploads"
+            android:contentDescription="@string/tab_uploads"
             />
         <item
             android:id="@+id/nav_settings"
             android:icon="@android:drawable/ic_menu_preferences"
             android:title="@string/menu_settings"
+            android:contentDescription="@string/menu_settings"
             />
     </group>
     <item

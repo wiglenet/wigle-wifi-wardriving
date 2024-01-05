@@ -1,3 +1,10 @@
+* 2.83 (01/04/2024)
+Map UI improvements with icon bubbles
+Jobs system refactor
+Many linting and UI fixes
+Icon updates
+Build modernization and fixes
+
 * 2.81 - 2.82 (11/28/2023)
 Bluetooth is now in text-to-speech
 Roaming Consortium ID's added to local DB and file upload (thanks MarkG!)

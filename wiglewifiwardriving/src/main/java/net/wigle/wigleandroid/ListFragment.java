@@ -56,6 +56,7 @@ import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.StatsUtil;
 
 import org.json.JSONObject;
 
@@ -140,6 +141,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private boolean animating = false;
     private AnimatedVectorDrawableCompat scanningAnimation = null;
 
+    private SharedPreferences prefs;
+
     static {
         final long maxMemory = Runtime.getRuntime().maxMemory();
         int cacheSize = 128;
@@ -161,12 +164,13 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final View view = inflater.inflate(R.layout.list, container, false);
         final State state = MainActivity.getStaticState();
         final TextView tv = view.findViewById( R.id.db_status );
         dbQueueTextColor = tv.getCurrentTextColor();
         Logging.info("setupUploadButton");
-        setupUploadButton(view);
+        setupUploadButton(view, prefs);
         Logging.info("setupList");
         setupList(view);
         Logging.info("setNetCountUI");
@@ -232,12 +236,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         //ALIBI: the number of async requests to perform.
         final Handler handler = new Handler(Looper.getMainLooper());
-        TextView tv = view.findViewById( R.id.stats_run );
-        long netCount = state.wifiReceiver.getRunNetworkCount();
-        if (null != state.bluetoothReceiver){
-            netCount += state.bluetoothReceiver.getRunNetworkCount();
-        }
-        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount)); //TODO: change to a templated string
         executor.execute(() -> {
             final long count = state.dbHelper.getNewWifiCount();
             handler.post(() -> {
@@ -245,7 +243,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 text.setText( UINumberFormat.counterFormat(count) );
             });
         });
-        tv = view.findViewById( R.id.stats_cell );
+        TextView tv = view.findViewById( R.id.stats_cell );
         tv.setText( UINumberFormat.counterFormat(lameStatic.newCells));
         executor.execute(() -> {
             final long count = state.dbHelper.getNewBtCount();
@@ -254,6 +252,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 text.setText( UINumberFormat.counterFormat(count) );
             });
         });
+        final long unUploaded = StatsUtil.newNetsSinceUpload(prefs);
+        tv = view.findViewById( R.id.stats_unuploaded );
+        tv.setText( UINumberFormat.counterFormat(unUploaded));
         executor.execute(() -> {
             final long count = state.dbHelper.getNetworkCount();
             handler.post(() -> {
@@ -309,7 +310,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 Logging.error("Null activity context - can't set animation");
             }
 
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             String quickPausePref = prefs.getString(PreferenceKeys.PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
             if (!QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) {
                 scanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.off));
@@ -378,6 +378,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onResume() {
         Logging.info( "LIST: resumed.");
         super.onResume();
+        if (null == prefs) {
+            prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        }
         final Activity a = getActivity();
         if (null != a) {
             a.setTitle(R.string.list_app_name);
@@ -453,7 +456,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
             item = menu.add(0, MENU_MUTE, 0,
                     muted ? getString(R.string.play) : getString(R.string.mute));
@@ -510,7 +512,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             case MENU_MUTE:
                 if (null != a) {
-                    final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                     boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
                     muted = !muted;
                     Editor editor = prefs.edit();
@@ -640,7 +642,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         // have to redo linkages/listeners
         final View v = getView();
         if (null != v) {
-            setupUploadButton(v);
+            setupUploadButton(v, prefs);
             setNetCountUI(state, v);
             if (null != main) {
                 setLocationUI(main, v);
@@ -734,7 +736,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             tv = view.findViewById( R.id.speed_text);
             final Activity a = getActivity();
             if (null != a) {
-                tv.setText(getString(R.string.list_speed, (location == null) ? "" : metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed())));
+                tv.setText(getString(R.string.list_speed, (location == null) ? "" :
+                        metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed(), prefs)));
             }
 
             TextView tv4 = view.findViewById( R.id.accuracy_text);
@@ -743,7 +746,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 tv4.setText( "" );
                 tv5.setText( "" );
             } else {
-                final SharedPreferences prefs = main.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 final String distString = UINumberFormat.metersToString(prefs,
                         state.numberFormat0, main, location.getAccuracy(), true);
                 tv4.setText("+/- " + distString);
@@ -759,9 +761,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
 
     public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,
-                                                       final float metersPerSecond ) {
-
-        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
+                                                       final float metersPerSecond, final SharedPreferences prefs ) {
         final boolean metric = prefs.getBoolean( PreferenceKeys.PREF_METRIC, false );
 
         String retval;
@@ -774,7 +774,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         return retval;
     }
 
-    private void setupUploadButton( final View view ) {
+    private void setupUploadButton( final View view, final SharedPreferences prefs) {
         final Button button = view.findViewById( R.id.upload_button );
         if (null != button) {
             MainActivity m = MainActivity.getMainActivity();
@@ -789,7 +789,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 }
                 final FragmentActivity a = getActivity();
                 if (null != a) {
-                    final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                     final boolean userConfirmed = prefs.getBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, false);
                     final State state = MainActivity.getStaticState();
 

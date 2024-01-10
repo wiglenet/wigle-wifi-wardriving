@@ -18,15 +18,6 @@
         android:paddingBottom="3dp"
         style="@style/MapOverlay"
         android:weightSum="21">
-        <TextView
-            android:id="@+id/stats_run"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:layout_weight="4"
-            style="@style/StatColor"
-            android:text="@string/run"
-            tools:text="Run: 88,88k"/>
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -106,8 +97,32 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
+            android:layout_weight="9"
+            android:gravity="end"
             tools:ignore="UseCompoundDrawables">
+            <ImageView
+                android:src="@drawable/new_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/new_word"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="@string/new_word"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_unuploaded"
+                android:textSize="15sp"
+                style="@style/UploadColor"
+                tools:text="888.8 K"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="/" />
             <ImageView
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"
@@ -118,7 +133,7 @@
                 android:paddingEnd="2dp"
                 android:text="database" />
             <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_dbnets"
                 android:textSize="15sp"

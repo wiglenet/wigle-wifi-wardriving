@@ -17,7 +17,8 @@
         android:layout_alignParentTop="true"
         android:paddingBottom="3dp"
         style="@style/MapOverlay"
-        android:weightSum="21">
+        android:weightSum="21"
+        android:baselineAligned="false">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -122,7 +123,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:text="/" />
+                android:text="/"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"/>
             <ImageView
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"

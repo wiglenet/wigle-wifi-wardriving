@@ -118,7 +118,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:text="/" />
+                android:text="/"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                />
             <ImageView
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"

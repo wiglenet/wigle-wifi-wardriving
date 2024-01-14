@@ -85,6 +85,7 @@ import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.HeadingManager;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.StatsUtil;
 
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
@@ -664,15 +665,17 @@ public final class MappingFragment extends Fragment {
                 previousRunNets = ListFragment.lameStatic.runNets;
 
                 if (view != null) {
-                    TextView tv = view.findViewById(R.id.stats_run);
-                    tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(
-                            ListFragment.lameStatic.runNets+ListFragment.lameStatic.runBt));
-                    tv = view.findViewById(R.id.stats_wifi);
+                    TextView tv = view.findViewById(R.id.stats_wifi);
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
                     tv = view.findViewById( R.id.stats_cell );
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
                     tv = view.findViewById( R.id.stats_bt );
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
+                    if (null != prefs) {
+                        final long unUploaded = StatsUtil.newNetsSinceUpload(prefs);
+                        tv = view.findViewById(R.id.stats_unuploaded);
+                        tv.setText(UINumberFormat.counterFormat(unUploaded));
+                    }
                     tv = view.findViewById(R.id.heading);
                     final Location gpsLocation = safelyGetLast(getContext(), LocationManager.GPS_PROVIDER);
                     if (BuildConfig.DEBUG && HeadingManager.DEBUG) {

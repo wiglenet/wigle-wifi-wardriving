@@ -183,5 +183,4 @@ public class SettingsUtil {
             public void onNothingSelected( final AdapterView<?> arg0 ) {}
         });
     }
-
 }

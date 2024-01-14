@@ -40,7 +40,7 @@ public final class WigleService extends Service {
 
     // NOTIFICATION_CHANNEL_ID must be updated for any channel change to take effect on an
     // existing device.
-    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_8";
+    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_9";
 
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );

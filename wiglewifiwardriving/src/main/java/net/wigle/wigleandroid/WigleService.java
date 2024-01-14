@@ -372,7 +372,7 @@ public final class WigleService extends Service {
             builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
-            builder.setSmallIcon(R.drawable.ic_w_logo_simple);
+            builder.setSmallIcon(R.drawable.ic_w_logo_simple_mono);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(VISIBILITY_PUBLIC);

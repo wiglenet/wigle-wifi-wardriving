@@ -68,7 +68,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation (name:'MaskedEditText-1.0.5', ext:'aar')
     implementation 'com.goebl:simplify:1.0.0'
-    implementation "com.appmattus.certificatetransparency:certificatetransparency-android:2.5.19"
+    implementation "com.appmattus.certificatetransparency:certificatetransparency-android:0.3.0"
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'

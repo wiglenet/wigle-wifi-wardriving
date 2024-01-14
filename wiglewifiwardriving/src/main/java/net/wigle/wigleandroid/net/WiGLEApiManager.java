@@ -13,7 +13,7 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.appmattus.certificatetransparency.CTInterceptorBuilder;
+import com.babylon.certificatetransparency.CTInterceptorBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 

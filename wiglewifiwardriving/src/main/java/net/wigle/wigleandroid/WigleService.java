@@ -40,7 +40,7 @@ public final class WigleService extends Service {
 
     // NOTIFICATION_CHANNEL_ID must be updated for any channel change to take effect on an
     // existing device.
-    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_9";
+    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_8";
 
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
@@ -372,7 +372,7 @@ public final class WigleService extends Service {
             builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
-            builder.setSmallIcon(R.drawable.ic_w_logo_simple);
+            builder.setSmallIcon(R.drawable.ic_w_logo_simple_mono);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(VISIBILITY_PUBLIC);

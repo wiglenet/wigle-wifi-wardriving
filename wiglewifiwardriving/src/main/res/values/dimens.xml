@@ -2,4 +2,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="menu_item_icon_size">24dp</dimen>
     <dimen name="map_label_image_padding">6dp</dimen>
+    <dimen name="design_navigation_separator_vertical_padding" tools:override="true">0dp</dimen>
 </resources>

@@ -11,6 +11,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -346,7 +349,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
     }
 
-    public void setScanningStatusIndicator(boolean scanning) {
+    public void setScanningStatusIndicator(final boolean scanning) {
         View view = getView();
         if (view != null) {
             final ImageButton scanningImageButton = view.findViewById(R.id.scanning);
@@ -362,6 +365,29 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     }
 
+    public void setGpsFixIndicator(final boolean locked) {
+        View view = getView();
+        if (view != null) {
+            final View gpsFixContainer = view.findViewById(R.id.gps_area);
+            final View gpsSearchingContainer = view.findViewById(R.id.gps_searching);
+            final ImageView searchingGps = view.findViewById(R.id.gps_searching_anim);
+            if (locked) {
+                if (null != searchingGps) {
+                    AnimatedVectorDrawable animatedVectorDrawable =  (AnimatedVectorDrawable) searchingGps.getDrawable();
+                    animatedVectorDrawable.stop();
+                }
+                gpsSearchingContainer.setVisibility(GONE);
+                gpsFixContainer.setVisibility(VISIBLE);
+            } else {
+                if (null != searchingGps) {
+                    AnimatedVectorDrawable animatedVectorDrawable =  (AnimatedVectorDrawable) searchingGps.getDrawable();
+                    animatedVectorDrawable.start();
+                }
+                gpsFixContainer.setVisibility(GONE);
+                gpsSearchingContainer.setVisibility(VISIBLE);
+            }
+        }
+    }
     @Override
     public void onPause() {
         Logging.info("LIST: paused.");
@@ -378,11 +404,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onResume() {
         Logging.info( "LIST: resumed.");
         super.onResume();
-        if (null == prefs) {
-            prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-        }
         final Activity a = getActivity();
         if (null != a) {
+            if (null == prefs) {
+                prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            }
             a.setTitle(R.string.list_app_name);
         }
         State state = MainActivity.getStaticState();
@@ -719,14 +745,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             String latText;
             if ( location == null ) {
                 if ( main.isScanning() ) {
-                    latText = getString(R.string.list_waiting_gps);
-                }
-                else {
-                    latText = getString(R.string.list_scanning_off);
+                    latText = getString(R.string.list_waiting_gps); //TODO: don't need to do this anymore
+                    setGpsFixIndicator(false);
+                } else {
+                    latText = getString(R.string.list_scanning_off); //TODO: maybe still show fix = false, but don't animate?
                     setScanningStatusIndicator(false);
                 }
-            }
-            else {
+            } else {
+                setGpsFixIndicator(true);
                 latText = state.numberFormat8.format( location.getLatitude() );
             }
             tv.setText( getString(R.string.list_short_lat, latText ));

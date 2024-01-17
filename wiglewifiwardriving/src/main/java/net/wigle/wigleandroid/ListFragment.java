@@ -745,10 +745,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             String latText;
             if ( location == null ) {
                 if ( main.isScanning() ) {
-                    latText = getString(R.string.list_waiting_gps); //TODO: don't need to do this anymore
+                    latText = "";
                     setGpsFixIndicator(false);
                 } else {
-                    latText = getString(R.string.list_scanning_off); //TODO: maybe still show fix = false, but don't animate?
+                    latText = getString(R.string.list_scanning_off); //TODO: perhaps a parallel GPS-disabled replacement display?
                     setScanningStatusIndicator(false);
                 }
             } else {

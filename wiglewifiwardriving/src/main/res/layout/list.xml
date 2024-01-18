@@ -145,9 +145,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        >
-
+        android:layout_height="wrap_content">
         <Button
             android:id="@+id/upload_button"
             android:layout_width="wrap_content"
@@ -159,60 +157,94 @@
             android:background="@drawable/upload_button"
             android:text="@string/upload_button" />
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="6"
+            android:layout_height="match_parent"
+            android:layout_weight="11"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:id="@+id/gps_searching"
             >
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/lat_text"
-                android:scrollHorizontally="true"
-                android:ellipsize="end"
-                android:maxLines="1"
+                android:contentDescription="@string/list_waiting_gps"
+                android:src="@drawable/animated_gps_searching"
+                android:scaleType="fitCenter"
+                android:layout_margin="5dp"
+                android:paddingTop="2dp"
+                android:id="@+id/gps_searching_anim"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/gps_searching_text"
                 android:text="@string/list_waiting_gps"
-            />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/lon_text"
-                tools:text="Lon: -108.44456771"
-            />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/speed_text"
-                tools:text="Speed: 88 mph" />
+                android:paddingTop="16dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                />
         </LinearLayout>
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="5"
-            >
-            <TextView
+            android:layout_height="wrap_content"
+            android:layout_weight="11"
+            android:orientation="horizontal"
+            android:id="@+id/gps_area">
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/accuracy_text"
-                tools:text="+/- 160 ft"
+                android:layout_height="fill_parent"
+                android:layout_weight="6"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lat_text"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="Lon: 32.72387801"
+                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lon_text"
+                    tools:text="Lon: -108.44456771"
+                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/speed_text"
+                    tools:text="Speed: 88 mph" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="5"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accuracy_text"
+                    tools:text="+/- 160 ft"
 
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/alt_text"
-                tools:text="Alt: 888 ft"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sats_text"
-                tools:text="Sats: 22"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/alt_text"
+                    tools:text="Alt: 888 ft"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sats_text"
+                    tools:text="Sats: 22"
 
-                />
+                    />
+            </LinearLayout>
         </LinearLayout>
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"

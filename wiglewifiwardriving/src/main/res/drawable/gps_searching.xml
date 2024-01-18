@@ -1,0 +1,37 @@
+<vector android:alpha="0.93" android:height="40.0dp"
+    android:viewportHeight="55.0" android:viewportWidth="55"
+    android:width="40.0dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:name="outerRotationGroup"
+        android:pivotX="27.5"
+        android:pivotY="27.5"
+        android:rotation="360">
+        <path android:fillColor="#00000000" android:fillType="evenOdd"
+            android:pathData="M52.038,27.502A24.537,24.537 0,0 1,29.106 51.987,24.537 24.537,0 0,1 3.173,30.705 24.537,24.537 0,0 1,22.714 3.436,24.537 24.537,0 0,1 51.202,21.151"
+            android:strokeColor="#303030" android:strokeLineCap="square"
+            android:strokeLineJoin="bevel" android:strokeWidth="1.965" android:id="@+id/outer_ring"/>
+    </group>
+    <group
+        android:name="innerRotationGroup"
+        android:pivotX="27.5"
+        android:pivotY="27.5"
+        android:rotation="180">
+        <path android:fillColor="#00000000" android:fillType="evenOdd"
+            android:pathData="M48.641,27.502A21.14,21.14 0,0 1,28.884 48.597,21.14 21.14,0 0,1 6.542,30.262 21.14,21.14 0,0 1,23.377 6.768,21.14 21.14,0 0,1 47.921,22.031"
+            android:strokeColor="#303030" android:strokeLineCap="square"
+            android:strokeLineJoin="bevel" android:strokeWidth="0.865" android:id="@+id/inner_ring"/>
+    </group>
+    <path android:fillColor="#303030"
+        android:pathData="m27.044,26.476h1.438v1.438h-1.438zM29.363,22.078 L32.88,25.599 29.359,29.117 25.841,25.596z"
+        android:strokeColor="#303030" android:strokeLineCap="round"
+        android:strokeLineJoin="miter" android:strokeWidth="0.130891" android:id="@+id/sat_body"/>
+    <path android:fillColor="#00000000"
+        android:pathData="m33.197,25.283 l9.506,9.506 -4.108,4.108 -9.506,-9.506zM20.126,12.298 L29.633,21.804 25.525,25.912 16.019,16.406z"
+        android:strokeColor="#303030" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:strokeWidth="0.612224" android:id="@+id/sat_panels_ring"/>
+    <path android:fillColor="#00000000"
+        android:pathData="m28.808,32.727a6.02,6.02 0,0 1,-6.02 -6.02m6.02,10.496A10.496,10.496 0,0 1,18.312 26.707m10.496,14.972a14.972,14.972 0,0 1,-14.972 -14.972"
+        android:strokeColor="#303030" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:strokeWidth="1.26008" android:id="@+id/sat_signal"
+        android:name="signal"/>
+</vector>

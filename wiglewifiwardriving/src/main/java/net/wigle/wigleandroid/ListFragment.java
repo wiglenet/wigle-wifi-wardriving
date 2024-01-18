@@ -12,8 +12,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -166,8 +164,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public ExecutorService executor;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final Activity a = getActivity();
+        if (null != a) {
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        }
         final View view = inflater.inflate(R.layout.list, container, false);
         final State state = MainActivity.getStaticState();
         final TextView tv = view.findViewById( R.id.db_status );
@@ -374,14 +375,18 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             if (locked) {
                 if (null != searchingGps) {
                     AnimatedVectorDrawable animatedVectorDrawable =  (AnimatedVectorDrawable) searchingGps.getDrawable();
-                    animatedVectorDrawable.stop();
+                    if (null != animatedVectorDrawable) {
+                        animatedVectorDrawable.stop();
+                    }
                 }
                 gpsSearchingContainer.setVisibility(GONE);
                 gpsFixContainer.setVisibility(VISIBLE);
             } else {
                 if (null != searchingGps) {
                     AnimatedVectorDrawable animatedVectorDrawable =  (AnimatedVectorDrawable) searchingGps.getDrawable();
-                    animatedVectorDrawable.start();
+                    if (null != animatedVectorDrawable) {
+                        animatedVectorDrawable.start();
+                    }
                 }
                 gpsFixContainer.setVisibility(GONE);
                 gpsSearchingContainer.setVisibility(VISIBLE);

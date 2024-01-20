@@ -39,6 +39,8 @@ public class UniqueTaskExecutorService extends ThreadPoolExecutor {
             WrappedTask wt = (WrappedTask)r;
             Logging.debug("===>EXECUTING: " + wt.getWrappedClass());
             current = r;
+        } else {
+            Logging.error("beforeExecute received non-WrappedTask runnable - cannot execute.");
         }
     }
 
@@ -49,6 +51,8 @@ public class UniqueTaskExecutorService extends ThreadPoolExecutor {
             jobClasses.remove(wt.getWrappedClass());
             current = null;
             Logging.debug("<===EXECUTED: " + wt.getWrappedClass());
+        } else {
+            Logging.error("afterExecute received non-WrappedTask runnable - cannot execute. (impossible case)");
         }
         super.afterExecute(r, t);
     }

@@ -152,7 +152,8 @@
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="4dp"
                 android:paddingTop="1dp"
-                android:paddingBottom="1dp" />
+                android:paddingBottom="1dp"
+                android:contentDescription="@string/total_seen"/>
             <TextView
                 android:id="@+id/db_total_notif"
                 android:layout_width="wrap_content"
@@ -190,8 +191,7 @@
                 style="@style/TextAppearance.Compat.Notification.Line2"
                 android:textColor="#000"
                 android:textStyle="bold"
-                android:textSize="14sp"
-                android:contentDescription="DB nets"/>
+                android:textSize="14sp"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -16,7 +16,6 @@
 			android:contentDescription="wep icon"
 			android:paddingStart="2dp"
 			android:paddingEnd="10dp"
-			android:text="wepicon"
 			tools:src="@drawable/wep_ico"/>
 		<ImageView
 			android:id="@+id/bticon"
@@ -26,7 +25,6 @@
 			android:paddingTop="1dp"
 			android:paddingStart="0dp"
 			android:paddingEnd="5dp"
-			android:text="bticon"
 			android:visibility="gone"/>
 		<TextView
 			android:id="@+id/ssid"

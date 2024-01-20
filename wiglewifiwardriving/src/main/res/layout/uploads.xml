@@ -54,6 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:contentDescription="@string/status_working"
                 app:tint="?attr/colorControlNormal">
             </ImageView>
             <ImageView
@@ -64,6 +65,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/no_connection"
                 android:visibility="gone"
+                android:contentDescription="@string/no_wigle_conn"
                 app:tint="?attr/colorControlNormal">
             </ImageView>
         </RelativeLayout>

@@ -57,7 +57,8 @@
 				android:src="@drawable/ic_wifi"
 				android:gravity="start"
 				android:paddingTop="4dp"
-				android:paddingHorizontal="4dp"/>
+				android:paddingHorizontal="4dp"
+				android:contentDescription="@string/dash_new_wifi"/>
 			<TextView android:id="@+id/discovered_wifi_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -95,7 +96,8 @@
 				android:gravity="end"
 				android:paddingTop="1dp"
 				android:paddingStart="2dp"
-				android:paddingEnd="5dp"/>
+				android:paddingEnd="5dp"
+				android:contentDescription="@string/dash_new_bt"/>
 			<TextView android:id="@+id/month_wifi_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -122,7 +124,7 @@
 				android:src="@drawable/ic_bt_sm"
 				android:paddingEnd="4dp"
 				android:paddingStart="1dp"
-				android:contentDescription="@string/total_bt" />
+				android:contentDescription="@string/dash_new_bt" />
 			<TextView android:id="@+id/total_bt_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -153,7 +155,7 @@
 				android:src="@drawable/cell"
 				android:paddingEnd="4dp"
 				android:paddingStart="1dp"
-				android:contentDescription="@string/total_cell" />
+				android:contentDescription="@string/dash_new_cells" />
 			<TextView android:id="@+id/total_cell_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"

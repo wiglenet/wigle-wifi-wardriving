@@ -113,13 +113,11 @@ public abstract class ProgressPanelRunnable implements AlertSettable {
     }
 
     protected void reactivateProgressBar(final int id) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pp.show();
-                setProgressStatus(id);
-                pp.setIndeterminate();
-            }});
+        activity.runOnUiThread(() -> {
+            pp.show();
+            setProgressStatus(id);
+            pp.setIndeterminate();
+        });
     }
 
     protected void setProgressIndeterminate() {
@@ -136,5 +134,4 @@ public abstract class ProgressPanelRunnable implements AlertSettable {
         msg.setData(bundle);
         handler.sendMessage(msg);
     }
-
 }

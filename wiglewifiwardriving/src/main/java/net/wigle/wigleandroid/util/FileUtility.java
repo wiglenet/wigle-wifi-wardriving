@@ -158,7 +158,7 @@ public class FileUtility {
         if (!path.exists()) {
             final boolean createdDirs = path.mkdir();
             if (! createdDirs) {
-                Logging.error("Failed to created directories for: "+dir+" - "+filename);
+                Logging.error("Failed to create directories for: "+dir+" - "+filename);
             }
         }
         if (path.exists() && path.isDirectory()) {

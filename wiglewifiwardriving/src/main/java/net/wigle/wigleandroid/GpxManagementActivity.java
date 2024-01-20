@@ -177,8 +177,8 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile(exportRouteId)) {
                     Logging.warn("Failed to export gpx.");
-                    WiGLEToast.showOverFragment(this, R.string.error_general,
-                            getString(R.string.gpx_failed));
+                    //WiGLEToast.showOverFragment(this, R.string.error_general,
+                    //        getString(R.string.gpx_failed));
                 }
                 break;
             }
@@ -192,7 +192,13 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
         if (totalRoutePoints > 1) {
             ExecutorService es = ListFragment.lameStatic.executorService;
             if (null != es) {
-                es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
+                try {
+                    es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
+                } catch (IllegalArgumentException e) {
+                    Logging.error("failed to submit job: ", e);
+                    WiGLEToast.showOverFragment(this, R.string.export_gpx, getString(R.string.duplicate_job));
+                    return false;
+                }
             } else {
                 Logging.error("null LameStatic ExecutorService - unable to submit route export");
             }

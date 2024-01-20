@@ -156,8 +156,10 @@ public class FileUtility {
                                                        final String dir) throws IOException {
         File path = new File(context.getFilesDir(), dir);
         if (!path.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            path.mkdir();
+            final boolean createdDirs = path.mkdir();
+            if (! createdDirs) {
+                Logging.error("Failed to created directories for: "+dir+" - "+filename);
+            }
         }
         if (path.exists() && path.isDirectory()) {
             //DEBUG: MainActivity.info("... file output directory found");
@@ -185,9 +187,14 @@ public class FileUtility {
      */
     public static String getM8bPath(final Context context) {
         if ( hasSD() ) {
-            return safeFilePath(Environment.getExternalStorageDirectory()) + M8B_DIR;
+            final String externalPath = safeFilePath(Environment.getExternalStorageDirectory()) + M8B_DIR;
+            Logging.debug("Using m8b (external) "+ externalPath);
+            return externalPath;
         } else if (context != null) {
-            return safeFilePath(context.getCacheDir());
+            final String internalPath = safeFilePath(context.getCacheDir())+"/";
+            //= safeFilePath(context.getFilesDir()) + M8B_DIR; // if we need to return to files-path for future sharing perms (1/2)
+            Logging.debug("Using m8b (internal)"+ internalPath);
+            return internalPath;
         }
         return null;
     }
@@ -198,9 +205,14 @@ public class FileUtility {
      */
     public static String getGpxPath(final Context context) {
         if ( hasSD() ) {
-            return safeFilePath(Environment.getExternalStorageDirectory()) + GPX_DIR;
+            final String externalPath = safeFilePath(Environment.getExternalStorageDirectory()) + GPX_DIR;
+            Logging.debug("Using gpx (external) "+ externalPath);
+            return externalPath;
         } else if (context != null) {
-            return safeFilePath(context.getCacheDir());
+            final String internalPath = safeFilePath(context.getCacheDir())+"/";
+            //= safeFilePath(context.getFilesDir()) + GPX_DIR; // if we need to return to files-path for future sharing perms (2/2)
+            Logging.debug("Using gpx (internal)"+ internalPath);
+            return internalPath;
         }
         return null;
     }
@@ -208,6 +220,7 @@ public class FileUtility {
     /**
      * just get the KML location for internal purposes; should be compatible with the results of
      * getKmlDownloadFile
+     * TODO: switch to use cache dir in case of no-external
      * @param context the context of the application
      * @return the string path suitable for intent construction
      */

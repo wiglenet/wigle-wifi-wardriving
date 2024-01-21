@@ -10,7 +10,8 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:weightSum="21">
+        android:weightSum="21"
+        android:baselineAligned="false">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -21,14 +22,14 @@
                 app:srcCompat="@drawable/ic_wifi_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run wifi"
+                android:contentDescription="@string/dash_new_wifi"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="wifi new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/stats_wifi"
                 android:textSize="15sp"
                 style="@style/WiFiColor"
@@ -45,18 +46,16 @@
                 app:srcCompat="@drawable/ic_cell_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run cell"
+                android:contentDescription="@string/dash_new_cells"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="cell new vs. run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_cell"
                 android:textSize="15sp"
-                android:layout_weight="1"
                 android:text="@string/stats"
                 style="@style/CellColor"
                 tools:text="888.8 K"
@@ -73,18 +72,16 @@
                 app:srcCompat="@drawable/ic_bt_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run bluetooth"
+                android:contentDescription="@string/dash_new_bt"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="bt new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_bt"
                 android:textSize="15sp"
-                android:layout_weight="1"
                 style="@style/BtColor"
                 tools:text="888.8 K"
                 />
@@ -126,11 +123,10 @@
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="DB nets"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="DB nets"
+                android:contentDescription="@string/total_seen"
                 app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="wrap_content"
@@ -189,7 +185,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="11"
             android:orientation="horizontal"
-            android:id="@+id/gps_area">
+            android:id="@+id/gps_area"
+            android:baselineAligned="false">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
@@ -262,7 +259,8 @@
             android:layout_width="44dip"
             android:layout_height="44dip"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:contentDescription="@string/dash_scan_off"/>
         <ImageButton
             android:id="@+id/scanning"
             android:background="#00000000"
@@ -277,7 +275,8 @@
             android:scaleType="fitCenter"
             android:visibility="gone"
             app:tint="?attr/colorControlNormal"
-            tools:visibility="visible"/>
+            tools:visibility="visible"
+            android:contentDescription="@string/list_scanning_on"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -307,7 +306,6 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/db_status"
-			android:text="-"
 			android:layout_weight="0"
             android:layout_gravity="end"
             android:paddingEnd="5dp"

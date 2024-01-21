@@ -161,7 +161,8 @@
                 android:paddingEnd="4dp"
                 android:paddingTop="8dp"
                 app:tint="#46AA00"
-                tools:ignore="RtlSymmetry" />
+                tools:ignore="RtlSymmetry"
+                android:contentDescription="@string/gps_status"/>
             <TextView
                 android:id="@+id/fixmeta"
                 android:layout_width="wrap_content"

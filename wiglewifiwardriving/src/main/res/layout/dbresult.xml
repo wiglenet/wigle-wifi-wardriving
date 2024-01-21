@@ -27,7 +27,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:visibility="gone"
-				app:tint="?attr/colorControlNormal">
+				app:tint="?attr/colorControlNormal"
+				android:contentDescription="@string/status_working">
 			</ImageView>
 			<ImageView
 				android:id="@+id/search_error"
@@ -37,7 +38,8 @@
 				android:layout_height="wrap_content"
 				android:src="@drawable/no_connection"
 				android:visibility="gone"
-				app:tint="?attr/colorControlNormal">
+				app:tint="?attr/colorControlNormal"
+				android:contentDescription="@string/no_wigle_conn">
 			</ImageView>
 		</RelativeLayout>
 	</RelativeLayout>

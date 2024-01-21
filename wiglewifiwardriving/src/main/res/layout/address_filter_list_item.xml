@@ -10,6 +10,7 @@
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
         android:paddingStart="8dp"
+        android:paddingEnd="0dp"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_alignStart="@+id/delete_btn"

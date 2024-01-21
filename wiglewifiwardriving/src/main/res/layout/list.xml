@@ -291,6 +291,7 @@
 			android:layout_weight="4"
             android:layout_gravity="start"
             android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             tools:text="8,888,888 km"
             />
         <TextView

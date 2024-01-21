@@ -43,6 +43,7 @@
             <RadioButton android:id="@+id/radio_search_local"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="0dp"
                 android:paddingEnd="6dp"
                 android:text="@string/search_local"
                 />

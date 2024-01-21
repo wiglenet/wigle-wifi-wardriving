@@ -8,14 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,10 +40,11 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserStatsFragment extends AuthenticatedFragment {
-    public static final int MSG_USER_DONE = 101;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_STATS = 202;
 
@@ -223,7 +223,9 @@ public class UserStatsFragment extends AuthenticatedFragment {
             }
         }
         if (null != stats.getImageBadgeUrl() && !stats.getImageBadgeUrl().isEmpty()) {
-            new DownloadBadgeImageTask(view.findViewById(R.id.badgeImage)).execute(UrlConfig.WIGLE_BASE_URL+stats.getImageBadgeUrl());
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+            executor.submit(new BadgeImageRunnable(handler, view.findViewById(R.id.badgeImage)));
         }
     }
 
@@ -294,14 +296,14 @@ public class UserStatsFragment extends AuthenticatedFragment {
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
         item.setIcon( R.drawable.ic_planet_small_white );
-        MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
         item.setIcon(R.drawable.ic_planet_small_white);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
         item.setIcon(android.R.drawable.ic_menu_sort_by_size);
-        MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
         item.setIcon(android.R.drawable.ic_menu_sort_by_size);
@@ -311,7 +313,7 @@ public class UserStatsFragment extends AuthenticatedFragment {
 
     /* Handles item selections */
     @Override
-    public boolean onOptionsItemSelected( final MenuItem item ) {
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
         final Activity currentActivity = getActivity();
         if (null != currentActivity) {
@@ -328,26 +330,26 @@ public class UserStatsFragment extends AuthenticatedFragment {
         return false;
     }
 
-    private static class DownloadBadgeImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView badgeImage;
+    private class BadgeImageRunnable implements Runnable {
+        final Handler handler;
+        final ImageView badgeImageView;
 
-        public DownloadBadgeImageTask(ImageView image) {
-            this.badgeImage = image;
+        public BadgeImageRunnable(final Handler handler, final ImageView badgeImageView) {
+            this.handler = handler;
+            this.badgeImageView = badgeImageView;
         }
-        protected Bitmap doInBackground(String... urls) {
-            String badgeUrl = urls[0];
-            Bitmap badge = null;
+
+        @Override
+        public void run() {
             try {
-                InputStream in = new java.net.URL(badgeUrl).openStream();
-                badge = BitmapFactory.decodeStream(in);
+                InputStream in = new java.net.URL(UrlConfig.WIGLE_BASE_URL+stats.getImageBadgeUrl()).openStream();
+                final Bitmap badge = BitmapFactory.decodeStream(in);
+                handler.post(() -> {
+                    badgeImageView.setImageBitmap(badge);
+                });
             } catch (Exception e) {
                 Logging.error("Failed to download bage image ", e);
             }
-            return badge;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            badgeImage.setImageBitmap(result);
         }
     }
 }

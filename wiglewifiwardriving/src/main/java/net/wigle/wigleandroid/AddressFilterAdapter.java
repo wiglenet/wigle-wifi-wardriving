@@ -64,7 +64,7 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
         View view = convertView;
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.address_filter_list_item, null);
+            view = inflater.inflate(R.layout.address_filter_list_item, parent, false);
         }
 
         TextView listItemText = view.findViewById(R.id.list_item_string);

@@ -58,7 +58,6 @@ public class MacFilterActivity extends ScreenChildActivity {
         ListView lv = findViewById(R.id.addr_filter_list_view);
 
         filtersAdapter = new AddressFilterAdapter(listItems, this, prefs, filterKey);
-
         lv.setAdapter(filtersAdapter);
     }
 

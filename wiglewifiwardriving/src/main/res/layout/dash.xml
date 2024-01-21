@@ -4,5 +4,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:keepScreenOn="true"
-    android:paddingStart="3dp">
+    android:paddingStart="3dp"
+    android:paddingEnd="0dp">
 </ScrollView>

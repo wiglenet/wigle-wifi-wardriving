@@ -1,7 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="10dp">
+    android:paddingStart="10dp"
+    android:paddingEnd="0dp">
     <CheckBox
         android:id="@+id/checkbox"
         style="?android:attr/textAppearanceMedium"

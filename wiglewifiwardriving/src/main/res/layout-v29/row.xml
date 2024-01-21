@@ -45,6 +45,7 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:paddingEnd="3dp"
+				android:paddingStart="0dp"
 				android:scrollHorizontally="true"
 				android:ellipsize="end"
 				android:maxLines="1"
@@ -74,6 +75,7 @@
 			tools:text="-69"
 			android:minWidth="24dp"
 			android:paddingEnd="0dp"
+			android:paddingStart="0dp"
 			android:textSize="12sp" />
 		<TextView
 			android:id="@+id/mac_string"

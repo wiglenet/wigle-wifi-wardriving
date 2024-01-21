@@ -32,6 +32,8 @@
 			android:layout_height="wrap_content"
 			android:textColor="@color/colorListSsidText"
 			tools:text="WiFi Network"
+			android:paddingEnd="5sp"
+			android:paddingStart="0dp"
 			/>
 		<LinearLayout
 			android:orientation="horizontal"

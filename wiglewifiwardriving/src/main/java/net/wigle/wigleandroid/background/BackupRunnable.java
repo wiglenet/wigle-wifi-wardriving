@@ -81,7 +81,7 @@ public class BackupRunnable extends ProgressPanelRunnable implements Runnable, A
                     } else {
                         Logging.error("null or empty DB result in DB backup postExec");
                         WiGLEToast.showOverFragment(activity, R.string.error_general,
-                                activity.getString(R.string.error_general));
+                                activity.getResources().getString(R.string.error_general));
                     }
                 } else {
                     Logging.error("Null result in postExecute - unable to share sqlite backup.");

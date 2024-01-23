@@ -41,6 +41,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -220,7 +221,11 @@ public final class MappingFragment extends Fragment {
                     Logging.error("security exception oncreateview map: " + ex, ex);
                 }
             } else {
-                WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
+                final FragmentActivity fa = getActivity();
+                if (null != fa) {
+                    WiGLEToast.showOverFragment(fa, R.string.fatal_pre_message,
+                            fa.getResources().getString(R.string.map_needs_playservice));
+                }
             }
             MapsInitializer.initialize(a);
         }

@@ -158,8 +158,7 @@
             android:layout_weight="11"
             android:orientation="horizontal"
             android:visibility="gone"
-            android:id="@+id/gps_searching"
-            >
+            android:id="@+id/gps_searching">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -175,7 +174,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/gps_searching_text"
                 android:text="@string/list_waiting_gps"
-                android:paddingTop="16dp"
+                android:layout_gravity="center"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 />

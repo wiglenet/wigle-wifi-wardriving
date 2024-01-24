@@ -39,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
+import static net.wigle.wigleandroid.MainActivity.getMainActivity;
 import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -537,8 +538,11 @@ public final class DataFragment extends Fragment implements DialogListener {
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile()) {
                     Logging.warn("Failed to export gpx.");
-                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
-                            getActivity().getResources().getString(R.string.gpx_failed));
+                    final FragmentActivity fa = getActivity();
+                    if (null != fa) {
+                        WiGLEToast.showOverFragment(fa, R.string.error_general,
+                                fa.getResources().getString(R.string.gpx_failed));
+                    }
                 }
                 break;
             }

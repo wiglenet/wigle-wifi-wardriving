@@ -126,10 +126,8 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                     public void onTaskCompleted() {
                         stopAnimation();
                         if (userDownloadFailed) {
-                            if (null != a) {
-                                WiGLEToast.showOverFragment(a, R.string.upload_failed,
-                                        a.getResources().getString(R.string.dl_failed));
-                            }
+                            WiGLEToast.showOverFragment(a, R.string.upload_failed,
+                                    a.getResources().getString(R.string.dl_failed));
                         }
                     }
 

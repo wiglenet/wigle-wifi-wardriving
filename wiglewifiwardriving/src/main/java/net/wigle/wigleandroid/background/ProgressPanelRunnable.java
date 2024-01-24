@@ -93,7 +93,7 @@ public abstract class ProgressPanelRunnable implements AlertSettable {
                             } else {
                                 pp.setQueue(activity.getString(R.string.queued_jobs, curSize));
                             }
-                            lastTaskQueueDepth = executorService.getQueue().size();
+                            lastTaskQueueDepth = curSize;
                         }
                     }
                 }

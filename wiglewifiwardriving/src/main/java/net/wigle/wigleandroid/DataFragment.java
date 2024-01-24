@@ -39,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
+import static net.wigle.wigleandroid.MainActivity.getMainActivity;
 import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -462,7 +463,11 @@ public final class DataFragment extends Fragment implements DialogListener {
                     BackupRunnable backupRunnable = new BackupRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true);
                     Future<?> bFuture = ListFragment.lameStatic.executorService.submit(backupRunnable);
                 } catch (IllegalArgumentException e) {
-                    WiGLEToast.showOverFragment(this.getActivity(), R.string.backup_in_progress, getString(R.string.duplicate_job));
+                    final FragmentActivity a = getActivity();
+                    if (null != a) {
+                        WiGLEToast.showOverFragment(a, R.string.backup_in_progress,
+                                a.getResources().getString(R.string.duplicate_job));
+                    }
                 }
                 break;
             }
@@ -526,15 +531,18 @@ public final class DataFragment extends Fragment implements DialogListener {
                 if (!exportM8bFile()) {
                     Logging.warn("Failed to export m8b.");
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
-                            getString(R.string.m8b_failed));
+                            getActivity().getResources().getString(R.string.m8b_failed));
                 }
                 break;
             }
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile()) {
                     Logging.warn("Failed to export gpx.");
-                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
-                            getString(R.string.gpx_failed));
+                    final FragmentActivity fa = getActivity();
+                    if (null != fa) {
+                        WiGLEToast.showOverFragment(fa, R.string.error_general,
+                                fa.getResources().getString(R.string.gpx_failed));
+                    }
                 }
                 break;
             }
@@ -573,7 +581,11 @@ public final class DataFragment extends Fragment implements DialogListener {
             MagicEightBallRunnable m8bRunnable = new MagicEightBallRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true, totalDbNets);
             Future<?> mFuture = ListFragment.lameStatic.executorService.submit(m8bRunnable);
         } catch (IllegalArgumentException e) {
-            WiGLEToast.showOverFragment(this.getActivity(), R.string.m8b_failed, getString(R.string.duplicate_job));
+            final FragmentActivity a = getActivity();
+            if (null != a) {
+                WiGLEToast.showOverFragment(a, R.string.m8b_failed,
+                        a.getResources().getString(R.string.duplicate_job));
+            }
         }
         return true;
     }
@@ -585,12 +597,18 @@ public final class DataFragment extends Fragment implements DialogListener {
                 GpxExportRunnable gpxRunnable = new GpxExportRunnable(this.getActivity(), ListFragment.lameStatic.executorService, true, totalRoutePoints);
                 Future<?> gFuture = ListFragment.lameStatic.executorService.submit(gpxRunnable);
             } catch (IllegalArgumentException e) {
-                WiGLEToast.showOverFragment(this.getActivity(), R.string.gpx_failed, getString(R.string.duplicate_job));
+                final FragmentActivity a = getActivity();
+                if (null != a) {
+                    WiGLEToast.showOverFragment(a, R.string.gpx_failed, a.getResources().getString(R.string.duplicate_job));
+                }
             }
         } else {
             Logging.error("no points to create route");
-            WiGLEToast.showOverFragment(getActivity(), R.string.gpx_failed,
-                    getString(R.string.gpx_no_points));
+            final FragmentActivity a = getActivity();
+            if (null != a) {
+                WiGLEToast.showOverFragment(a, R.string.gpx_failed,
+                        a.getResources().getString(R.string.gpx_no_points));
+            }
             //NO POINTS
         }
         return true;

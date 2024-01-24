@@ -196,7 +196,8 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
                     es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
                 } catch (IllegalArgumentException e) {
                     Logging.error("failed to submit job: ", e);
-                    WiGLEToast.showOverFragment(this, R.string.export_gpx, getString(R.string.duplicate_job));
+                    WiGLEToast.showOverFragment(this, R.string.export_gpx,
+                            getResources().getString(R.string.duplicate_job));
                     return false;
                 }
             } else {
@@ -205,7 +206,7 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
         } else {
             Logging.error("no points to create route");
             WiGLEToast.showOverFragment(this, R.string.gpx_failed,
-                    getString(R.string.gpx_no_points));
+                    getResources().getString(R.string.gpx_no_points));
             //NO POINTS
         }
         return true;

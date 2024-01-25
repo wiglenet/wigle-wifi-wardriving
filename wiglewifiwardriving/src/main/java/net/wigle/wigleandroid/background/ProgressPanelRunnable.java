@@ -74,25 +74,27 @@ public abstract class ProgressPanelRunnable implements AlertSettable {
             @Override
             public void run() {
                 //DEBUG: Logging.info("progress: "+percent);
-                if (100 == percent) {
-                    if (null != pp && (executorService == null || executorService.getQueue().size() == 0) ) {
-                        pp.hide();
-                    }
-                    return;
-                }
-                if (percent > lastSentPercent) {
-                    pp.setProgress(percent);
-                    lastSentPercent = percent;
-                }
-                if (null != executorService) {
-                    final int curSize = executorService.getQueue().size();
-                    if (curSize != lastTaskQueueDepth) {
-                        if (curSize == 0) {
-                            pp.hideQueue();
-                        } else {
-                            pp.setQueue(activity.getString(R.string.queued_jobs, curSize));
+                if (null != pp) {
+                    if (100 == percent) {
+                        if (executorService == null || executorService.getQueue().size() == 0) {
+                            pp.hide();
                         }
-                        lastTaskQueueDepth = executorService.getQueue().size();
+                        return;
+                    }
+                    if (percent > lastSentPercent) {
+                        pp.setProgress(percent);
+                        lastSentPercent = percent;
+                    }
+                    if (null != executorService) {
+                        final int curSize = executorService.getQueue().size();
+                        if (curSize != lastTaskQueueDepth) {
+                            if (curSize == 0) {
+                                pp.hideQueue();
+                            } else {
+                                pp.setQueue(activity.getString(R.string.queued_jobs, curSize));
+                            }
+                            lastTaskQueueDepth = curSize;
+                        }
                     }
                 }
             }

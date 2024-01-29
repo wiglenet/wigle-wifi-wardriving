@@ -1364,10 +1364,8 @@ public final class DatabaseHelper extends Thread {
 
                     Integer mfgrid = null;
                     if (mfgridInt != 0) mfgrid = mfgridInt;
-                    List<String> serviceUUIDs = null;
-                    if (!service.isEmpty()) {
-                        serviceUUIDs = Arrays.asList(service.split(" "));
-                    }
+                    List<String> serviceUUIDs = service.isEmpty() ? null :
+                            new ArrayList<>(Arrays.asList(service.split(" ")));
 
                     final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
                     retval = new Network( bssid, ssid, frequency, capabilities, 0, type, serviceUUIDs, mfgrid );

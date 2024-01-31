@@ -51,6 +51,12 @@ public final class WigleService extends Service {
     private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
     private final NumberFormat countFormat = NumberFormat.getIntegerInstance();
 
+    public static final String UPLOAD_COMPLETE_INTENT = "net.wigle.wigleandroid.UPLOAD_COMPLETE";
+    public static final String UPLOAD_FAILED_INTENT = "net.wigle.wigleandroid.UPLOAD_FAILED";
+    public static final String UPLOAD_INTENT = "net.wigle.wigleandroid.UPLOAD";
+    public static final String PAUSE_INTENT = "net.wigle.wigleandroid.PAUSE";
+    public static final String SCAN_INTENT = "net.wigle.wigleandroid.SCAN";
+
     private class GuardThread extends Thread {
         GuardThread() {
         }
@@ -237,7 +243,7 @@ public final class WigleService extends Service {
                 }
 
                 final Intent pauseSharedIntent = new Intent();
-                pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
+                pauseSharedIntent.setAction(PAUSE_INTENT);
                 pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
 
                 final MainActivity ma = MainActivity.getMainActivity();
@@ -246,12 +252,12 @@ public final class WigleService extends Service {
                 if (null != ma) {
                     final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     final Intent scanSharedIntent = new Intent();
-                    scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
+                    scanSharedIntent.setAction(SCAN_INTENT);
                     scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
                     final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
                     final Intent uploadSharedIntent = new Intent();
-                    uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
+                    uploadSharedIntent.setAction(UPLOAD_INTENT);
                     uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
                     final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     if (SDK_INT >= 31) {

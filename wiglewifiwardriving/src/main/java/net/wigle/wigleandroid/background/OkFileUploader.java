@@ -2,6 +2,9 @@ package net.wigle.wigleandroid.background;
 
 import android.os.Handler;
 
+import com.google.gson.Gson;
+
+import net.wigle.wigleandroid.model.api.UploadReseponse;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
@@ -16,6 +19,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Alternative upload to HttpFileUploader - use of OkHttp directly gives us several benefits:
@@ -48,7 +52,7 @@ public class OkFileUploader {
      * @return string payload (JSON) from the upload POST
      * @throws IOException an IOException if the upload fails
      */
-    public static String upload(final String urlString, final String filename, final String fileParamName,
+    public static UploadReseponse upload(final String urlString, final String filename, final String fileParamName,
                                 final Map<String, String> params,
                                 final String authUser, final String authToken,
                                 final Handler handler)
@@ -108,7 +112,13 @@ public class OkFileUploader {
                 return null;
             } else {
                 if (null != response.body()) {
-                    return response.body().string();
+                    try (ResponseBody responseBody = response.body()) {
+                        final String responseBodyString = responseBody.string();
+                        return new Gson().fromJson(responseBodyString,
+                                UploadReseponse.class);
+                    } catch (Exception e) {
+                        return null;
+                    }
                 } else {
                     return null;
                 }

@@ -1,7 +1,11 @@
 package net.wigle.wigleandroid.background;
 
+import static net.wigle.wigleandroid.WigleService.UPLOAD_COMPLETE_INTENT;
+import static net.wigle.wigleandroid.WigleService.UPLOAD_FAILED_INTENT;
+
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -18,6 +22,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.api.UploadReseponse;
 import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
@@ -48,9 +53,11 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLException;
 
@@ -238,41 +245,37 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 Logging.info("anonymous upload");
             }
 
-            final String response = OkFileUploader.upload(UrlConfig.FILE_POST_URL, absolutePath,
+            final UploadReseponse response = OkFileUploader.upload(UrlConfig.FILE_POST_URL, absolutePath,
                     "file", params, authName, token, getHandler());
 
-            if ( ! prefs.getBoolean(PreferenceKeys.PREF_DONATE, false) ) {
-                if ( response != null && response.indexOf("donate=Y") > 0 ) {
+            Intent intent = new Intent();
+            if ( response != null && response.getSuccess() ) {
+                final UploadReseponse.UploadResultsResponse uploadResults = response.getResults();
+                if (null != uploadResults && uploadResults.getTransids() != null) {
+                    status = Status.SUCCESS;
+                    // save in the prefs
                     final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean( PreferenceKeys.PREF_DONATE, true );
+                    editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
+                    editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
+                    editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
                     editor.apply();
-                }
-            }
-
-            //TODO: any reason to parse this JSON object? all we care about are two strings.
-            Logging.info(response);
-            if ( response != null && response.indexOf("\"success\":true") > 0 ) {
-                status = Status.SUCCESS;
-
-                // save in the prefs
-                final SharedPreferences.Editor editor = prefs.edit();
-                editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
-                editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
-                editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
-                editor.apply();
-            } else if ( response != null && response.indexOf("File upload failed.") > 0 ) {
-                status = Status.FAIL;
-            } else {
-                String error;
-                if ( response != null && response.trim().equals( "" ) ) {
-                    error = "no response from server";
+                    List<String> transIds = uploadResults.getTransids().stream()
+                            .map(UploadReseponse.UploadTransaction::getTransId)
+                            .collect(Collectors.toList());
+                    if (transIds.size() > 0) {
+                        intent.putExtra("transIds", transIds.toString());
+                        intent.setAction(UPLOAD_COMPLETE_INTENT);
+                        //NB: we'll still update the DB marker if no transIDs were generated.
+                    }
                 } else {
-                    error = "response: " + response;
+                    intent.setAction(UPLOAD_FAILED_INTENT);
+                    status = Status.FAIL;
                 }
-                Logging.error( error );
-                bundle.putString( BackgroundGuiHandler.ERROR, error );
+            } else {
+                intent.setAction(UPLOAD_FAILED_INTENT);
                 status = Status.FAIL;
             }
+            context.sendBroadcast(intent);
         } catch ( final InterruptedException ex ) {
             Logging.info("ObservationUploader interrupted");
             throw ex;

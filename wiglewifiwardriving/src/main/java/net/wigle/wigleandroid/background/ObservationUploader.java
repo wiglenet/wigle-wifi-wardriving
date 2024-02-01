@@ -19,10 +19,10 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.api.UploadReseponse;
+import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
@@ -33,6 +33,8 @@ import net.wigle.wigleandroid.util.UrlConfig;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.DuplicateHeaderMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,6 +81,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private final boolean writeEntireDb;
     private final boolean writeRun;
 
+    Status status;
+
     public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,Frequency,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,RCOIs,MfgrId,Type";
 
     private static class CountStats {
@@ -113,10 +117,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
     @Override
-    protected void subRun() throws IOException, InterruptedException, WiGLEAuthException {
+    protected void subRun() throws WiGLEAuthException {
         try {
             if ( justWriteFile ) {
-                justWriteFile();
+                status = justWriteFile();
             } else {
                 doRun();
             }
@@ -141,16 +145,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final String username = getUsername();
         final String password = getPassword();
 
-        Status status = null;
         final Bundle bundle = new Bundle();
         if (!validAuth()) {
             status = validateUserPass(username, password);
         }
         if ( status == null ) {
-            status = doUpload(bundle);
+            doUpload(bundle);
         }
-        // tell the gui thread
-        sendBundledMessage( status.ordinal(), bundle );
     }
 
     /**
@@ -193,13 +194,11 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * upload guts. lifted from FileUploaderTask
-     * @return the Status of the upload
+     *
      * @throws InterruptedException if the upload is interrupted
      */
-    private Status doUpload( final Bundle bundle )
+    private void doUpload(final Bundle bundle )
             throws InterruptedException {
-
-        Status status;
 
         final Object[] fileFilename = new Object[2];
         try (final OutputStream fos = FileAccess.getOutputStream( context, bundle, fileFilename )) {
@@ -219,15 +218,18 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
             final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             if (!beAnonymous && null == authName) {
-                return Status.BAD_LOGIN;
+                status = Status.BAD_LOGIN;
+                sendBundledMessage(status.ordinal(), bundle);
+                return;
             }
-            final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
-            final String token = TokenAccess.getApiToken(prefs);
 
-            // don't upload empty files
-            if ( countStats.lineCount == 0 && ! "ark-mobile".equals(userName) &&
+            // don't upload empty files (exceptions for ark and bob for testing)
+            final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
+            if ( countStats.lineCount == 0 && ! "arkasha".equals(userName) &&
                     ! "bobzilla".equals(userName) ) {
-                return Status.EMPTY_FILE;
+                status = Status.EMPTY_FILE;
+                sendBundledMessage(status.ordinal(), bundle);
+                return;
             }
             Logging.info("preparing upload...");
 
@@ -236,7 +238,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             // send file
             final boolean hasSD = FileUtility.hasSD();
-
             final String absolutePath = hasSD ? file.getAbsolutePath() : context.getFileStreamPath(filename).getAbsolutePath();
 
             Logging.info("authName: " + authName);
@@ -245,65 +246,90 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 Logging.info("anonymous upload");
             }
 
-            final UploadReseponse response = OkFileUploader.upload(UrlConfig.FILE_POST_URL, absolutePath,
-                    "file", params, authName, token, getHandler());
-
-            Intent intent = new Intent();
-            if ( response != null && response.getSuccess() ) {
-                final UploadReseponse.UploadResultsResponse uploadResults = response.getResults();
-                if (null != uploadResults && uploadResults.getTransids() != null) {
-                    status = Status.SUCCESS;
-                    // save in the prefs
-                    final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
-                    editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
-                    editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
-                    editor.apply();
-                    List<String> transIds = uploadResults.getTransids().stream()
-                            .map(UploadReseponse.UploadTransaction::getTransId)
-                            .collect(Collectors.toList());
-                    if (transIds.size() > 0) {
-                        intent.putExtra("transIds", transIds.toString());
-                        intent.setAction(UPLOAD_COMPLETE_INTENT);
-                        //NB: we'll still update the DB marker if no transIDs were generated.
+            final MainActivity.State s = MainActivity.getStaticState();
+            if (null != s) {
+                s.apiManager.upload(absolutePath, "file", params, getHandler(), new RequestCompletedListener<UploadReseponse, JSONObject>() {
+                    @Override
+                    public void onTaskCompleted() {
+                        //TODO: any GUI items that need to take place here?
                     }
-                } else {
-                    intent.setAction(UPLOAD_FAILED_INTENT);
-                    status = Status.FAIL;
-                }
-            } else {
-                intent.setAction(UPLOAD_FAILED_INTENT);
-                status = Status.FAIL;
-            }
-            context.sendBroadcast(intent);
+
+                    @Override
+                    public void onTaskSucceeded(UploadReseponse response) {
+                        Intent intent = new Intent();
+                        if ( response != null && response.getSuccess() ) {
+                            status = Status.SUCCESS;
+                            final SharedPreferences.Editor editor = prefs.edit();
+                            editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
+                            editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
+                            editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
+                            editor.apply();
+                            final UploadReseponse.UploadResultsResponse uploadResults = response.getResults();
+                            List<String> transIds = uploadResults.getTransids().stream()
+                                    .map(UploadReseponse.UploadTransaction::getTransId)
+                                    .collect(Collectors.toList());
+                            if (transIds.size() > 0) {
+                                intent.putExtra("transIds", transIds.toString());
+                                intent.setAction(UPLOAD_COMPLETE_INTENT);
+                                //NB: we'll still update the DB marker if no transIDs were generated.
+                                bundle.putString(BackgroundGuiHandler.TRANSIDS, transIds.toString());
+                            }
+                            //TODO: eventually learn about server-side donate=Y here
+                        } else {
+                            intent.setAction(UPLOAD_FAILED_INTENT);
+                            status = Status.FAIL;
+                        }
+                        sendBundledMessage(status.ordinal(), bundle);
+                        context.sendBroadcast(intent);
+                    }
+
+                    @Override
+                    public void onTaskFailed(int httpStatus, JSONObject error) {
+                        Intent intent = new Intent();
+                        intent.setAction(UPLOAD_FAILED_INTENT);
+                        status = Status.FAIL;
+                        try {
+                            if (null != error) {
+                                final String e = error.getString("message");
+                                Logging.error(e);
+                                intent.putExtra("error", e);
+                                status = Status.EXCEPTION;
+                            } else {
+                                bundle.putString( BackgroundGuiHandler.ERROR, "Unable to connect. (data: "+WiGLEApiManager.hasDataConnection(context)+")");
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        sendBundledMessage(status.ordinal(), bundle);
+                        context.sendBroadcast(intent);
+                    }
+                });
+            };
         } catch ( final InterruptedException ex ) {
             Logging.info("ObservationUploader interrupted");
             throw ex;
-
         } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {
-            Logging.error( "connection problem: " + ex, ex );
+            Logging.error( "Upload connection problem: " + ex, ex );
             ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn) );
         } catch (final SSLException ex) {
-            Logging.error( "security problem: " + ex, ex );
+            Logging.error( "Upload security problem: " + ex, ex );
             ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_secure_wigle_conn) );
         } catch ( final IOException ex ) {
             ex.printStackTrace();
-            Logging.error( "io problem: " + ex, ex );
+            Logging.error( "Upload io problem: " + ex, ex );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         } catch ( final Exception ex ) {
             ex.printStackTrace();
-            Logging.error( "ex problem: " + ex, ex );
+            Logging.error( "Upload problem: " + ex, ex );
             MainActivity.writeError( this, ex, context, "Has data connection: " + WiGLEApiManager.hasDataConnection(context) );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
         }
-
-        return status;
     }
 
     /**

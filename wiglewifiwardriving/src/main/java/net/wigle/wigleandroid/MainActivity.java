@@ -162,7 +162,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         int uiMode;
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
-        WiGLEApiManager apiManager;
+        public WiGLEApiManager apiManager;
         Map<Integer, String> btVendors = Collections.emptyMap();
         Map<Integer, String> btMfgrIds = Collections.emptyMap();
     }

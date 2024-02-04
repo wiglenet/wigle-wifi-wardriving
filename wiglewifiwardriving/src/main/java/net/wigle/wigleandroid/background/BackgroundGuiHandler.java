@@ -212,14 +212,22 @@ public class BackgroundGuiHandler extends Handler {
                         }
                     } else {
                         //Other file types get a default dialog
+                        Logging.error("file ending success error");
                         showError(fm, msg, status);
                     }
                 } else {
                     //Null filename - weird case
+                    Logging.error("null filename error");
                     showError(fm, msg, status);
                 }
             } else {
-                showError(fm, msg, status);
+                if (msg.what == Status.BAD_USERNAME.ordinal()) {
+                    WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_no_user));
+                } else if (msg.what == Status.BAD_PASSWORD.ordinal()) {
+                    WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_no_pass));
+                } else {
+                    showError(fm, msg, status);
+                }
             }
         }
     }

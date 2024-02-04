@@ -146,11 +146,15 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final String password = getPassword();
 
         final Bundle bundle = new Bundle();
+
         if (!validAuth()) {
             status = validateUserPass(username, password);
         }
         if ( status == null ) {
             doUpload(bundle);
+        } else {
+            // tell the gui thread
+            sendBundledMessage( status.ordinal(), bundle );
         }
     }
 

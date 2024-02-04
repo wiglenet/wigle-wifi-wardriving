@@ -187,13 +187,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.setContext(context);
     }
 
+    /**
+     * make sure that we have an auth name and API token
+     * @return true if both are present, otherwise false.
+     */
     protected final boolean validAuth() {
         final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
         if ( (!prefs.getString(PreferenceKeys.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
             return true;
         }
         return false;
-
     }
 
 
@@ -235,11 +238,10 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             Logging.error( "username not defined" );
             status = Status.BAD_USERNAME;
         }
-        else if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase(Locale.US) ) ) {
+        if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase(Locale.US) ) ) {
             Logging.error( "password not defined and username isn't 'anonymous'" );
             status = Status.BAD_PASSWORD;
         }
-
         return status;
     }
 

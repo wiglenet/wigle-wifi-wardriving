@@ -108,7 +108,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 true, false, false,
                 AbstractApiRequest.REQUEST_POST, listener, true);
         this.justWriteFile = justWriteFile;
-
         if (writeRun && writeEntireDb) {
             throw new IllegalArgumentException("Cannot specify both individual run and entire db");
         }
@@ -138,7 +137,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 listener.requestComplete(null, false);
             }
         }
-
     }
 
     private void doRun() throws InterruptedException, WiGLEAuthException {
@@ -146,7 +144,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final String password = getPassword();
 
         final Bundle bundle = new Bundle();
-
+        status = null;
         if (!validAuth()) {
             status = validateUserPass(username, password);
         }

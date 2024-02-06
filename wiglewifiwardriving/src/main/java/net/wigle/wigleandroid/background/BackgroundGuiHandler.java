@@ -221,12 +221,23 @@ public class BackgroundGuiHandler extends Handler {
                     showError(fm, msg, status);
                 }
             } else {
+                boolean settingsForward = false;
                 if (msg.what == Status.BAD_USERNAME.ordinal()) {
                     WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_no_user));
+                    settingsForward = true;
                 } else if (msg.what == Status.BAD_PASSWORD.ordinal()) {
                     WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_no_pass));
+                    settingsForward = true;
                 } else {
                     showError(fm, msg, status);
+                }
+                //ALIBI: on first-launch, this is a little weird, since user just confirmed "anonymous" - but we don't set the pref for them when they click "ok" - we forward them
+                if (settingsForward) {
+                    try {
+                        MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
+                    } catch (Exception ex) {
+                        Logging.info("failed to start settings fragment: " + ex, ex);
+                    }
                 }
             }
         }

@@ -219,16 +219,6 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return password;
     }
 
-    protected final String getToken() {
-        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
-        String token = TokenAccess.getApiToken(prefs);
-
-        if ( prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false) ) {
-            token = "";
-        }
-        return token;
-    }
-
     /**
      * @return null if ok, else an error status
      */

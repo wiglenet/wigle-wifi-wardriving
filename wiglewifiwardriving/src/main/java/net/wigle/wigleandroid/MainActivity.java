@@ -2328,7 +2328,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 // have to use the app context to bind to the service, cuz we're in tabs
                 final Context c = getApplicationContext();
                 if (null != c) {
-                    getApplicationContext().unbindService(state.serviceConnection);
+                    c.unbindService(state.serviceConnection);
                 }
             } catch (final IllegalArgumentException ex) {
                 Logging.info("serviceConnection not registered: " + ex, ex);

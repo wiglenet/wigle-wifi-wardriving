@@ -19,6 +19,7 @@ import com.google.maps.android.ui.RotationLayout;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * Based extensively on MapUtils {@link com.google.maps.android.ui.IconGenerator} - but retooled specifically for WiGLE's wireless network use case.
@@ -227,13 +228,13 @@ public class NetworkIconGenerator {
                 return R.drawable.bt_white;
             case BLE:
                 return R.drawable.btle_white;
+            case NR:
+                return R.drawable.ic_cell_5g;
             case GSM:
             case LTE:
             case CDMA:
             case WCDMA:
-                return R.drawable.cell;
-            case NR:
-                return R.drawable.cell_5g;
+                return R.drawable.ic_cell;
             case WIFI:
                 switch (crypto) {
                     case Network.CRYPTO_NONE:
@@ -247,7 +248,6 @@ public class NetworkIconGenerator {
                     case Network.CRYPTO_WPA3:
                         return R.drawable.wpa3_ico;
                 }
-                return R.drawable.cell_5g;
             default:
                 return R.drawable.ic_wifi_sm;
         }

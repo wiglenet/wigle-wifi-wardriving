@@ -619,7 +619,7 @@ public class WifiReceiver extends BroadcastReceiver {
                             g = new GsmOperator((CellIdentityNr) ((CellInfoNr) (cellInfo)).getCellIdentity());
                             CellSignalStrength cellStrengthW = ((CellInfoNr) (cellInfo)).getCellSignalStrength();
                             return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "NR",
-                                    cellStrengthW.getDbm(), NetworkType.typeForCode("D"), location);
+                                    cellStrengthW.getDbm(), NetworkType.typeForCode("N"), location);
                         }
                         break;
                     default:

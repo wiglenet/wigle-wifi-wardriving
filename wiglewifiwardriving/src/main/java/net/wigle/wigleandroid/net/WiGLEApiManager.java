@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.net;
 
 import static net.wigle.wigleandroid.util.UrlConfig.API_DOMAIN;
+import static net.wigle.wigleandroid.util.UrlConfig.FILE_POST_URL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,15 +15,19 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.appmattus.certificatetransparency.CTInterceptorBuilder;
+import com.google.android.gms.common.api.Api;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import net.wigle.wigleandroid.TokenAccess;
+import net.wigle.wigleandroid.background.BackgroundGuiHandler;
+import net.wigle.wigleandroid.background.CountingRequestBody;
 import net.wigle.wigleandroid.background.Status;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.model.api.BtSearchResponse;
 import net.wigle.wigleandroid.model.api.CellSearchResponse;
 import net.wigle.wigleandroid.model.api.RankResponse;
+import net.wigle.wigleandroid.model.api.UploadReseponse;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
@@ -48,6 +53,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -599,6 +606,86 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Upload a (CSV) file
+     * @param filename the file name on-device to upload
+     * @param fileParamName parameter name for the file
+     * @param params additional parameters ("donate" at time of implementation)
+     * @param handler the callback for progress or completion
+     * @param completedListener the RequestCompletedListener implementation to call on completion
+     */
+    public void upload(@NotNull final String filename,
+                       @NotNull final String fileParamName,
+                       @NotNull final Map<String, String> params,
+                       final Handler handler,
+                       @NotNull final RequestCompletedListener<UploadReseponse,
+            JSONObject> completedListener) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart(fileParamName, filename,
+                        RequestBody.create(new File(filename), MediaType.parse("application/octet-stream")));
+        // add params if present
+        if (!params.isEmpty()) {
+            for ( Map.Entry<String, String> entry : params.entrySet() ) {
+                builder.addFormDataPart(entry.getKey(), entry.getValue());
+            }
+        }
+        MultipartBody requestBody = builder.build();
+        // progress-aware requestBody
+        CountingRequestBody countingBody
+                = new CountingRequestBody(requestBody, (bytesWritten, contentLength) -> {
+            int progress = (int)((bytesWritten*1000) / contentLength );
+            Logging.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
+            if ( handler != null && progress >= 0 ) {
+                //TODO: we can improve this, but minimal risk dictates reuse of old technique to start
+                handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
+            }
+        });
+        OkHttpClient client = unauthedClient;
+        if (authedClient != null) {
+            client = authedClient;
+        }
+        Request request = new Request.Builder()
+                .url(FILE_POST_URL)
+                .post(countingBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    if (!response.isSuccessful()) {
+                        Logging.error("Failed to upload file:"+response.code()+" "+response.message());
+                        completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                    } else {
+                        if (null != response.body()) {
+                            try (ResponseBody responseBody = response.body()) {
+                                final String responseBodyString = responseBody.string();
+                                UploadReseponse r =  new Gson().fromJson(responseBodyString,
+                                        UploadReseponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                //TODO: deserialize failed response to get error and send to onTaskFailed?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    if (null != e) {
+                        Logging.error("Failed to upload - client exception: "+ e.getClass() + " - " + e.getMessage());
+                    } else {
+                        Logging.error("Failed to upload - client call failed. (data: "+hasDataConnection(context.getApplicationContext())+")");
+                    }
+                    completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                }
+            }
+        );
+    }
 
     /**
      * Check to see if we have a working data connection

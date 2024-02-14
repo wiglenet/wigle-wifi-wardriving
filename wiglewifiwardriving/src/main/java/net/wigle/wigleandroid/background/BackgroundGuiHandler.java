@@ -32,11 +32,10 @@ import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
-    public static final int AUTHENTICATION_ERROR = 1;
-    public static final int CONNECTION_ERROR = -1;
     public static final String ERROR = "error";
     public static final String FILENAME = "filename";
     public static final String FILEPATH = "filepath";
+    public static final String TRANSIDS = "transIds";
 
     private FragmentActivity context;
     private final Object lock;
@@ -63,13 +62,13 @@ public class BackgroundGuiHandler extends Handler {
     @Override
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
-            if (msg.what == AUTHENTICATION_ERROR) {
+            if (msg.what == Status.BAD_LOGIN.ordinal()) {
                 WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_login_fail));
                 if (pp != null) {
                     pp.hide();
                 }
             }
-            if (msg.what == CONNECTION_ERROR) {
+            if (msg.what == Status.CONNECTION_ERROR.ordinal()) {
                 WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.no_wigle_conn));
                 if (pp != null) {
                     pp.hide();
@@ -141,7 +140,7 @@ public class BackgroundGuiHandler extends Handler {
                 WiGLEToast.showOverFragment(context, status.getTitle(),
                         composeDisplayMessage(context, msg.peekData().getString(ERROR),
                                 msg.peekData().getString(FILEPATH), msg.peekData().getString(FILENAME),
-                                status.getMessage()));
+                                status.getMessage(), msg.peekData().getString(TRANSIDS)));
             } else if (Status.WRITE_SUCCESS.equals(status)) {
                 final String fileName = msg.peekData().getString(FILENAME);
                 if (null != fileName) {
@@ -213,14 +212,33 @@ public class BackgroundGuiHandler extends Handler {
                         }
                     } else {
                         //Other file types get a default dialog
+                        Logging.error("file ending success error");
                         showError(fm, msg, status);
                     }
                 } else {
                     //Null filename - weird case
+                    Logging.error("null filename error");
                     showError(fm, msg, status);
                 }
             } else {
-                showError(fm, msg, status);
+                boolean settingsForward = false;
+                if (msg.what == Status.BAD_USERNAME.ordinal()) {
+                    WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_no_user));
+                    settingsForward = true;
+                } else if (msg.what == Status.BAD_PASSWORD.ordinal()) {
+                    WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_no_pass));
+                    settingsForward = true;
+                } else {
+                    showError(fm, msg, status);
+                }
+                //ALIBI: on first-launch, this is a little weird, since user just confirmed "anonymous" - but we don't set the pref for them when they click "ok" - we forward them
+                if (settingsForward) {
+                    try {
+                        MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
+                    } catch (Exception ex) {
+                        Logging.info("failed to start settings fragment: " + ex, ex);
+                    }
+                }
             }
         }
     }
@@ -236,8 +254,20 @@ public class BackgroundGuiHandler extends Handler {
             Logging.warn("illegal state in background gui handler: ", ex);
         }
     }
+
+    /**
+     * Compose a file-specific string (for use in a dialog) including optional error, file name/path, and transId list (for uploads)
+     * TODO: this does a poor job of i18n, the "File location:"  and "Transaction IDs:" messages should be delegated to local String files
+     * @param context the context for string i18n
+     * @param error the error string
+     * @param filepath the path of the file
+     * @param filename the name of the file
+     * @param messageId the R.string.id of the message to prepend to error
+     * @param transIds the list of transIds for transaction Ids
+     * @return a composited string
+     */
     public static String composeDisplayMessage(Context context, String error, String filepath,
-                                        String filename, final int messageId) {
+                                        String filename, final int messageId, final String transIds) {
         if ( filename != null ) {
             // just don't show the gz
             int index = filename.indexOf( ".gz" );
@@ -253,11 +283,15 @@ public class BackgroundGuiHandler extends Handler {
             filename = "";
         } else {
             final String showPath = filepath == null ? "" : filepath;
-            filename = "\n\nFile location:\n" + showPath + filename;
+            filename = "File location:\n" + showPath + filename;
         }
-        error = error == null ? "" : " Error: " + error;
+        String transIdString = "";
+        if (transIds != null && !transIds.isEmpty()) {
+            transIdString = String.format("\n\nTransaction ID(s):\n"+transIds);
+        }
+        error = (error == null || error.isEmpty()) ? "" :  error+"\n\n";
 
-        return context.getString(messageId) + error + filename;
+        return error + filename + transIdString;
     }
 
     public static class BackgroundAlertDialog extends DialogFragment {
@@ -287,7 +321,7 @@ public class BackgroundGuiHandler extends Handler {
 
             builder.setMessage( composeDisplayMessage(activity,  (null != bundle) ? bundle.getString( ERROR ):null,
                     (null != bundle) ? bundle.getString( FILEPATH ):null, (null != bundle) ? bundle.getString( FILENAME ):null,
-                    message ));
+                    message,  (null != bundle)?bundle.getString( TRANSIDS) : null));
 
             AlertDialog ad = builder.create();
             ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", (dialog, which) -> {

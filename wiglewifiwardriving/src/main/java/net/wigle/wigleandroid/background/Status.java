@@ -15,7 +15,8 @@ public enum Status {
     WRITING( R.string.status_working, R.string.status_writing ),
     EMPTY_FILE( R.string.status_nothing, R.string.status_empty ),
     DOWNLOADING( R.string.status_downloading, R.string.status_downloading ),
-    PARSING( R.string.status_parsing, R.string.status_parsing );
+    PARSING( R.string.status_parsing, R.string.status_parsing ),
+    CONNECTION_ERROR(R.string.no_wigle_conn, R.string.no_wigle_conn );
 
     private final int title;
     private final int message;

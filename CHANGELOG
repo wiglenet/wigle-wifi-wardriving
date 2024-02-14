@@ -1,3 +1,8 @@
+* 2.85 (02/14/2024)
+Animated GPS searching logo
+Background task overhaul
+Various layout/bug/leak fixes
+
 * 2.84 (01/14/2024)
 Star number of observations not yet uploaded
 Fix crash on Android 7

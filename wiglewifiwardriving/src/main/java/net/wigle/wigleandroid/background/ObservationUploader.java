@@ -271,10 +271,11 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                     .map(UploadReseponse.UploadTransaction::getTransId)
                                     .collect(Collectors.toList());
                             if (transIds.size() > 0) {
-                                intent.putExtra("transIds", transIds.toString());
+                                final String transIdListStr = transIds.toString();
+                                intent.putExtra("transIds", transIdListStr);
                                 intent.setAction(UPLOAD_COMPLETE_INTENT);
                                 //NB: we'll still update the DB marker if no transIDs were generated.
-                                bundle.putString(BackgroundGuiHandler.TRANSIDS, transIds.toString());
+                                bundle.putString(BackgroundGuiHandler.TRANSIDS, transIdListStr);
                             }
                             //TODO: eventually learn about server-side donate=Y here
                         } else {

@@ -2,7 +2,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="#00FFFFFF">
+    <!-- ALIBI:  background in to prevent arrow/scroll regressions on oldroid -->
 <LinearLayout
 	android:id="@+id/settingslayout"
     android:orientation="vertical"

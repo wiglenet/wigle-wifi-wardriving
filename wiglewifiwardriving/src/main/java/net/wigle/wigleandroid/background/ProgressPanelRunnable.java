@@ -116,14 +116,18 @@ public abstract class ProgressPanelRunnable implements AlertSettable {
 
     protected void reactivateProgressBar(final int id) {
         activity.runOnUiThread(() -> {
-            pp.show();
-            setProgressStatus(id);
-            pp.setIndeterminate();
+            if (null != pp) {
+                pp.show();
+                setProgressStatus(id);
+                pp.setIndeterminate();
+            }
         });
     }
 
     protected void setProgressIndeterminate() {
-        pp.setIndeterminate();
+        if (null != pp) {
+            pp.setIndeterminate();
+        }
     }
 
     protected abstract void onPreExecute();

@@ -4,9 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 
@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.caverock.androidsvg.SVG;
 import com.google.android.material.navigation.NavigationView;
 
 import net.wigle.wigleandroid.model.api.UserStats;
@@ -341,14 +342,15 @@ public class UserStatsFragment extends AuthenticatedFragment {
 
         @Override
         public void run() {
-            try {
-                InputStream in = new java.net.URL(UrlConfig.WIGLE_BASE_URL+stats.getImageBadgeUrl()).openStream();
-                final Bitmap badge = BitmapFactory.decodeStream(in);
+            try (InputStream in = new java.net.URL(UrlConfig.WIGLE_BASE_URL+
+                        stats.getImageBadgeUrl().replace(".png",".svg")).openStream()) {
+                SVG svg = SVG.getFromInputStream(in);
+                Drawable drawable = new PictureDrawable(svg.renderToPicture());
                 handler.post(() -> {
-                    badgeImageView.setImageBitmap(badge);
+                    badgeImageView.setImageDrawable(drawable);
                 });
             } catch (Exception e) {
-                Logging.error("Failed to download bage image ", e);
+                Logging.error("Failed to download badge image ", e);
             }
         }
     }

@@ -72,6 +72,7 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
+    implementation 'com.caverock:androidsvg-aar:1.4'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'androidx.test:core:1.5.0'
@@ -122,6 +123,7 @@ tasks.register('createMccMncDB') {
     new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) { loadScript(sql, it) }
     def inputFile = new File(mxcDictionaryFile.toString())
     def mccMap = new JsonSlurper().parseText(inputFile.text)
+    assert mccMap instanceof Map
     def insertSql = 'INSERT OR REPLACE INTO wigle_mcc_mnc (mcc, mnc, type, countryName, countryCode, brand, operator, status, bands, notes) VALUES (?,?,?,?,?,?,?,?,?,?)'
     def myKeyNames = ['mcc', 'mnc']
     mccMap.each { mcc, mncMap ->

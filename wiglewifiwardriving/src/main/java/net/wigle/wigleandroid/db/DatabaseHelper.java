@@ -289,9 +289,11 @@ public final class DatabaseHelper extends Thread {
             }
 
             final MainActivity mainActivity = MainActivity.getMainActivity();
-            final Intent errorReportIntent = new Intent( mainActivity, ErrorReportActivity.class );
-            errorReportIntent.putExtra( ERROR_REPORT_DIALOG, error );
-            mainActivity.startActivity( errorReportIntent );
+            if (null != mainActivity) {
+                final Intent errorReportIntent = new Intent(mainActivity, ErrorReportActivity.class);
+                errorReportIntent.putExtra(ERROR_REPORT_DIALOG, error);
+                mainActivity.startActivity(errorReportIntent);
+            }
         }
     }
 

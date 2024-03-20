@@ -1,6 +1,6 @@
 # WiGLE Wireless Wardriving
 
-(https://github.com/wiglenet/wigle-wifi-wardriving/actions/workflows/android.yml/badge.svg)
+![ci badge](https://github.com/wiglenet/wigle-wifi-wardriving/actions/workflows/android.yml/badge.svg)
 
 Nethugging client for Android, from [wigle.net](https://wigle.net). 
 

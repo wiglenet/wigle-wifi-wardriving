@@ -1,5 +1,7 @@
 # WiGLE Wireless Wardriving
 
+![ci badge](https://github.com/wiglenet/wigle-wifi-wardriving/actions/workflows/android.yml/badge.svg)
+
 Nethugging client for Android, from [wigle.net](https://wigle.net). 
 
 This client provides geolocated detection and logging for WiFi, Bluetooth, and cellular signals using Android devices.

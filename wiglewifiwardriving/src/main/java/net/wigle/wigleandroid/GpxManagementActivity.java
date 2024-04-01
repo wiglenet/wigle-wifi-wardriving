@@ -160,14 +160,16 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
         RecyclerView recyclerView = findViewById(R.id.gpx_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        try {
-            Cursor cursor = dbHelper.routeMetaIterator();
-            final DateFormat itemDateFormat = android.text.format.DateFormat.getDateFormat(this.getApplicationContext());
-            final DateFormat itemTimeFormat = android.text.format.DateFormat.getTimeFormat(this.getApplicationContext());
-            GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
-            recyclerView.setAdapter(adapter);
-        } catch (DBException dbex) {
-            Logging.error("Failed to setup list for GPX management: ", dbex);
+        if (null != dbHelper) {
+            try {
+                Cursor cursor = dbHelper.routeMetaIterator();
+                final DateFormat itemDateFormat = android.text.format.DateFormat.getDateFormat(this.getApplicationContext());
+                final DateFormat itemTimeFormat = android.text.format.DateFormat.getTimeFormat(this.getApplicationContext());
+                GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
+                recyclerView.setAdapter(adapter);
+            } catch (DBException dbex) {
+                Logging.error("Failed to setup list for GPX management: ", dbex);
+            }
         }
     }
 

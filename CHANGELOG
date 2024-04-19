@@ -1,3 +1,8 @@
+* 2.86 (04/19/2024)
+Visual improvement using SVGs
+Fixing scrolling regression
+Various other bug fixes
+
 * 2.85 (02/14/2024)
 Animated GPS searching logo
 Background task overhaul

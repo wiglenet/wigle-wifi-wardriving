@@ -8,11 +8,11 @@ Description (4000 characters):
 WiGLE er en open source wardriving app til netstumble, display og kort fundet trådløse netværk og mobilmaster overalt i verden, nemt at uploade til WiGLE.net databasen. WiGLE blev startet i 2001 og har nu mere end 125 mio WiFi-netværk kortlagt hele verden.
 
 • Konkurrere på det globale WiGLE leaderboard for de fleste netværk er placeret!
-• Eksport til CSV-filer på SD-kort (comma-seperated values)!
+• Eksport til CSV-filer på SD-kort (kommasepareret tal)!
 • Eksporter til KML-filer på SD-kort (til at importere ind i Google Maps/Earth)!
 • Lyd og tekst-til-tale alarmering!
 • Lokal database til at spore nye netværk fundet!
-• Real-time kort over netværk fundet (OpenStreetMap)!
+• Real-tid kort over netværk fundet (OpenStreetMap)!
 • Kan flytte app til et SD-kort!
 • Lydløs knappen for at slukke al lyd/tale med det samme!
 • Bluetooth GPS støtte gennem mock steder!

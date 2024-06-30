@@ -311,14 +311,16 @@ public class DBResultActivity extends ProgressThrobberActivity {
                             stopAnimation();
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
                             boolean hasValidPoints = false;
-                            for (Network n : resultList) {
-                                listAdapter.add(n);
-                                mapRender.addItem(n);
-                                final LatLng ll = n.getPosition();
-                                //noinspection ConstantConditions
-                                if (ll != null) {
-                                    builder.include(ll);
-                                    hasValidPoints = true;
+                            if (null != mapRender) {
+                                for (Network n : resultList) {
+                                    listAdapter.add(n);
+                                    mapRender.addItem(n);
+                                    final LatLng ll = n.getPosition();
+                                    //noinspection ConstantConditions
+                                    if (ll != null) {
+                                        builder.include(ll);
+                                        hasValidPoints = true;
+                                    }
                                 }
                             }
                             if (hasValidPoints) {

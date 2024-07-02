@@ -96,8 +96,9 @@ public class CellSearchResponse {
     }
     public static Network asNetwork(CellNetwork wNet) {
         final LatLng l = new LatLng(wNet.getTrilat(),wNet.getTrilong());
+        final String attr = wNet.getAttributes() == null ? "" : wNet.getAttributes().toUpperCase(Locale.ROOT);
         return new Network(wNet.getId(), wNet.getSsid(),
-                0, wNet.getAttributes().toUpperCase(Locale.ROOT)+" [SEARCH]",
+                0, attr + " [SEARCH]",
                 0, NetworkType.valueOf(wNet.getGentype()) /*TODO: check*/, l);
     }
 }

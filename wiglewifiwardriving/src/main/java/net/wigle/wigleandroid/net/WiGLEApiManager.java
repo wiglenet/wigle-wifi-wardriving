@@ -88,6 +88,7 @@ public class WiGLEApiManager {
                     System.getProperty("os.name") + " " +
                     System.getProperty("os.version") +
                     " [" + System.getProperty("os.arch") + "]";
+            javaVersion = javaVersion.replaceAll("[^\\x00-\\x7F]", "");
         } catch (RuntimeException e) {
             Logging.error("Unable to get Java version for user agent string: ",e);
         }

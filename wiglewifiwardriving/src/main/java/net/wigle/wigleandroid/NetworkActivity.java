@@ -711,7 +711,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     @Override
     public void handleWiFiSeen(String bssid, Integer rssi, Location location) {
         LatLng latest = new LatLng(location.getLatitude(), location.getLongitude());
-        localObsMap.put(latest, new Observation(rssi, location.getLatitude(), location.getLongitude()));
+        localObsMap.put(latest, new Observation(rssi, location.getLatitude(), location.getLongitude(), location.getAltitude()));
         final LatLng estCentroid = computeObservationLocation(localObsMap);
         final int zoomLevel = computeZoom(obsMap, estCentroid);
         mapView.getMapAsync(googleMap -> {

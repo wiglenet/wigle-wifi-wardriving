@@ -81,13 +81,10 @@ public class KmlSurveyWriter extends AbstractBackgroundTask {
         FileAccess.writeFos( fos, "<Placemark><name>"+observation.getFormattedTime()+observation.getRssi()+"</name><styleUrl>");
         FileAccess.writeFos( fos, getStyleStringForRssi(observation.getRssi()));
         FileAccess.writeFos( fos, "</styleUrl>");
-		//				<ExtendedData>
-		//					<SchemaData>
-		//						<SimpleData name="Date">30/11/2016</SimpleData>
-		//					</SchemaData>
-	    //					</ExtendedData>
-        FileAccess.writeFos( fos, "<Point><coordinates>"+observation.getLongitude()+","+observation.getLatitude()+",0</coordinates></Point></Placemark>");
+        FileAccess.writeFos( fos, "<ExtendedData><SchemaData><SimpleData name=\"signal\">"+observation.getRssi()+"</SimpleData></SchemaData></ExtendedData>");
+        FileAccess.writeFos( fos, "<Point><coordinates>"+observation.getLongitude()+","+observation.getLatitude()+","+ observation.getElevationMeters()+"</coordinates></Point></Placemark>");
     }
+
     private String getStyleStringForRssi(final int rssi) {
         if (rssi >= 100) {
             return "#100_and_up";

@@ -18,10 +18,13 @@ public class Observation {
 
     private double longitude;
 
-    public Observation(final int rissi, final double latitude, final double longitude) {
+    private double elevationMeters;
+
+    public Observation(final int rissi, final double latitude, final double longitude, final double elevationMeters) {
         this.rssi = rssi;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.elevationMeters = elevationMeters;
         this.formattedTime = sdf.format(new Date());
     }
 
@@ -39,5 +42,9 @@ public class Observation {
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public double getElevationMeters() {
+        return elevationMeters;
     }
 }

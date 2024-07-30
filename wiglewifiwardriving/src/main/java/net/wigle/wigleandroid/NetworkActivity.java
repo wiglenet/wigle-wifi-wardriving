@@ -5,9 +5,11 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -28,6 +30,8 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
+import androidx.fragment.app.FragmentActivity;
+
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -52,13 +56,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.background.KmlSurveyWriter;
 import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
+import net.wigle.wigleandroid.listener.WiFiScanUpdater;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
+import net.wigle.wigleandroid.model.Observation;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
@@ -66,7 +73,7 @@ import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
 @SuppressWarnings("deprecation")
-public class NetworkActivity extends ScreenChildActivity implements DialogListener {
+public class NetworkActivity extends ScreenChildActivity implements DialogListener, WiFiScanUpdater {
     private static final int MENU_RETURN = 11;
     private static final int MENU_COPY = 12;
     private static final int NON_CRYPTO_DIALOG = 130;
@@ -81,6 +88,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     private int observations = 0;
     private boolean isDbResult = false;
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
+    private final ConcurrentLinkedHashMap<LatLng, Observation> localObsMap = new ConcurrentLinkedHashMap<>(1024);
     private NumberFormat numberFormat;
 
     // used for shutting extraneous activities down on an error
@@ -370,6 +378,10 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                             googleMap.addMarker(new MarkerOptions().position(estCentroid));
                         }
                         Logging.info("observation count: " + count);
+                        if ( NetworkType.WIFI.equals(network.getType()) ) {
+                            View v = findViewById(R.id.survey);
+                            v.setVisibility(View.VISIBLE);
+                        }
                     });
                 }
             }
@@ -407,6 +419,32 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
             if (null != obs.getKey()) {
                 float cleanSignal = cleanSignal((float) obs.getValue());
+                final double latV = obs.getKey().latitude;
+                final double lonV = obs.getKey().longitude;
+                if (Math.abs(latV) > 0.01d && Math.abs(lonV) > 0.01d) { // 0 GPS-coord check
+                    cleanSignal *= cleanSignal;
+                    latSum += (obs.getKey().latitude * cleanSignal);
+                    lonSum += (obs.getKey().longitude * cleanSignal);
+                    weightSum += cleanSignal;
+                }
+            }
+        }
+        double trilateratedLatitude = 0;
+        double trilateratedLongitude = 0;
+        if (weightSum > 0) {
+            trilateratedLatitude = latSum / weightSum;
+            trilateratedLongitude = lonSum / weightSum;
+        }
+        return new LatLng(trilateratedLatitude, trilateratedLongitude);
+    }
+
+    private LatLng computeObservationLocation(ConcurrentLinkedHashMap<LatLng, Observation> obsMap) {
+        double latSum = 0.0;
+        double lonSum = 0.0;
+        double weightSum = 0.0;
+        for (Map.Entry<LatLng, Observation> obs : obsMap.entrySet()) {
+            if (null != obs.getKey()) {
+                float cleanSignal = cleanSignal((float) obs.getValue().getRssi());
                 final double latV = obs.getKey().latitude;
                 final double lonV = obs.getKey().longitude;
                 if (Math.abs(latV) > 0.01d && Math.abs(lonV) > 0.01d) { // 0 GPS-coord check
@@ -535,7 +573,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 disableLogMacButton.setEnabled(false);
             }
 
-
             hideMacButton.setOnClickListener(buttonView -> {
                 // add a display-exclude row fot MAC
                 if (network.getBssid() != null) {
@@ -564,6 +601,36 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 }
                 disableLogMacButton.setEnabled(false);
             });
+
+            final Button startSurveyButton = findViewById(R.id.start_survey);
+            final Button endSurveyButton = findViewById(R.id.end_survey);
+            MainActivity.State state = MainActivity.getStaticState();
+            startSurveyButton.setOnClickListener(buttonView -> {
+                //TDDO: disabled until obsMap DB load complete?
+                if (null != state) {
+                    startSurveyButton.setVisibility(View.GONE);
+                    endSurveyButton.setVisibility(View.VISIBLE);
+                    obsMap.clear();
+                    final String[] currentList = new String[]{network.getBssid()};
+                    final Set<String> registerSet = new HashSet<>(Arrays.asList(currentList));
+                    state.wifiReceiver.registerWiFiScanUpdater(this, registerSet);
+                    mapView.getMapAsync(googleMap -> {
+                        googleMap.clear();
+                    });
+                }
+            });
+            endSurveyButton.setOnClickListener(buttonView -> {
+                startSurveyButton.setVisibility(View.VISIBLE);
+                endSurveyButton.setVisibility(View.GONE);
+                if (null != state) {
+                    state.wifiReceiver.unregisterWiFiScanUpdater();
+                    KmlSurveyWriter kmlWriter = new KmlSurveyWriter((FragmentActivity) MainActivity.getMainActivity(), ListFragment.lameStatic.dbHelper,
+                            "KmlSurveyWriter", true, network.getBssid(), localObsMap.values());
+                    kmlWriter.start();
+                    //TODO: do we want the obsMap back?
+                }
+            });
+
         }
     }
 
@@ -639,6 +706,26 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             final boolean disableOthers = true;
             wifiManager.enableNetwork(netId, disableOthers);
         }
+    }
+
+    @Override
+    public void handleWiFiSeen(String bssid, Integer rssi, Location location) {
+        LatLng latest = new LatLng(location.getLatitude(), location.getLongitude());
+        localObsMap.put(latest, new Observation(rssi, location.getLatitude(), location.getLongitude()));
+        final LatLng estCentroid = computeObservationLocation(localObsMap);
+        final int zoomLevel = computeZoom(obsMap, estCentroid);
+        mapView.getMapAsync(googleMap -> {
+            if (network.getLatLng() == null) {
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(latest).zoom(zoomLevel).build();
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+            BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
+                    getApplicationContext(), rssi);
+            googleMap.addMarker(new MarkerOptions().icon(obsIcon)
+                    .position(latest).zIndex(rssi));
+            Logging.info("survey observation added");
+        });
     }
 
     public static class CryptoDialog extends DialogFragment {
@@ -764,4 +851,5 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         }
         return false;
     }
+
 }

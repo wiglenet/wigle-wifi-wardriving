@@ -10,7 +10,7 @@ import java.util.Date;
  * @author rksh
  */
 public class Observation {
-    private DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     private int rssi;
     private String formattedTime;
 

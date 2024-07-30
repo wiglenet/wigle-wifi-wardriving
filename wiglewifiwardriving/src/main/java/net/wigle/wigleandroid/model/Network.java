@@ -118,7 +118,7 @@ public final class Network implements ClusterItem {
      * @param scanResult a result from a wifi scan
      */
     public Network( final ScanResult scanResult ) {
-        this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
+        this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.isPasspointNetwork() ? (scanResult.capabilities + "[HS2.0]") : scanResult.capabilities,
                 scanResult.level,  NetworkType.WIFI, null, null, null);
     }
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,

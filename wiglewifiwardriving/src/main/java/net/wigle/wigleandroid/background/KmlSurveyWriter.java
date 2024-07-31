@@ -86,23 +86,23 @@ public class KmlSurveyWriter extends AbstractBackgroundTask {
     }
 
     private String getStyleStringForRssi(final int rssi) {
-        if (rssi >= 100) {
+        if (rssi <= -100) {
             return "#100_and_up";
-        } else if (rssi >= 90) {
+        } else if (rssi <= -90) {
             return "#90_to_99";
-        } else if (rssi >= 80) {
+        } else if (rssi <= -80) {
             return "#80_to_89";
-        } else if (rssi >= 70) {
+        } else if (rssi <= -70) {
             return "#70_to_79";
-        } else if (rssi >= 60) {
+        } else if (rssi <= -60) {
             return "#60_to_69";
-        } else if (rssi >= 50) {
+        } else if (rssi <= -50) {
             return "#50_to_59";
-        } else if (rssi >= 40) {
+        } else if (rssi <= -40) {
             return "#40_to_49";
-        } else if (rssi >= 30) {
+        } else if (rssi <= -30) {
             return "#30_to_39";
-        } else if (rssi >= 20) {
+        } else if (rssi <= -20) {
             return "#20_to_29";
         } else {
             return "#0_to_19";

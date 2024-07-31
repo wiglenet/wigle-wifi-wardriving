@@ -20,7 +20,7 @@ public class Observation {
 
     private double elevationMeters;
 
-    public Observation(final int rissi, final double latitude, final double longitude, final double elevationMeters) {
+    public Observation(final int rssi, final double latitude, final double longitude, final double elevationMeters) {
         this.rssi = rssi;
         this.latitude = latitude;
         this.longitude = longitude;

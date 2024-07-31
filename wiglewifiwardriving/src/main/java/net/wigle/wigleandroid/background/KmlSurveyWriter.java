@@ -6,8 +6,10 @@ import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import androidx.annotation.ColorInt;
 import androidx.fragment.app.FragmentActivity;
 
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Observation;
@@ -48,16 +50,13 @@ public class KmlSurveyWriter extends AbstractBackgroundTask {
         final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         FileAccess.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
-                +"<Style id=\"100_and_up\"><IconStyle><color>ee0000ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"90_to_99\"><IconStyle><color>ee0046fd</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"80_to_89\"><IconStyle><color>ee0068f7</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"70_to_79\"><IconStyle><color>ee0085ed</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"60_to_69\"><IconStyle><color>ee009de0</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"50_to_59\"><IconStyle><color>ee00b3d2</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"40_to_49\"><IconStyle><color>ee00c7c2</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"30_to_39\"><IconStyle><color>ee00daae</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"20_to_29\"><IconStyle><color>ee00ed92</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"0_to_19\"><IconStyle><color>ee00ff6f</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"100_and_up\"><IconStyle><color>cc0000ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"90_to_99\"><IconStyle><color>cc0055ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"80_to_89\"><IconStyle><color>cc00aaff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"70_to_79\"><IconStyle><color>cc00ffff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"60_to_69\"><IconStyle><color>cc00ffaa</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"50_to_59\"><IconStyle><color>cc00ff55</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"0_to_49\"><IconStyle><color>cc00ff00</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
                 + "<Folder><name>"+bssid+"</name>\n" );
 
         for (Observation o : observations) {
@@ -98,14 +97,10 @@ public class KmlSurveyWriter extends AbstractBackgroundTask {
             return "#60_to_69";
         } else if (rssi <= -50) {
             return "#50_to_59";
-        } else if (rssi <= -40) {
-            return "#40_to_49";
-        } else if (rssi <= -30) {
-            return "#30_to_39";
-        } else if (rssi <= -20) {
-            return "#20_to_29";
+        } else if (rssi <= -40){
+            return "#0_to_49";
         } else {
-            return "#0_to_19";
+            return "#0_to_49";
         }
     }
 }

@@ -50,13 +50,13 @@ public class KmlSurveyWriter extends AbstractBackgroundTask {
         final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         FileAccess.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
-                +"<Style id=\"rssi_100_and_up\"><IconStyle><color>cc0000ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"rssi_90_to_99\"><IconStyle><color>cc0055ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"rssi_80_to_89\"><IconStyle><color>cc00aaff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"rssi_70_to_79\"><IconStyle><color>cc00ffff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"rssi_60_to_69\"><IconStyle><color>cc00ffaa</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"rssi_50_to_59\"><IconStyle><color>cc00ff55</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
-                +"<Style id=\"rssi_0_to_49\"><IconStyle><color>cc00ff00</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_100_up\"><IconStyle><color>cc0000ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_90_99\"><IconStyle><color>cc0055ff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_80_89\"><IconStyle><color>cc00aaff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_70_79\"><IconStyle><color>cc00ffff</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_60_69\"><IconStyle><color>cc00ffaa</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_50_59\"><IconStyle><color>cc00ff55</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
+                +"<Style id=\"r_0_49\"><IconStyle><color>cc00ff00</color><scale>0.75</scale><Icon> <href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href></Icon></IconStyle><LabelStyle><scale>0</scale></LabelStyle></Style>"
                 + "<Folder><name>"+bssid+"</name>\n" );
 
         for (Observation o : observations) {
@@ -86,21 +86,21 @@ public class KmlSurveyWriter extends AbstractBackgroundTask {
 
     private String getStyleStringForRssi(final int rssi) {
         if (rssi <= -100) {
-            return "#rssi_100_and_up";
+            return "#r_100_up";
         } else if (rssi <= -90) {
-            return "#rssi_90_to_99";
+            return "#r_90_99";
         } else if (rssi <= -80) {
-            return "#rssi_80_to_89";
+            return "#r_80_89";
         } else if (rssi <= -70) {
-            return "#rssi_70_to_79";
+            return "#r_70_79";
         } else if (rssi <= -60) {
-            return "#rssi_60_to_69";
+            return "#r_60_69";
         } else if (rssi <= -50) {
-            return "#rssi_50_to_59";
+            return "#r_50_59";
         } else if (rssi <= -40){
-            return "#rssi_0_to_49";
+            return "#r_0_49";
         } else {
-            return "#rssi_0_to_49";
+            return "#r_0_49";
         }
     }
 }

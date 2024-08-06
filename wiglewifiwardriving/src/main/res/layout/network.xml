@@ -236,13 +236,13 @@
                 android:id="@+id/start_survey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Site Survey"/>
+                android:text="@string/start_survey"/>
             <Button
                 android:id="@+id/end_survey"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="End Survey"/>
+                android:text="@string/end_survey"/>
         </RelativeLayout>
 
         <RelativeLayout

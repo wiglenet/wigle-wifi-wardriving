@@ -69,6 +69,7 @@ import net.wigle.wigleandroid.model.Observation;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -77,6 +78,9 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     private static final int MENU_RETURN = 11;
     private static final int MENU_COPY = 12;
     private static final int NON_CRYPTO_DIALOG = 130;
+
+    private static final int SITE_SURVEY_DIALOG = 131;
+
 
     private static final int MSG_OBS_UPDATE = 1;
     private static final int MSG_OBS_DONE = 2;
@@ -606,17 +610,13 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             final Button endSurveyButton = findViewById(R.id.end_survey);
             MainActivity.State state = MainActivity.getStaticState();
             startSurveyButton.setOnClickListener(buttonView -> {
+                final FragmentActivity fa = this;
                 //TDDO: disabled until obsMap DB load complete?
-                if (null != state) {
-                    startSurveyButton.setVisibility(View.GONE);
-                    endSurveyButton.setVisibility(View.VISIBLE);
-                    obsMap.clear();
-                    final String[] currentList = new String[]{network.getBssid()};
-                    final Set<String> registerSet = new HashSet<>(Arrays.asList(currentList));
-                    state.wifiReceiver.registerWiFiScanUpdater(this, registerSet);
-                    mapView.getMapAsync(googleMap -> {
-                        googleMap.clear();
-                    });
+                if (null != fa) {
+                    final String message = String.format(getString(R.string.confirm_survey),
+                            getString(R.string.end_survey), getString(R.string.nonstop));
+                    WiGLEConfirmationDialog.createConfirmation(fa, message,
+                            R.id.nav_data, SITE_SURVEY_DIALOG);
                 }
             });
             endSurveyButton.setOnClickListener(buttonView -> {
@@ -676,6 +676,22 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         switch(dialogId) {
             case NON_CRYPTO_DIALOG:
                 connectToNetwork( null );
+                break;
+            case SITE_SURVEY_DIALOG:
+                MainActivity.State state = MainActivity.getStaticState();
+                final Button startSurveyButton = findViewById(R.id.start_survey);
+                final Button endSurveyButton = findViewById(R.id.end_survey);
+                if (null != state) {
+                    startSurveyButton.setVisibility(View.GONE);
+                    endSurveyButton.setVisibility(View.VISIBLE);
+                    obsMap.clear();
+                    final String[] currentList = new String[]{network.getBssid()};
+                    final Set<String> registerSet = new HashSet<>(Arrays.asList(currentList));
+                    state.wifiReceiver.registerWiFiScanUpdater(this, registerSet);
+                    mapView.getMapAsync(googleMap -> {
+                        googleMap.clear();
+                    });
+                }
                 break;
             default:
                 Logging.warn("Network unhandled dialogId: " + dialogId);

@@ -453,4 +453,7 @@
     <string name="search_area">검색 영역:</string>
     <string name="queued_jobs">(%1$d개의 대기 중인 작업)</string>
     <string name="duplicate_job">이 유형의 작업이 이미 실행 중이거나 실행 대기 중입니다.</string>
+    <string name="start_survey">현장 조사</string>
+    <string name="end_survey">설문조사 종료</string>
+    <string name="confirm_survey">설문조사를 완료하고 활동을 종료하기 전에 결과를 저장하려면 \"%1$s\"를 클릭해야 합니다!\n\n 최상의 결과를 얻으려면 이동 속도 설정에서 \"%2$s\" 스캔을 설정하는 것이 좋습니다. (이것은 배터리에 영향을 미칠 것입니다)</string>
 </resources>

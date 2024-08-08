@@ -453,4 +453,7 @@
     <string name="search_area">منطقة البحث:</string>
     <string name="queued_jobs">(%1$d مهمة في قائمة الانتظار)</string>
     <string name="duplicate_job">هناك مهمة من هذا النوع قيد التشغيل بالفعل أو في انتظار التشغيل.</string>
+    <string name="start_survey">استبيان عن الموقع</string>
+    <string name="end_survey">نهاية المسح</string>
+    <string name="confirm_survey">يجب عليك النقر فوق \"%1$s\" لإكمال الاستبيان وحفظ النتائج قبل الخروج من النشاط!\n\n نوصي بتعيين المسح \"%2$s\" ضمن الإعدادات الخاصة بسرعة سفرك للحصول على أفضل النتائج. (سيكون لهذا عواقب على البطارية)</string>
 </resources>

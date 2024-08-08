@@ -453,4 +453,7 @@
     <string name="search_area">Obszar wyszukiwania:</string>
     <string name="queued_jobs">(%1$d zadania w kolejce)</string>
     <string name="duplicate_job">Zadanie tego typu jest już uruchomione lub czeka na uruchomienie.</string>
+    <string name="start_survey">Badanie na stronie</string>
+    <string name="end_survey">Zakończ ankietę</string>
+    <string name="confirm_survey">MUSISZ kliknąć „%1$s”, aby zakończyć ankietę i zapisać wyniki przed zakończeniem aktywności!\n\n Aby uzyskać najlepsze wyniki, zalecamy ustawienie skanowania „%2$s” w ustawieniach prędkości podróży. (BĘDZIE to miało konsekwencje dla baterii)</string>
 </resources>

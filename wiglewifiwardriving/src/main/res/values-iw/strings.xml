@@ -453,4 +453,7 @@
     <string name="search_area">אזור חיפוש:</string>
     <string name="queued_jobs">(%1$d משימות בתור)</string>
     <string name="duplicate_job">עבודה מסוג זה כבר פועלת או ממתינה להפעלה.</string>
+    <string name="start_survey">סקר שטח</string>
+    <string name="end_survey">סיום הסקר</string>
+    <string name="confirm_survey">עליך ללחוץ על \"%1$s\" כדי להשלים את הסקר ולשמור את התוצאות שלך לפני היציאה מהפעילות!\n\n אנו ממליצים להגדיר \"%2$s\" סריקה תחת הגדרות עבור מהירות הנסיעה שלך לקבלת התוצאות הטובות ביותר. (לזה יהיו השלכות סוללה)</string>
 </resources>

@@ -452,4 +452,7 @@
     <string name="search_area">Eneo la Utafutaji:</string>
     <string name="queued_jobs">(Kazi %1$d zilizowekwa kwenye foleni)</string>
     <string name="duplicate_job">Kazi ya aina hii tayari inaendeshwa au inasubiri kufanya kazi.</string>
+    <string name="start_survey">Utafiti wa Tovuti</string>
+    <string name="end_survey">Maliza Utafiti</string>
+    <string name="confirm_survey">LAZIMA ubofye \"%1$s\" ili kukamilisha utafiti na kuhifadhi matokeo yako kabla ya kuondoka kwenye shughuli!\n\n Tunapendekeza uweke \"%2$s\" uchanganuzi chini ya mipangilio ya kasi yako ya usafiri ili kupata matokeo bora zaidi. (Hii ITAKUWA na matokeo ya betri)</string>
 </resources>

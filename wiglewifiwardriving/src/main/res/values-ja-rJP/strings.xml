@@ -452,4 +452,7 @@
     <string name="search_area">検索エリア:</string>
     <string name="queued_jobs">(%1$d キューに入れられたタスク)</string>
     <string name="duplicate_job">このタイプのジョブはすでに実行中か、実行を待機しています。</string>
+    <string name="start_survey">実地調査</string>
+    <string name="end_survey">調査を終了する</string>
+    <string name="confirm_survey">アクティビティを終了する前に、「%1$s」をクリックしてアンケートを完了し、結果を保存する必要があります!\n\n 最良の結果を得るには、移動速度の設定でスキャンを「%2$s」に設定することをお勧めします。 (これはバッテリーに影響を及ぼします)</string>
 </resources>

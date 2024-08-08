@@ -224,6 +224,26 @@
                 android:paddingStart="5dp"
                 android:paddingEnd="5dp" />
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/survey"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/passpoint_row"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            >
+            <Button
+                android:id="@+id/start_survey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/start_survey"/>
+            <Button
+                android:id="@+id/end_survey"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/end_survey"/>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/cell_info"

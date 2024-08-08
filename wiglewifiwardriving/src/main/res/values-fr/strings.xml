@@ -453,4 +453,7 @@
     <string name="search_area">Zone de recherche:</string>
     <string name="queued_jobs">(%1$d tâches en file d\'attente)</string>
     <string name="duplicate_job">Un travail de ce type est déjà en cours d\'exécution ou en attente d\'exécution.</string>
+    <string name="start_survey">Enquête sur le site</string>
+    <string name="end_survey">Fin de l\'enquête</string>
+    <string name="confirm_survey">Vous DEVEZ cliquer sur «%1$s» pour terminer l\'enquête et enregistrer vos résultats avant de quitter l\'activité!\n\n Nous vous recommandons de définir le balayage «%2$s» dans les paramètres de votre vitesse de déplacement pour de meilleurs résultats. (Cela aura des conséquences sur la batterie)</string>
 </resources>

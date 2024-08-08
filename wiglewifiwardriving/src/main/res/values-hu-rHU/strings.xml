@@ -453,4 +453,7 @@
     <string name="search_area">Keresési terület:</string>
     <string name="queued_jobs">(%1$d sorban álló feladat)</string>
     <string name="duplicate_job">Egy ilyen típusú feladat már fut, vagy futásra vár.</string>
+    <string name="start_survey">Helyszíni felmérés</string>
+    <string name="end_survey">A felmérés befejezése</string>
+    <string name="confirm_survey">A „%1$s” gombra KELL kattintania a felmérés kitöltéséhez és az eredmények mentéséhez, mielőtt kilép a tevékenységből!\n\n Javasoljuk, hogy a legjobb eredmény érdekében állítsa be a „%2$s” szkennelést az utazási sebesség beállításainál. (Ennek az akkumulátor következményei lesznek)</string>
 </resources>

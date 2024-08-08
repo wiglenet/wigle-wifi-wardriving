@@ -453,4 +453,7 @@
     <string name="search_area">Area di ricerca:</string>
     <string name="queued_jobs">(%1$d attività in coda)</string>
     <string name="duplicate_job">Un lavoro di questo tipo è già in esecuzione o in attesa di essere eseguito.</string>
+    <string name="start_survey">Sondaggio del sito</string>
+    <string name="end_survey">Fine sondaggio</string>
+    <string name="confirm_survey">DEVI fare clic su \"%1$s\" per completare il sondaggio e salvare i risultati prima di uscire dall\'attività!\n\n Ti consigliamo di impostare la scansione \"%2$s\" nelle impostazioni per la velocità di viaggio per ottenere i migliori risultati. (Ciò avrà conseguenze sulla batteria)</string>
 </resources>

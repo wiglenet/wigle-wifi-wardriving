@@ -414,7 +414,7 @@
     <string name="gpx_preparing">准备GPX导出</string>
     <string name="gpx_exporting">导出GPX文件。</string>
     <string name="discovered">发现</string>
-    <string name="new_to_us">（WiGLE新手)</string>
+    <string name="new_to_us">(WiGLE没见到过)</string>
     <string name="total_seen">观察总数</string>
     <string name="csv">CSV</string>
     <string name="kml">KML</string>

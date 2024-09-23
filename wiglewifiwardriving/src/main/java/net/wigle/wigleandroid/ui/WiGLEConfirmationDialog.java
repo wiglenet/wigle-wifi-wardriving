@@ -70,13 +70,17 @@ public class WiGLEConfirmationDialog extends DialogFragment {
         final Activity activity = getActivity();
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setCancelable(true);
-        builder.setTitle("Confirmation"); //TODO: literal string
-        final String checkboxLabel = getArguments().getString("checkboxLabel");
-        if (null != checkboxLabel) {
-            View checkBoxView = View.inflate(activity, R.layout.checkbox, null);
-            CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
-            checkBox.setText(checkboxLabel);
-            builder.setView(checkBoxView);
+        final String confirmString = getString(R.string.dialog_confirm);
+        builder.setTitle(confirmString);
+        Bundle arguments = getArguments();
+        if (null != arguments) {
+            final String checkboxLabel = arguments.getString("checkboxLabel");
+            if (null != checkboxLabel) {
+                View checkBoxView = View.inflate(activity, R.layout.checkbox, null);
+                CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
+                checkBox.setText(checkboxLabel);
+                builder.setView(checkBoxView);
+            }
         }
         final String persistPrefKey = getArguments().getString("persistPref");
         final String persistPrefAgreeValue = getArguments().getString("persistPrefAgreeValue");
@@ -90,17 +94,20 @@ public class WiGLEConfirmationDialog extends DialogFragment {
 
         final AlertDialog ad = builder.create();
         // ok
-        ad.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), (dialog, which) -> {
+        final String okString = null != activity?activity.getString(R.string.ok):"OK";
+        ad.setButton(DialogInterface.BUTTON_POSITIVE, okString, (dialog, which) -> {
             try {
                 if (null != persistPrefKey) {
                     CheckBox checkBox = ((AlertDialog) dialog).findViewById(R.id.checkbox);
-                    if (checkBox.isChecked()) {
+                    if (checkBox.isChecked() && prefs != null) {
                         final SharedPreferences.Editor editor = prefs.edit();
                         editor.putString(persistPrefKey, persistPrefAgreeValue);
                         editor.apply();
                     }
                 }
-                dialog.dismiss();
+                if (null != dialog) {
+                    dialog.dismiss();
+                }
                 final Activity activity1 = getActivity();
                 if (activity1 == null) {
                     Logging.info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
@@ -113,7 +120,7 @@ public class WiGLEConfirmationDialog extends DialogFragment {
                         final Fragment fragment = fragmentManager.findFragmentByTag(MainActivity.FRAGMENT_TAG_PREFIX + tabPos);
                         if (fragment == null) {
                             Logging.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
-                            //TODO: might behoove us to show an error here
+                            //ALIBI: how would we show an error here with a null fragment?
                         } else {
                             ((DialogListener) fragment).handleDialog(dialogId);
                         }
@@ -128,7 +135,8 @@ public class WiGLEConfirmationDialog extends DialogFragment {
         });
 
         // cancel
-        ad.setButton(DialogInterface.BUTTON_NEGATIVE, activity.getString(R.string.cancel), (dialog, which) -> {
+        final String cancelString = null != activity?activity.getString(R.string.cancel):"Cancel";
+        ad.setButton(DialogInterface.BUTTON_NEGATIVE, cancelString, (dialog, which) -> {
             try {
                 if (null != persistPrefKey) {
                     CheckBox checkBox = ((AlertDialog) dialog).findViewById(R.id.checkbox);
@@ -138,7 +146,9 @@ public class WiGLEConfirmationDialog extends DialogFragment {
                         editor.apply();
                     }
                 }
-                dialog.dismiss();
+                if (null != dialog) {
+                    dialog.dismiss();
+                }
             } catch (Exception ex) {
                 // guess it wasn't there anyways
                 Logging.info("exception dismissing fragment alert dialog: ", ex);
@@ -146,6 +156,7 @@ public class WiGLEConfirmationDialog extends DialogFragment {
         });
         return ad;
     }
+
     public static void createConfirmation(final FragmentActivity activity, final String message,
                                           final int tabPos, final int dialogId) {
         try {
@@ -181,6 +192,4 @@ public class WiGLEConfirmationDialog extends DialogFragment {
             Logging.error(errorMessage, ex);
         }
     }
-
-
 }

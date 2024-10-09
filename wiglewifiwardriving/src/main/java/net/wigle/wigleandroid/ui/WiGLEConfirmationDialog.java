@@ -94,7 +94,7 @@ public class WiGLEConfirmationDialog extends DialogFragment {
 
         final AlertDialog ad = builder.create();
         // ok
-        final String okString = null != activity?activity.getString(R.string.ok):"OK";
+        final String okString = (null != activity) ? activity.getString(R.string.ok) : "OK";
         ad.setButton(DialogInterface.BUTTON_POSITIVE, okString, (dialog, which) -> {
             try {
                 if (null != persistPrefKey) {
@@ -135,7 +135,7 @@ public class WiGLEConfirmationDialog extends DialogFragment {
         });
 
         // cancel
-        final String cancelString = null != activity?activity.getString(R.string.cancel):"Cancel";
+        final String cancelString = (null != activity) ? activity.getString(R.string.cancel) : "Cancel";
         ad.setButton(DialogInterface.BUTTON_NEGATIVE, cancelString, (dialog, which) -> {
             try {
                 if (null != persistPrefKey) {

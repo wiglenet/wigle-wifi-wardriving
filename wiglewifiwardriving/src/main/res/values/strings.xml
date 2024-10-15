@@ -453,4 +453,5 @@
     <string name="search_area">Search area:</string>
     <string name="queued_jobs">(%1$d queued tasks)</string>
     <string name="duplicate_job">A job of this type is already running or waiting to run.</string>
+    <string name="dialog_confirm">Confirm</string>
 </resources>

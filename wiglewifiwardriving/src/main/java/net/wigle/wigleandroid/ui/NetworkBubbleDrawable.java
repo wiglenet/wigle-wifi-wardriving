@@ -26,8 +26,8 @@ public class NetworkBubbleDrawable extends Drawable {
 
     @SuppressLint("UseCompatLoadingForDrawables") //ALIBI: lifted from the original
     public NetworkBubbleDrawable(Resources res) {
-        this.mMask = res.getDrawable(R.drawable.amu_bubble_mask);
-        this.mShadow = res.getDrawable(R.drawable.amu_bubble_shadow);
+        this.mMask = res.getDrawable(com.google.maps.android.R.drawable.amu_bubble_mask);
+        this.mShadow = res.getDrawable(com.google.maps.android.R.drawable.amu_bubble_shadow);
     }
     public void setColor(int color) {
         this.mColor = color;

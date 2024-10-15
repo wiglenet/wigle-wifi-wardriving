@@ -59,9 +59,9 @@ public class NetworkIconGenerator {
     public NetworkIconGenerator(Context context) {
         mContext = context;
         mBackground = new NetworkBubbleDrawable(this.mContext.getResources());
-        mContainer = (ViewGroup) LayoutInflater.from(mContext).inflate(R.layout.amu_text_bubble, null);
+        mContainer = (ViewGroup) LayoutInflater.from(mContext).inflate(com.google.maps.android.R.layout.amu_text_bubble, null);
         mRotationLayout = (RotationLayout) mContainer.getChildAt(0);
-        mContentView = mTextView = (TextView) mRotationLayout.findViewById(R.id.amu_text);
+        mContentView = mTextView = (TextView) mRotationLayout.findViewById(com.google.maps.android.R.id.amu_text);
         setStyle(STYLE_DEFAULT);
     }
 
@@ -123,7 +123,7 @@ public class NetworkIconGenerator {
         mRotationLayout.removeAllViews();
         mRotationLayout.addView(contentView);
         mContentView = contentView;
-        final View view = mRotationLayout.findViewById(R.id.amu_text);
+        final View view = mRotationLayout.findViewById(com.google.maps.android.R.id.amu_text);
         mTextView = view instanceof TextView ? (TextView) view : null;
     }
 
@@ -210,14 +210,14 @@ public class NetworkIconGenerator {
             case 1:
             case 2:
             default:
-                return R.style.amu_Bubble_TextAppearance_Dark; //style.amu_Bubble_TextAppearance_Dark;
+                return com.google.maps.android.R.style.amu_Bubble_TextAppearance_Dark; //style.amu_Bubble_TextAppearance_Dark;
             case 3:
             case 4:
             case 5:
             case 6:
             case 7:
             case 8:
-                return R.style.amu_Bubble_TextAppearance_Light;//style.amu_Bubble_TextAppearance_Light;
+                return com.google.maps.android.R.style.amu_Bubble_TextAppearance_Light;//style.amu_Bubble_TextAppearance_Light;
         }
     }
 

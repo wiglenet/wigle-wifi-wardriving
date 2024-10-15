@@ -183,26 +183,26 @@ public class TokenAccess {
         try {
             final KeyStore keyStore = getKeyStore();
 
-            KeyStore.PrivateKeyEntry privateKeyEntry;
-
+            KeyStore.PrivateKeyEntry privateKeyEntry = null;
             // prefer v2 key -> v1 key -> v0 key, nada as applicable
             int versionThreshold = android.os.Build.VERSION_CODES.M;
-            if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
-                return getApiTokenVersion2(prefs);
-            } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
-                privateKeyEntry = (KeyStore.PrivateKeyEntry)
-                        keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
-            } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                privateKeyEntry = (KeyStore.PrivateKeyEntry)
-                        keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V0, null);
-                versionThreshold = Build.VERSION_CODES.JELLY_BEAN_MR2;
-            } else {
-                Logging.warn("[TOKEN] Compatible build, but no key set: " +
-                        android.os.Build.VERSION.SDK_INT + " - returning plaintext.");
-                return prefs.getString(PreferenceKeys.PREF_TOKEN, "");
+            if (null != keyStore) {
+                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
+                    return getApiTokenVersion2(prefs);
+                } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
+                    privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                            keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
+                } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
+                    privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                            keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V0, null);
+                    versionThreshold = Build.VERSION_CODES.JELLY_BEAN_MR2;
+                } else {
+                    Logging.warn("[TOKEN] Compatible build, but no key set: " +
+                            android.os.Build.VERSION.SDK_INT + " - returning plaintext.");
+                    return prefs.getString(PreferenceKeys.PREF_TOKEN, "");
+                }
             }
-
 
             if (null != privateKeyEntry) {
                 String encodedCypherText = prefs.getString(PreferenceKeys.PREF_TOKEN, "");

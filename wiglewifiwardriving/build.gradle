@@ -15,6 +15,9 @@ android {
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
     }
+    buildFeatures {
+        buildConfig = true
+    }
 
     buildTypes {
         release {
@@ -27,7 +30,6 @@ android {
             excludes += ['META-INF/ASL2.0', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/LICENSE.txt', 'META-INF/MANIFEST.MF']
         }
     }
-
 }
 
 configurations {

@@ -92,7 +92,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
+                                    if (null != dialog) {
+                                        dialog.dismiss();
+                                    }
                                 }
                             });
 

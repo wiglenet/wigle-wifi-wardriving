@@ -26,7 +26,7 @@
     <string name="maxout_maxid_text">Sæt max kør til:</string>
     <string name="csv_run_export_button">Start CSV Eksport</string>
     <string name="csv_run_export_text">Eksport aktuelle forløb til CSV-fil</string>
-    <string name="csv_export_button">CSV Eksport til DB</string>
+    <string name="csv_export_button">CSV Eksport fra DB</string>
     <string name="csv_export_text">Eksportere hele DB til CSV fil</string>
     <string name="kml_run_export_button">Start KML Eksport</string>
     <string name="kml_run_export_text">Eksport aktuelle forløb til KML-fil</string>

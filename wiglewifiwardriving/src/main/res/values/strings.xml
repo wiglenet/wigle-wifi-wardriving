@@ -453,5 +453,8 @@
     <string name="search_area">Search area:</string>
     <string name="queued_jobs">(%1$d queued tasks)</string>
     <string name="duplicate_job">A job of this type is already running or waiting to run.</string>
+    <string name="start_survey">Site Survey</string>
+    <string name="end_survey">End Survey</string>
+    <string name="confirm_survey">You MUST click \"%1$s\" to complete the survey and save your results before exiting the activity!\n\n We recommend setting \"%2$s\" scanning under settings for your travel speed for best results. (This WILL have battery consequences)</string>
     <string name="dialog_confirm">Confirm</string>
 </resources>

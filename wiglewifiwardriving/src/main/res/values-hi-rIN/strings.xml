@@ -452,4 +452,7 @@
     <string name="search_area">खोज क्षेत्र:</string>
     <string name="queued_jobs">(%1$d कतारबद्ध कार्य)</string>
     <string name="duplicate_job">इस प्रकार का कार्य पहले से ही चल रहा है या चलने की प्रतीक्षा कर रहा है।</string>
+    <string name="start_survey">साइट सर्वेक्षण</string>
+    <string name="end_survey">सर्वेक्षण समाप्त करें</string>
+    <string name="confirm_survey">सर्वेक्षण पूरा करने और गतिविधि से बाहर निकलने से पहले अपने परिणामों को सहेजने के लिए आपको \"%1$s\" पर क्लिक करना होगा!\n\n हम सर्वोत्तम परिणामों के लिए आपकी यात्रा की गति के लिए सेटिंग्स के तहत \"%2$s\" स्कैनिंग सेट करने की सलाह देते हैं। (इसके बैटरी परिणाम होंगे)</string>
 </resources>

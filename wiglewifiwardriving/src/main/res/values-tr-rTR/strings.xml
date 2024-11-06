@@ -453,4 +453,7 @@
     <string name="search_area">Arama Alanı:</string>
     <string name="queued_jobs">(%1$d sıraya alınmış görev)</string>
     <string name="duplicate_job">Bu türde bir iş zaten çalışıyor veya çalıştırılmayı bekliyor.</string>
+    <string name="start_survey">Site anketi</string>
+    <string name="end_survey">Anketi Sonlandır</string>
+    <string name="confirm_survey">Anketi tamamlamak ve aktiviteden çıkmadan önce sonuçlarınızı kaydetmek için \"%1$s\"ya tıklamanız GEREKİR!\n\n En iyi sonuçları elde etmek için seyahat hızınız için ayarlar altında \"%2$s\" taramayı ayarlamanızı öneririz. (Bunun pil sonuçları OLACAKTIR)</string>
 </resources>

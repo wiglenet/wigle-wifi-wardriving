@@ -374,7 +374,7 @@ public final class MappingFragment extends Fragment {
                     @Override
                     public Tile getTile(int x, int y, int zoom) {
                         if (!checkTileExists(x, y, zoom)) {
-                            return null;
+                            return NO_TILE;
                         }
 
                         final Long since = prefs.getLong(PreferenceKeys.PREF_SHOW_DISCOVERED_SINCE, 2001);
@@ -402,7 +402,11 @@ public final class MappingFragment extends Fragment {
 
                         try {
                             final byte[] data = downloadData(new URL(s), userAgent, authToken);
-                            return new Tile(providerTileRes, providerTileRes, data);
+                            if (data.length > 0) {
+                                return new Tile(providerTileRes, providerTileRes, data);
+                            } else {
+                                return null;
+                            }
                         } catch (MalformedURLException e) {
                             throw new AssertionError(e);
                         }

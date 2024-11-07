@@ -2426,7 +2426,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     iseDlgBuilder.setMessage(external?R.string.no_external_space_message:R.string.no_internal_space_message)
                             .setTitle(external?R.string.no_external_space_title:R.string.no_internal_space_title)
                             .setCancelable(true)
-                            .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
+                            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                                if (null != dialog) {
+                                    dialog.dismiss();
+                                }});
                     final Dialog dialog = iseDlgBuilder.create();
                     if (!isFinishing()) {
                         dialog.show();

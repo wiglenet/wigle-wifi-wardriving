@@ -128,7 +128,9 @@ public class BackgroundGuiHandler extends Handler {
             if (dialog != null) {
                 try {
                     //DEBUG: Logging.info("fragment from dialog: " + dialog);
-                    dialog.dismiss();
+                    if (null != dialog && dialog.isVisible()) {
+                        dialog.dismiss();
+                    }
                 } catch ( Exception ex ) {
                     // you can't dismiss what isn't there
                     Logging.error( "exception dismissing fm dialog: " + ex );
@@ -326,7 +328,9 @@ public class BackgroundGuiHandler extends Handler {
             AlertDialog ad = builder.create();
             ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", (dialog, which) -> {
                 try {
-                    dialog.dismiss();
+                    if (null != dialog) {
+                        dialog.dismiss();
+                    }
                 } catch ( Exception ex ) {
                     // guess it wasn't there anyways
                     Logging.info( "exception dismissing alert dialog: " + ex );

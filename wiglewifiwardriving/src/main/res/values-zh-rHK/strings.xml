@@ -16,8 +16,8 @@
     <string name="data_activity_name">WiGLE WiFi - 資料庫</string>
     <string name="dbresult_activity_name">WiGLE WiFi - 搜尋結果</string>
     <string name="upload_button">上傳到WiGLE.net</string>
-    <string name="使用者名稱">WiGLE 使用者名稱</string>
-    <string name="密碼">WiGLE 密碼</string>
+    <string name="username">WiGLE 使用者名稱</string>
+    <string name="password">WiGLE 密碼</string>
     <string name="show_current">只顯示目前的網路</string>
     <string name="use_metric">使用公制單位</string>
     <string name="be_anonymous">匿名上傳</string>
@@ -456,4 +456,7 @@
     <string name="search_area">搜索區域：</string>
     <string name="queued_jobs">（%1$d 個排隊任務）</string>
     <string name="duplicate_job">這種類型的作業已經在運行或正在等待運行。</string>
+    <string name="start_survey">現場調查</string>
+    <string name="end_survey">結束調查</string>
+    <string name="confirm_survey">您必須點擊“%1$s”來完成調查並在退出活動之前保存您的結果！ \n\n 我們建議您在行駛速度設定下設定“%2$s”掃描以獲得最佳結果。 （這會對電池造成影響）</string>
 </resources>

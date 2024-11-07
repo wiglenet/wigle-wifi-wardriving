@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,6 +96,10 @@ public class WifiReceiver extends BroadcastReceiver {
     private long prevNewNetCount;
     private long prevScanPeriod;
     private boolean scanInFlight = false;
+
+    private Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
+
+    private WiFiScanUpdater updateOnSeen = null;
 
     public static final int CELL_MIN_STRENGTH = -113;
 
@@ -322,6 +327,11 @@ public class WifiReceiver extends BroadcastReceiver {
                     }
                     if (!matches) {
                         dbHelper.pendingObservation( network, added, false, false );
+                    }
+                }
+                if (null != updateOnSeen && null != safeWatchSsids && null != location) {
+                    if (safeWatchSsids.contains(network.getBssid())) {
+                        updateOnSeen.handleWiFiSeen(network.getBssid(), result.level, location);
                     }
                 }
             }
@@ -938,6 +948,16 @@ public class WifiReceiver extends BroadcastReceiver {
         wifiTimer.post(this::doWifiScan);
     }
 
+    public synchronized void registerWiFiScanUpdater(final WiFiScanUpdater updater, final Set<String> watchBssids) {
+        safeWatchSsids.addAll(watchBssids);
+        updateOnSeen = updater;
+    }
+
+    public synchronized void unregisterWiFiScanUpdater() {
+        updateOnSeen = null;
+        safeWatchSsids.clear();
+    }
+
     /**
      * only call this from a Handler
      * @return true if startScan success
@@ -1131,5 +1151,4 @@ public class WifiReceiver extends BroadcastReceiver {
         //ALIBI: allows us to run in conjunction with current-carrier detection
         return network;
     }
-
 }

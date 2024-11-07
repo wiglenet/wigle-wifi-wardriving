@@ -88,9 +88,10 @@ public class ErrorReportActivity extends AppCompatActivity {
                         @Override
                         public void onClick( final DialogInterface dialog, final int which ) {
                             try {
-                                dialog.dismiss();
-                            }
-                            catch ( Exception ex ) {
+                                if (null != dialog) {
+                                    dialog.dismiss();
+                                }
+                            }  catch ( Exception ex ) {
                                 // guess it wasn't there anyways
                                 Logging.info( "exception dismissing alert dialog: " + ex );
                             }

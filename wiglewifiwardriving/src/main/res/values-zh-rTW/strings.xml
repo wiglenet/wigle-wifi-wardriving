@@ -11,7 +11,6 @@
     <string name="error_name">WiGLE WiFi - 設定</string>
     <string name="error_report_name">WiGLE WiFi - 最近錯誤報告</string>
     <string name="speech_name">WiGLE WiFi - 語言</string>
-    <string name="speech_name">WiGLE WiFi - 語音設定</string>
     <string name="network_activity_name">WiGLE WiFi - 網路</string>
     <string name="data_activity_name">WiGLE WiFi - 資料庫</string>
     <string name="dbresult_activity_name">WiGLE WiFi - 搜尋結果</string>

@@ -22,7 +22,7 @@
         tools:text="11/15/01 14:33 - 16:03 (867)"/>
     <ImageButton
         android:id="@+id/share_route"
-        android:background="@android:drawable/ic_menu_share"
+        android:background="@drawable/share"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="end"

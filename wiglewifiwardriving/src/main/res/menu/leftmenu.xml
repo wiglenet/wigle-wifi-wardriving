@@ -10,13 +10,13 @@
             />
         <item
             android:id="@+id/nav_map"
-            android:icon="@android:drawable/ic_menu_mapmode"
+            android:icon="@drawable/map"
             android:title="@string/tab_map"
             android:contentDescription="@string/tab_map"
             />
         <item
             android:id="@+id/nav_dash"
-            android:icon="@android:drawable/ic_menu_directions"
+            android:icon="@drawable/dashboard"
             android:title="@string/tab_dash"
             android:contentDescription="@string/tab_dash"
             />
@@ -53,7 +53,7 @@
                 />
             <item
                 android:id="@+id/nav_rank"
-                android:icon="@android:drawable/ic_menu_sort_alphabetically"
+                android:icon="@drawable/rankings"
                 android:title="@string/tab_rank"
                 android:contentDescription="@string/tab_rank"
                 />

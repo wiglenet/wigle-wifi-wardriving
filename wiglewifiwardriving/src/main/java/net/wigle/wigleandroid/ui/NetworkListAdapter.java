@@ -272,7 +272,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         tv.setText(ouiString + sep);
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getConstructionTime(format, network));
+        tv.setText(NetworkListUtil.getTime(format, network));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();

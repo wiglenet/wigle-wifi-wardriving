@@ -48,6 +48,7 @@ public final class Network implements ClusterItem {
 
     private int frequency;
     private int level;
+    private Long lastTime;
     private Integer channel;
     private LatLng geoPoint;
     private boolean isNew;
@@ -119,33 +120,34 @@ public final class Network implements ClusterItem {
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null, null, null);
+                scanResult.level,  NetworkType.WIFI, null, null, null, null);
     }
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null);
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final long lastTime) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime);
     }
 
     // for WiFiSearchResponse
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null);
     }
 
-    private Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+    private Network(final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId,
-                    final LatLng latLng ) {
+                    final LatLng latLng, final Long lastTime ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
+        this.lastTime = lastTime;
         if (bleMfgrId != null) this.bleMfgrId = bleMfgrId;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
@@ -263,6 +265,10 @@ public final class Network implements ClusterItem {
         return result == null ? "" : result;
     }
 
+    public long getLastTime() {
+        return lastTime;
+    }
+
     public void setRcois(final String concatenatedRcois) {
         this.concatenatedRcois = concatenatedRcois;
     }
@@ -325,6 +331,7 @@ public final class Network implements ClusterItem {
         return constructionTime;
     }
 
+    public long getTime() { return null == lastTime?constructionTime:lastTime;}
     /**
      * try using a service UUID to lookup mfgr name
      * @param fullUuid the raw esrvice UUID to use

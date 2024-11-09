@@ -51,8 +51,8 @@ public class NetworkListUtil {
     private static final int COLOR_6A = Color.argb(128, 255, 85, 0);
     private static final int COLOR_7A = Color.argb(128, 255, 0, 0);
 
-    public static String getConstructionTime(final SimpleDateFormat format, final Network network) {
-        return format.format(new Date(network.getConstructionTime()));
+    public static String getTime(final SimpleDateFormat format, final Network network) {
+        return format.format(new Date(network.getTime()));
     }
 
     public static SimpleDateFormat getConstructionTimeFormater(final Context context) {

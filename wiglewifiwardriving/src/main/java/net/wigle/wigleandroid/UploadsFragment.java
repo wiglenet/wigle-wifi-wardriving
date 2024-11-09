@@ -370,18 +370,11 @@ public class UploadsFragment extends ProgressThrobberFragment {
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
-        item.setIcon( android.R.drawable.ic_menu_myplaces );
+        item.setIcon(R.drawable.user_star);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_myplaces);
-
-        item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon( R.drawable.ic_planet_small_white );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon(R.drawable.ic_planet_small_white);
+        item.setIcon(R.drawable.user_star);
 
         super.onCreateOptionsMenu(menu, inflater);
     }

@@ -296,18 +296,18 @@ public class UserStatsFragment extends AuthenticatedFragment {
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon( R.drawable.ic_planet_small_white );
+        item.setIcon( R.drawable.w_logo );
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon(R.drawable.ic_planet_small_white);
+        item.setIcon(R.drawable.w_logo);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_sort_by_size);
+        item.setIcon(R.drawable.rankings);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_sort_by_size);
+        item.setIcon(R.drawable.rankings);
 
         super.onCreateOptionsMenu(menu, inflater);
     }

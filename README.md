@@ -52,5 +52,13 @@ F-Droid (externally maintained build of the [foss-master branch](https://github.
 ## How to use it
 There aren't presently any official how-to guides, but a youtube search will provide tutorials. For detail on settings in the application, see [https://wigle.net/wiwi_settings](https://wigle.net/wiwi_settings).
 
+## Attributions
+Icon source from SVG:
+ - dashboard: https://www.figma.com/@syalankush
+ - eye, filter, map, sort: https://dazzleui.gumroad.com/l/dazzleiconsfree
+ - no wifi: https://www.figma.com/@d12da0b9_b193_4
+ - share: https://noahjacob.us/?ref=svgrepo.com
+ - user star: https://github.com/Remix-Design/remixicon
+ - wrench: https://github.com/FortAwesome/Font-Awesome
 
 This project is maintained by the WiGLE.net team

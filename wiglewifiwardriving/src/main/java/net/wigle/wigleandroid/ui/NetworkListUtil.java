@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.provider.Settings;
+import android.text.format.DateFormat;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
@@ -33,6 +33,15 @@ import static net.wigle.wigleandroid.R.*;
  * Common utility methods for the network list
  */
 public class NetworkListUtil {
+    private static final Locale l = Locale.getDefault();
+    private static final  String timePattern = DateFormat.getBestDateTimePattern(l, "h:mm:ss a");
+    private static final  String timePattern24 = DateFormat.getBestDateTimePattern(l, "H:mm:ss");
+    private static final String dateTimePattern = DateFormat.getBestDateTimePattern(l, "yyyy-MM-dd h:mm:ss a");
+    private static final  String dateTimePattern24 = DateFormat.getBestDateTimePattern(l, "yyyy-MM-dd H:mm:ss");
+    private static  final SimpleDateFormat timeFormatter = new SimpleDateFormat(timePattern, l);
+    private static  final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(dateTimePattern, l);
+    private static  final SimpleDateFormat timeFormatter24 = new SimpleDateFormat(timePattern24, l);
+    private static  final SimpleDateFormat dateTimeFormatter24 = new SimpleDateFormat(dateTimePattern24, l);
 
     //color by signal strength
     private static final int COLOR_1 = Color.rgb(0, 255, 0);
@@ -51,19 +60,22 @@ public class NetworkListUtil {
     private static final int COLOR_6A = Color.argb(128, 255, 85, 0);
     private static final int COLOR_7A = Color.argb(128, 255, 0, 0);
 
-    public static String getTime(final SimpleDateFormat format, final Network network) {
-        return format.format(new Date(network.getTime()));
-    }
-
-    public static SimpleDateFormat getConstructionTimeFormater(final Context context) {
-        final int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
-        SimpleDateFormat format;
-        if (value == 24) {
-            format = new SimpleDateFormat("H:mm:ss", Locale.getDefault());
-        } else {
-            format = new SimpleDateFormat("h:mm:ss a", Locale.getDefault());
+    public static String getTime(@NonNull  final Network network, @NonNull final Context context) {
+        final Long last = network.getLastTime();
+        if (null == last) {
+            if (DateFormat.is24HourFormat(context)) {
+                return timeFormatter24.format(new Date(network.getConstructionTime()));
+            } else {
+                return timeFormatter.format(new Date(network.getConstructionTime()));
+            }
+            // SOMEDAY (SDK26+: return Instant.ofEpochSecond(network.getConstructionTime()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(timePattern));
         }
-        return format;
+        if (DateFormat.is24HourFormat(context)) {
+            return dateTimeFormatter24.format(new Date(network.getLastTime()));
+        } else {
+            return dateTimeFormatter.format(new Date(network.getLastTime()));
+        }
+        // SOMEDAY (SDK 26+): return Instant.ofEpochSecond(network.getConstructionTime()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(timePattern));
     }
 
     public static int getSignalColor(final int level, final boolean alpha) {

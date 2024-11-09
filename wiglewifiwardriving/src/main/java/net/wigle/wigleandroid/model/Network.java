@@ -128,7 +128,7 @@ public final class Network implements ClusterItem {
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final long lastTime) {
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime) {
         this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime);
     }
 
@@ -147,7 +147,9 @@ public final class Network implements ClusterItem {
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        this.lastTime = lastTime;
+        if (null != lastTime && lastTime > 0L) {
+            this.lastTime = lastTime;
+        }
         if (bleMfgrId != null) this.bleMfgrId = bleMfgrId;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
@@ -265,7 +267,7 @@ public final class Network implements ClusterItem {
         return result == null ? "" : result;
     }
 
-    public long getLastTime() {
+    public Long getLastTime() {
         return lastTime;
     }
 
@@ -331,7 +333,6 @@ public final class Network implements ClusterItem {
         return constructionTime;
     }
 
-    public long getTime() { return null == lastTime?constructionTime:lastTime;}
     /**
      * try using a service UUID to lookup mfgr name
      * @param fullUuid the raw esrvice UUID to use

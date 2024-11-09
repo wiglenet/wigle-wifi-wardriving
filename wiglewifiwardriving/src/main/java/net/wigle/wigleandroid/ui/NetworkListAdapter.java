@@ -29,9 +29,6 @@ import java.util.Set;
  */
 @Deprecated
 public final class NetworkListAdapter extends AbstractListAdapter<Network> {
-
-    private final SimpleDateFormat format;
-
     private final List<Network> unsafeNetworks = new ArrayList<>();
     private final List<Network> networks = Collections.synchronizedList(unsafeNetworks);
 
@@ -45,7 +42,6 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
 
     public NetworkListAdapter(final Context context, final int rowLayout) {
         super(context, rowLayout);
-        format = NetworkListUtil.getConstructionTimeFormater(context);
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
@@ -272,7 +268,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         tv.setText(ouiString + sep);
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getTime(format, network));
+        tv.setText(NetworkListUtil.getTime(network, getContext()));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();

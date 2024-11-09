@@ -2,7 +2,6 @@ package net.wigle.wigleandroid;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -131,7 +130,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
         Logging.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
-        final SimpleDateFormat format = NetworkListUtil.getConstructionTimeFormater(this);
         if (null != MainActivity.getNetworkCache()) {
             network = MainActivity.getNetworkCache().get(bssid);
         }
@@ -181,7 +179,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             tv.setText( network.getType().name() );
 
             tv = findViewById( R.id.na_firsttime );
-            tv.setText( NetworkListUtil.getTime(format, network ) );
+            tv.setText( NetworkListUtil.getTime(network, getApplicationContext()) );
 
             tv = findViewById( R.id.na_chan );
             Integer chan = network.getChannel();

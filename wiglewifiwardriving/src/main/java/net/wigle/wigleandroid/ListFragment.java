@@ -464,15 +464,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_MAP, 0, getString(R.string.tab_map));
-        item.setIcon( android.R.drawable.ic_menu_mapmode );
+        item.setIcon(R.drawable.map );
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-        item.setIcon(android.R.drawable.ic_menu_manage);
+        item.setIcon(R.drawable.wrench);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
-        item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
+        item.setIcon(R.drawable.sort);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         final MainActivity main = MainActivity.getMainActivity(this);

@@ -10,13 +10,13 @@
             />
         <item
             android:id="@+id/nav_map"
-            android:icon="@android:drawable/ic_menu_mapmode"
+            android:icon="@drawable/map"
             android:title="@string/tab_map"
             android:contentDescription="@string/tab_map"
             />
         <item
             android:id="@+id/nav_dash"
-            android:icon="@android:drawable/ic_menu_directions"
+            android:icon="@drawable/dashboard"
             android:title="@string/tab_dash"
             android:contentDescription="@string/tab_dash"
             />
@@ -47,19 +47,19 @@
             android:id="@+id/stats_group">
             <item
                 android:id="@+id/nav_user_stats"
-                android:icon="@android:drawable/ic_menu_myplaces"
+                android:icon="@drawable/user_star"
                 android:title="@string/user_stats_app_name"
                 android:contentDescription="@string/user_stats_app_name"
                 />
             <item
                 android:id="@+id/nav_rank"
-                android:icon="@android:drawable/ic_menu_sort_alphabetically"
+                android:icon="@drawable/rankings"
                 android:title="@string/tab_rank"
                 android:contentDescription="@string/tab_rank"
                 />
             <item
                 android:id="@+id/nav_site_stats"
-                android:icon="@drawable/ic_planet_small_white"
+                android:icon="@drawable/w_logo"
                 app:tint="?attr/colorControlNormal"
                 android:title="@string/site_stats_app_name"
                 android:contentDescription="@string/site_stats_app_name"

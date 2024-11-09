@@ -871,11 +871,11 @@ public final class MappingFragment extends Fragment {
             item.setIcon(android.R.drawable.ic_menu_directions);
 
             item = menu.add(0, MENU_MAP_TYPE, 0, getString(R.string.menu_map_type));
-            item.setIcon(android.R.drawable.ic_menu_mapmode);
+            item.setIcon(R.drawable.map);
             MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             item = menu.add(0, MENU_FILTER, 0, getString(R.string.settings_map_head));
-            item.setIcon(android.R.drawable.ic_menu_search);
+            item.setIcon(R.drawable.filter);
             MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);

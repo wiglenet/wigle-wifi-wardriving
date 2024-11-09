@@ -208,18 +208,18 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
-        item.setIcon( android.R.drawable.ic_menu_myplaces );
+        item.setIcon( R.drawable.user_star );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_myplaces);
+        item.setIcon(R.drawable.user_star);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_sort_by_size);
+        item.setIcon(R.drawable.rankings);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_sort_by_size);
+        item.setIcon(R.drawable.rankings);
 
         super.onCreateOptionsMenu(menu, inflater);
     }

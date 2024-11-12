@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import static net.wigle.wigleandroid.db.DatabaseHelper.SEARCH_NETWORKS;
 import static net.wigle.wigleandroid.model.Network.RSN_CAP;
 import static net.wigle.wigleandroid.model.Network.SAE_CAP;
 import static net.wigle.wigleandroid.model.Network.SUITE_B_192_CAP;
@@ -43,7 +44,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import net.wigle.wigleandroid.background.PooledQueryExecutor;
-import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkFilterType;
@@ -136,7 +136,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
 
     private void setupList() {
         // not set by nonconfig retain
-        listAdapter = new SetNetworkListAdapter( this, R.layout.row );
+        listAdapter = new SetNetworkListAdapter( this, true, R.layout.row );
         final ListView listView = findViewById( R.id.dblist );
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }
@@ -163,7 +163,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
     private void setupQuery( final QueryArgs queryArgs ) {
 
         final LatLngBounds bounds = queryArgs.getLocationBounds();
-        String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
+        String sql = SEARCH_NETWORKS;
         final String ssid = queryArgs.getSSID();
         String bssid = queryArgs.getBSSID();
         boolean limit = false;

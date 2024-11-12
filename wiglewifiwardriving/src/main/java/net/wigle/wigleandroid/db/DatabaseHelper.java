@@ -144,6 +144,8 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
         + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
+    public static final String SEARCH_NETWORKS = "SELECT bssid,lastlat,lastlon FROM " + NETWORK_TABLE + " WHERE 1=1 ";
+    //TODO: should search use best[lat|lon] instead of last?
 
     private static final String LOCATED_WIFI_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
             + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND " + NetworkFilter.WIFI.getFilter()
@@ -1348,7 +1350,7 @@ public final class DatabaseHelper extends Thread {
             try {
                 checkDB();
                 final String[] args = new String[]{ bssid };
-                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service FROM "
+                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service,bestlevel,lasttime FROM "
                         + NETWORK_TABLE
                         + " WHERE bssid = ?", args);
                 if ( cursor.getCount() > 0 ) {
@@ -1363,6 +1365,8 @@ public final class DatabaseHelper extends Thread {
                     final String rcois = cursor.getString(8);
                     final int mfgridInt = cursor.getInt(9);
                     final String service = cursor.getString(10);
+                    final int level = cursor.getInt(11);
+                    final long lastTime = cursor.getLong(12);
 
                     Integer mfgrid = null;
                     if (mfgridInt != 0) mfgrid = mfgridInt;
@@ -1370,16 +1374,17 @@ public final class DatabaseHelper extends Thread {
                             new ArrayList<>(Arrays.asList(service.split(" ")));
 
                     final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
-                    retval = new Network( bssid, ssid, frequency, capabilities, 0, type, serviceUUIDs, mfgrid );
+                    retval = new Network( bssid, ssid, frequency, capabilities, level, type, serviceUUIDs, mfgrid, lastTime );
                     if (bestlat != 0 && bestlon != 0) {
                         retval.setLatLng( new LatLng(bestlat, bestlon) );
-                    }
-                    else {
+                    } else {
                         retval.setLatLng( new LatLng(lastlat, lastlon) );
                     }
                     if (!rcois.isEmpty()) {
                         retval.setRcois(rcois);
                     }
+
+
                     MainActivity.getNetworkCache().put( bssid, retval );
                 }
             } catch (DBException ex ) {

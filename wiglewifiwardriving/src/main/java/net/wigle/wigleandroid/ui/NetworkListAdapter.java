@@ -15,7 +15,6 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.util.Logging;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,9 +28,6 @@ import java.util.Set;
  */
 @Deprecated
 public final class NetworkListAdapter extends AbstractListAdapter<Network> {
-
-    private final SimpleDateFormat format;
-
     private final List<Network> unsafeNetworks = new ArrayList<>();
     private final List<Network> networks = Collections.synchronizedList(unsafeNetworks);
 
@@ -43,12 +39,14 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     private final List<Network> cellNets = new ArrayList<>();
     private final List<Network> wifiNets = new ArrayList<>();
 
+    private final Boolean historical;
+
     public NetworkListAdapter(final Context context, final int rowLayout) {
         super(context, rowLayout);
-        format = NetworkListUtil.getConstructionTimeFormater(context);
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
+        historical = false;
     }
 
     public void clearWifiAndCell() {
@@ -272,7 +270,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         tv.setText(ouiString + sep);
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getConstructionTime(format, network));
+        tv.setText(NetworkListUtil.getTime(network, historical, getContext()));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();

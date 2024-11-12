@@ -254,7 +254,6 @@ public class SearchFragment extends Fragment {
     private void setupQueryButtons( final View view ) {
         Button button = view.findViewById( R.id.perform_search_button);
         button.setOnClickListener(buttonView -> {
-
             RadioGroup rbg = view.findViewById(R.id.search_type_group);
             int searchTypeId = rbg.getCheckedRadioButtonId();
             final boolean local = searchTypeId != R.id.radio_search_wigle;

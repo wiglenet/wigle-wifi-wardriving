@@ -632,7 +632,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         if (network == null) {
             //DEBUG: MainActivity.info("new BT net: "+bssid + "(new: "+newForRun+")");
             //ALIBI: using frequency to hold deviceType
-            network = new Network(bssid, ssid, deviceType, capabilities, strength, type, uuid16Services, mfgrId);
+            network = new Network(bssid, ssid, deviceType, capabilities, strength, type, uuid16Services, mfgrId, null);
             networkCache.put(bssid, network);
         } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
             //ALIBI: detected via standard bluetooth, updated as LE (LE should win)

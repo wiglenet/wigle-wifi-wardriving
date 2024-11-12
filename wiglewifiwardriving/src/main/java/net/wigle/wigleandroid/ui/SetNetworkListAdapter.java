@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
@@ -9,19 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.util.Logging;
 
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
 
 /**
@@ -29,13 +27,14 @@ import java.util.Comparator;
  * note: separators aren't drawn if areAllItemsEnabled or isEnabled are false
  */
 public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
-    private final SimpleDateFormat format;
 
     private final SetBackedNetworkList networks = new SetBackedNetworkList();
 
-    public SetNetworkListAdapter(final Context context, final int rowLayout) {
+    private final boolean historical;
+
+    public SetNetworkListAdapter(final Context context, final boolean historical, final int rowLayout) {
         super(context, rowLayout);
-        format = NetworkListUtil.getConstructionTimeFormater(context);
+        this.historical = historical;
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
@@ -169,10 +168,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     }
 
     @Override
-    public void sort(Comparator comparator) {
+    public void sort(@NonNull Comparator comparator) {
         networks.sort(comparator);
     }
 
+    @NonNull
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         // long start = System.currentTimeMillis();
@@ -230,7 +230,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         }
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getConstructionTime(format, network));
+        tv.setText(NetworkListUtil.getTime(network, historical, getContext()));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();

@@ -102,7 +102,7 @@ public class NetworkListTest {
     @Test
     public void testSetBackedList() {
         Assert.assertTrue(null != context);
-        SetNetworkListAdapter setAdapter = new SetNetworkListAdapter( context, R.layout.row );
+        SetNetworkListAdapter setAdapter = new SetNetworkListAdapter( context, true, R.layout.row );
         long start = System.currentTimeMillis();
         for (Network net: btleLarge) {
             setAdapter.addBluetoothLe(net);

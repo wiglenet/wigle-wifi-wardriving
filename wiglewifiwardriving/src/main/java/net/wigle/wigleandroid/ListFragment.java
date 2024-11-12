@@ -687,7 +687,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupList(final View view ) {
         State state = MainActivity.getStaticState();
         if (null != state && state.listAdapter == null) {
-            state.listAdapter = new SetNetworkListAdapter(requireActivity().getBaseContext(), R.layout.row );
+            state.listAdapter = new SetNetworkListAdapter(requireActivity().getBaseContext(), false, R.layout.row );
         }
         // always set our current list adapter
         if (null != state) {

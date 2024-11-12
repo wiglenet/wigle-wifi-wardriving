@@ -179,7 +179,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             tv.setText( network.getType().name() );
 
             tv = findViewById( R.id.na_firsttime );
-            tv.setText( NetworkListUtil.getTime(network, getApplicationContext()) );
+            tv.setText( NetworkListUtil.getTime(network, true, getApplicationContext()) );
 
             tv = findViewById( R.id.na_chan );
             Integer chan = network.getChannel();

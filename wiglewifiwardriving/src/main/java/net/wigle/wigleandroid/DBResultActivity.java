@@ -136,7 +136,7 @@ public class DBResultActivity extends ProgressThrobberActivity {
 
     private void setupList() {
         // not set by nonconfig retain
-        listAdapter = new SetNetworkListAdapter( this, R.layout.row );
+        listAdapter = new SetNetworkListAdapter( this, true, R.layout.row );
         final ListView listView = findViewById( R.id.dblist );
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }

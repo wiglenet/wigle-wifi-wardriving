@@ -15,7 +15,6 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.util.Logging;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,11 +39,14 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     private final List<Network> cellNets = new ArrayList<>();
     private final List<Network> wifiNets = new ArrayList<>();
 
+    private final Boolean historical;
+
     public NetworkListAdapter(final Context context, final int rowLayout) {
         super(context, rowLayout);
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
+        historical = false;
     }
 
     public void clearWifiAndCell() {
@@ -268,7 +270,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         tv.setText(ouiString + sep);
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getTime(network, getContext()));
+        tv.setText(NetworkListUtil.getTime(network, historical, getContext()));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();

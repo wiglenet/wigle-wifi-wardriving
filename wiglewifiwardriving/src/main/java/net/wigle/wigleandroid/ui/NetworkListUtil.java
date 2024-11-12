@@ -33,6 +33,7 @@ import static net.wigle.wigleandroid.R.*;
  * Common utility methods for the network list
  */
 public class NetworkListUtil {
+    //ALIBI: while this means you need a restart to get new date/time formats, dynamic calls for each refresh would be heavy.
     private static final Locale l = Locale.getDefault();
     private static final  String timePattern = DateFormat.getBestDateTimePattern(l, "h:mm:ss a");
     private static final  String timePattern24 = DateFormat.getBestDateTimePattern(l, "H:mm:ss");
@@ -60,9 +61,13 @@ public class NetworkListUtil {
     private static final int COLOR_6A = Color.argb(128, 255, 85, 0);
     private static final int COLOR_7A = Color.argb(128, 255, 0, 0);
 
-    public static String getTime(@NonNull  final Network network, @NonNull final Context context) {
+    public static String getTime(@NonNull  final Network network, final boolean historical, @NonNull final Context context) {
         final Long last = network.getLastTime();
         if (null == last) {
+            if (historical) {
+                //ALIBI: if this is a historical/non-live view, we don't want construction times.
+                return "";
+            }
             if (DateFormat.is24HourFormat(context)) {
                 return timeFormatter24.format(new Date(network.getConstructionTime()));
             } else {

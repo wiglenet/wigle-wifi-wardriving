@@ -30,8 +30,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
 
     private final SetBackedNetworkList networks = new SetBackedNetworkList();
 
-    public SetNetworkListAdapter(final Context context, final int rowLayout) {
+    private final boolean historical;
+
+    public SetNetworkListAdapter(final Context context, final boolean historical, final int rowLayout) {
         super(context, rowLayout);
+        this.historical = historical;
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
@@ -227,7 +230,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         }
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getTime(network, getContext()));
+        tv.setText(NetworkListUtil.getTime(network, historical, getContext()));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();

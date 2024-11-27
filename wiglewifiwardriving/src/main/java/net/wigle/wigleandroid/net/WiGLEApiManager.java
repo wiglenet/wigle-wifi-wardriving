@@ -6,7 +6,8 @@ import static net.wigle.wigleandroid.util.UrlConfig.FILE_POST_URL;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,7 +16,6 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.appmattus.certificatetransparency.CTInterceptorBuilder;
-import com.google.android.gms.common.api.Api;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -700,8 +700,15 @@ public class WiGLEApiManager {
             Logging.error("null ConnectivityManager trying to determine connection info");
             return false;
         }
-        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        final Network n = connectivityManager.getActiveNetwork();
+        if (null != n) {
+            final NetworkCapabilities cap = connectivityManager.getNetworkCapabilities(n);
+            if (cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                    cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

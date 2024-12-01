@@ -298,7 +298,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                 intent.putExtra("error", e);
                                 status = Status.EXCEPTION;
                             } else {
-                                bundle.putString( BackgroundGuiHandler.ERROR, "Unable to connect. (data: "+WiGLEApiManager.hasDataConnection(context)+")");
+                                final String translated = context != null? context.getString(R.string.no_wigle_conn): "Unable to connect.";
+                                bundle.putString( BackgroundGuiHandler.ERROR, translated+" (data: "+WiGLEApiManager.hasDataConnection(context)+")");
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);

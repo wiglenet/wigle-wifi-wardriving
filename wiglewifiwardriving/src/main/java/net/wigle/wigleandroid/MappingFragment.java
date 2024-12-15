@@ -871,7 +871,7 @@ public final class MappingFragment extends Fragment {
             item.setIcon(android.R.drawable.ic_menu_directions);
 
             item = menu.add(0, MENU_MAP_TYPE, 0, getString(R.string.menu_map_type));
-            item.setIcon(R.drawable.map);
+            item.setIcon(R.drawable.map_layer);
             MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             item = menu.add(0, MENU_FILTER, 0, getString(R.string.settings_map_head));

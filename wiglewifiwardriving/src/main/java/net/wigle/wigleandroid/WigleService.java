@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -286,8 +287,13 @@ public final class WigleService extends Service {
                             notificationManager.notify(NOTIFICATION_ID, notification);
                         }
                         else {
-                            Logging.info("service startForeground");
-                            startForeground(NOTIFICATION_ID, notification);
+                            if (SDK_INT >= Build.VERSION_CODES.R) {
+                                Logging.info("service startForeground version R+");
+                                startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION | ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+                            } else {
+                                Logging.info("service startForeground Q-");
+                                startForeground(NOTIFICATION_ID, notification);
+                            }
                         }
                     } catch (Exception ex) {
                         Logging.error("notification service error: ", ex);

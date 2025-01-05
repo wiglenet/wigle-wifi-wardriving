@@ -11,10 +11,11 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 288,
-      "versionName": "2.88",
+      "versionCode": 289,
+      "versionName": "2.89",
       "outputFile": "wiglewifiwardriving-release.apk"
     }
   ],
-  "elementType": "File"
+  "elementType": "File",
+  "minSdkVersionForDexing": 24
 }

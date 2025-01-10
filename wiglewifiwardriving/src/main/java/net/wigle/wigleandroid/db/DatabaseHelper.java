@@ -52,10 +52,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+
+import androidx.annotation.WorkerThread;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -72,7 +75,9 @@ public final class DatabaseHelper extends Thread {
     private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
-    private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
+    private static final int DB_PRIORITY = Build.VERSION.SDK_INT  >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ?
+            /*Process.THREAD_PRIORITY_BACKGROUND |*/ Process.THREAD_PRIORITY_DEFAULT  :
+            Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
     private static final long QUEUE_CULL_TIMEOUT = 10000L;
@@ -162,8 +167,8 @@ public final class DatabaseHelper extends Thread {
 
     private SQLiteDatabase db;
 
-    private static final int MAX_QUEUE = 512;
-    private static final int MAX_DRAIN = 512; // seems to work fine slurping the whole darn thing
+    private static final int MAX_QUEUE = Build.VERSION_CODES.R >= Build.VERSION.SDK_INT ? 768 : 512;
+    private static final int MAX_DRAIN = MAX_QUEUE;
     private static final String ERROR = "error";
     private static final String EXCEPTION = "exception";
     private final Context context;
@@ -713,6 +718,7 @@ public final class DatabaseHelper extends Thread {
         return false;
     }
 
+    @WorkerThread
     private boolean addObservation( final Network network, final int level, final Location location,
                                     final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed ) {
 

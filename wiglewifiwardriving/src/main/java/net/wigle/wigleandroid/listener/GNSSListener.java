@@ -282,7 +282,7 @@ public class GNSSListener implements LocationListener {
             } else if (prevLocation == null ||  prevLocation.getTime() < currentLocation.getTime()) {
                 // initialize previous location
                 prevLocation = currentLocation;
-            } else if (prevLocation != null){
+            } else if (prevLocation != null) {
                 if (currentLocation.getTime() != prevLocation.getTime()) {
                     Logging.warn("Location timestamp (" + currentLocation.getTime() + ") < previous location timestamp (" + prevLocation.getTime() + ")");
                     //ALIBI: we're ignoring this rather than trying to slot it in only because we'd need an in-memory or DB route otherwise.

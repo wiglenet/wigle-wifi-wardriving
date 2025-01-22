@@ -4,9 +4,9 @@
     <path android:fillColor="#00000000"
         android:pathData="M15.001,12C15.001,13.657 13.658,15 12.001,15C10.344,15 9.001,13.657 9.001,12C9.001,10.343 10.344,9 12.001,9C13.658,9 15.001,10.343 15.001,12Z"
         android:strokeColor="?attr/colorControlNormal" android:strokeLineCap="round"
-        android:strokeLineJoin="round" android:strokeWidth="2"/>
+        android:strokeLineJoin="round" android:strokeWidth="1.5"/>
     <path android:fillColor="#00000000"
         android:pathData="M12.001,5C7.524,5 3.733,7.943 2.459,12C3.733,16.057 7.524,19 12.001,19C16.479,19 20.269,16.057 21.543,12C20.269,7.943 16.479,5 12.001,5Z"
         android:strokeColor="?attr/colorControlNormal" android:strokeLineCap="round"
-        android:strokeLineJoin="round" android:strokeWidth="2"/>
+        android:strokeLineJoin="round" android:strokeWidth="1.5"/>
 </vector>

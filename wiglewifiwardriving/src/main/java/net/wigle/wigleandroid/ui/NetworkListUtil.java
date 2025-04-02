@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid.ui;
 
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
+
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.res.Resources;
@@ -182,7 +185,6 @@ public class NetworkListUtil {
         } else {
             resource = drawable.ic_cell;
         }
-
         return resource;
     }
 
@@ -322,5 +324,18 @@ public class NetworkListUtil {
                 resource = null;
         }
         return resource;
+    }
+
+    public static Integer getBleAddrTypeImage(final Integer type) {
+        switch (type) {
+            case ADDRESS_TYPE_ANONYMOUS:
+                return drawable.balaclava;
+            //case PRIVATE_RESOLVABLE:
+                //return drawable.groucho;
+            case ADDRESS_TYPE_RANDOM:
+                return drawable.d6;
+            default:
+                return null;
+        }
     }
 }

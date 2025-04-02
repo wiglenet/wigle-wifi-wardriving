@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid.ui;
 
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Build;
@@ -21,6 +24,7 @@ import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.util.Comparator;
+import java.util.Random;
 
 /**
  * the array adapter for a list of networks.
@@ -214,6 +218,22 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             }
         } else {
             btico.setVisibility(View.GONE);
+        }
+
+        final ImageView btRandom = row.findViewById(R.id.btrandom);
+        if (NetworkType.BLE.equals(network.getType())) {
+            final Integer bleAddressType = network.getBleAddressType();
+            if (null != bleAddressType && (bleAddressType == ADDRESS_TYPE_RANDOM || bleAddressType == ADDRESS_TYPE_ANONYMOUS)) {
+                final Integer img = NetworkListUtil.getBleAddrTypeImage(bleAddressType);
+                if (null != img) {
+                    btRandom.setImageResource(img);
+                    btRandom.setVisibility(View.VISIBLE);
+                }
+            } else {
+                btRandom.setVisibility(View.GONE);
+            }
+        } else {
+            btRandom.setVisibility(View.GONE);
         }
 
         TextView tv = row.findViewById(R.id.ssid);

@@ -6,7 +6,7 @@ apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
     namespace "net.wigle.wigleandroid"
-    compileSdk 34
+    compileSdk 35
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
         minSdkVersion 24

@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelUuid;
@@ -157,7 +158,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     // prev/current sets of BSSIDs for each scan. ~ redundant w/ sets in SetBackedNetworkList in current-only mode...
     //ALIBI: both need to be synchronized since BTLE scan results can mutate/remove a BSSID from prev
     private final Set<String> latestBt = Collections.synchronizedSet(new HashSet<>());
-    private Set<String> prevBt = Collections.synchronizedSet(new HashSet<>());
+    private Set prevBt = Collections.synchronizedSet(new HashSet<>());
 
     private final Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
 
@@ -183,11 +184,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             final ScanRecord scanRecord = scanResult.getScanRecord();
             if (scanRecord != null) {
                 final BluetoothDevice device = scanResult.getDevice();
-                //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
-                //final String adDeviceName = (adData != null) ? adData.getName(): null;
+                final Integer addressType = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) ?  device.getAddressType(): null;
 
                 final String bssid = device.getAddress();
-
                 latestBtle.add(bssid);
                 prevBt.remove(bssid);
                 latestBt.remove(bssid);
@@ -219,12 +218,13 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                                     + "\n\tRSSI:\t" + scanResult.getRssi()
                                     + "\n\tFlags:\t" + scanRecord.getAdvertiseFlags()
                                     + "\n\tScanRecord:\t" + scanRecord
+                                    + "\n\tAddressType:\t" + addressType
                                     );
                             //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
                 }
 
                 List<String> uuid16Services = null;
-                if (null != scanRecord.getServiceUuids() && scanRecord.getServiceUuids().size() > 0) {
+                if (null != scanRecord.getServiceUuids() && !scanRecord.getServiceUuids().isEmpty()) {
                     uuid16Services = new ArrayList<>();
                     for (ParcelUuid u: scanRecord.getServiceUuids()) {
                         uuid16Services.add(u.getUuid().toString());
@@ -243,10 +243,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 final String capabilities = DEVICE_TYPE_LEGEND.get(
                         bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
                 if (MainActivity.getMainActivity() != null) {
-                    //ALIBI: shamelessly re-using frequency here for device type.
                     addOrUpdateBt(bssid, ssid, type, capabilities,
                             scanResult.getRssi(), NetworkType.BLE,
-                            uuid16Services, mfgrKey, location, prefs, batch);
+                            uuid16Services, mfgrKey, location, prefs, batch, addressType);
                 }
             }
         } catch (SecurityException se) {
@@ -375,6 +374,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     Logging.error("onReceive with null device - discarding this instance");
                     return;
                 }
+                final Integer addressType = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) ?  device.getAddressType(): null;
                 latestBt.add(device.getAddress());
                 final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
@@ -382,7 +382,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 final String bssid = device.getAddress();
                 try {
                     final String ssid = device.getName();
-
                     int type;
 
                     if (btClass == null) {
@@ -419,9 +418,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         Logging.warn("null gpsListener in BTR onReceive");
                     }
 
-                    List<String> uuid16Services = null; //TODO: I guess we can't do this here?
-
-                    final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, uuid16Services, null, location, prefs, false);
+                    final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, null, null, location, prefs, false, addressType);
                     if (listAdapter != null) {
                         SetNetworkListAdapter l = listAdapter.get();
                         if (null != l) {
@@ -438,7 +435,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 prevBt = Collections.synchronizedSet(new HashSet(latestBt));
                 latestBt.clear();
 
-                ListFragment.lameStatic.currBt = ((null != scanCallback) ? scanCallback.getPrevBtLeSize() : (0 + prevBt.size()));
+                ListFragment.lameStatic.currBt = ((null != scanCallback) ? scanCallback.getPrevBtLeSize() : (prevBt.size()));
 
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
                 if (listAdapter != null) {
@@ -609,9 +606,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     private Network addOrUpdateBt(final String bssid, final String ssid,
                                     final int deviceType, /*final String networkTypeName*/final String capabilities,
                                     final int strength, final NetworkType type, final List<String> uuid16Services, final Integer mfgrId,
-                                    final Location location, SharedPreferences prefs, final boolean batch) {
-
-        //final String capabilities = networkTypeName + ";" + operator;
+                                    final Location location, SharedPreferences prefs, final boolean batch, final Integer addressType) {
 
         final ConcurrentLinkedHashMap<String, Network> networkCache = MainActivity.getNetworkCache();
         final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);

@@ -57,6 +57,8 @@ public final class Network implements ClusterItem {
     private Integer bleMfgrId;
     private String bleMfgr;
 
+    private Integer bleAddressType;
+
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
 
@@ -115,38 +117,42 @@ public final class Network implements ClusterItem {
     private String concatenatedRcois;
 
     /**
-     * convenience constructor
+     * convenience constructor, WiFi-specific
      * @param scanResult a result from a wifi scan
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null, null, null, null);
-    }
-    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null);
+                scanResult.level,  NetworkType.WIFI, null, null, null, null, null);
     }
 
+    // load from CSV/observation list
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+                    final int level, final NetworkType type) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null, null);
+    }
+
+    // new Network, no location
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime);
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, null);
     }
 
     // for WiFiSearchResponse
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null, null);
     }
 
     private Network(final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId,
-                    final LatLng latLng, final Long lastTime ) {
+                    final LatLng latLng, final Long lastTime, final Integer bleAddressType ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
+        this.bleAddressType = bleAddressType;
         if (null != lastTime && lastTime > 0L) {
             this.lastTime = lastTime;
         }
@@ -313,6 +319,14 @@ public final class Network implements ClusterItem {
             bleMfgr = lookupMfgrByMfgrId(id);
         }
     }
+
+    public Integer getBleAddressType() {
+        if (type.equals(NetworkType.BLE)) {
+            return bleAddressType;
+        }
+        return null;
+    }
+
     public void setIsNew() {
         this.isNew = true;
     }

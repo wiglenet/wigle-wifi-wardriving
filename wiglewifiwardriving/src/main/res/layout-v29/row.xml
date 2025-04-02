@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<LinearLayout
@@ -25,6 +26,18 @@
 			android:paddingTop="1dp"
 			android:paddingStart="0dp"
 			android:paddingEnd="5dp"
+			android:visibility="gone"/>
+		<ImageView
+			android:id="@+id/btrandom"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="bt random"
+			android:paddingTop="1dp"
+			android:paddingStart="0dp"
+			android:paddingEnd="5dp"
+			android:text="bticon"
+			tools:src="@drawable/d6"
+			app:tint="?attr/colorControlNormal"
 			android:visibility="gone"/>
 		<TextView
 			android:id="@+id/ssid"

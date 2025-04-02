@@ -8,20 +8,28 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.location.LocationManagerCompat;
 
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -30,10 +38,14 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE;
+import static android.location.LocationManager.GPS_PROVIDER;
 import static android.os.Build.VERSION.SDK_INT;
 
 public final class WigleService extends Service {
@@ -58,6 +70,9 @@ public final class WigleService extends Service {
     public static final String PAUSE_INTENT = "net.wigle.wigleandroid.PAUSE";
     public static final String SCAN_INTENT = "net.wigle.wigleandroid.SCAN";
 
+    private MainActivity.State state;
+
+    private LocationManager locationManager;
     private class GuardThread extends Thread {
         GuardThread() {
         }
@@ -140,6 +155,7 @@ public final class WigleService extends Service {
         Logging.info( "service: onCreate" );
 
         setupNotification();
+        setupLocation();
 
         // don't use guard thread
         guardThread = new GuardThread();
@@ -162,25 +178,35 @@ public final class WigleService extends Service {
         Logging.info( "service: onLowMemory" );
     }
 
-    //This is the old onStart method that will be called on the pre-2.0
-    //platform.  On 2.0 or later we override onStartCommand() so this
-    //method will not be called.
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onStart( Intent intent, int startId ) {
-        Logging.info( "service: onStart" );
-        handleCommand( intent );
-        setupNotification();
-    }
-
     @Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
         Logging.info( "service: onStartCommand" );
+        checkPermission();
         handleCommand( intent );
         setupNotification();
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
         return Service.START_STICKY;
+    }
+
+    private void checkPermission() {
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+            ) {
+                  return;
+            }
+            Logging.error("R+ insufficient");
+            throw new RuntimeException("Insufficient Permissions for Foreground location access (>= R).");
+        } else {
+            if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            Logging.error("< R insufficient");
+            throw new RuntimeException("Insufficient Permissions for Foreground location access. (< R)");
+        }
     }
 
     private void handleCommand( Intent intent ) {
@@ -190,6 +216,47 @@ public final class WigleService extends Service {
 
     private void shutdownNotification() {
         stopForeground(true);
+    }
+
+    private void setupLocation() {
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        MainActivity ma = MainActivity.getMainActivity();
+        try {
+            // check if there is a gps
+            Logging.info("\tGNSS HW: "+ LocationManagerCompat.getGnssHardwareModelName(locationManager)+" year: "+LocationManagerCompat.getGnssYearOfHardware(locationManager)+ " enabled: "+ LocationManagerCompat.isLocationEnabled(locationManager));
+            final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
+            if (locProvider == null && ma != null) {
+                WiGLEToast.showOverActivity(ma, R.string.app_name, getString(R.string.no_gps_device), Toast.LENGTH_LONG);
+            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
+                // gps exists, but isn't on
+                if (ma != null) {
+                    WiGLEToast.showOverActivity(ma, R.string.app_name, getString(R.string.turn_on_gps), Toast.LENGTH_LONG);
+                }
+                final Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                try {
+                    startActivity(myIntent);
+                } catch (Exception ex) {
+                    Logging.error("exception trying to start location activity: " + ex, ex);
+                }
+            }
+        } catch (final SecurityException ex) {
+            Logging.info("Security exception in setupLocation: " + ex);
+            return;
+        }
+
+        this.state = ma.getState();
+        if (state.GNSSListener == null) {
+            // force a listener to be created
+            boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
+            if (logRoutes && null != ma) {
+                ma.startRouteLogging(prefs);
+            }
+            boolean displayRoute = prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false);
+            if (displayRoute && null != ma) {
+                ma.startRouteMapping(prefs);
+            }
+        }
     }
 
     public void setupNotification() {
@@ -208,7 +275,8 @@ public final class WigleService extends Service {
                 String distString = "";
                 String distStringShort = "";
                 String wrappedDistString = "";
-                SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+
+                final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
                     final Configuration conf = getResources().getConfiguration();
                     Locale locale = null;
@@ -493,5 +561,4 @@ public final class WigleService extends Service {
 
         return builder.build();
     }
-
 }

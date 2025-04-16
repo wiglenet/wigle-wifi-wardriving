@@ -1374,7 +1374,7 @@ public final class DatabaseHelper extends Thread {
                             new ArrayList<>(Arrays.asList(service.split(" ")));
 
                     final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
-                    retval = new Network( bssid, ssid, frequency, capabilities, level, type, serviceUUIDs, mfgrid, lastTime );
+                    retval = new Network( bssid, ssid, frequency, capabilities, level, type, serviceUUIDs, mfgrid, lastTime, null /*TODO: BLE address type*/ );
                     if (bestlat != 0 && bestlon != 0) {
                         retval.setLatLng( new LatLng(bestlat, bestlon) );
                     } else {

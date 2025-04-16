@@ -57,7 +57,7 @@ public final class Network implements ClusterItem {
     private Integer bleMfgrId;
     private String bleMfgr;
 
-    private Integer bleAddressType;
+    private Integer bleAddressType = null;
 
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
@@ -133,8 +133,8 @@ public final class Network implements ClusterItem {
 
     // new Network, no location
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, null);
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime, final Integer bleAddressType) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, bleAddressType);
     }
 
     // for WiFiSearchResponse
@@ -152,7 +152,9 @@ public final class Network implements ClusterItem {
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        this.bleAddressType = bleAddressType;
+        if (bleAddressType != null) {
+            this.bleAddressType = bleAddressType;
+        }
         if (null != lastTime && lastTime > 0L) {
             this.lastTime = lastTime;
         }
@@ -321,10 +323,13 @@ public final class Network implements ClusterItem {
     }
 
     public Integer getBleAddressType() {
-        if (type.equals(NetworkType.BLE)) {
-            return bleAddressType;
+        return bleAddressType;
+    }
+
+    public void setBleAddressType(final Integer bleAddressType) {
+        if (null != bleAddressType && (null == this.bleAddressType || bleAddressType > this.bleAddressType)) {
+            this.bleAddressType = bleAddressType;
         }
-        return null;
     }
 
     public void setIsNew() {

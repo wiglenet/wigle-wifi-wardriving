@@ -1,10 +1,12 @@
 package net.wigle.wigleandroid.ui;
 
 import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_PUBLIC;
 import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
 
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -327,15 +329,29 @@ public class NetworkListUtil {
     }
 
     public static Integer getBleAddrTypeImage(final Integer type) {
+        if (type != 0) {
+            Logging.error("BLEADDRTYPE: " + type);
+        }
         switch (type) {
             case ADDRESS_TYPE_ANONYMOUS:
                 return drawable.balaclava;
-            //case PRIVATE_RESOLVABLE:
-                //return drawable.groucho;
+            //case ADDRESS_TYPE_ PRIVATE_RESOLVABLE / PRIVATE_NONRESOLVABLE: - not yet in Android API
+                //return drawable.groucho
             case ADDRESS_TYPE_RANDOM:
                 return drawable.d6;
             default:
                 return null;
+        }
+    }
+
+    public static void sort(final SharedPreferences prefs, final SetNetworkListAdapter listAdapter) {
+        if (listAdapter != null) {
+            try {
+                listAdapter.sort(NetworkListSorter.getSort(prefs));
+                listAdapter.notifyDataSetChanged();
+            } catch (IllegalArgumentException ex) {
+                Logging.error("netlist sort failed: ",ex);
+            }
         }
     }
 }

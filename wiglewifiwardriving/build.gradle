@@ -52,6 +52,8 @@ ext {
     mxcDictionaryFile = inputMxcSqlDir.file("mcc-mnc-dict.json")
     outputBtMemberUuidFile = layout.projectDirectory.file("src/main/assets/btmember.yaml")
     outputBtCoIdFile = layout.projectDirectory.file("src/main/assets/btco.yaml")
+    outputBtServiceUuidFile = layout.projectDirectory.file("src/main/assets/ble_svc_uuids.yaml")
+    outputBtCharacteristicUuidFile = layout.projectDirectory.file("src/main/assets/ble_char_uuids.yaml")
 }
 
 dependencies {
@@ -172,6 +174,31 @@ tasks.register('downloadBtMemberFile') {
     } else {
         throw new IOException("Failed to download BT co. ID file: $outputBtCoIdFile")
     }
+    println "===BT Service UUID YAML Data==="
+    download.run {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/service_uuids.yaml'
+        dest outputBtServiceUuidFile
+        overwrite true
+    }
+    File testServiceUuids = new File(outputBtServiceUuidFile.toString())
+    if (testServiceUuids.exists()) {
+        println "Wrote $outputBtServiceUuidFile"
+    } else {
+        throw new IOException("Failed to download BT Service UUID file: $outputBtServiceUuidFile")
+    }
+    println "===BT Characteristic UUID YAML Data==="
+    download.run {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/characteristic_uuids.yaml'
+        dest outputBtCharacteristicUuidFile
+        overwrite true
+    }
+    File testCharUuids = new File(outputBtCharacteristicUuidFile.toString())
+    if (testCharUuids.exists()) {
+        println "Wrote $outputBtCharacteristicUuidFile"
+    } else {
+        throw new IOException("Failed to download BT Service UUID file: $outputBtCharacteristicUuidFile")
+    }
 }
+
 
 build.dependsOn downloadFile, createMccMncDB, downloadBtMemberFile

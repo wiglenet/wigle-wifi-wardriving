@@ -689,7 +689,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 if (Math.abs(latV) > 0.01d && Math.abs(lonV) > 0.01d) { // 0 GPS-coord check
                     cleanSignal *= cleanSignal;
                     latSum += (obs.getKey().latitude * cleanSignal);
-                    latSum += (obs.getKey().latitude * cleanSignal);
                     lonSum += (obs.getKey().longitude * cleanSignal);
                     weightSum += cleanSignal;
                 }

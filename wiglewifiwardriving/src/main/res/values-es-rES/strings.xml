@@ -455,4 +455,5 @@
     <string name="start_survey">Encuesta del lugar</string>
     <string name="end_survey">Finalizar encuesta</string>
     <string name="confirm_survey">¡DEBES hacer clic en \"%1$s\" para completar la encuesta y guardar los resultados antes de salir de la actividad!\n\n Recomendamos configurar \"%2$s\" para escanear en la configuración tu velocidad de viaje para obtener mejores resultados. (Esto tendrá consecuencias para la batería)</string>
+    <string name="interrogate_ble">consulta para detalles</string>
 </resources>

@@ -456,4 +456,5 @@
     <string name="start_survey">Platsundersökning</string>
     <string name="end_survey">Avsluta undersökning</string>
     <string name="confirm_survey">Du MÅSTE klicka på \"%1$s\" för att slutföra undersökningen och spara dina resultat innan du avslutar aktiviteten!\n\n Vi rekommenderar att du ställer in \"%2$s\" skanning under inställningar för din reshastighet för bästa resultat. (Detta KOMMER att få batterikonsekvenser)</string>
+    <string name="interrogate_ble">fråga efter detaljer</string>
 </resources>

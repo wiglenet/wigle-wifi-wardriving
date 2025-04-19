@@ -456,4 +456,5 @@
     <string name="start_survey">Gebietserhebung</string>
     <string name="end_survey">Umfrage beenden</string>
     <string name="confirm_survey">Sie MÜSSEN auf „%1$s“ klicken, um die Umfrage abzuschließen und Ihre Ergebnisse zu speichern, bevor Sie die Aktivität beenden!\n\n Für optimale Ergebnisse empfehlen wir, in den Einstellungen für das Scannen „%2$s“ für Ihre Reisegeschwindigkeit einzustellen. (Dies wird Auswirkungen auf die Batterie haben)</string>
+    <string name="interrogate_ble">für Details untersuchen</string>
 </resources>

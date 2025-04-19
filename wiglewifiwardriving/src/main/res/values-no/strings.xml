@@ -457,4 +457,5 @@
     <string name="start_survey">Befaring</string>
     <string name="end_survey">Avslutt undersøkelsen</string>
     <string name="confirm_survey">Du MÅ klikke \"%1$s\" for å fullføre undersøkelsen og lagre resultatene dine før du avslutter aktiviteten!\n\n Vi anbefaler å sette inn \"%2$s\" skanning under innstillinger for reisehastigheten for best resultat. (Dette VIL ha batterikonsekvenser)</string>
+    <string name="interrogate_ble">be om detaljer</string>
 </resources>

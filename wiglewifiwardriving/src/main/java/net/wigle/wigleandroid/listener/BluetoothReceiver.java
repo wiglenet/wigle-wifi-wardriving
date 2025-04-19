@@ -1,7 +1,5 @@
 package net.wigle.wigleandroid.listener;
 
-import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_PUBLIC;
-import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
 import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_CLASSIC;
 import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_DUAL;
 import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_LE;
@@ -55,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -114,10 +113,12 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         initMap.put(BluetoothClass.Device.HEALTH_THERMOMETER, "Thermometer");
         initMap.put(BluetoothClass.Device.HEALTH_UNCATEGORIZED, "Health");
         initMap.put(BluetoothClass.Device.HEALTH_WEIGHING, "Scale");
-        initMap.put(BluetoothClass.Device.PERIPHERAL_KEYBOARD, "Keyboard");
-        initMap.put(BluetoothClass.Device.PERIPHERAL_KEYBOARD_POINTING, "Keyboard+p");
-        initMap.put(BluetoothClass.Device.PERIPHERAL_NON_KEYBOARD_NON_POINTING, "Keyboard !p");
-        initMap.put(BluetoothClass.Device.PERIPHERAL_POINTING, "Pointer");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            initMap.put(BluetoothClass.Device.PERIPHERAL_KEYBOARD, "Keyboard");
+            initMap.put(BluetoothClass.Device.PERIPHERAL_KEYBOARD_POINTING, "Keyboard+p");
+            initMap.put(BluetoothClass.Device.PERIPHERAL_NON_KEYBOARD_NON_POINTING, "Keyboard !p");
+            initMap.put(BluetoothClass.Device.PERIPHERAL_POINTING, "Pointer");
+        }
         initMap.put(BluetoothClass.Device.PHONE_CELLULAR, "Cellphone");
         initMap.put(BluetoothClass.Device.PHONE_CORDLESS, "Cordless Phone");
         initMap.put(BluetoothClass.Device.PHONE_ISDN, "ISDN");
@@ -280,6 +281,11 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     uuid16Services = new ArrayList<>();
                     for (ParcelUuid u: scanRecord.getServiceUuids()) {
                         uuid16Services.add(u.getUuid().toString());
+                        byte[] data = scanRecord.getServiceData(u);
+                        if (null != data) {
+                            //Logging.infoHexString(data);
+                            //Logging.info(u.getUuid().toString() + ": " + data);
+                        }
                     }
                 }
 
@@ -292,7 +298,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     }
                 }
 
-//TODO: in practice this isn't working for BLE - figure out how to get better classification from UUIDs?
                 final String capabilities = DEVICE_TYPE_LEGEND.get(
                         bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
 
@@ -676,6 +681,22 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         return 0L;
     }
 
+    /**
+     * Common "update" method for BT networks - make a new one if not present, otherwise merge attributes
+     * @param bssid the unique address
+     * @param ssid the name
+     * @param deviceType BLE/BC
+     * @param capabilities the computed capabilities list
+     * @param strength signal strength
+     * @param type composite of reported type (BC) and discovered capabilities/services (BLE)
+     * @param uuid16Services services uuid16 values for BLE
+     * @param mfgrId manufacturer ID for BLE
+     * @param location location at time of observation
+     * @param prefs SharedPreferences instance
+     * @param batch whether this is part of a batch update (false = single add)
+     * @param bleAddressType address type PUBLIC/RANDOM (not seen IRL yet)
+     * @return the new or updated Network instance
+     */
     private Network addOrUpdateBt(final String bssid, final String ssid,
                                     final int deviceType, /*final String networkTypeName*/final String capabilities,
                                     final int strength, final NetworkType type, final List<String> uuid16Services, final Integer mfgrId,
@@ -718,6 +739,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
             if (null != uuid16Services && !uuid16Services.isEmpty()) {
                 for (final String uuid : uuid16Services) {
+//Logging.info(bssid+": svc: "+uuid);
                     network.addBleServiceUuid(uuid);
                 }
             }
@@ -736,8 +758,8 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 btTypeUpdate = true;
                 network.setType(NetworkType.BLE);
             } else {
-                //DEBUG: MainActivity.info("existing BT net: "+network.getBssid() + "(new: "+newForRun+")");
                 //ALIBI: update capabilities only if was Misc/Uncategorized, now recognized?
+                //DEBUG: MainActivity.info("existing BT net: "+network.getBssid() + "(new: "+newForRun+")");
                 if (capabilities != null && !capabilities.isEmpty() &&
                         !capabilities.startsWith("Misc") && !capabilities.startsWith("Uncategorized") &&
                         (network.getCapabilities().isEmpty() || network.getCapabilities().startsWith("Misc")
@@ -747,18 +769,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 }
             }
         }
-        final MainActivity m = MainActivity.getMainActivity();
-        final boolean ssidSpeak = prefs.getBoolean(PreferenceKeys.PREF_SPEAK_SSID, false)
-                && null != m && !m.isMuted();
-
-        if (newForRun) {
-            // ALIBI: There are simply a lot of these - not sure this is practical
-            /*if ( ssidSpeak ) {
-                ssidSpeaker.add( network.getSsid() );
-            }*/
-        }
-
-        //TODO: somethingAdded |= added;
 
         if ( location != null && (newForRun || network.getLatLng() == null) ) {
             // set the LatLng for mapping
@@ -766,7 +776,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             network.setLatLng( LatLng );
         }
 
-
+        final MainActivity m = MainActivity.getMainActivity();
         final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, PreferenceKeys.FILTER_PREF_PREFIX );
         if (null != m) {
             final Matcher bssidMatcher = m.getBssidFilterMatcher(PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
@@ -821,6 +831,17 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     dbHelper.pendingObservation(network, newForRun, deviceTypeUpdate, btTypeUpdate);
                 }
             }
+        }
+
+        //TODO: notify matcher for BLE goes here
+        final boolean ssidSpeak = prefs.getBoolean(PreferenceKeys.PREF_SPEAK_SSID, false)
+                && null != m && !m.isMuted();
+
+        if (newForRun) {
+            // ALIBI: There are simply a lot of these - not sure this is practical
+            /*if ( ssidSpeak ) {
+                ssidSpeaker.add( network.getSsid() );
+            }*/
         }
         return network;
     }

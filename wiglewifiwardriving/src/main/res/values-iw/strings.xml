@@ -456,4 +456,5 @@
     <string name="start_survey">סקר שטח</string>
     <string name="end_survey">סיום הסקר</string>
     <string name="confirm_survey">עליך ללחוץ על \"%1$s\" כדי להשלים את הסקר ולשמור את התוצאות שלך לפני היציאה מהפעילות!\n\n אנו ממליצים להגדיר \"%2$s\" סריקה תחת הגדרות עבור מהירות הנסיעה שלך לקבלת התוצאות הטובות ביותר. (לזה יהיו השלכות סוללה)</string>
+    <string name="interrogate_ble">לבקש פירוט</string>
 </resources>

@@ -456,4 +456,5 @@
     <string name="start_survey">Pesquisa do local</string>
     <string name="end_survey">Finalizar pesquisa</string>
     <string name="confirm_survey">Você DEVE clicar em \"%1$s\" para concluir a pesquisa e salvar seus resultados antes de sair da atividade!\n\n Recomendamos definir a verificação \"%2$s\" nas configurações de sua velocidade de viagem para obter melhores resultados. (Isso TERÁ consequências para a bateria)</string>
+    <string name="interrogate_ble">peça detalhes</string>
 </resources>

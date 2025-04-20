@@ -419,7 +419,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        tools:visibility="visible">
+        tools:visibility="gone">
     <Button
         android:id="@+id/query_ble_network"
         android:layout_width="0dp"

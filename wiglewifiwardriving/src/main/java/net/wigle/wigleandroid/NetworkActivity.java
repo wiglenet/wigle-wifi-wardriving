@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import java.text.DecimalFormat;
@@ -174,12 +175,12 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 btico.setVisibility(VISIBLE);
                 Integer btImageId = NetworkListUtil.getBtImage(network);
                 if (null == btImageId) {
-                    btico.setVisibility(View.GONE);
+                    btico.setVisibility(GONE);
                 } else {
                     btico.setImageResource(btImageId);
                 }
             } else {
-                btico.setVisibility(View.GONE);
+                btico.setVisibility(GONE);
             }
 
             tv = findViewById( R.id.na_signal );
@@ -295,6 +296,11 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             setupButtons(network, prefs);
             if (NetworkType.BLE.equals(network.getType())) {
                 setupBleInspection(this, network);
+            } else {
+                View interrogateView = findViewById(R.id.ble_tools_row);
+                if (interrogateView != null) {
+                    interrogateView.setVisibility(GONE);
+                }
             }
             setupQuery();
         }
@@ -792,7 +798,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
 
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
             final View filterRowView = findViewById(R.id.filter_row);
-            filterRowView.setVisibility(View.GONE);
+            filterRowView.setVisibility(GONE);
         } else {
             final Button hideMacButton = findViewById( R.id.hide_mac_button );
             final Button hideOuiButton = findViewById( R.id.hide_oui_button );
@@ -856,7 +862,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             });
             endSurveyButton.setOnClickListener(buttonView -> {
                 startSurveyButton.setVisibility(VISIBLE);
-                endSurveyButton.setVisibility(View.GONE);
+                endSurveyButton.setVisibility(GONE);
                 if (null != state) {
                     state.wifiReceiver.unregisterWiFiScanUpdater();
                     KmlSurveyWriter kmlWriter = new KmlSurveyWriter((FragmentActivity) MainActivity.getMainActivity(), ListFragment.lameStatic.dbHelper,
@@ -917,7 +923,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 final Button startSurveyButton = findViewById(R.id.start_survey);
                 final Button endSurveyButton = findViewById(R.id.end_survey);
                 if (null != state) {
-                    startSurveyButton.setVisibility(View.GONE);
+                    startSurveyButton.setVisibility(GONE);
                     endSurveyButton.setVisibility(VISIBLE);
                     obsMap.clear();
                     final String[] currentList = new String[]{network.getBssid()};

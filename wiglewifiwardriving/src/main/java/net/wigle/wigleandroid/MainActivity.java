@@ -1748,6 +1748,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             } catch (IOException e) {
                                 Logging.error("Failed to load BLE mfgr yaml: ",e);
                             }
+                            state.btServiceUuids = new HashMap<>();
+                            state.btCharUuids = new HashMap<>();
                             setupBleUuids("ble_svc_uuids.yaml", state.btServiceUuids);
                             setupBleUuids("ble_char_uuids.yaml", state.btCharUuids);
                         });
@@ -2139,7 +2141,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final HashMap<String, Object> data = yaml.load(reader);
             final List<LinkedHashMap<String, Object>> entries =
                     (List<LinkedHashMap<String, Object>>) data.get("uuids");
-            uuidDestination = new HashMap<>();
             if (null != entries) {
                 for (LinkedHashMap<String, Object> entry : entries) {
                     uuidDestination.put(((Integer) entry.get("uuid")), (String) entry.get("id"));

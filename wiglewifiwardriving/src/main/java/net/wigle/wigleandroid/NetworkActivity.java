@@ -478,7 +478,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                                                     .append(" (0x").append(charId.toUpperCase()).append(")\n");
                                         }
                                         if (charId.equals("2a00")) {
-                                            //DEBUG Logging.info( "\t\t"+gatt.getDevice().getName());
+                                            Logging.info( "\t\t"+gatt.getDevice().getName());
                                         }
                                     }
                                 }
@@ -486,9 +486,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         }
                     }
 
-                    if (DEBUG_BLUETOOTH_DATA) {
-                        Logging.info(displayMessage.toString());
-                    }
                     gatt.disconnect();
                     gatt.close();
                     found.set(false);
@@ -627,18 +624,18 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             public void onBatchScanResults(List<ScanResult> results) {
                 super.onBatchScanResults(results);
                 if (!done.get()) {
-                if (results != null) {
-                    for (ScanResult result : results) {
-                        final BluetoothDevice device = result.getDevice();
-                        if (device.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
-                            if (found.compareAndSet(false, true)) {
-                                //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
-                                final BluetoothGatt btGatt = device.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
-                                btGatt.discoverServices();
+                    if (results != null) {
+                        for (ScanResult result : results) {
+                            final BluetoothDevice device = result.getDevice();
+                            if (device.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
+                                if (found.compareAndSet(false, true)) {
+                                    //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                                    final BluetoothGatt btGatt = device.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+                                    btGatt.discoverServices();
+                                }
                             }
                         }
                     }
-                }
                 }
             }
 

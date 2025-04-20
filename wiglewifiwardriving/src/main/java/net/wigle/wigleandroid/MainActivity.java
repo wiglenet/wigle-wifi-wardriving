@@ -1748,38 +1748,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             } catch (IOException e) {
                                 Logging.error("Failed to load BLE mfgr yaml: ",e);
                             }
-                            try (BufferedReader reader = new BufferedReader(
-                                    new InputStreamReader((getAssets().open("ble_svc_uuids.yaml"))))) {
-                                Constructor constructor = new Constructor(new LoaderOptions());
-                                Yaml yaml = new Yaml(constructor);
-                                final HashMap<String, Object> data = yaml.load(reader);
-                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
-                                state.btServiceUuids = new HashMap<>();
-                                if (null != entries) {
-                                    for (LinkedHashMap<String, Object> entry : entries) {
-                                        state.btServiceUuids.put(((Integer) entry.get("uuid")), (String) entry.get("id"));
-                                    }
-                                    Logging.info("BLE service UUIDs initialized: "+entries.size()+" entries");
-                                }
-                            } catch (IOException e) {
-                                Logging.error("Failed to load BLE mfgr yaml: ",e);
-                            }
-                            try (BufferedReader reader = new BufferedReader(
-                                    new InputStreamReader((getAssets().open("ble_char_uuids.yaml"))))) {
-                                Constructor constructor = new Constructor(new LoaderOptions());
-                                Yaml yaml = new Yaml(constructor);
-                                final HashMap<String, Object> data = yaml.load(reader);
-                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
-                                state.btCharUuids = new HashMap<>();
-                                if (null != entries) {
-                                    for (LinkedHashMap<String, Object> entry : entries) {
-                                        state.btCharUuids.put(((Integer) entry.get("uuid")), (String) entry.get("id"));
-                                    }
-                                    Logging.info("BLE characteristic UUIDs initialized: "+entries.size()+" entries");
-                                }
-                            } catch (IOException e) {
-                                Logging.error("Failed to load BLE mfgr yaml: ",e);
-                            }
+                            setupBleUuids("ble_svc_uuids.yaml", state.btServiceUuids);
+                            setupBleUuids("ble_char_uuids.yaml", state.btCharUuids);
                         });
                     }
 
@@ -2158,6 +2128,27 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("Security exception removing status listener: " + ex, ex);
                 }
             }
+        }
+    }
+
+    private void setupBleUuids (final String uuidFileName, Map<Integer, String> uuidDestination) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader((getAssets().open(uuidFileName))))) {
+            Constructor constructor = new Constructor(new LoaderOptions());
+            Yaml yaml = new Yaml(constructor);
+            final HashMap<String, Object> data = yaml.load(reader);
+            final List<LinkedHashMap<String, Object>> entries =
+                    (List<LinkedHashMap<String, Object>>) data.get("uuids");
+            uuidDestination = new HashMap<>();
+            if (null != entries) {
+                for (LinkedHashMap<String, Object> entry : entries) {
+                    uuidDestination.put(((Integer) entry.get("uuid")), (String) entry.get("id"));
+                }
+                Logging.info("BLE " + uuidFileName + " initialized: " +
+                        entries.size()+" entries");
+            }
+        } catch (IOException e) {
+            Logging.error("Failed to load BLE "+uuidFileName+": ",e);
         }
     }
 

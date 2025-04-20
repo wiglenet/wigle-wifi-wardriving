@@ -3,6 +3,8 @@ package net.wigle.wigleandroid;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -458,23 +460,34 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     super.onServicesDiscovered(gatt, status);
                     final StringBuffer displayMessage = new StringBuffer();
                     for (BluetoothGattService service: gatt.getServices()) {
-                        final String serviceId = service.getUuid().toString().substring(4,8);
-                        final String serviceTitle = MainActivity.getMainActivity().getBleService(serviceId.toUpperCase());
-                        //DEBUG: Logging.error("service: "+ serviceId + " - "+ serviceTitle);
-                        if (null != serviceTitle) {
-                            displayMessage.append(serviceTitle).append(" (0x").append(serviceId.toUpperCase()).append(")\n");
-                        for (BluetoothGattCharacteristic characteristic:  service.getCharacteristics()) {
-                            final String charId = characteristic.getUuid().toString().substring(4,8);
-                            String charTitle = MainActivity.getMainActivity().getBleCharacteristic(charId);
-                            //DEBUG: Logging.error("\tchar: " +charId + " - " + charTitle);
-                            if (null != charTitle) {
-                                displayMessage.append("\t").append(charTitle).append(" (0x").append(charId.toUpperCase()).append(")\n");
-                            }
-                            if (charId.equals("2a00")) {
-                                //DEBUG Logging.error( "\t\t"+gatt.getDevice().getName());
+                        final String serviceUuid = service.getUuid().toString();
+                        if (serviceUuid.length() >= 8) {
+                            final String serviceId = serviceUuid.substring(4,8);
+                            final String serviceTitle = MainActivity.getMainActivity()
+                                    .getBleService(serviceId.toUpperCase());
+                            if (null != serviceTitle) {
+                                displayMessage.append(serviceTitle).append(" (0x").append(serviceId.toUpperCase()).append(")\n");
+                                for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
+                                    final String characteristicUuid = characteristic.getUuid().toString();
+                                    if (characteristicUuid.length() >= 8) {
+                                        final String charId = characteristicUuid.substring(4, 8);
+                                        String charTitle = MainActivity.getMainActivity()
+                                                .getBleCharacteristic(charId);
+                                        if (null != charTitle) {
+                                            displayMessage.append("\t").append(charTitle)
+                                                    .append(" (0x").append(charId.toUpperCase()).append(")\n");
+                                        }
+                                        if (charId.equals("2a00")) {
+                                            //DEBUG Logging.info( "\t\t"+gatt.getDevice().getName());
+                                        }
+                                    }
+                                }
                             }
                         }
-                        }
+                    }
+
+                    if (DEBUG_BLUETOOTH_DATA) {
+                        Logging.info(displayMessage.toString());
                     }
                     gatt.disconnect();
                     gatt.close();
@@ -487,7 +500,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                             pair.setEnabled(true);
                         }
                     });
-                    //TODO: gui thread
                 }
 
                 @SuppressLint("MissingPermission")
@@ -495,7 +507,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
                     super.onCharacteristicRead(gatt, characteristic, value, status);
                     if (status == BluetoothGatt.GATT_SUCCESS) {
-                        Logging.error(characteristic.getUuid() + ": " + Arrays.toString(value));
                         gatt.disconnect();
                         gatt.close();
                     }
@@ -519,7 +530,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 public void onCharacteristicChanged(BluetoothGatt gatt,
                                                     BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
-                    Logging.error("char: "+ characteristic.toString());
+                    //DEBUG: Logging.info("char: "+ characteristic.toString());
                     gatt.disconnect();
                     gatt.close();
                     found.set(false);
@@ -534,7 +545,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 @Override
                 public void onServiceChanged(@NonNull BluetoothGatt gatt) {
                     super.onServiceChanged(gatt);
-                    Logging.error(gatt + " d!");
+                    //DEBUG: Logging.info(gatt + " d!");
                     gatt.disconnect();
                     gatt.close();
                     found.set(false);
@@ -550,7 +561,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 @Override
                 public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
-                        Logging.info("Connected");
                         gatt.discoverServices();
                         runOnUiThread(new Runnable() {
                             @Override
@@ -563,7 +573,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTING) {
                         Logging.info("Disconnecting...");
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                        Logging.info("Disconnected");
                         found.set(false);
                         done.set(true);
                         runOnUiThread(new Runnable() {
@@ -601,12 +610,11 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             public void onScanResult(int callbackType, ScanResult result) {
                 super.onScanResult(callbackType, result);
                 if (!done.get()) {
-                    Logging.info("single result before LE stop");
                     if (null != result) {
                         final BluetoothDevice device = result.getDevice();
                         if (device.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
                             if (found.compareAndSet(false, true)) {
-                                Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                                //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
                                 final BluetoothGatt btGatt = device.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
                             }
                         }
@@ -624,7 +632,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         final BluetoothDevice device = result.getDevice();
                         if (device.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
                             if (found.compareAndSet(false, true)) {
-                                Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                                //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
                                 final BluetoothGatt btGatt = device.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
                                 btGatt.discoverServices();
                             }
@@ -637,7 +645,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             @Override
             public void onScanFailed(int errorCode) {
                 super.onScanFailed(errorCode);
-                Logging.info("failed before LE scan stop");
+                Logging.info("LE failed before scan stop");
             }
         };
 
@@ -649,7 +657,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 if (!done.get()) {
                     if (bluetoothDevice.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
                         if (found.compareAndSet(false, true)) {
-                            Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                            //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
                             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                             if (bluetoothAdapter != null) {
                                 bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
@@ -658,9 +666,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                             final BluetoothGatt btGatt = bluetoothDevice.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
                             //Logging.info("class: " + bluetoothDevice.getBluetoothClass().getMajorDeviceClass() + " (all " + bluetoothDevice.getBluetoothClass().getDeviceClass() + ") vs "+network.getCapabilities());
                             btGatt.discoverServices();
-                            //Logging.info();
-                            //TODO:
-                            bluetoothDevice.fetchUuidsWithSdp(); //TODO check
                         }
                     }
                 }

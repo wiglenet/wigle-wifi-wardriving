@@ -416,7 +416,7 @@
                 android:layout_below="@+id/ble_services_row"
                 android:orientation="horizontal"
                 android:paddingHorizontal="1dp"
-                android:paddingTop="2dp"
+                android:paddingTop="1dp"
                 android:visibility="gone">
                 <TextView
                     android:id="@+id/ble_chars_content"

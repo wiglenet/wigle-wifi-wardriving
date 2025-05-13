@@ -54,6 +54,7 @@ ext {
     outputBtCoIdFile = layout.projectDirectory.file("src/main/assets/btco.yaml")
     outputBtServiceUuidFile = layout.projectDirectory.file("src/main/assets/ble_svc_uuids.yaml")
     outputBtCharacteristicUuidFile = layout.projectDirectory.file("src/main/assets/ble_char_uuids.yaml")
+    outputBtCharacteristicAppearanceFile = layout.projectDirectory.file("src/main/assets/appearance_values.yaml")
 }
 
 dependencies {
@@ -77,6 +78,7 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
     implementation 'com.caverock:androidsvg-aar:1.4'
+    implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'androidx.test:core:1.5.0'
@@ -197,6 +199,18 @@ tasks.register('downloadBtMemberFile') {
         println "Wrote $outputBtCharacteristicUuidFile"
     } else {
         throw new IOException("Failed to download BT Service UUID file: $outputBtCharacteristicUuidFile")
+    }
+    println "===BT Appearance YAML Data==="
+    download.run {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/core/appearance_values.yaml'
+        dest outputBtCharacteristicAppearanceFile
+        overwrite true
+    }
+    File testAppearanceMap = new File(outputBtCharacteristicAppearanceFile.toString())
+    if (testAppearanceMap.exists()) {
+        println "Wrote $outputBtCharacteristicAppearanceFile"
+    } else {
+        throw new IOException("Failed to download BT appearance map: $outputBtCharacteristicAppearanceFile")
     }
 }
 

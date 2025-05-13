@@ -212,7 +212,6 @@
                 android:id="@+id/na_rcoi_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/na_rcoi"
                 android:paddingStart="1dp"
                 android:paddingEnd="1dp"
                 android:text="@string/network_rcois"
@@ -408,6 +407,21 @@
                     android:layout_toEndOf="@+id/na_ble_services_id_label"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
+                    android:textSize="13sp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/ble_chars_row"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ble_services_row"
+                android:orientation="horizontal"
+                android:paddingHorizontal="1dp"
+                android:paddingTop="2dp"
+                android:visibility="gone">
+                <TextView
+                    android:id="@+id/ble_chars_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:textSize="13sp" />
             </RelativeLayout>
         </RelativeLayout>

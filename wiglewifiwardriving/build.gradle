@@ -150,68 +150,35 @@ tasks.register('createMccMncDB') {
     sql.close()
 }
 
+ext.downloadIfStale = { localFile, remoteFile, title ->
+    def MAX_DL_SKEW = 864000000; // 10 days in ms
+    File currentFile = new File(localFile.toString())
+    def modifiedMillisecondsAgo = new Date().time - currentFile.lastModified()
+    def secondsMod = modifiedMillisecondsAgo/1000
+    println("$title: modified $secondsMod s ago / exists " + currentFile.exists())
+    if (!currentFile.exists() || (modifiedMillisecondsAgo > MAX_DL_SKEW)) {
+        println "===$title==="
+        download.run {
+            src remoteFile //'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
+            dest localFile.toString()
+            overwrite true
+        }
+        File testFile = new File(localFile.toString())
+        if (testFile.exists()) {
+            println "Wrote $localFile"
+        } else {
+            throw new IOException("Failed to download $title: $localFile")
+        }
+    }
+}
+
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 tasks.register('downloadBtMemberFile') {
-    println "===BT Member UUID YAML Data==="
-    download.run {
-        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
-        dest outputBtMemberUuidFile.toString()
-        overwrite true
-    }
-    File testUuid = new File(outputBtMemberUuidFile.toString())
-    if (testUuid.exists()) {
-        println "Wrote $outputBtMemberUuidFile"
-    } else {
-        throw new IOException("Failed to download BT UUID file: $outputBtMemberUuidFile")
-    }
-    println "===BT Company ID YAML Data==="
-    download.run {
-        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
-        dest outputBtCoIdFile
-        overwrite true
-    }
-    File testMfgrId = new File(outputBtCoIdFile.toString())
-    if (testMfgrId.exists()) {
-        println "Wrote $outputBtCoIdFile"
-    } else {
-        throw new IOException("Failed to download BT co. ID file: $outputBtCoIdFile")
-    }
-    println "===BT Service UUID YAML Data==="
-    download.run {
-        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/service_uuids.yaml'
-        dest outputBtServiceUuidFile
-        overwrite true
-    }
-    File testServiceUuids = new File(outputBtServiceUuidFile.toString())
-    if (testServiceUuids.exists()) {
-        println "Wrote $outputBtServiceUuidFile"
-    } else {
-        throw new IOException("Failed to download BT Service UUID file: $outputBtServiceUuidFile")
-    }
-    println "===BT Characteristic UUID YAML Data==="
-    download.run {
-        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/characteristic_uuids.yaml'
-        dest outputBtCharacteristicUuidFile
-        overwrite true
-    }
-    File testCharUuids = new File(outputBtCharacteristicUuidFile.toString())
-    if (testCharUuids.exists()) {
-        println "Wrote $outputBtCharacteristicUuidFile"
-    } else {
-        throw new IOException("Failed to download BT Service UUID file: $outputBtCharacteristicUuidFile")
-    }
-    println "===BT Appearance YAML Data==="
-    download.run {
-        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/core/appearance_values.yaml'
-        dest outputBtCharacteristicAppearanceFile
-        overwrite true
-    }
-    File testAppearanceMap = new File(outputBtCharacteristicAppearanceFile.toString())
-    if (testAppearanceMap.exists()) {
-        println "Wrote $outputBtCharacteristicAppearanceFile"
-    } else {
-        throw new IOException("Failed to download BT appearance map: $outputBtCharacteristicAppearanceFile")
-    }
+    downloadIfStale(outputBtMemberUuidFile, 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml', 'BLE Member UUID YAML')
+    downloadIfStale(outputBtCoIdFile, 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml', 'BLE Company ID YAML')
+    downloadIfStale(outputBtServiceUuidFile, 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/service_uuids.yaml', 'BLE Service UUID YAML')
+    downloadIfStale(outputBtCharacteristicUuidFile, 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/characteristic_uuids.yaml', 'BLE Characteristic UUID YAML')
+    downloadIfStale(outputBtCharacteristicAppearanceFile, 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/core/appearance_values.yaml', 'BLE Appearance YAML')
 }
 
 

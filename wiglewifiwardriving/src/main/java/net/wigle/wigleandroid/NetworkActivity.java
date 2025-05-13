@@ -556,15 +556,15 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         if (UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
                             final String mfgrValue = new String(characteristic.getValue());
                             //DEBUG: Logging.info("MFGR: "+mfgrValue );
-                            characteristicResults.put("Manufacturer: ", mfgrValue);
+                            characteristicResults.put("Manufacturer", mfgrValue);
                         } else if (UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
                             final String modelValue = new String(characteristic.getValue());
                             //DEBUG Logging.info("MODEL: " + new String(characteristic.getValue()));
-                            characteristicResults.put("Model: ", modelValue);
+                            characteristicResults.put("Model", modelValue);
                         } else if (UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
                             final String name = new String(characteristic.getValue());
                             //Logging.info("NAME: " + name);
-                            characteristicResults.put("Device: ", name);
+                            characteristicResults.put("Device", name);
                             // NB: _could_ replace BT name with the discovered dev name here, but is that useful?
                             //if (null == network.getSsid() || network.getSsid().isBlank()) {
                             //    network.setSsid(name);
@@ -578,10 +578,10 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                             final String subcategoryHex = Integer.toHexString(subcategory);
                             final String appearanceString = MainActivity.getMainActivity().getBleAppearance(category, subcategory);
                             //DEBUG: Logging.info("APPEARANCE: " + categoryHex + ":" + subcategoryHex + " - " + appearanceString + " from "+ Hex.bytesToStringLowercase(characteristic.getValue()) + ": "+Integer.toHexString(appearanceValue));
-                            characteristicResults.put("Appearance: ", appearanceString + "( 0x" + categoryHex + ": 0x" + subcategoryHex + ")");
+                            characteristicResults.put("Appearance", appearanceString + "( 0x" + categoryHex + ": 0x" + subcategoryHex + ")");
                         } else {
                             //unexpected characteristic - what did we get?
-                            Logging.info(characteristic.getUuid().toString()+" :"+new String(characteristic.getValue()) );
+                            Logging.info(characteristic.getUuid().toString()+": "+new String(characteristic.getValue()) );
                         }
 
                         if (!characteristicsToQuery.isEmpty()) {

@@ -456,4 +456,5 @@
     <string name="start_survey">Site-onderzoek</string>
     <string name="end_survey">Enquête beëindigen</string>
     <string name="confirm_survey">U MOET op \"%1$s\" klikken om de enquête in te vullen en uw resultaten op te slaan voordat u de activiteit afsluit!\n\n Voor de beste resultaten raden wij aan om \"%2$s\" te scannen onder de instellingen voor uw reissnelheid. (Dit ZAL gevolgen hebben voor de batterij)</string>
+    <string name="interrogate_ble">vraag om details</string>
 </resources>

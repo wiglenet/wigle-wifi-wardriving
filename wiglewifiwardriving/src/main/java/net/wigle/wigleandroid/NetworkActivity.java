@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -9,12 +12,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -27,10 +44,12 @@ import android.os.Handler;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentActivity;
 
+import android.os.ParcelUuid;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -43,6 +62,11 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.github.razir.progressbutton.DrawableButton;
+import com.github.razir.progressbutton.DrawableButtonExtensionsKt;
+import com.github.razir.progressbutton.ProgressButtonHolderKt;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapView;
@@ -69,15 +93,18 @@ import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
+import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+
+import kotlin.Unit;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends ScreenChildActivity implements DialogListener, WiFiScanUpdater {
     private static final int MENU_RETURN = 11;
     private static final int MENU_COPY = 12;
     private static final int NON_CRYPTO_DIALOG = 130;
-
     private static final int SITE_SURVEY_DIALOG = 131;
 
 
@@ -98,6 +125,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     public static NetworkActivity networkActivity;
 
     /** Called when the activity is first created. */
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Logging.info("NET: onCreate");
@@ -154,15 +182,15 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
 
             final ImageView btico = findViewById(R.id.bticon);
             if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
-                btico.setVisibility(View.VISIBLE);
+                btico.setVisibility(VISIBLE);
                 Integer btImageId = NetworkListUtil.getBtImage(network);
                 if (null == btImageId) {
-                    btico.setVisibility(View.GONE);
+                    btico.setVisibility(GONE);
                 } else {
                     btico.setImageResource(btImageId);
                 }
             } else {
-                btico.setVisibility(View.GONE);
+                btico.setVisibility(GONE);
             }
 
             tv = findViewById( R.id.na_signal );
@@ -233,7 +261,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         }
                         if (rec != null) {
                             View v = findViewById(R.id.cell_info);
-                            v.setVisibility(View.VISIBLE);
+                            v.setVisibility(VISIBLE);
                             tv = findViewById( R.id.na_cell_status );
                             tv.setText(rec.getStatus() );
                             tv = findViewById( R.id.na_cell_brand );
@@ -242,7 +270,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                             tv.setText( rec.getBands());
                             if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
                                 v = findViewById(R.id.cell_notes_row);
-                                v.setVisibility(View.VISIBLE);
+                                v.setVisibility(VISIBLE);
                                 tv = findViewById( R.id.na_cell_notes );
                                 tv.setText( rec.getNotes());
                             }
@@ -255,10 +283,10 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
 
             if (NetworkType.isBtType(network.getType())) {
                 View v = findViewById(R.id.ble_info);
-                v.setVisibility(View.VISIBLE);
+                v.setVisibility(VISIBLE);
                 if (network.getBleMfgrId() != null || network.getBleMfgr() != null) {
                     v = findViewById(R.id.ble_vendor_row);
-                    v.setVisibility(View.VISIBLE);
+                    v.setVisibility(VISIBLE);
                     tv = findViewById( R.id.na_ble_vendor_id );
                     tv.setText((null != network.getBleMfgrId())?network.getBleMfgrId()+"":"-");
                     tv = findViewById( R.id.na_ble_vendor_lookup );
@@ -268,7 +296,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 List<String> serviceUuids = network.getBleServiceUuids();
                 if (null != serviceUuids && !serviceUuids.isEmpty()) {
                     v = findViewById(R.id.ble_services_row);
-                    v.setVisibility(View.VISIBLE);
+                    v.setVisibility(VISIBLE);
                     tv = findViewById( R.id.na_ble_service_uuids );
                     tv.setText(serviceUuids.toString() );
                 }
@@ -276,6 +304,14 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             setupMap(network, savedInstanceState, prefs );
             // kick off the query now that we have our map
             setupButtons(network, prefs);
+            if (NetworkType.BLE.equals(network.getType())) {
+                setupBleInspection(this, network);
+            } else {
+                View interrogateView = findViewById(R.id.ble_tools_row);
+                if (interrogateView != null) {
+                    interrogateView.setVisibility(GONE);
+                }
+            }
             setupQuery();
         }
     }
@@ -382,7 +418,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         Logging.info("observation count: " + count);
                         if ( NetworkType.WIFI.equals(network.getType()) ) {
                             View v = findViewById(R.id.survey);
-                            v.setVisibility(View.VISIBLE);
+                            v.setVisibility(VISIBLE);
                         }
                     });
                 }
@@ -412,6 +448,311 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             }
         }, ListFragment.lameStatic.dbHelper ));
         //ListFragment.lameStatic.dbHelper.addToQueue( request );
+    }
+
+    private void setupBleInspection(Activity activity, final Network network) {
+        View interrogateView = findViewById(R.id.ble_tools_row);
+        if (interrogateView != null) {
+            interrogateView.setVisibility(VISIBLE);
+        }
+        final AtomicBoolean done = new AtomicBoolean(false);
+        final Button pair = findViewById(R.id.query_ble_network);
+        final View charView = findViewById(R.id.ble_chars_row);
+        final TextView charContents = findViewById(R.id.ble_chars_content);
+        if (null != pair) {
+            ProgressButtonHolderKt.bindProgressButton(this, pair);
+            final AtomicBoolean found = new AtomicBoolean(false);
+            Set<BluetoothGattCharacteristic> characteristicsToQuery = new HashSet<>();
+            ConcurrentHashMap<String, String> characteristicResults = new ConcurrentHashMap<>();
+            final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                    super.onServicesDiscovered(gatt, status);
+                    final StringBuffer displayMessage = new StringBuffer();
+                    for (BluetoothGattService service: gatt.getServices()) {
+                        final String serviceUuid = service.getUuid().toString();
+                        if (serviceUuid.length() >= 8) {
+                            final String serviceId = serviceUuid.substring(4,8);
+                            final String serviceTitle = MainActivity.getMainActivity()
+                                    .getBleService(serviceId.toUpperCase());
+                            if ("180A".equalsIgnoreCase(serviceId)) {
+                                //Most devices supply some info, notably Mfgr and model #
+                                BluetoothGattCharacteristic mfgrNameCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"));
+                                if (mfgrNameCharacteristic != null) {
+                                    characteristicsToQuery.add(mfgrNameCharacteristic);
+                                } else {
+                                    Logging.info("GATT: Mfgr Name is null");
+                                }
+                                BluetoothGattCharacteristic modelCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"));
+                                if (modelCharacteristic != null) {
+                                    characteristicsToQuery.add(modelCharacteristic);
+                                } else {
+                                    Logging.info("GATT: model number is null");
+                                }
+                                //TODO: what other services should we query?
+                            } else if ("1800".equalsIgnoreCase(serviceId)) {
+                                //Most devices publish GAP, including device name and appearance
+                                BluetoothGattCharacteristic deviceNameCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"));
+                                if (deviceNameCharacteristic != null) {
+                                    characteristicsToQuery.add(deviceNameCharacteristic);
+                                } else {
+                                    Logging.info("GAP: Device Name is null");
+                                }
+                                BluetoothGattCharacteristic appearanceCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"));
+                                if (appearanceCharacteristic != null) {
+                                    characteristicsToQuery.add(appearanceCharacteristic);
+                                } else {
+                                    Logging.info("GAP: Appearance is null");
+                                }
+                                //TODO: what other services should we query?
+                            }
+
+                            if (null != serviceTitle) {
+                                int lastServicePeriod = serviceTitle.lastIndexOf(".");
+                                displayMessage.append(lastServicePeriod == -1
+                                                ? serviceTitle : serviceTitle.substring(lastServicePeriod+1))
+                                        .append(" (0x").append(serviceId.toUpperCase()).append(")\n");
+
+                                for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
+                                    final String characteristicUuid = characteristic.getUuid().toString();
+                                    if (characteristicUuid.length() >= 8) {
+                                        final String charId = characteristicUuid.substring(4, 8);
+                                        String charTitle = MainActivity.getMainActivity()
+                                                .getBleCharacteristic(charId);
+                                        if (null != charTitle) {
+                                            int lastCharPeriod = charTitle.lastIndexOf(".");
+                                            displayMessage.append("\t").append(lastCharPeriod == -1
+                                                            ? charTitle : charTitle.substring(lastCharPeriod+1))
+                                                    .append(" (0x").append(charId.toUpperCase()).append(")");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!characteristicsToQuery.isEmpty()) {
+                        BluetoothGattCharacteristic first = characteristicsToQuery.iterator().next();
+                        characteristicsToQuery.remove(first);
+                        gatt.readCharacteristic(first);
+                    } else {
+                        found.set(false);
+                        done.set(true);
+                    }
+                    runOnUiThread(() -> WiGLEToast.showOverActivity(
+                            activity, R.string.btloc_title, displayMessage.toString(), Toast.LENGTH_LONG)
+                    );
+                }
+
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
+                    super.onCharacteristicRead(gatt, characteristic, value, status);
+                    if (status == BluetoothGatt.GATT_SUCCESS && characteristic.getValue() != null) {
+                        if (UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            final String mfgrValue = new String(characteristic.getValue());
+                            //DEBUG: Logging.info("MFGR: "+mfgrValue );
+                            characteristicResults.put("Manufacturer", mfgrValue);
+                        } else if (UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            final String modelValue = new String(characteristic.getValue());
+                            //DEBUG Logging.info("MODEL: " + new String(characteristic.getValue()));
+                            characteristicResults.put("Model", modelValue);
+                        } else if (UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            final String name = new String(characteristic.getValue());
+                            //Logging.info("NAME: " + name);
+                            characteristicResults.put("Device", name);
+                            // NB: _could_ replace BT name with the discovered dev name here, but is that useful?
+                            //if (null == network.getSsid() || network.getSsid().isBlank()) {
+                            //    network.setSsid(name);
+                            //}
+                        } else if (UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            byte[] charValue = characteristic.getValue();
+                            int appearanceValue = BluetoothUtil.getGattUint16(charValue);
+                            int category = (appearanceValue >> 6) & 0xFF;
+                            int subcategory = appearanceValue & 0x3F;
+                            final String categoryHex = Integer.toHexString(category);
+                            final String subcategoryHex = Integer.toHexString(subcategory);
+                            final String appearanceString = MainActivity.getMainActivity().getBleAppearance(category, subcategory);
+                            //DEBUG: Logging.info("APPEARANCE: " + categoryHex + ":" + subcategoryHex + " - " + appearanceString + " from "+ Hex.bytesToStringLowercase(characteristic.getValue()) + ": "+Integer.toHexString(appearanceValue));
+                            characteristicResults.put("Appearance", appearanceString + "( 0x" + categoryHex + ": 0x" + subcategoryHex + ")");
+                        } else {
+                            //unexpected characteristic - what did we get?
+                            Logging.info(characteristic.getUuid().toString()+": "+new String(characteristic.getValue()) );
+                        }
+
+                        if (!characteristicsToQuery.isEmpty()) {
+                            BluetoothGattCharacteristic next = characteristicsToQuery.iterator().next();
+                            characteristicsToQuery.remove(next);
+                            gatt.readCharacteristic(next);
+                        } else {
+                            gatt.disconnect();
+                            gatt.close();
+                            if (characteristicResults.isEmpty()) {
+                                runOnUiThread(() -> {
+                                    WiGLEToast.showOverActivity(activity, R.string.btloc_title, "No results read", Toast.LENGTH_LONG);
+                                    hideProgressCenter(pair);
+                                });
+                            } else {
+                                final StringBuffer results = new StringBuffer();
+                                boolean first = true;
+                                for (String key: characteristicResults.keySet()) {
+                                    if (first) {
+                                       first = false;
+                                    } else {
+                                        results.append("\n");
+                                    }
+                                    results.append(key).append(": ").append(characteristicResults.get(key));
+                                }
+                                runOnUiThread(() -> {
+                                    charView.setVisibility(VISIBLE);
+                                    charContents.setText(results.toString());
+                                    hideProgressCenter(pair);
+                                });
+                            }
+                        }
+                    }
+                }
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onCharacteristicChanged(BluetoothGatt gatt,
+                                                    BluetoothGattCharacteristic characteristic) {
+                    super.onCharacteristicChanged(gatt, characteristic);
+                    Logging.info("CHARACTERISTIC CHANGED" + characteristic.getUuid().toString()+" :"+new String(characteristic.getValue()) );
+                    gatt.disconnect();
+                    gatt.close();
+                    found.set(false);
+                    runOnUiThread(() -> {
+                        WiGLEToast.showOverActivity(activity, R.string.btloc_title, "characteristic change.");
+                    });
+                }
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onServiceChanged(@NonNull BluetoothGatt gatt) {
+                    super.onServiceChanged(gatt);
+                    //DEBUG: Logging.info(gatt + " d!");
+                    gatt.disconnect();
+                    gatt.close();
+                    found.set(false);
+                    done.set(true);
+                    runOnUiThread(() -> {
+                        WiGLEToast.showOverActivity(activity, R.string.btloc_title, "service change.");
+                    });
+                }
+
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        gatt.discoverServices();
+                        runOnUiThread(() -> WiGLEToast.showOverActivity(activity, R.string.btloc_title, "connected to device."));
+                    } else if (newState == BluetoothProfile.STATE_CONNECTING) {
+                        Logging.info("Connecting...");
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTING) {
+                        Logging.info("Disconnecting...");
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        gatt.disconnect();
+                        gatt.close();
+                        found.set(false);
+                        done.set(true);
+                        runOnUiThread(() -> {
+                            WiGLEToast.showOverActivity(activity, R.string.btloc_title, "disconnected from device.");
+                            hideProgressCenter(pair);
+                        });
+                    } else {
+                        Logging.info("GATT Characteristic status: " + status + " new: " + newState);
+                    }
+                }
+            };
+
+            final BluetoothAdapter.LeScanCallback scanCallback = getLeScanCallback(network, found, done, gattCallback);
+
+            pair.setOnClickListener(buttonView -> {
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                    final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    if (bluetoothAdapter != null) {
+                        done.set(false);
+                        found.set(false);
+                        charView.setVisibility(GONE);
+                        showProgressCenter(pair);
+                        bluetoothAdapter.startLeScan(scanCallback); //TODO: should already be going on
+                    }
+                }
+            });
+        }
+    }
+
+    private BluetoothAdapter.LeScanCallback getLeScanCallback(Network network, AtomicBoolean found, AtomicBoolean done, BluetoothGattCallback gattCallback) {
+        final ScanCallback leScanCallback = new ScanCallback() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                super.onScanResult(callbackType, result);
+                if (!done.get()) {
+                    if (null != result) {
+                        final BluetoothDevice device = result.getDevice();
+                        if (device.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
+                            if (found.compareAndSet(false, true)) {
+                                //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                                final BluetoothGatt btGatt = device.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            @SuppressLint("MissingPermission")
+            public void onBatchScanResults(List<ScanResult> results) {
+                super.onBatchScanResults(results);
+                if (!done.get()) {
+                    if (results != null) {
+                        for (ScanResult result : results) {
+                            final BluetoothDevice device = result.getDevice();
+                            if (device.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
+                                if (found.compareAndSet(false, true)) {
+                                    //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                                    final BluetoothGatt btGatt = device.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+                                    btGatt.discoverServices();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onScanFailed(int errorCode) {
+                super.onScanFailed(errorCode);
+                Logging.info("LE failed before scan stop");
+            }
+        };
+
+
+        return new BluetoothAdapter.LeScanCallback() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
+                if (!done.get()) {
+                    if (bluetoothDevice.getAddress().compareToIgnoreCase(network.getBssid()) == 0) {
+                        if (found.compareAndSet(false, true)) {
+                            //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
+                            final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                            if (bluetoothAdapter != null) {
+                                bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
+                                bluetoothAdapter.getBluetoothLeScanner().flushPendingScanResults(leScanCallback);
+                            }
+                            final BluetoothGatt btGatt = bluetoothDevice.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+                            //Logging.info("class: " + bluetoothDevice.getBluetoothClass().getMajorDeviceClass() + " (all " + bluetoothDevice.getBluetoothClass().getDeviceClass() + ") vs "+network.getCapabilities());
+                            btGatt.discoverServices();
+                        }
+                    }
+                }
+            }
+        };
     }
 
     private LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
@@ -555,7 +896,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
 
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
             final View filterRowView = findViewById(R.id.filter_row);
-            filterRowView.setVisibility(View.GONE);
+            filterRowView.setVisibility(GONE);
         } else {
             final Button hideMacButton = findViewById( R.id.hide_mac_button );
             final Button hideOuiButton = findViewById( R.id.hide_oui_button );
@@ -618,11 +959,11 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 }
             });
             endSurveyButton.setOnClickListener(buttonView -> {
-                startSurveyButton.setVisibility(View.VISIBLE);
-                endSurveyButton.setVisibility(View.GONE);
+                startSurveyButton.setVisibility(VISIBLE);
+                endSurveyButton.setVisibility(GONE);
                 if (null != state) {
                     state.wifiReceiver.unregisterWiFiScanUpdater();
-                    KmlSurveyWriter kmlWriter = new KmlSurveyWriter((FragmentActivity) MainActivity.getMainActivity(), ListFragment.lameStatic.dbHelper,
+                    KmlSurveyWriter kmlWriter = new KmlSurveyWriter(MainActivity.getMainActivity(), ListFragment.lameStatic.dbHelper,
                             "KmlSurveyWriter", true, network.getBssid(), localObsMap.values());
                     kmlWriter.start();
                     //TODO: do we want the obsMap back?
@@ -680,8 +1021,8 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 final Button startSurveyButton = findViewById(R.id.start_survey);
                 final Button endSurveyButton = findViewById(R.id.end_survey);
                 if (null != state) {
-                    startSurveyButton.setVisibility(View.GONE);
-                    endSurveyButton.setVisibility(View.VISIBLE);
+                    startSurveyButton.setVisibility(GONE);
+                    endSurveyButton.setVisibility(VISIBLE);
                     obsMap.clear();
                     final String[] currentList = new String[]{network.getBssid()};
                     final Set<String> registerSet = new HashSet<>(Arrays.asList(currentList));
@@ -866,4 +1207,17 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         return false;
     }
 
+    private void showProgressCenter(final Button button) {
+        DrawableButtonExtensionsKt.showProgress(button, progressParams -> {
+            progressParams.setProgressColor(Color.WHITE);
+            progressParams.setGravity(DrawableButton.GRAVITY_CENTER);
+            return Unit.INSTANCE;
+        });
+        button.setEnabled(false);
+    }
+
+    private void hideProgressCenter(final Button button) {
+        button.setEnabled(true);
+        DrawableButtonExtensionsKt.hideProgress(button, R.string.interrogate_ble);
+    }
 }

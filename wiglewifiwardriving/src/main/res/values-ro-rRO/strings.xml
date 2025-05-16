@@ -456,4 +456,5 @@
     <string name="start_survey">Studiu pe site</string>
     <string name="end_survey">Încheiați sondajul</string>
     <string name="confirm_survey">TREBUIE să dați clic pe „%1$s” pentru a finaliza sondajul și a salva rezultatele înainte de a părăsi activitatea!\n\n Vă recomandăm să setați scanarea „%2$s” în setări pentru viteza de deplasare pentru cele mai bune rezultate. (Acest lucru VA avea consecințe asupra bateriei)</string>
+    <string name="interrogate_ble">cere detalii</string>
 </resources>

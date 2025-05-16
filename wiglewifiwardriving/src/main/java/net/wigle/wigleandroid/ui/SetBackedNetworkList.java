@@ -43,7 +43,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public boolean contains(Object o) {
-        if (o != null && o instanceof Network) {
+        if (o instanceof Network) {
             switch (((Network) o).getType()) {
                 case BLE:
                     return leNets.contains(o);
@@ -90,8 +90,8 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     /**
      * fulfilling the contract. not recommended due to introspection
-     * @param network
-     * @return
+     * @param network the network instance to add
+     * @return true if the network was added, false if already present
      */
     @Deprecated
     @Override
@@ -126,9 +126,14 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         return false;
     }
 
+    /**
+     * Remove a network from the set
+     * @param o the object to remove
+     * @return true if it was present and removed, otherwise false
+     */
     @Override
     public boolean remove(Object o) {
-        if (o != null && o instanceof Network) {
+        if (o instanceof Network) {
             boolean found;
             switch (((Network) o).getType()) {
                 case BLE:
@@ -223,9 +228,8 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
     @Override
     public boolean removeAll(@NonNull Collection<?> collection) {
         boolean succeeded = false;
-        Iterator netIter = collection.iterator();
-        while (netIter.hasNext()) {
-            succeeded |= remove(netIter.next());
+        for (Object o : collection) {
+            succeeded |= remove(o);
         }
         return succeeded;
     }
@@ -455,17 +459,13 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     public void enqueueBluetooth(Network n) {
         if (null != n) {
-            if (!btNets.contains(n) && !networks.contains(n)) {
-                nextBtNets.add(n);
-            }
+            nextBtNets.add(n);
         }
     }
 
     public void enqueueBluetoothLe(Network n) {
         if (null != n) {
-            if (!leNets.contains(n) && !networks.contains(n)) {
-                nextLeNets.add(n);
-            }
+            nextLeNets.add(n);
         }
     }
 
@@ -473,20 +473,16 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         if (showCurrent) {
             //ALIBI: if we're in current-only, strip last from networks and sets, add new to set, add revamped set to networks
             if (updateLe) {
-                //DEBUG: final int initialSize = networks.size();
                 networks.removeAll(leNets);
-                //DEBUG: final int postRemoveSize = networks.size();
-                //TODO: 1/2: faster to clear and re-add all?
                 leNets.retainAll(nextLeNets);
+                //TODO: faster to clear and re-add all? See btNets below
                 leNets.addAll(nextLeNets);
                 networks.addAll(leNets);
-                //DEBUG: final int finalSize = networks.size();
-                //DEBUG: Logging.error(initialSize+" -> "+postRemoveSize+" -> "+ finalSize + " (prev le: "+ leNets.size()+" new le: "+nextLeNets.size()+")");
             }
             if (updateClassic) {
                 networks.removeAll(btNets);
-                //TODO: 2/2: faster to clear and re-add all?
-                btNets.retainAll(nextBtNets);
+                // clear and re-add all instead of retainAll/etc
+                btNets.clear();
                 btNets.addAll(nextBtNets);
                 networks.addAll(btNets);
             }
@@ -521,7 +517,6 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
             Collections.sort(networks, comparator);
         } catch (IllegalArgumentException iaex) {
             Logging.warn("SBNL.sort: IllegalArgumentException", iaex);
-            iaex.printStackTrace();
             //ALIBI: missing a sort isn't a critical error, since this list gets updated continually
         }
     }

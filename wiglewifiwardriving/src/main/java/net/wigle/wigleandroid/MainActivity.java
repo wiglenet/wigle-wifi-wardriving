@@ -86,6 +86,7 @@ import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -165,6 +166,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         public WiGLEApiManager apiManager;
         Map<Integer, String> btVendors = Collections.emptyMap();
         Map<Integer, String> btMfgrIds = Collections.emptyMap();
+        Map<Integer, String> btServiceUuids = Collections.emptyMap();
+        Map<Integer, String> btCharUuids = Collections.emptyMap();
+        Map<Integer, BluetoothUtil.AppearanceCategory> btAppearance = Collections.emptyMap();
     }
 
     private State state;
@@ -1663,7 +1667,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("register BroadcastReceiver");
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        registerReceiver(state.wifiReceiver, intentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(state.wifiReceiver, intentFilter, RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(state.wifiReceiver, intentFilter);
+        }
     }
 
     private boolean canBtBeActivated() {
@@ -1742,6 +1750,40 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             } catch (IOException e) {
                                 Logging.error("Failed to load BLE mfgr yaml: ",e);
                             }
+                            state.btServiceUuids = new HashMap<>();
+                            state.btCharUuids = new HashMap<>();
+                            setupBleUuids("ble_svc_uuids.yaml", state.btServiceUuids);
+                            setupBleUuids("ble_char_uuids.yaml", state.btCharUuids);
+                            try (BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader((getAssets().open("appearance_values.yaml"))))) {
+                                Constructor constructor = new Constructor(new LoaderOptions());
+                                Yaml yaml = new Yaml(constructor);
+                                final HashMap<Integer, Object> data = yaml.load(reader);
+                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("appearance_values");
+                                state.btAppearance = new HashMap<>();
+                                if (null != entries) {
+                                    for (LinkedHashMap<String, Object> entry : entries) {
+                                        final List<LinkedHashMap<String, Object>> subEntries = (List<LinkedHashMap<String, Object>>) entry.get("subcategory");
+                                        Map<Integer, String> subcategories = null;
+                                        if (null != subEntries) {
+                                            subcategories = new HashMap<>();
+                                            for (LinkedHashMap<String, Object> subEntry : subEntries) {
+                                                if (null != subEntry) {
+                                                    int value = (Integer) subEntry.get("value");
+                                                    String name = (String) subEntry.get("name");
+                                                    if (null != name) {
+                                                        subcategories.put(value, name);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        state.btAppearance.put((Integer) entry.get("category"), new BluetoothUtil.AppearanceCategory( (String) entry.get("name"), subcategories));
+                                    }
+                                    Logging.info("BLE appearance initialized: " + entries.size() + " categories");
+                                }
+                            } catch (IOException e) {
+                                Logging.error("Failed to load BLE appearance yaml:", e);
+                            }
                         });
                     }
 
@@ -1754,7 +1796,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 Logging.info("\tregister bluetooth BroadcastReceiver");
                 final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-                registerReceiver(state.bluetoothReceiver, intentFilter);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    registerReceiver(state.bluetoothReceiver, intentFilter, RECEIVER_EXPORTED);
+                } else {
+                    registerReceiver(state.bluetoothReceiver, intentFilter);
+                }
             }
         } catch (SecurityException e) {
             Logging.error("exception initializing bluetooth: ", e);
@@ -2116,6 +2162,26 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("Security exception removing status listener: " + ex, ex);
                 }
             }
+        }
+    }
+
+    private void setupBleUuids (final String uuidFileName, Map<Integer, String> uuidDestination) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader((getAssets().open(uuidFileName))))) {
+            Constructor constructor = new Constructor(new LoaderOptions());
+            Yaml yaml = new Yaml(constructor);
+            final HashMap<String, Object> data = yaml.load(reader);
+            final List<LinkedHashMap<String, Object>> entries =
+                    (List<LinkedHashMap<String, Object>>) data.get("uuids");
+            if (null != entries) {
+                for (LinkedHashMap<String, Object> entry : entries) {
+                    uuidDestination.put(((Integer) entry.get("uuid")), (String) entry.get("id"));
+                }
+                Logging.info("BLE " + uuidFileName + " initialized: " +
+                        entries.size()+" entries");
+            }
+        } catch (IOException e) {
+            Logging.error("Failed to load BLE "+uuidFileName+": ",e);
         }
     }
 
@@ -2548,6 +2614,31 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public String getBleMfgr(final int i) {
         final State s = state;
         return s == null ? null : s.btMfgrIds.get(i);
+    }
+
+    public String getBleService(final String uuid) {
+        final State s = state;
+        int key = Integer.parseInt(uuid, 16);
+        return s == null ? null : s.btServiceUuids.get(key);
+    }
+
+    public String getBleCharacteristic(final String uuid) {
+        final State s = state;
+        int key = Integer.parseInt(uuid, 16);
+        return s == null ? null : s.btCharUuids.get(key);
+    }
+
+    public String getBleAppearance(final Integer category, final Integer subcategory) {
+        final State s = state;
+        if (s.btAppearance != null) {
+            final BluetoothUtil.AppearanceCategory cat = s.btAppearance.get(category);
+            if (null != cat && cat.getSubcategories() != null) {
+                return cat.getName() + ": "+cat.getSubcategories().get(subcategory);
+            } else {
+                return cat.getName();
+            }
+        }
+        return null;
     }
 
     public boolean hasWakeLock() {

@@ -127,11 +127,9 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         networks.enqueueBluetoothLe(n);
     }
 
-    //TODO: almost certainly the source of our duplicate BT nets in non show-current
     public void batchUpdateBt(final boolean showCurrent, final boolean updateLe, final boolean updateClassic) {
-
         networks.batchUpdateBt(showCurrent,updateLe,updateClassic);
-        notifyDataSetChanged();
+        //TODO: could simply move list sort here, since they're always paired
     }
 
     @Override
@@ -214,6 +212,31 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             }
         } else {
             btico.setVisibility(View.GONE);
+        }
+
+        final ImageView btRandom = row.findViewById(R.id.btrandom);
+        if (NetworkType.BLE.equals(network.getType())) {
+            final Integer bleAddressType = network.getBleAddressType();
+            if (null != bleAddressType /*&& (bleAddressType == ADDRESS_TYPE_RANDOM || bleAddressType == ADDRESS_TYPE_ANONYMOUS)*/) {
+                final Integer img = NetworkListUtil.getBleAddrTypeImage(bleAddressType);
+                if (null != img) {
+                    btRandom.setImageResource(img);
+                    btRandom.setVisibility(View.VISIBLE);
+                } else {
+                    if (bleAddressType != 0) {
+                        Logging.error("null image for BLE addr type: "+bleAddressType);
+                        btRandom.setImageResource(R.drawable.groucho);
+                        btRandom.setVisibility(View.VISIBLE);
+                    } else {
+                        btRandom.setVisibility(View.GONE);
+                    }
+                }
+            } else {
+                //DEBUG: Logging.error("null/random address type: "+bleAddressType);
+                btRandom.setVisibility(View.GONE);
+            }
+        } else {
+            btRandom.setVisibility(View.GONE);
         }
 
         TextView tv = row.findViewById(R.id.ssid);

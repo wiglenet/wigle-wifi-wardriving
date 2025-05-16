@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -114,5 +115,46 @@ public class BluetoothUtil {
 
         }
         return new BleAdvertisedData(uuids, name);
+    }
+
+    /**
+     * Model class for GATT Characteristic Appearance Category
+     */
+    public static class AppearanceCategory {
+        String name;
+        Map<Integer, String> subcategories;
+
+        public AppearanceCategory(String name, Map<Integer, String> subcategories) {
+            this.name = name;
+            this.subcategories = subcategories;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Map<Integer, String> getSubcategories() {
+            return subcategories;
+        }
+
+        public void setSubcategory(Map<Integer, String> subcategories) {
+            this.subcategories = subcategories;
+        }
+    }
+
+    /**
+     * Utility method to get an int for a GATT 16 bit Uint
+     * @param bytes the two byte value
+     * @return the integer value
+     */
+    public static int getGattUint16(byte[] bytes) {
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        bb = bb.order(ByteOrder.LITTLE_ENDIAN); //ALIBI: GATTributes van be presumed little-endian
+        short s = bb.getShort(); //signed short
+        return 0xFFFF & s;
     }
 }

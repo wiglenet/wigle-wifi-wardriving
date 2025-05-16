@@ -456,4 +456,5 @@
     <string name="start_survey">现场调查</string>
     <string name="end_survey">结束调查</string>
     <string name="confirm_survey">您必须单击“%1$s”来完成调查并在退出活动之前保存您的结果！\n\n 我们建议您在行驶速度设置下设置“%2$s”扫描以获得最佳结果。 （这会对电池造成影响）</string>
+    <string name="interrogate_ble">询问详情</string>
 </resources>

@@ -456,4 +456,5 @@
     <string name="start_survey">Sivustotutkimus</string>
     <string name="end_survey">Lopeta kysely</string>
     <string name="confirm_survey">Sinun PITÄÄ napsauttaa \"%1$s\" suorittaaksesi kyselyn ja tallentaaksesi tulokset ennen kuin lopetat aktiviteetin!\n\n Suosittelemme, että asetat \"%2$s\"-skannauksen matkustusnopeuden asetuksiin saadaksesi parhaat tulokset. (Tällä on akun seurauksia)</string>
+    <string name="interrogate_ble">kysy lisätietoja</string>
 </resources>

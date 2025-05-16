@@ -456,4 +456,5 @@
     <string name="start_survey">Områdeundersøgelse</string>
     <string name="end_survey">Slutundersøgelse</string>
     <string name="confirm_survey">Du SKAL klikke på \"%1$s\" for at fuldføre undersøgelsen og gemme dine resultater, før du afslutter aktiviteten!\n\n Vi anbefaler at indstille \"%2$s\" scanning under indstillinger for din rejsehastighed for at få de bedste resultater. (Dette VIL have batterikonsekvenser)</string>
+    <string name="interrogate_ble">Spørg efter detaljer</string>
 </resources>

@@ -23,6 +23,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.GsmOperator;
 import net.wigle.wigleandroid.model.GsmOperatorException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
@@ -382,10 +383,7 @@ public class WifiReceiver extends BroadcastReceiver {
         // check for "New" cell towers
         final long newCellCount = dbHelper.getNewCellCount();
 
-
-        if (listAdapter != null) {
-            listAdapter.sort(NetworkListSorter.getSort(prefs) );
-        }
+        NetworkListUtil.sort(prefs, listAdapter);
 
         final long dbNets = dbHelper.getNetworkCount();
         final long dbLocs = dbHelper.getLocationCount();
@@ -435,11 +433,6 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         // info( savedStats );
-
-        // notify
-        if (listAdapter != null) {
-            listAdapter.notifyDataSetChanged();
-        }
 
         mainActivity.setScanStatusUI( resultSize, ListFragment.lameStatic.currWifiScanDurMs);
 

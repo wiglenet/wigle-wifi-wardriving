@@ -457,4 +457,13 @@
     <string name="end_survey">Fine sondaggio</string>
     <string name="confirm_survey">DEVI fare clic su \"%1$s\" per completare il sondaggio e salvare i risultati prima di uscire dall\'attività!\n\n Ti consigliamo di impostare la scansione \"%2$s\" nelle impostazioni per la velocità di viaggio per ottenere i migliori risultati. (Ciò avrà conseguenze sulla batteria)</string>
     <string name="interrogate_ble">chiedere dettagli</string>
+    <string name="ble_mfgr_title">Fabbricante</string>
+    <string name="ble_model_title">Modello</string>
+    <string name="ble_serial_title"># di serie</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Nome</string>
+    <string name="ble_pnp_title">ID PnP</string>
+    <string name="ble_appearance_title">Aspetto</string>
 </resources>

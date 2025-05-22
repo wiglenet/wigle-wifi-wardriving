@@ -457,5 +457,14 @@
     <string name="end_survey">Anketi Sonlandır</string>
     <string name="confirm_survey">Anketi tamamlamak ve aktiviteden çıkmadan önce sonuçlarınızı kaydetmek için \"%1$s\"ya tıklamanız GEREKİR!\n\n En iyi sonuçları elde etmek için seyahat hızınız için ayarlar altında \"%2$s\" taramayı ayarlamanızı öneririz. (Bunun pil sonuçları OLACAKTIR)</string>
     <string name="interrogate_ble">detay isteyin</string>
+    <string name="ble_mfgr_title">Üretici</string>
+    <string name="ble_model_title">Modeli</string>
+    <string name="ble_serial_title">Seri numarası</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Donanım</string>
+    <string name="ble_sw_title">Yazılım</string>
+    <string name="ble_name_title">İsim</string>
+    <string name="ble_pnp_title">Tak ve Çalıştır</string>
+    <string name="ble_appearance_title">Dış görünüş</string>
 </resources>
 

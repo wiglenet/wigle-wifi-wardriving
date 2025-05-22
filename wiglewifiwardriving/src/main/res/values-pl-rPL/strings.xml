@@ -457,4 +457,13 @@
     <string name="end_survey">Zakończ ankietę</string>
     <string name="confirm_survey">MUSISZ kliknąć „%1$s”, aby zakończyć ankietę i zapisać wyniki przed zakończeniem aktywności!\n\n Aby uzyskać najlepsze wyniki, zalecamy ustawienie skanowania „%2$s” w ustawieniach prędkości podróży. (BĘDZIE to miało konsekwencje dla baterii)</string>
     <string name="interrogate_ble">zapytaj o szczegóły</string>
+    <string name="ble_mfgr_title">Producent</string>
+    <string name="ble_model_title">Model</string>
+    <string name="ble_serial_title">Numer seryjny</string>
+    <string name="ble_firmware_title">Oprogramowanie sprzętowe</string>
+    <string name="ble_hw_title">Sprzęt komputerowy</string>
+    <string name="ble_sw_title">Oprogramowanie</string>
+    <string name="ble_name_title">Nazwa</string>
+    <string name="ble_pnp_title">Podłącz i graj</string>
+    <string name="ble_appearance_title">Wygląd</string>
 </resources>

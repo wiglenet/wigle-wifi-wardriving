@@ -457,4 +457,13 @@
     <string name="end_survey">Fin de l\'enquête</string>
     <string name="confirm_survey">Vous DEVEZ cliquer sur «%1$s» pour terminer l\'enquête et enregistrer vos résultats avant de quitter l\'activité!\n\n Nous vous recommandons de définir le balayage «%2$s» dans les paramètres de votre vitesse de déplacement pour de meilleurs résultats. (Cela aura des conséquences sur la batterie)</string>
     <string name="interrogate_ble">demander des détails</string>
+    <string name="ble_mfgr_title">Fabricant</string>
+    <string name="ble_model_title">Modèle</string>
+    <string name="ble_serial_title">Numéro de série</string>
+    <string name="ble_firmware_title">Micrologiciel</string>
+    <string name="ble_hw_title">Matériel</string>
+    <string name="ble_sw_title">Logiciel</string>
+    <string name="ble_name_title">Nom</string>
+    <string name="ble_pnp_title">Identifiant PnP</string>
+    <string name="ble_appearance_title">Apparence</string>
 </resources>

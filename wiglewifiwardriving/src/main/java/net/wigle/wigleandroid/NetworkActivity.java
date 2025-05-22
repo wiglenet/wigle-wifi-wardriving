@@ -3,6 +3,8 @@ package net.wigle.wigleandroid;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static net.wigle.wigleandroid.util.BluetoothUtil.BLE_STRING_CHARACTERSITIC_UUIDS;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -49,7 +51,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentActivity;
 
-import android.os.ParcelUuid;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -69,6 +70,7 @@ import com.github.razir.progressbutton.DrawableButtonExtensionsKt;
 import com.github.razir.progressbutton.ProgressButtonHolderKt;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -124,7 +126,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     // used for shutting extraneous activities down on an error
     public static NetworkActivity networkActivity;
 
-    /** Called when the activity is first created. */
+        /** Called when the activity is first created. */
     @SuppressLint("MissingPermission")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -492,6 +494,41 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                                 } else {
                                     Logging.info("GATT: model number is null");
                                 }
+                                BluetoothGattCharacteristic serialNumCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"));
+                                if (serialNumCharacteristic != null) {
+                                    characteristicsToQuery.add(serialNumCharacteristic);
+                                } else {
+                                    Logging.info("GATT: Serial number is null");
+                                }
+                                BluetoothGattCharacteristic firmwareRevCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"));
+                                if (firmwareRevCharacteristic != null) {
+                                    characteristicsToQuery.add(firmwareRevCharacteristic);
+                                } else {
+                                    Logging.info("GATT: firmware rev. is null");
+                                }
+                                BluetoothGattCharacteristic hardwareNRevCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"));
+                                if (hardwareNRevCharacteristic != null) {
+                                    characteristicsToQuery.add(hardwareNRevCharacteristic);
+                                } else {
+                                    Logging.info("GATT: hardware rev. is null");
+                                }
+                                BluetoothGattCharacteristic softwareRevCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"));
+                                if (softwareRevCharacteristic != null) {
+                                    characteristicsToQuery.add(softwareRevCharacteristic);
+                                } else {
+                                    Logging.info("GATT: Software rev. is null");
+                                }
+                                BluetoothGattCharacteristic pnpIdCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"));
+                                if (pnpIdCharacteristic != null) {
+                                    characteristicsToQuery.add(pnpIdCharacteristic);
+                                } else {
+                                    Logging.info("GATT: PnP ID is null");
+                                }
                                 //TODO: what other services should we query?
                             } else if ("1800".equalsIgnoreCase(serviceId)) {
                                 //Most devices publish GAP, including device name and appearance
@@ -509,7 +546,37 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                                 } else {
                                     Logging.info("GAP: Appearance is null");
                                 }
+                                BluetoothGattCharacteristic systemIdCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"));
+                                if (systemIdCharacteristic != null) {
+                                    characteristicsToQuery.add(systemIdCharacteristic);
+                                } else {
+                                    Logging.info("GAP: system ID is null");
+                                }
+                                BluetoothGattCharacteristic modelNumCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"));
+                                if (modelNumCharacteristic != null) {
+                                    characteristicsToQuery.add(modelNumCharacteristic);
+                                } else {
+                                    Logging.info("GAP: model number is null");
+                                }
+                            } else if ("180D".equalsIgnoreCase(serviceId)) {
+                                BluetoothGattCharacteristic heartRateCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002aa4-0000-1000-8000-00805f9b34fb"));
+                                if (heartRateCharacteristic != null) {
+                                    characteristicsToQuery.add(heartRateCharacteristic);
+                                } else {
+                                    Logging.info("HR: Heart rate is null");
+                                }
                                 //TODO: what other services should we query?
+                            } else if ("180F".equalsIgnoreCase(serviceId)) {
+                                BluetoothGattCharacteristic batteryLevelCharacteristic =
+                                        service.getCharacteristic(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"));
+                                if (batteryLevelCharacteristic != null) {
+                                    characteristicsToQuery.add(batteryLevelCharacteristic);
+                                } else {
+                                    Logging.info("BAT: Battery level is null");
+                                }
                             }
 
                             if (null != serviceTitle) {
@@ -528,7 +595,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                                             int lastCharPeriod = charTitle.lastIndexOf(".");
                                             displayMessage.append("\t").append(lastCharPeriod == -1
                                                             ? charTitle : charTitle.substring(lastCharPeriod+1))
-                                                    .append(" (0x").append(charId.toUpperCase()).append(")");
+                                                    .append(" (0x").append(charId.toUpperCase()).append(")\n");
                                         }
                                     }
                                 }
@@ -553,23 +620,25 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
                     super.onCharacteristicRead(gatt, characteristic, value, status);
                     if (status == BluetoothGatt.GATT_SUCCESS && characteristic.getValue() != null) {
-                        if (UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
-                            final String mfgrValue = new String(characteristic.getValue());
-                            //DEBUG: Logging.info("MFGR: "+mfgrValue );
-                            characteristicResults.put("Manufacturer", mfgrValue);
-                        } else if (UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
-                            final String modelValue = new String(characteristic.getValue());
-                            //DEBUG Logging.info("MODEL: " + new String(characteristic.getValue()));
-                            characteristicResults.put("Model", modelValue);
+                        Integer titleResourceStringId = BLE_STRING_CHARACTERSITIC_UUIDS.get(characteristic.getUuid());
+                        if (null != titleResourceStringId) {
+                            // common case: this is a string value characteristic.
+                            final String characteristicStringValue = new String(characteristic.getValue());
+                            characteristicResults.put(getString(titleResourceStringId), characteristicStringValue);
+                        } else if (UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            //ALIBI: PnP value has a slightly complex decoding
+                            final String pnpValue = getPnpValue(characteristic);
+                            characteristicResults.put(getString(R.string.ble_pnp_title), pnpValue);
                         } else if (UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            //ALIBI: this could be added to the stringCharacteristicUuids map, but we're leaving it its own case in case we want to update the network SSID value
                             final String name = new String(characteristic.getValue());
-                            //Logging.info("NAME: " + name);
-                            characteristicResults.put("Device", name);
+                            characteristicResults.put(getString(R.string.ble_name_title), name);
                             // NB: _could_ replace BT name with the discovered dev name here, but is that useful?
                             //if (null == network.getSsid() || network.getSsid().isBlank()) {
                             //    network.setSsid(name);
                             //}
                         } else if (UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb").equals(characteristic.getUuid())) {
+                            //ALIBI: appearance value has a slightly complex decoding
                             byte[] charValue = characteristic.getValue();
                             int appearanceValue = BluetoothUtil.getGattUint16(charValue);
                             int category = (appearanceValue >> 6) & 0xFF;
@@ -578,9 +647,9 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                             final String subcategoryHex = Integer.toHexString(subcategory);
                             final String appearanceString = MainActivity.getMainActivity().getBleAppearance(category, subcategory);
                             //DEBUG: Logging.info("APPEARANCE: " + categoryHex + ":" + subcategoryHex + " - " + appearanceString + " from "+ Hex.bytesToStringLowercase(characteristic.getValue()) + ": "+Integer.toHexString(appearanceValue));
-                            characteristicResults.put("Appearance", appearanceString + "( 0x" + categoryHex + ": 0x" + subcategoryHex + ")");
+                            characteristicResults.put(getString(R.string.ble_appearance_title), appearanceString + "( 0x" + categoryHex + ": 0x" + subcategoryHex + ")");
                         } else {
-                            //unexpected characteristic - what did we get?
+                            //TODO: battery and heart rate will land here for now
                             Logging.info(characteristic.getUuid().toString()+": "+new String(characteristic.getValue()) );
                         }
 
@@ -616,6 +685,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         }
                     }
                 }
+
                 @SuppressLint("MissingPermission")
                 @Override
                 public void onCharacteristicChanged(BluetoothGatt gatt,
@@ -683,6 +753,16 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 }
             });
         }
+    }
+
+    @NonNull
+    private static String getPnpValue(@NonNull BluetoothGattCharacteristic characteristic) {
+        byte[] charValue = characteristic.getValue();
+        final String vendorIdSrc = BluetoothUtil.getGattUint8(charValue[0]) == 1 ? "BLE" : "USB";
+        final String vendorId = ""+BluetoothUtil.getGattUint8(charValue[1]);
+        final String productString = ""+BluetoothUtil.getGattUint8(charValue[2]);
+        final String productVersionString = "" + BluetoothUtil.getGattUint8(charValue[3]);
+        return vendorIdSrc + ":" +  vendorId + ":" + productString + ":" + productVersionString;
     }
 
     private BluetoothAdapter.LeScanCallback getLeScanCallback(Network network, AtomicBoolean found, AtomicBoolean done, BluetoothGattCallback gattCallback) {
@@ -1027,9 +1107,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     final String[] currentList = new String[]{network.getBssid()};
                     final Set<String> registerSet = new HashSet<>(Arrays.asList(currentList));
                     state.wifiReceiver.registerWiFiScanUpdater(this, registerSet);
-                    mapView.getMapAsync(googleMap -> {
-                        googleMap.clear();
-                    });
+                    mapView.getMapAsync(GoogleMap::clear);
                 }
                 break;
             default:
@@ -1117,7 +1195,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             password.addTextChangedListener( new SettingsFragment.SetWatcher() {
                 @Override
                 public void onTextChanged( final String s ) {
-                    if ( s.length() > 0 ) {
+                    if (!s.isEmpty()) {
                         ok.setEnabled(true);
                     }
                 }

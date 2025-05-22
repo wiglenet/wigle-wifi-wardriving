@@ -457,4 +457,13 @@
     <string name="end_survey">Finalizar pesquisa</string>
     <string name="confirm_survey">Você DEVE clicar em \"%1$s\" para concluir a pesquisa e salvar seus resultados antes de sair da atividade!\n\n Recomendamos definir a verificação \"%2$s\" nas configurações de sua velocidade de viagem para obter melhores resultados. (Isso TERÁ consequências para a bateria)</string>
     <string name="interrogate_ble">peça detalhes</string>
+    <string name="ble_mfgr_title">Fabricante</string>
+    <string name="ble_model_title">Modelo</string>
+    <string name="ble_serial_title">Número de série</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Programas</string>
+    <string name="ble_name_title">Nome</string>
+    <string name="ble_pnp_title">ID PnP</string>
+    <string name="ble_appearance_title">Aparência</string>
 </resources>

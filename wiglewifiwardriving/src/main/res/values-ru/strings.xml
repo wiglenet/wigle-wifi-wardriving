@@ -457,4 +457,13 @@
     <string name="end_survey">Завершить опрос</string>
     <string name="confirm_survey">Вы ДОЛЖНЫ нажать «%1$s», чтобы завершить опрос и сохранить результаты, прежде чем выйти из занятия!\n\n Мы рекомендуем установить «%2$s» сканирование в настройках скорости вашего движения для достижения наилучших результатов. (Это БУДЕТ иметь последствия для батареи)</string>
     <string name="interrogate_ble">спросить подробности</string>
+    <string name="ble_mfgr_title">Производитель</string>
+    <string name="ble_model_title">Модель</string>
+    <string name="ble_serial_title">Серийный номер</string>
+    <string name="ble_firmware_title">Прошивка</string>
+    <string name="ble_hw_title">Аппаратное обеспечение</string>
+    <string name="ble_sw_title">Программное обеспечение</string>
+    <string name="ble_name_title">Имя</string>
+    <string name="ble_pnp_title">Подключи и играй</string>
+    <string name="ble_appearance_title">внешний вид</string>
 </resources>

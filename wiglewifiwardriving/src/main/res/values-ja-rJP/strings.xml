@@ -456,4 +456,13 @@
     <string name="end_survey">調査を終了する</string>
     <string name="confirm_survey">アクティビティを終了する前に、「%1$s」をクリックしてアンケートを完了し、結果を保存する必要があります!\n\n 最良の結果を得るには、移動速度の設定でスキャンを「%2$s」に設定することをお勧めします。 (これはバッテリーに影響を及ぼします)</string>
     <string name="interrogate_ble">詳細を尋ねる</string>
+    <string name="ble_mfgr_title">製造者</string>
+    <string name="ble_model_title">型</string>
+    <string name="ble_serial_title">シリアルナンバー #</string>
+    <string name="ble_firmware_title">ファームウェア</string>
+    <string name="ble_hw_title">ハードウェア</string>
+    <string name="ble_sw_title">ソフトウェア</string>
+    <string name="ble_name_title">名前</string>
+    <string name="ble_pnp_title">プラグアンドプレイ ID</string>
+    <string name="ble_appearance_title">外観</string>
 </resources>

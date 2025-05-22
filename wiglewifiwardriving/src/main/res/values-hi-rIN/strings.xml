@@ -456,4 +456,13 @@
     <string name="end_survey">सर्वेक्षण समाप्त करें</string>
     <string name="confirm_survey">सर्वेक्षण पूरा करने और गतिविधि से बाहर निकलने से पहले अपने परिणामों को सहेजने के लिए आपको \"%1$s\" पर क्लिक करना होगा!\n\n हम सर्वोत्तम परिणामों के लिए आपकी यात्रा की गति के लिए सेटिंग्स के तहत \"%2$s\" स्कैनिंग सेट करने की सलाह देते हैं। (इसके बैटरी परिणाम होंगे)</string>
     <string name="interrogate_ble">विवरण मांगें</string>
+    <string name="ble_mfgr_title">उत्पादक</string>
+    <string name="ble_model_title">नमूना</string>
+    <string name="ble_serial_title">क्रम संख्या</string>
+    <string name="ble_firmware_title">फर्मवेयर</string>
+    <string name="ble_hw_title">हार्डवेयर</string>
+    <string name="ble_sw_title">सॉफ़्टवेयर</string>
+    <string name="ble_name_title">नाम</string>
+    <string name="ble_pnp_title">प्लग एंड प्ले आईडी</string>
+    <string name="ble_appearance_title">उपस्थिति</string>
 </resources>

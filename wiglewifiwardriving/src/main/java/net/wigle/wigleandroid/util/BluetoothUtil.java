@@ -1,18 +1,31 @@
 package net.wigle.wigleandroid.util;
 
-import java.io.UnsupportedEncodingException;
+import net.wigle.wigleandroid.R;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
  * Created by bobzilla on 12/20/15
- * Adapted from: http://stackoverflow.com/questions/26290640/android-bluetoothdevice-getname-return-null
+ * Adapted from: <a href="http://stackoverflow.com/questions/26290640/android-bluetoothdevice-getname-return-null">...</a>
  */
 public class BluetoothUtil {
+
+    public static final Map<UUID, Integer> BLE_STRING_CHARACTERSITIC_UUIDS = new HashMap<>();
+    static {
+        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"), R.string.ble_mfgr_title);
+        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"), R.string.ble_model_title);
+        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"), R.string.ble_serial_title);
+        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"), R.string.ble_firmware_title);
+        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"), R.string.ble_hw_title);
+        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"), R.string.ble_sw_title);
+    }
 
     private static final int DATA_TYPE_FLAGS = 0x01;
     private static final int DATA_TYPE_SERVICE_UUIDS_16_BIT_PARTIAL = 0x02;
@@ -98,11 +111,7 @@ public class BluetoothUtil {
                         //MainActivity.info("Name");
                         byte[] nameBytes = new byte[length-1];
                         buffer.get(nameBytes);
-                        try {
-                            name = new String(nameBytes, "utf-8");
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
+                        name = new String(nameBytes, StandardCharsets.UTF_8);
                         break;
                     default:
                             //TODO: Bad position -40/23
@@ -153,8 +162,18 @@ public class BluetoothUtil {
      */
     public static int getGattUint16(byte[] bytes) {
         ByteBuffer bb = ByteBuffer.wrap(bytes);
-        bb = bb.order(ByteOrder.LITTLE_ENDIAN); //ALIBI: GATTributes van be presumed little-endian
+        bb = bb.order(ByteOrder.LITTLE_ENDIAN); //ALIBI: GATTributes can be presumed little-endian
         short s = bb.getShort(); //signed short
         return 0xFFFF & s;
     }
+
+    /**
+     * Utility method to get an int for a GATT 16 bit Uint
+     * @param intByte the byte value
+     * @return the integer value
+     */
+    public static int getGattUint8(byte intByte) {
+        return 0xFF & intByte;
+    }
+
 }

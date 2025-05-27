@@ -17,16 +17,43 @@ import java.util.UUID;
  */
 public class BluetoothUtil {
 
-    public static final Map<UUID, Integer> BLE_STRING_CHARACTERSITIC_UUIDS = new HashMap<>();
+    public static final Map<UUID, Integer> BLE_STRING_CHARACTERISTIC_UUIDS = new HashMap<>();
     static {
-        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"), R.string.ble_mfgr_title);
-        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"), R.string.ble_model_title);
-        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"), R.string.ble_serial_title);
-        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"), R.string.ble_firmware_title);
-        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"), R.string.ble_hw_title);
-        BLE_STRING_CHARACTERSITIC_UUIDS.put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"), R.string.ble_sw_title);
+        BLE_STRING_CHARACTERISTIC_UUIDS.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"), R.string.ble_model_title);
+        BLE_STRING_CHARACTERISTIC_UUIDS.put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"), R.string.ble_serial_title);
+        BLE_STRING_CHARACTERISTIC_UUIDS.put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"), R.string.ble_firmware_title);
+        BLE_STRING_CHARACTERISTIC_UUIDS.put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"), R.string.ble_hw_title);
+        BLE_STRING_CHARACTERISTIC_UUIDS.put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"), R.string.ble_sw_title);
+        BLE_STRING_CHARACTERISTIC_UUIDS.put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"), R.string.ble_mfgr_title);
     }
 
+    public static final Map<UUID, Map<UUID, String>> BLE_SERVICE_CHARACTERISTIC_MAP = new HashMap<>();
+    static {
+        final Map<UUID, String> gattServiceMap = new HashMap<>();
+        gattServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"GATT: Model number");  //:check:
+        gattServiceMap.put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"),"GATT: Serial number");
+        gattServiceMap.put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"),"GATT: Firmware rev.");
+        gattServiceMap.put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"),"GATT: Hardware rev.");
+        gattServiceMap.put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"),"GATT: Software rev.");
+        gattServiceMap.put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"),"GATT: Mfgr name");
+        gattServiceMap.put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"),"GATT: PnP ID");
+        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), gattServiceMap);
+
+        final Map<UUID, String> gapServiceMap = new HashMap<>();
+        gapServiceMap.put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"),"GAP: Device name"); //:check:
+        gapServiceMap.put(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"),"GAP: Appearance"); //:check:
+        gapServiceMap.put(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"),"GAP: System ID");
+        gapServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"GAP: Model number"); //:check:
+        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("00001800-0000-1000-8000-00805f9b34fb"), gapServiceMap);
+
+        final Map<UUID, String> heartServiceMap = new HashMap<>();
+        heartServiceMap.put(UUID.fromString("00002aa4-0000-1000-8000-00805f9b34fb"),"HR: Heart rate");
+        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb"), heartServiceMap);
+
+        final Map<UUID, String> batteryServiceMap = new HashMap<>();
+        batteryServiceMap.put(UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb"),"BAT: Battery level");
+        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb"), batteryServiceMap);
+    }
     private static final int DATA_TYPE_FLAGS = 0x01;
     private static final int DATA_TYPE_SERVICE_UUIDS_16_BIT_PARTIAL = 0x02;
     private static final int DATA_TYPE_SERVICE_UUIDS_16_BIT_COMPLETE = 0x03;

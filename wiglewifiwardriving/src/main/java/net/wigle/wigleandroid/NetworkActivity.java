@@ -580,19 +580,10 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                                     hideProgressCenter(pair);
                                 });
                             } else {
-                                final StringBuffer results = new StringBuffer();
-                                boolean first = true;
-                                for (String key: characteristicResults.keySet()) {
-                                    if (first) {
-                                       first = false;
-                                    } else {
-                                        results.append("\n");
-                                    }
-                                    results.append(key).append(": ").append(characteristicResults.get(key));
-                                }
+                                final String results = characteristicDisplayString(characteristicResults);
                                 runOnUiThread(() -> {
                                     charView.setVisibility(VISIBLE);
-                                    charContents.setText(results.toString());
+                                    charContents.setText(results);
                                     hideProgressCenter(pair);
                                 });
                             }
@@ -645,6 +636,15 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         runOnUiThread(() -> {
                             WiGLEToast.showOverActivity(activity, R.string.btloc_title, "disconnected from device.");
                             hideProgressCenter(pair);
+                            if (!characteristicsToQuery.isEmpty() && !characteristicResults.isEmpty()) {
+                                //ALIBI: we were interrupted, but have some characteristics to show
+                                final String results = characteristicDisplayString(characteristicResults);
+                                runOnUiThread(() -> {
+                                    charView.setVisibility(VISIBLE);
+                                    charContents.setText(results);
+                                    hideProgressCenter(pair);
+                                });
+                            }
                         });
                     } else {
                         Logging.info("GATT Characteristic status: " + status + " new: " + newState);
@@ -1211,5 +1211,19 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     private void hideProgressCenter(final Button button) {
         button.setEnabled(true);
         DrawableButtonExtensionsKt.hideProgress(button, R.string.interrogate_ble);
+    }
+
+    private static String characteristicDisplayString(final Map<String, String> characteristicResults) {
+        final StringBuilder results = new StringBuilder();
+        boolean first = true;
+        for (String key: characteristicResults.keySet()) {
+            if (first) {
+                first = false;
+            } else {
+                results.append("\n");
+            }
+            results.append(key).append(": ").append(characteristicResults.get(key));
+        }
+        return results.toString();
     }
 }

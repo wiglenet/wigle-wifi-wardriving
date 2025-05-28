@@ -29,22 +29,30 @@ public class BluetoothUtil {
 
     public static final Map<UUID, Map<UUID, String>> BLE_SERVICE_CHARACTERISTIC_MAP = new HashMap<>();
     static {
-        final Map<UUID, String> gattServiceMap = new HashMap<>();
-        gattServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"GATT: Model number");  //:check:
-        gattServiceMap.put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"),"GATT: Serial number");
-        gattServiceMap.put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"),"GATT: Firmware rev.");
-        gattServiceMap.put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"),"GATT: Hardware rev.");
-        gattServiceMap.put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"),"GATT: Software rev.");
-        gattServiceMap.put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"),"GATT: Mfgr name");
-        gattServiceMap.put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"),"GATT: PnP ID");
-        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), gattServiceMap);
 
         final Map<UUID, String> gapServiceMap = new HashMap<>();
-        gapServiceMap.put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"),"GAP: Device name"); //:check:
-        gapServiceMap.put(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"),"GAP: Appearance"); //:check:
+        gapServiceMap.put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"),"GAP: Device name");
+        gapServiceMap.put(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"),"GAP: Appearance");
         gapServiceMap.put(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"),"GAP: System ID");
-        gapServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"GAP: Model number"); //:check:
+        gapServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"GAP: Model number");
         BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("00001800-0000-1000-8000-00805f9b34fb"), gapServiceMap);
+
+        //1805 TIME
+        //   0x2a08 Date Time / 0x2a09 Day of Week / 0x2a0a Day Date Time / 0x2a0C Exact Time 256...
+        //1808 GLUCOSE
+        //   0x2a18 Glucose Measurement
+        //1809 THERMOMETER
+        //   0x2a1D Temperature Measurement / 0x2A1E Temperature Type...
+
+        final Map<UUID, String> infoServiceMap = new HashMap<>();
+        infoServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"INFO: Model number");
+        infoServiceMap.put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"),"INFO: Serial number");
+        infoServiceMap.put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"),"INFO: Firmware rev.");
+        infoServiceMap.put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"),"INFO: Hardware rev.");
+        infoServiceMap.put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"),"INFO: Software rev.");
+        infoServiceMap.put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"),"INFO: Mfgr name");
+        infoServiceMap.put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"),"INFO: PnP ID");
+        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), infoServiceMap);
 
         final Map<UUID, String> heartServiceMap = new HashMap<>();
         heartServiceMap.put(UUID.fromString("00002aa4-0000-1000-8000-00805f9b34fb"),"HR: Heart rate");
@@ -53,6 +61,21 @@ public class BluetoothUtil {
         final Map<UUID, String> batteryServiceMap = new HashMap<>();
         batteryServiceMap.put(UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb"),"BAT: Battery level");
         BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb"), batteryServiceMap);
+
+        //1810 BLOOD PRESSURE
+        //1812 HID
+        //1814 RUNNING
+        //1815 Automation IO
+        //1816 Cycling Speed and Cadence
+        //1818 Cycling Power
+        //1819 Location and Navigation
+        //181A Environmental Sensing
+        //181B Body Composition
+        //181C User Data
+        //181D Weight Scale
+        //181F Continuous Glucose Monitoring
+        //1821 Indoor Positioning
+        //1822 Pulse Oximeter
     }
     private static final int DATA_TYPE_FLAGS = 0x01;
     private static final int DATA_TYPE_SERVICE_UUIDS_16_BIT_PARTIAL = 0x02;

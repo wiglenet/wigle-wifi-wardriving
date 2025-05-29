@@ -34,11 +34,17 @@ public class BluetoothUtil {
         gapServiceMap.put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"),"GAP: Device name");
         gapServiceMap.put(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"),"GAP: Appearance");
         gapServiceMap.put(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"),"GAP: System ID");
-        gapServiceMap.put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"),"GAP: Model number");
         BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("00001800-0000-1000-8000-00805f9b34fb"), gapServiceMap);
 
-        //1805 TIME
-        //   0x2a08 Date Time / 0x2a09 Day of Week / 0x2a0a Day Date Time / 0x2a0C Exact Time 256...
+        //Disabled for now
+        //final Map<UUID, String> timeServiceMap = new HashMap<>();
+        //timeServiceMap.put(UUID.fromString("00002a08-0000-1000-8000-00805f9b34fb"),"TIME: Date Time");
+        //timeServiceMap.put(UUID.fromString("00002a09-0000-1000-8000-00805f9b34fb"),"TIME: Day of week");
+        //timeServiceMap.put(UUID.fromString("00002a0a-0000-1000-8000-00805f9b34fb"),"TIME: Day date time");
+        //timeServiceMap.put(UUID.fromString("00002a0c-0000-1000-8000-00805f9b34fb"),"TIME: Exact time");
+        // loads more here
+        //BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("00001805-0000-1000-8000-00805f9b34fb"), timeServiceMap);
+
         //1808 GLUCOSE
         //   0x2a18 Glucose Measurement
         //1809 THERMOMETER
@@ -54,15 +60,23 @@ public class BluetoothUtil {
         infoServiceMap.put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"),"INFO: PnP ID");
         BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), infoServiceMap);
 
-        final Map<UUID, String> heartServiceMap = new HashMap<>();
-        heartServiceMap.put(UUID.fromString("00002aa4-0000-1000-8000-00805f9b34fb"),"HR: Heart rate");
-        BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb"), heartServiceMap);
+        //Disabled for now
+        //final Map<UUID, String> heartServiceMap = new HashMap<>();
+        //heartServiceMap.put(UUID.fromString("00002aa4-0000-1000-8000-00805f9b34fb"),"HR: Heart rate");
+        //BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb"), heartServiceMap);
 
         final Map<UUID, String> batteryServiceMap = new HashMap<>();
         batteryServiceMap.put(UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb"),"BAT: Battery level");
         BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb"), batteryServiceMap);
 
-        //1810 BLOOD PRESSURE
+        //Disabled for now
+        //final Map<UUID, String> bpServiceMap = new HashMap<>();
+        //bpServiceMap.put(UUID.fromString("00002a35-0000-1000-8000-00805f9b34fb"),"BP: Blood Pressure");
+        //bpServiceMap.put(UUID.fromString("00002a36-0000-1000-8000-00805f9b34fb"),"BP: Intermediate cuff pressure");
+        //bpServiceMap.put(UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb"),"BP: Heart rate measurement");
+        //bpServiceMap.put(UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb"),"BP: Body sensor location");
+        //BLE_SERVICE_CHARACTERISTIC_MAP.put(UUID.fromString("00001810-0000-1000-8000-00805f9b34fb"), bpServiceMap);
+
         //1812 HID
         //1814 RUNNING
         //1815 Automation IO

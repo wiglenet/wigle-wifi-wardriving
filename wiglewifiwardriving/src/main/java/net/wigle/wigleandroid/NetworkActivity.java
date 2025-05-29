@@ -477,19 +477,21 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         final String serviceId = service.getUuid().toString().substring(4,8);
                         final String serviceTitle = MainActivity.getMainActivity()
                                 .getBleService(serviceId.toUpperCase());
-                        Map<UUID, String> currentMap = BLE_SERVICE_CHARACTERISTIC_MAP.get(service.getUuid());
-                        if (currentMap != null) {
-                            for (UUID key: currentMap.keySet()) {
-                                BluetoothGattCharacteristic characteristic = service.getCharacteristic(key);
-                                if (null != characteristic) {
-                                    //DEBUG: Logging.error("enqueueing: " + currentMap.get(key));
-                                    characteristicsToQuery.add(characteristic);
-                                } else {
-                                    Logging.debug(currentMap.get(key)+" is null");
+                        if (service.getUuid() != null) {
+                            Map<UUID, String> currentMap = BLE_SERVICE_CHARACTERISTIC_MAP.get(service.getUuid());
+                            if (currentMap != null) {
+                                for (UUID key : currentMap.keySet()) {
+                                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(key);
+                                    if (null != characteristic) {
+                                        //DEBUG: Logging.error("enqueueing: " + currentMap.get(key));
+                                        characteristicsToQuery.add(characteristic);
+                                    } else {
+                                        Logging.info(currentMap.get(key) + " is null");
+                                    }
                                 }
+                            } else {
+                                Logging.debug("Unhandled service: " + serviceTitle + " (" + serviceId + ")");
                             }
-                        } else {
-                            Logging.debug("Unhandled service: "+serviceTitle+" ("+serviceId+")");
                         }
 
                         if (null != serviceTitle) {

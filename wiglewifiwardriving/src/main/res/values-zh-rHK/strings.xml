@@ -456,4 +456,13 @@
     <string name="end_survey">結束調查</string>
     <string name="confirm_survey">您必須點擊“%1$s”來完成調查並在退出活動之前保存您的結果！ \n\n 我們建議您在行駛速度設定下設定“%2$s”掃描以獲得最佳結果。 （這會對電池造成影響）</string>
     <string name="interrogate_ble">詢問詳情</string>
+    <string name="ble_mfgr_title">生產廠家</string>
+    <string name="ble_model_title">榜樣</string>
+    <string name="ble_serial_title">編號</string>
+    <string name="ble_firmware_title">固件</string>
+    <string name="ble_hw_title">硬件</string>
+    <string name="ble_sw_title">軟體</string>
+    <string name="ble_name_title">定名</string>
+    <string name="ble_pnp_title">即插即用</string>
+    <string name="ble_appearance_title">扮相</string>
 </resources>

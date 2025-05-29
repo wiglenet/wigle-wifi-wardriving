@@ -458,4 +458,13 @@
     <string name="confirm_survey">You MUST click \"%1$s\" to complete the survey and save your results before exiting the activity!\n\n We recommend setting \"%2$s\" scanning under settings for your travel speed for best results. (This WILL have battery consequences)</string>
     <string name="dialog_confirm">Confirm</string>
     <string name="interrogate_ble">Query for detail</string>
+    <string name="ble_mfgr_title">Manufacturer</string>
+    <string name="ble_model_title">Model</string>
+    <string name="ble_serial_title">Serial #</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Name</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Appearance</string>
 </resources>

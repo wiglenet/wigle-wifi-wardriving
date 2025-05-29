@@ -457,4 +457,13 @@
     <string name="end_survey">Umfrage beenden</string>
     <string name="confirm_survey">Sie MÜSSEN auf „%1$s“ klicken, um die Umfrage abzuschließen und Ihre Ergebnisse zu speichern, bevor Sie die Aktivität beenden!\n\n Für optimale Ergebnisse empfehlen wir, in den Einstellungen für das Scannen „%2$s“ für Ihre Reisegeschwindigkeit einzustellen. (Dies wird Auswirkungen auf die Batterie haben)</string>
     <string name="interrogate_ble">für Details untersuchen</string>
+    <string name="ble_mfgr_title">Hersteller</string>
+    <string name="ble_model_title">Modell</string>
+    <string name="ble_serial_title">Seriennummer</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Name</string>
+    <string name="ble_pnp_title">PnP-ID</string>
+    <string name="ble_appearance_title">Aussehen</string>
 </resources>

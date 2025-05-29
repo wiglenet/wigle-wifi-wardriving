@@ -457,4 +457,13 @@
     <string name="end_survey">A felmérés befejezése</string>
     <string name="confirm_survey">A „%1$s” gombra KELL kattintania a felmérés kitöltéséhez és az eredmények mentéséhez, mielőtt kilép a tevékenységből!\n\n Javasoljuk, hogy a legjobb eredmény érdekében állítsa be a „%2$s” szkennelést az utazási sebesség beállításainál. (Ennek az akkumulátor következményei lesznek)</string>
     <string name="interrogate_ble">kérjen részleteket</string>
+    <string name="ble_mfgr_title">Gyártó</string>
+    <string name="ble_model_title">Modell</string>
+    <string name="ble_serial_title">Sorozatszám</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardver</string>
+    <string name="ble_sw_title">Szoftver</string>
+    <string name="ble_name_title">Név</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Megjelenés</string>
 </resources>

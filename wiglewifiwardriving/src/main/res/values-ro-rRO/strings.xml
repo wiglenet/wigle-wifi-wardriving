@@ -457,4 +457,13 @@
     <string name="end_survey">Încheiați sondajul</string>
     <string name="confirm_survey">TREBUIE să dați clic pe „%1$s” pentru a finaliza sondajul și a salva rezultatele înainte de a părăsi activitatea!\n\n Vă recomandăm să setați scanarea „%2$s” în setări pentru viteza de deplasare pentru cele mai bune rezultate. (Acest lucru VA avea consecințe asupra bateriei)</string>
     <string name="interrogate_ble">cere detalii</string>
+    <string name="ble_mfgr_title">Producător</string>
+    <string name="ble_model_title">Model</string>
+    <string name="ble_serial_title">Număr de serie</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Nume</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Aspect</string>
 </resources>

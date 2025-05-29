@@ -457,4 +457,13 @@
     <string name="end_survey">Lopeta kysely</string>
     <string name="confirm_survey">Sinun PITÄÄ napsauttaa \"%1$s\" suorittaaksesi kyselyn ja tallentaaksesi tulokset ennen kuin lopetat aktiviteetin!\n\n Suosittelemme, että asetat \"%2$s\"-skannauksen matkustusnopeuden asetuksiin saadaksesi parhaat tulokset. (Tällä on akun seurauksia)</string>
     <string name="interrogate_ble">kysy lisätietoja</string>
+    <string name="ble_mfgr_title">Valmistaja</string>
+    <string name="ble_model_title">Malli</string>
+    <string name="ble_serial_title">Sarjanumero</string>
+    <string name="ble_firmware_title">Laiteohjelmisto</string>
+    <string name="ble_hw_title">Laitteisto</string>
+    <string name="ble_sw_title">Ohjelmisto</string>
+    <string name="ble_name_title">Nimi</string>
+    <string name="ble_pnp_title">PnP-tunnus</string>
+    <string name="ble_appearance_title">Ulkonäkö</string>
 </resources>

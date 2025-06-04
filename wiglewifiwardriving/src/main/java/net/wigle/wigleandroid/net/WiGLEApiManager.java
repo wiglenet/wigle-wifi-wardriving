@@ -703,10 +703,8 @@ public class WiGLEApiManager {
         final Network n = connectivityManager.getActiveNetwork();
         if (null != n) {
             final NetworkCapabilities cap = connectivityManager.getNetworkCapabilities(n);
-            if (cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                    cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
-                return true;
-            }
+            return cap != null && cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                    cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
         }
         return false;
     }
@@ -736,7 +734,7 @@ public class WiGLEApiManager {
 
     //TODO: should this be implemented as an interceptor? we'd have to parametereize based on queries...
     private static void cacheResult(final String result, final String outputFileName, final Context context) {
-        if (outputFileName == null || result == null || result.length() < 1) return;
+        if (outputFileName == null || result == null || result.isEmpty()) return;
 
         try (FileOutputStream fos = FileUtility.createFile(context, outputFileName, true)) {
             //DEBUG: Logging.info("writing cache file "+outputFileName);

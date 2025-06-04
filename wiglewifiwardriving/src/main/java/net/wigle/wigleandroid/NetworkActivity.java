@@ -959,9 +959,13 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 endSurveyButton.setVisibility(GONE);
                 if (null != state) {
                     state.wifiReceiver.unregisterWiFiScanUpdater();
-                    KmlSurveyWriter kmlWriter = new KmlSurveyWriter(MainActivity.getMainActivity(), ListFragment.lameStatic.dbHelper,
-                            "KmlSurveyWriter", true, network.getBssid(), localObsMap.values());
-                    kmlWriter.start();
+                    try {
+                        KmlSurveyWriter kmlWriter = new KmlSurveyWriter(MainActivity.getMainActivity(), ListFragment.lameStatic.dbHelper,
+                                "KmlSurveyWriter", true, network.getBssid(), localObsMap.values());
+                        kmlWriter.start();
+                    } catch (IllegalArgumentException e) {
+                        Logging.error("Failed to start KML writer: ", e);
+                    }
                     //TODO: do we want the obsMap back?
                 }
             });

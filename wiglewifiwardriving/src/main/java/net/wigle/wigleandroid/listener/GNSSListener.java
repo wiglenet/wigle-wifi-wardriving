@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
@@ -282,7 +281,7 @@ public class GNSSListener implements LocationListener {
             } else if (prevLocation == null ||  prevLocation.getTime() < currentLocation.getTime()) {
                 // initialize previous location
                 prevLocation = currentLocation;
-            } else if (prevLocation != null){
+            } else if (prevLocation != null) {
                 if (currentLocation.getTime() != prevLocation.getTime()) {
                     Logging.warn("Location timestamp (" + currentLocation.getTime() + ") < previous location timestamp (" + prevLocation.getTime() + ")");
                     //ALIBI: we're ignoring this rather than trying to slot it in only because we'd need an in-memory or DB route otherwise.

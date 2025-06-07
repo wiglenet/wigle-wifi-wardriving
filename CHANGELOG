@@ -1,3 +1,8 @@
+* 2.90 (06/07/2025)
+Bluetooth characteristics and GATT/GAP interrogation
+Major refactor of BT/BLE scanning
+Various bug fixes
+
 * 2.89 (01/05/2025)
 Adding site survey function
 Icon vector updates

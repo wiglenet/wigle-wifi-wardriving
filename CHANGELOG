@@ -1,4 +1,4 @@
-* 2.90 (06/07/2025)
+* 2.90 - 2.91 (06/11/2025)
 Bluetooth characteristics and GATT/GAP interrogation
 Major refactor of BT/BLE scanning
 Various bug fixes

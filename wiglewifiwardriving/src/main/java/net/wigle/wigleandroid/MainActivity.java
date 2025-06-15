@@ -71,6 +71,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.background.BssidMatchingAudioThread;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -117,6 +118,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -138,6 +140,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         AtomicBoolean transferring;
         MediaPlayer soundPop;
         MediaPlayer soundNewPop;
+        MediaPlayer soundScanning;
+        MediaPlayer soundContact;
         WifiLock wifiLock;
         GNSSListener GNSSListener;
         WifiReceiver wifiReceiver;
@@ -160,6 +164,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
+        Matcher bssidAlertList;
         int uiMode;
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
@@ -169,6 +174,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Map<Integer, String> btServiceUuids = Collections.emptyMap();
         Map<Integer, String> btCharUuids = Collections.emptyMap();
         Map<Integer, BluetoothUtil.AppearanceCategory> btAppearance = Collections.emptyMap();
+        Thread bssidMatchHeartbeat;
+        AtomicInteger lastHighestSignal = new AtomicInteger(Integer.MIN_VALUE); //set to 0 if you want a test ping on startup.
     }
 
     private State state;
@@ -882,7 +889,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onDestroy() {
         Logging.info("MAIN: destroy.");
         super.onDestroy();
-
+        stopHeartbeat();
         if (!state.uiRestart.get()) {
             try {
                 Logging.info("unregister batteryLevelReceiver");
@@ -899,7 +906,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
 
             if (state.tts != null) state.tts.shutdown();
-
             //TODO: redundant with endBluetooth?
             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             try {
@@ -1367,6 +1373,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.soundNewPop == null) {
             state.soundNewPop = MediaPlayer.create(getApplicationContext(), R.raw.newpop);
         }
+        if (state.soundScanning == null) {
+            state.soundScanning = MediaPlayer.create(getApplicationContext(), R.raw.scanning);
+        }
+        if (state.soundContact == null) {
+            state.soundContact = MediaPlayer.create(getApplicationContext(), R.raw.contact);
+        }
 
         // make volume change "media"
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -1397,7 +1409,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null != state) {
             state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
             state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+            state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
             //TODO: port SSID matcher over as well?
+            if (null != state.bssidAlertList && !isMuted() ) {
+                startHeartbeat();
+            } else {
+                stopHeartbeat();
+            }
         }
     }
 
@@ -1412,6 +1430,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
             } else if (PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
                 state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+            } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
+                state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
+                if (null != state.bssidAlertList && !isMuted()) {
+                    startHeartbeat();
+                } else {
+                    stopHeartbeat();
+                }
             }
         }
     }
@@ -1427,6 +1452,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 return state.bssidDisplayExclusions;
             } else if (PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
                 return state.bssidLogExclusions;
+            } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
+                return state.bssidAlertList;
             }
         }
         return null;
@@ -2628,6 +2655,24 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return s == null ? null : s.btCharUuids.get(key);
     }
 
+    /**
+     * Update the last highest level seen matching the current BSSID alert filter (since last announcement)
+     * @param value the candidate to update if higher
+     */
+    public void updateLastHighSignal(final Integer value) {
+        final State s = state;
+        if (null != value && !value.equals(Integer.MIN_VALUE)) {
+            s.lastHighestSignal.updateAndGet(currentValue -> value > currentValue ?
+                    value : currentValue);
+        }
+    }
+
+    /**
+     * Get the related String for category and sub-category.
+     * @param category category int ID
+     * @param subcategory subcategory int ID
+     * @return the composite string name
+     */
     public String getBleAppearance(final Integer category, final Integer subcategory) {
         final State s = state;
         if (s.btAppearance != null) {
@@ -2644,5 +2689,27 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public boolean hasWakeLock() {
         final State s = state;
         return s != null && s.screenLocked;
+    }
+
+    private void startHeartbeat() {
+        if (null != state.bssidMatchHeartbeat) {
+            state.bssidMatchHeartbeat.interrupt();
+            state.bssidMatchHeartbeat = null;
+        }
+        state.bssidMatchHeartbeat = new BssidMatchingAudioThread(state.soundScanning,
+                state.soundContact, state.lastHighestSignal, state.wifiReceiver);
+        state.bssidMatchHeartbeat.start();
+    }
+
+    private void stopHeartbeat() {
+        if (null != state.bssidMatchHeartbeat) {
+            state.bssidMatchHeartbeat.interrupt();
+            try {
+                state.bssidMatchHeartbeat.join();
+            } catch (InterruptedException e) {
+                Logging.error("Failed to join bssidMatchHeartbeat");
+            }
+            state.bssidMatchHeartbeat = null;
+        }
     }
 }

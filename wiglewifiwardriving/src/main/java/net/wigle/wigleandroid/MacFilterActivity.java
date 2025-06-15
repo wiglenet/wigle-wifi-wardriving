@@ -19,6 +19,7 @@ import java.util.List;
 import br.com.sapereaude.maskedEditText.MaskedEditText;
 
 /**
+ * General purpose MAC-address filter creation
  * Created by arkasha on 8/31/17.
  */
 
@@ -43,6 +44,8 @@ public class MacFilterActivity extends ScreenChildActivity {
             filterKey = PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS;
         } else if (FilterActivity.INTENT_LOG_FILTER.equals(filterType)) {
             filterKey = PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS;
+        } else if (FilterActivity.INTENT_ALERT_FILTER.equals(filterType)) {
+            filterKey = PreferenceKeys.PREF_ALERT_ADDRS;
         } else {
             filterKey = PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS;
         }

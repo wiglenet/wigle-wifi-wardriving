@@ -466,4 +466,5 @@
     <string name="ble_name_title">שֵׁם</string>
     <string name="ble_pnp_title">מזהה הכנס והפעל</string>
     <string name="ble_appearance_title">הוֹפָעָה</string>
+    <string name="alert_filter_button">התראה על חשבונות MAC/OUI…</string>
 </resources>

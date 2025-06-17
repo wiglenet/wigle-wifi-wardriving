@@ -466,5 +466,5 @@
     <string name="ble_name_title">Navn</string>
     <string name="ble_pnp_title">PnP ID</string>
     <string name="ble_appearance_title">Udseende</string>
-    <string name="alert_filter_button">Advarsel om MAC'er/OUI'er…</string>
+    <string name="alert_filter_button">Advarsel om MAC\'er/OUI\'er…</string>
 </resources>

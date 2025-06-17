@@ -129,6 +129,9 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+/**
+ * MainActivity for WiGLE Wireless logging and visualization client
+ */
 public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     //*** state that is retained ***
     public static class State {
@@ -175,7 +178,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Map<Integer, String> btCharUuids = Collections.emptyMap();
         Map<Integer, BluetoothUtil.AppearanceCategory> btAppearance = Collections.emptyMap();
         Thread bssidMatchHeartbeat;
-        AtomicInteger lastHighestSignal = new AtomicInteger(Integer.MIN_VALUE); //set to 0 if you want a test ping on startup.
+        // ALIBI set to -80 if you want a test ping on startup, Integer.MIN_VALUE for quiet start.
+        AtomicInteger lastHighestSignal = new AtomicInteger(-80);
     }
 
     private State state;

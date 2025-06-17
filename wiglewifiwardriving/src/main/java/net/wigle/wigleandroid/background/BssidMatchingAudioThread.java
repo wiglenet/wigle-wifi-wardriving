@@ -8,6 +8,10 @@ import net.wigle.wigleandroid.util.Logging;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Audio thread to indicate BSSID matching results.
+ * @author arkasha
+ */
 public class BssidMatchingAudioThread extends Thread {
     MediaPlayer soundScanning;
     MediaPlayer soundContact;
@@ -20,6 +24,7 @@ public class BssidMatchingAudioThread extends Thread {
         this.lastHighestSignal = lastHighestSignal;
         this.wifiReceiver = wifiReceiver;
     }
+
     @Override
     public void run() {
         while (!isInterrupted()) {
@@ -32,8 +37,10 @@ public class BssidMatchingAudioThread extends Thread {
                     soundContact.setPlaybackParams(params);
                     soundContact.start();
                 }
-                final long currentRate = wifiReceiver.getScanPeriod();
-                    Thread.sleep(currentRate - soundScanning.getDuration());
+                final long currentScanPeriod = wifiReceiver.getScanPeriod();
+                // ALIBI: more frequent than 1/2 second is too frenetic
+                final long currentRate = Math.max(currentScanPeriod, 500L);
+                Thread.sleep(currentRate - soundScanning.getDuration());
             } catch (InterruptedException e) {
                 Logging.info("terminated BSSID Matching Audio Thread.", e);
                 return;

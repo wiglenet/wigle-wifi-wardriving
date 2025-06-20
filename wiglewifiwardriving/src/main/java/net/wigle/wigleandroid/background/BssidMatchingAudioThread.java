@@ -51,7 +51,6 @@ public class BssidMatchingAudioThread extends Thread {
     static float scaleLevel(final long level) {
         if (level > -80 && level < 0) {
             float factor = (Math.abs(20/((float)level)));
-            Logging.error("got "+1.0f + factor);
             return 1.0f + factor;
         }
         return 1.0f;

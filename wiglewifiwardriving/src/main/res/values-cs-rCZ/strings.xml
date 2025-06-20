@@ -466,4 +466,5 @@
     <string name="ble_name_title">Jméno</string>
     <string name="ble_pnp_title">ID PnP</string>
     <string name="ble_appearance_title">Vzhled</string>
+    <string name="alert_filter_button">Upozornění na MAC/OUI…</string>
 </resources>

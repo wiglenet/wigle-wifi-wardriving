@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,6 +60,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
+import static net.wigle.wigleandroid.MainActivity.getMainActivity;
 
 /**
  * Central class for compound BT scanning: BT Scan intent receiver and (if supported) LE scan
@@ -781,6 +781,8 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         if (null != m) {
             final Matcher bssidMatcher = m.getBssidFilterMatcher(PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
             final Matcher bssidDbMatcher = m.getBssidFilterMatcher(PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+            final Matcher bssidAlertMatcher = m.getBssidFilterMatcher( PreferenceKeys.PREF_ALERT_ADDRS );
+
             //Update display
             if (listAdapter != null) {
                 if (btTypeUpdate) {
@@ -829,6 +831,12 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 // w/out location
                 if (!matches) {
                     dbHelper.pendingObservation(network, newForRun, deviceTypeUpdate, btTypeUpdate);
+                }
+            }
+            if (bssidAlertMatcher != null) {
+                bssidAlertMatcher.reset(network.getBssid());
+                if (bssidAlertMatcher.find()) {
+                    getMainActivity().updateLastHighSignal(network.getLevel());
                 }
             }
         }

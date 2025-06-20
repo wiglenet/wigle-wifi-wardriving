@@ -466,4 +466,5 @@
     <string name="ble_name_title">Nimi</string>
     <string name="ble_pnp_title">PnP-tunnus</string>
     <string name="ble_appearance_title">Ulkonäkö</string>
+    <string name="alert_filter_button">Varoitus MAC-/OUI-osoitteista…</string>
 </resources>

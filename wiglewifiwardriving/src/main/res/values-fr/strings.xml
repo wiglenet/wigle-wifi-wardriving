@@ -466,4 +466,5 @@
     <string name="ble_name_title">Nom</string>
     <string name="ble_pnp_title">Identifiant PnP</string>
     <string name="ble_appearance_title">Apparence</string>
+    <string name="alert_filter_button">Alerte sur les MAC/OUI…</string>
 </resources>

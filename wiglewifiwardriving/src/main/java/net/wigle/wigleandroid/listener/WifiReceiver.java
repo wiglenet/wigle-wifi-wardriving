@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.listener;
 
+import static net.wigle.wigleandroid.MainActivity.getMainActivity;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DecimalFormat;
@@ -228,6 +230,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, PreferenceKeys.FILTER_PREF_PREFIX );
         final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS );
         final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS );
+        final Matcher bssidAlertMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_ALERT_ADDRS );
 
         // can be null on shutdown
         if ( results != null ) {
@@ -330,6 +333,14 @@ public class WifiReceiver extends BroadcastReceiver {
                         dbHelper.pendingObservation( network, added, false, false );
                     }
                 }
+
+                if (bssidAlertMatcher != null) {
+                    bssidAlertMatcher.reset(network.getBssid());
+                    if (bssidAlertMatcher.find()) {
+                        getMainActivity().updateLastHighSignal(network.getLevel());
+                    }
+                }
+
                 if (null != updateOnSeen && null != safeWatchSsids && null != location) {
                     if (safeWatchSsids.contains(network.getBssid())) {
                         updateOnSeen.handleWiFiSeen(network.getBssid(), result.level, location);

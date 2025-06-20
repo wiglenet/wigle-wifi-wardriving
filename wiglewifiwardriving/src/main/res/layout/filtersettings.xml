@@ -27,6 +27,13 @@
             android:layout_weight="1"
             android:paddingTop="10dip"
             android:paddingBottom="10dip"/>
+        <Button android:id="@+id/alert_filter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:text="@string/alert_filter_button"
+            android:layout_weight="1"
+            android:paddingTop="10dip"
+            android:paddingBottom="10dip"/>
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

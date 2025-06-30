@@ -1,9 +1,12 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -29,6 +32,12 @@ public class MapFilterActivity extends ScreenChildActivity {
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.mapfilter);
+
+        //ALIBI: the map view tools reuses the filter options, which includes alert-on.
+        Button alerts = findViewById(R.id.alert_filter_button);
+        if (alerts != null) {
+            alerts.setVisibility(GONE);
+        }
 
         final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

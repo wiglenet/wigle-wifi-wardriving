@@ -1415,8 +1415,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
             state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
             //TODO: port SSID matcher over as well?
-            if (null != state.bssidAlertList && !isMuted() ) {
-                startHeartbeat();
+            if (null != state.bssidAlertList ) {
+                startHeartbeat(prefs);
             } else {
                 stopHeartbeat();
             }
@@ -1436,8 +1436,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
             } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
                 state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
-                if (null != state.bssidAlertList && !isMuted()) {
-                    startHeartbeat();
+                if (null != state.bssidAlertList) {
+                    startHeartbeat(prefs);
                 } else {
                     stopHeartbeat();
                 }
@@ -2695,12 +2695,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return s != null && s.screenLocked;
     }
 
-    private void startHeartbeat() {
+    private void startHeartbeat(SharedPreferences prefs) {
         if (null != state.bssidMatchHeartbeat) {
             state.bssidMatchHeartbeat.interrupt();
             state.bssidMatchHeartbeat = null;
         }
-        state.bssidMatchHeartbeat = new BssidMatchingAudioThread(state.soundScanning,
+        state.bssidMatchHeartbeat = new BssidMatchingAudioThread(
+                prefs,
+                state.soundScanning,
                 state.soundContact, state.lastHighestSignal, state.wifiReceiver);
         state.bssidMatchHeartbeat.start();
     }

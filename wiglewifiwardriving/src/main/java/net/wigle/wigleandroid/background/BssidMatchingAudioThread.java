@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid.background;
 
+import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_MUTED;
+
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 
@@ -17,8 +20,11 @@ public class BssidMatchingAudioThread extends Thread {
     MediaPlayer soundContact;
     AtomicInteger lastHighestSignal;
     WifiReceiver wifiReceiver;
-    public BssidMatchingAudioThread(final MediaPlayer soundScanning, final MediaPlayer soundContact,
+
+    SharedPreferences prefs;
+    public BssidMatchingAudioThread(final SharedPreferences prefs, final MediaPlayer soundScanning, final MediaPlayer soundContact,
         final AtomicInteger lastHighestSignal, final WifiReceiver wifiReceiver) {
+        this.prefs = prefs;
         this.soundScanning = soundScanning;
         this.soundContact = soundContact;
         this.lastHighestSignal = lastHighestSignal;
@@ -29,13 +35,19 @@ public class BssidMatchingAudioThread extends Thread {
     public void run() {
         while (!isInterrupted()) {
             try {
-                soundScanning.start();
-                final long last = lastHighestSignal.getAndSet(Integer.MIN_VALUE);
-                if (last != Integer.MIN_VALUE) {
-                    PlaybackParams params = new PlaybackParams();
-                    params.setPitch(scaleLevel(last));
-                    soundContact.setPlaybackParams(params);
-                    soundContact.start();
+                boolean notify = true;
+                if (null != prefs) {
+                    notify = !prefs.getBoolean(PREF_MUTED, false);
+                }
+                if (notify) {
+                    soundScanning.start();
+                    final long last = lastHighestSignal.getAndSet(Integer.MIN_VALUE);
+                    if (last != Integer.MIN_VALUE) {
+                        PlaybackParams params = new PlaybackParams();
+                        params.setPitch(scaleLevel(last));
+                        soundContact.setPlaybackParams(params);
+                        soundContact.start();
+                    }
                 }
                 final long currentScanPeriod = wifiReceiver.getScanPeriod();
                 // ALIBI: more frequent than 1/2 second is too frenetic

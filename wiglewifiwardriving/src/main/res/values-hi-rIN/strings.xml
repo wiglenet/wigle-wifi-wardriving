@@ -465,4 +465,5 @@
     <string name="ble_name_title">नाम</string>
     <string name="ble_pnp_title">प्लग एंड प्ले आईडी</string>
     <string name="ble_appearance_title">उपस्थिति</string>
+    <string name="alert_filter_button">MAC/OUI पर चेतावनी…</string>
 </resources>

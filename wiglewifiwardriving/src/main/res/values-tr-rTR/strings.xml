@@ -466,5 +466,6 @@
     <string name="ble_name_title">İsim</string>
     <string name="ble_pnp_title">Tak ve Çalıştır</string>
     <string name="ble_appearance_title">Dış görünüş</string>
+    <string name="alert_filter_button">MAC/OUI uyarısı…</string>
 </resources>
 

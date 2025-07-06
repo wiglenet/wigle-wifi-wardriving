@@ -465,4 +465,5 @@
     <string name="ble_name_title">名前</string>
     <string name="ble_pnp_title">プラグアンドプレイ ID</string>
     <string name="ble_appearance_title">外観</string>
+    <string name="alert_filter_button">MAC/OUI に関する警告…</string>
 </resources>

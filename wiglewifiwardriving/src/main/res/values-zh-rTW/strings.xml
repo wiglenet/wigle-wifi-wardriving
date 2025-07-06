@@ -465,4 +465,5 @@
     <string name="ble_name_title">定名</string>
     <string name="ble_pnp_title">即插即用</string>
     <string name="ble_appearance_title">扮相</string>
+    <string name="alert_filter_button">對 MAC/OUI 發出警報…</string>
 </resources>

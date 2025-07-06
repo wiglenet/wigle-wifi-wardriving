@@ -22,6 +22,7 @@ public class FilterActivity extends ScreenChildActivity {
     public static final String ADDR_FILTER_MESSAGE = "net.wigle.wigleandroid.filter.MESSAGE";
     public static final String INTENT_DISPLAY_FILTER = "displayFilter";
     public static final String INTENT_LOG_FILTER = "logFilter";
+    public static final String INTENT_ALERT_FILTER = "alertFilter";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,13 @@ public class FilterActivity extends ScreenChildActivity {
         filter_log_button.setOnClickListener(view12 -> {
             final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
             macFilterIntent.putExtra(ADDR_FILTER_MESSAGE, INTENT_LOG_FILTER);
+            startActivity( macFilterIntent );
+        });
+
+        final Button filter_alert_button = view.findViewById(R.id.alert_filter_button);
+        filter_alert_button.setOnClickListener(view12 -> {
+            final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
+            macFilterIntent.putExtra(ADDR_FILTER_MESSAGE, INTENT_ALERT_FILTER);
             startActivity( macFilterIntent );
         });
 

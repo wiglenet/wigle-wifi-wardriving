@@ -466,4 +466,5 @@
     <string name="ble_name_title">Naam</string>
     <string name="ble_pnp_title">PnP ID</string>
     <string name="ble_appearance_title">Verschijning</string>
+    <string name="alert_filter_button">Waarschuwing voor MAC\'s/OUI\'s…</string>
 </resources>

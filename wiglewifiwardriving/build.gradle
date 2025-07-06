@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

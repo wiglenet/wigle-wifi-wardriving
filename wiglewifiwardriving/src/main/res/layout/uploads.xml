@@ -5,9 +5,7 @@
     android:id="@+id/linearlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="4dp"
-    >
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -20,13 +18,14 @@
         style="@style/InvertedText"
         android:textSize="16sp"
         android:paddingEnd="2dp"
-        android:paddingStart="0dp"
+        android:paddingStart="4dp"
         tools:text="@string/queue_depth"
         />
     </LinearLayout>
     <RelativeLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:paddingHorizontal="4dp">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

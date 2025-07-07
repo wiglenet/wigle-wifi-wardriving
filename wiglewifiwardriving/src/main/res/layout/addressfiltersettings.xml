@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
-    android:minWidth="280dip">
+    android:minWidth="280dip"
+    android:fitsSystemWindows="true">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"

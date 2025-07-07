@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:id="@+id/network_main"
+    android:fitsSystemWindows="true">
     <RelativeLayout
         android:id="@+id/netmap_rl"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" />
     <RelativeLayout
         style="@style/NetworkViewOverlay"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="4dp">
@@ -50,7 +52,7 @@
 
         <LinearLayout
             android:id="@+id/bssid_row"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/na_network_title"
             android:orientation="horizontal">
@@ -436,18 +438,18 @@
         android:visibility="gone"
         tools:visibility="gone"
         >
-    <Button
-        android:id="@+id/query_ble_network"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dip"
-        android:layout_marginTop="5dip"
-        android:layout_marginEnd="2dip"
-        android:layout_marginBottom="3dip"
-        android:layout_weight="4"
-        android:background="@drawable/filter_button"
-        android:minHeight="0dp"
-        android:text="@string/interrogate_ble" />
+        <Button
+            android:id="@+id/query_ble_network"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginEnd="2dip"
+            android:layout_marginBottom="3dip"
+            android:layout_weight="4"
+            android:background="@drawable/filter_button"
+            android:minHeight="0dp"
+            android:text="@string/interrogate_ble" />
     </LinearLayout>
     <LinearLayout
         android:id="@+id/filter_row"

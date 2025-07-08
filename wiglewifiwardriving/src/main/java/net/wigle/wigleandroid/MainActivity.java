@@ -277,7 +277,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         DrawerLayout dl = findViewById(R.id.drawer_layout);
         if (null != dl) {
             int [] attrs = { com.google.android.material.R.attr.scrimBackground };
-            try (TypedArray typedValues  = obtainStyledAttributes(R.style.AppTheme, attrs)) {
+            try (@SuppressLint("ResourceType") TypedArray typedValues  = obtainStyledAttributes(R.style.AppTheme, attrs)) {
                 int scrimColor = typedValues.getColor(0, Color.parseColor("#99000000"));
                 dl.setScrimColor(scrimColor);
             }

@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.wigle.wigleandroid.ActivateActivity">
+    tools:context="net.wigle.wigleandroid.ActivateActivity"
+    android:fitsSystemWindows="true">
     <SurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,7 +12,6 @@
         android:layout_alignParentStart="true"
         android:id="@+id/camera_view"
         />
-
     <TextView
         android:text="@string/setting_activate_prompt"
         android:layout_width="wrap_content"

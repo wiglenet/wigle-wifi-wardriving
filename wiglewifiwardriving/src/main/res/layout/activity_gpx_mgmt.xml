@@ -8,7 +8,8 @@
     <LinearLayout android:orientation="vertical"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_above="@+id/inline_status_bar">
+        android:layout_above="@+id/inline_status_bar"
+        android:background="@color/child_activity_background">
         <LinearLayout
             android:layout_weight="1"
             android:layout_width="fill_parent"
@@ -46,7 +47,8 @@
         <LinearLayout
             android:layout_weight="1"
             android:layout_width="fill_parent"
-            android:layout_height="0dp">
+            android:layout_height="0dp"
+            android:background="@color/child_activity_background">
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/gpx_list"
                 android:layout_width="match_parent"

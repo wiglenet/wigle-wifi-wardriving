@@ -7,7 +7,9 @@
         android:id="@+id/linearlayout"
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/child_activity_background"
+        >
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"

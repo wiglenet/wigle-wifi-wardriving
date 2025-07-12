@@ -9,8 +9,8 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/uploads_swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="match_parent"
+        android:background="@color/child_activity_background">
         <ScrollView
             android:orientation="vertical"
             android:layout_width="fill_parent"

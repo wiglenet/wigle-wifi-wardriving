@@ -108,21 +108,22 @@
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/error_report_name"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask" />
         <activity
             android:name=".DebugActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/menu_debug"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".SpeechActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/speech_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -135,7 +136,8 @@
             android:exported="false"
             android:label="@string/network_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -146,7 +148,8 @@
             android:name=".RegistrationActivity"
             android:parentActivityName=".MainActivity"
             android:exported="true"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -200,7 +203,8 @@
             android:exported="false"
             android:label="@string/dbresult_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -213,7 +217,8 @@
             android:exported="false"
             android:label="@string/manage_gpx"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

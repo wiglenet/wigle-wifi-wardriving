@@ -113,5 +113,13 @@ public class MapFilterActivity extends ScreenChildActivity {
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
+
+        final Button finishButton = view.findViewById(R.id.finish_map_filter);
+        if (null != finishButton) {
+            finishButton.setOnClickListener(v -> {
+                finish();
+            });
+        }
+
     }
 }

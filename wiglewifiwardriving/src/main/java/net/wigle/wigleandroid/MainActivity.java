@@ -2727,4 +2727,20 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidMatchHeartbeat = null;
         }
     }
+
+    public void refreshMenuSelection() {
+        if (state != null) {
+            final NavigationView navigationView = findViewById(R.id.left_drawer);
+            if (navigationView != null) {
+                navigationView.getMenu().setGroupVisible(R.id.stats_group, false);
+                final MenuItem mItem = navigationView.getMenu().findItem(this.state.currentTab);
+                if (null != mItem) {
+                    Logging.info("updating selected menu items");
+                    mItem.setChecked(true);
+                } else {
+                    Logging.error("no menu item found matching "+this.state.currentTab);
+                }
+            }
+        }
+    }
 }

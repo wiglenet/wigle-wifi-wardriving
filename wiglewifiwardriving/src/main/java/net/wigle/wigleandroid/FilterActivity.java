@@ -97,5 +97,11 @@ public class FilterActivity extends ScreenChildActivity {
             startActivity( macFilterIntent );
         });
 
+        final Button finishButton = view.findViewById(R.id.finish_filter);
+        if (null != finishButton) {
+            finishButton.setOnClickListener(v -> {
+                finish();
+            });
+        }
     }
 }

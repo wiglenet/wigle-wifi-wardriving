@@ -29,7 +29,7 @@ public class FilterActivity extends ScreenChildActivity {
         super.onCreate(savedInstanceState);
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
-        setContentView(R.layout.filtersettings);
+        setContentView(R.layout.listfiltersettings);
 
         final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

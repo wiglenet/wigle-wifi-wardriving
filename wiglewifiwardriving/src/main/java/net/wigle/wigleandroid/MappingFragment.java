@@ -195,10 +195,7 @@ public final class MappingFragment extends Fragment {
         }
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(2);
-        // media volume
-        //TODO: almost certainly not like this.
         final SharedPreferences prefs = (null != a)?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
-
         if (prefs != null && BuildConfig.DEBUG && HeadingManager.DEBUG && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
             headingManager = new HeadingManager(a);
         }
@@ -218,7 +215,7 @@ public final class MappingFragment extends Fragment {
                     mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
                 }
                 catch (final SecurityException ex) {
-                    Logging.error("security exception oncreateview map: " + ex, ex);
+                    Logging.error("security exception onCreateView map: " + ex, ex);
                 }
             } else {
                 final FragmentActivity fa = getActivity();
@@ -231,13 +228,8 @@ public final class MappingFragment extends Fragment {
         }
         final View view = inflater.inflate(R.layout.map, container, false);
 
-        LatLng oldCenter = null;
+        final LatLng oldCenter = state.oldCenter != null ? state.oldCenter : null;
         int oldZoom = Integer.MIN_VALUE;
-        if (state.oldCenter != null) {
-            // pry an orientation change, which calls destroy
-            oldCenter = state.oldCenter;
-        }
-
         setupMapView(view, oldCenter, oldZoom);
         return view;
     }
@@ -246,7 +238,6 @@ public final class MappingFragment extends Fragment {
     private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
         // view
         final RelativeLayout rlView = view.findViewById(R.id.map_rl);
-
         if (mapView != null) {
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);

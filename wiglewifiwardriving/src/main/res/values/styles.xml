@@ -9,6 +9,9 @@
         <item name="colorNavigationItem">#353535</item>
         <item name="scrimBackground">#88000000</item>
     </style>
+    <style name="ChildActivityTheme" parent="AppTheme">
+        <item name="android:colorBackground">#1A1A1A</item>
+    </style>
     <style name="NavigationDrawerStyle">
         <item name="android:textSize">24sp</item>
     </style>

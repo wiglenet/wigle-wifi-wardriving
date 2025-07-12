@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -28,7 +29,6 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
     private final Context context;
     private final SharedPreferences prefs;
     private final String filterKey;
-
 
 
     public AddressFilterAdapter(List<String> list, Context context, final SharedPreferences prefs, final String filterKey) {

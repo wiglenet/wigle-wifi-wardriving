@@ -159,12 +159,12 @@
             android:exported="false"
             android:label="@string/filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
-
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".MainActivity"/>
         </activity>
         <activity
             android:name=".MacFilterActivity"
@@ -172,7 +172,8 @@
             android:exported="false"
             android:label="@string/mac_filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".FilterActivity">
+            android:parentActivityName=".FilterActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -185,7 +186,8 @@
             android:exported="false"
             android:label="@string/mapfilter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data

@@ -2,7 +2,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:fitsSystemWindows="true">
+    android:layout_below="@id/filter_settings_caption"
+    android:layout_above="@id/filter_settings_ok"
+    android:background="@color/child_activity_background">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"

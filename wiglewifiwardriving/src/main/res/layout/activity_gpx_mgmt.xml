@@ -4,23 +4,33 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".GpxManagementActivity"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="false">
     <LinearLayout android:orientation="vertical"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_above="@+id/inline_status_bar"
         android:background="@color/child_activity_background">
-        <LinearLayout
+        <RelativeLayout
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:orientation="vertical">
-                <RelativeLayout
-                    android:id="@+id/gpx_map_rl"
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent" />
-                <LinearLayout
+            <RelativeLayout
+                android:id="@+id/gpx_map_rl"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+            </RelativeLayout>
+            <ImageButton
+                android:id="@+id/gpx_back_button"
+                android:layout_marginVertical="32dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="#00000000"
+                android:contentDescription="@string/menu_settings"
+                android:src="?attr/homeAsUpIndicator"
+                android:gravity="end"/>
+            <LinearLayout
                     android:layout_width="wrap_content"
                     android:id="@+id/gpx_info"
                     android:layout_height="wrap_content"
@@ -43,7 +53,7 @@
                         android:layout_height="25dp"
                         android:layout_marginEnd="0dp" />
                 </LinearLayout>
-        </LinearLayout>
+        </RelativeLayout>
         <LinearLayout
             android:layout_weight="1"
             android:layout_width="fill_parent"

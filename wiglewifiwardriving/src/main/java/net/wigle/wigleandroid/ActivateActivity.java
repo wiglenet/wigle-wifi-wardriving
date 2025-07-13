@@ -13,6 +13,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.ImageButton;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -56,6 +57,10 @@ public class ActivateActivity extends Activity {
         } else {
             Log.e(LOG_TAG, "intent data: "+data+" did not match "+ActivateActivity.barcodeIntent);
             finish();
+        }
+        ImageButton backButton = findViewById(R.id.activate_back_button);
+        if (null != backButton) {
+            backButton.setOnClickListener(v -> { finish(); });
         }
     }
 

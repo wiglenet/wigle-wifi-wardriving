@@ -92,8 +92,8 @@
             android:label="@string/title_activity_activate"
             android:exported="true"
             android:parentActivityName=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
-            <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.wigle.wigleandroid.MainActivity" />

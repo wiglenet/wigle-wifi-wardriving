@@ -61,6 +61,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -890,6 +891,12 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         final ArrayList<String> hideAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
         final ArrayList<String> blockAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
 
+        ImageButton back = findViewById(R.id.network_back_button);
+        if (null != back) {
+            back.setOnClickListener( v -> {
+                finish();
+            });
+        }
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
             final View filterRowView = findViewById(R.id.filter_row);
             filterRowView.setVisibility(GONE);

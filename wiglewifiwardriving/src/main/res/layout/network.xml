@@ -56,7 +56,7 @@
                 android:layout_weight="0"
                 android:background="#00000000"
                 android:contentDescription="@string/tab_list"
-                android:src="?attr/homeAsUpIndicator"
+                android:src="@drawable/cancel"
                 android:gravity="end"/>
         </LinearLayout>
 

@@ -14,11 +14,11 @@
     <ImageButton
         android:id="@+id/activate_back_button"
         android:layout_marginTop="46dp"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="@null"
         android:contentDescription="@string/menu_settings"
-        android:src="?attr/homeAsUpIndicator"
+        android:src="@drawable/arrow_left"
         android:gravity="start"
         />
     <TextView

@@ -116,9 +116,7 @@ public class MapFilterActivity extends ScreenChildActivity {
 
         final Button finishButton = view.findViewById(R.id.finish_map_filter);
         if (null != finishButton) {
-            finishButton.setOnClickListener(v -> {
-                finish();
-            });
+            finishButton.setOnClickListener(v -> finish());
         }
 
     }

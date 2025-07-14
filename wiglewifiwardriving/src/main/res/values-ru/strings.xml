@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi — Настройки</string>
     <string name="mapping_app_name">WiGLE WiFi — Карта</string>
     <string name="dashboard_app_name">WiGLE WiFi — Обзор</string>
-    <string name="error_report_name">WiGLE WiFi — Новые ошибки</string>
+    <string name="error_report_name">Новые ошибки</string>
     <string name="speech_name">WiGLE WiFi — звуковые параметры</string>
     <string name="network_activity_name">WiGLE WiFi — Сети</string>
     <string name="data_activity_name">WiGLE WiFi — База данных</string>

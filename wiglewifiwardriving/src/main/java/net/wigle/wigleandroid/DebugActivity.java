@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -28,6 +29,14 @@ public class DebugActivity extends ScreenChildActivity {
         setContentView(R.layout.debug);
         setupSwipeRefresh();
         updateView();
+        final ImageButton backButton = findViewById(R.id.debug_back_button);
+        if (null != backButton) {
+            backButton.setOnClickListener(v -> finish());
+        }
+        final ImageButton shareButton = findViewById(R.id.debug_share_button);
+        if (shareButton != null) {
+            shareButton.setOnClickListener(v -> setupEmail());
+        }
     }
 
     private void setupSwipeRefresh() {

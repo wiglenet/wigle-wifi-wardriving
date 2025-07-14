@@ -76,7 +76,7 @@ public class SpeechActivity extends ScreenChildActivity {
 
         Button speechSettingsFinished = findViewById(R.id.finish_speech_settings);
         if (null != speechSettingsFinished) {
-            speechSettingsFinished.setOnClickListener(v-> { finish(); });
+            speechSettingsFinished.setOnClickListener(v-> finish());
        }
     }
 

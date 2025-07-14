@@ -108,14 +108,16 @@
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/error_report_name"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:theme="@style/ChildActivityTheme"/>
         <activity
             android:name=".DebugActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/menu_debug"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme"/>
         <activity
             android:name=".SpeechActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"

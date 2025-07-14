@@ -5,7 +5,7 @@
     <string name="settings_app_name">WiGLE WiFi - सेटिंग्स</string>
     <string name="mapping_app_name">WiGLE - मानचित्र</string>
     <string name="dashboard_app_name">WiGLE WiFi - डैशबोर्ड</string>
-    <string name="error_report_name">WiGLE WiFi - सबसे हाल की त्रुटि रिपोर्ट</string>
+    <string name="error_report_name">सबसे हाल की त्रुटि रिपोर्ट</string>
     <string name="speech_name">WiGLE WiFi - भाषण सेटिंग्स</string>
     <string name="network_activity_name">WiGLE WiFi - नेटवर्क</string>
     <string name="data_activity_name">WiGLE WiFi - डेटाबेस</string>

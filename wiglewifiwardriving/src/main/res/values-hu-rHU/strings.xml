@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi – Beállítások</string>
     <string name="mapping_app_name">WiGLE WiFi – Térkép</string>
     <string name="dashboard_app_name">WiGLE WiFi – Áttekintés</string>
-    <string name="error_report_name">WiGLE WiFi – Legfrissebb hibajelentés</string>
+    <string name="error_report_name">Legfrissebb hibajelentés</string>
     <string name="speech_name">WiGLE Wifi – Beszédbeállítások</string>
     <string name="network_activity_name">WiGLE WiFi – Hálózat</string>
     <string name="data_activity_name">WiGLE WiFi – Adatbázis</string>

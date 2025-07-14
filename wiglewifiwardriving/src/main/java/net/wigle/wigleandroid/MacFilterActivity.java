@@ -64,7 +64,7 @@ public class MacFilterActivity extends ScreenChildActivity {
         lv.setAdapter(filtersAdapter);
         Button doneButton = findViewById(R.id.finish_address_filter);
         if (doneButton != null) {
-            doneButton.setOnClickListener(v -> { finish(); });
+            doneButton.setOnClickListener(v -> finish());
         }
     }
 

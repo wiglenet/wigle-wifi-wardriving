@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.activity.EdgeToEdge;
+
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
@@ -32,6 +34,7 @@ public class MapFilterActivity extends ScreenChildActivity {
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.mapfilter);
+        EdgeToEdge.enable(this);
 
         //ALIBI: the map view tools reuses the filter options, which includes alert-on.
         Button alerts = findViewById(R.id.alert_filter_button);
@@ -113,5 +116,11 @@ public class MapFilterActivity extends ScreenChildActivity {
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
+
+        final Button finishButton = view.findViewById(R.id.finish_map_filter);
+        if (null != finishButton) {
+            finishButton.setOnClickListener(v -> finish());
+        }
+
     }
 }

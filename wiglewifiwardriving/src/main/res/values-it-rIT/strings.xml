@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi - Impostazioni</string>
     <string name="mapping_app_name">Lista geografica</string>
     <string name="dashboard_app_name">WiGLE WiFi - Riepilogo</string>
-    <string name="error_report_name">WiGLE WiFi - Segnalazioni di errore</string>
+    <string name="error_report_name">Segnalazioni di errore</string>
     <string name="speech_name">WiGLE WiFi - Impostazioni sintesi vocale</string>
     <string name="network_activity_name">WiGLE WiFi - Rete</string>
     <string name="data_activity_name">WiGLE WiFi - Database</string>

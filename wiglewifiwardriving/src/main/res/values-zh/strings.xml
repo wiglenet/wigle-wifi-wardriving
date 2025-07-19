@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi - 设定</string>
     <string name="mapping_app_name">WiGLE - 地图</string>
     <string name="dashboard_app_name">WiGLE WiFi - 控制面板</string>
-    <string name="error_report_name">WiGLE WiFi - 最近错误报告</string>
+    <string name="error_report_name">最近错误报告</string>
     <string name="speech_name">WiGLE WiFi - 语言</string>
     <string name="network_activity_name">WiGLE WiFi - 网路</string>
     <string name="data_activity_name">WiGLE WiFi - 数据库</string>

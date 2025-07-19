@@ -3,6 +3,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,7 +37,6 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static android.view.View.GONE;
 import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
@@ -77,6 +77,10 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
         prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         setupMap(prefs);
         setupList();
+        ImageButton backButton = findViewById(R.id.gpx_back_button);
+        if (null != backButton) {
+            backButton.setOnClickListener(v -> finish());
+        }
     }
 
     @Override

@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.activity.EdgeToEdge;
+
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
@@ -29,12 +31,13 @@ public class FilterActivity extends ScreenChildActivity {
         super.onCreate(savedInstanceState);
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
-        setContentView(R.layout.filtersettings);
+        setContentView(R.layout.listfiltersettings);
 
         final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        EdgeToEdge.enable(this);
         View view = findViewById(android.R.id.content);
         Logging.info("Filter Fragment Selected");
         final EditText regex = findViewById( R.id.edit_regex );
@@ -97,5 +100,9 @@ public class FilterActivity extends ScreenChildActivity {
             startActivity( macFilterIntent );
         });
 
+        final Button finishButton = view.findViewById(R.id.finish_filter);
+        if (null != finishButton) {
+            finishButton.setOnClickListener(v -> finish());
+        }
     }
 }

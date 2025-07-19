@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/filtersettings"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/filter_settings_caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/child_activity_background"
+        android:paddingHorizontal="14dp">
+        <TextView
+            android:paddingTop="38dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_app_name"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+    </LinearLayout>
+    <include layout="@layout/filtersettings" />
+    <LinearLayout
+        android:id="@+id/filter_settings_ok"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:paddingBottom="22dp"
+        android:paddingHorizontal="4dp"
+        android:background="@color/child_activity_background">
+        <Button
+            android:id="@+id/finish_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/listdialog_button"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="6dp"
+            />
+    </LinearLayout>
+</RelativeLayout>

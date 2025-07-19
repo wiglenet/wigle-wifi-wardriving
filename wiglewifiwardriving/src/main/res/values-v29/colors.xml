@@ -22,4 +22,5 @@
     <color name="gpx_pressed_color">#B0B0B0</color>
     <color name="gpx_selected_color">#B0B0B0</color>
     <color name="gpx_focused_color">#1A1A1A</color>
+    <color name="child_activity_background">#FFF</color>
 </resources>

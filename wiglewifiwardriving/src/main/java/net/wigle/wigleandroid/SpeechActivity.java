@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -64,7 +65,6 @@ public class SpeechActivity extends ScreenChildActivity {
             speakText.setText(getString(R.string.no_tts));
         }
 
-
         final String off = getString(R.string.off);
         final String sec = " " + getString(R.string.sec);
         final String min = " " + getString(R.string.min);
@@ -73,6 +73,11 @@ public class SpeechActivity extends ScreenChildActivity {
                 "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
         SettingsUtil.doSpinner(findViewById(R.id.speak_spinner), PreferenceKeys.PREF_SPEECH_PERIOD,
                 MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, this);
+
+        Button speechSettingsFinished = findViewById(R.id.finish_speech_settings);
+        if (null != speechSettingsFinished) {
+            speechSettingsFinished.setOnClickListener(v-> finish());
+       }
     }
 
     @Override

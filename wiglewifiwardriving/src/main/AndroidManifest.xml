@@ -92,8 +92,8 @@
             android:label="@string/title_activity_activate"
             android:exported="true"
             android:parentActivityName=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
-            <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.wigle.wigleandroid.MainActivity" />
@@ -108,21 +108,24 @@
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/error_report_name"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask"
+            android:theme="@style/ChildActivityTheme"/>
         <activity
             android:name=".DebugActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/menu_debug"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme"/>
         <activity
             android:name=".SpeechActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/speech_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -135,7 +138,8 @@
             android:exported="false"
             android:label="@string/network_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -146,7 +150,8 @@
             android:name=".RegistrationActivity"
             android:parentActivityName=".MainActivity"
             android:exported="true"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -159,12 +164,12 @@
             android:exported="false"
             android:label="@string/filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
-
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".MainActivity"/>
         </activity>
         <activity
             android:name=".MacFilterActivity"
@@ -172,7 +177,8 @@
             android:exported="false"
             android:label="@string/mac_filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".FilterActivity">
+            android:parentActivityName=".FilterActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -185,7 +191,8 @@
             android:exported="false"
             android:label="@string/mapfilter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -198,7 +205,8 @@
             android:exported="false"
             android:label="@string/dbresult_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -211,7 +219,8 @@
             android:exported="false"
             android:label="@string/manage_gpx"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

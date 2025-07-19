@@ -11,14 +11,25 @@
         android:layout_alignParentStart="true"
         android:id="@+id/camera_view"
         />
-
+    <ImageButton
+        android:id="@+id/activate_back_button"
+        android:layout_marginTop="46dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@null"
+        android:contentDescription="@string/menu_settings"
+        android:src="@drawable/arrow_left"
+        android:gravity="start"
+        />
     <TextView
         android:text="@string/setting_activate_prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:textSize="24sp" />
-
+        android:layout_marginBottom="24dp"
+        android:layout_marginHorizontal="8dp"
+        android:textColor="@color/child_activity_background"
+        android:textSize="16sp" />
 </RelativeLayout>

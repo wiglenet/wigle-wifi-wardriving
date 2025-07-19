@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:id="@+id/network_main"
+    android:fitsSystemWindows="false">
     <RelativeLayout
         android:id="@+id/netmap_rl"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" />
     <RelativeLayout
         style="@style/NetworkViewOverlay"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="4dp">
@@ -19,9 +21,9 @@
             android:id="@+id/na_network_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="38dp"
             android:layout_alignParentTop="true"
             android:orientation="horizontal">
-
             <ImageView
                 android:id="@+id/wepicon"
                 android:layout_width="wrap_content"
@@ -29,7 +31,8 @@
                 android:contentDescription="@string/crypto"
                 android:paddingLeft="4dp"
                 android:paddingTop="6dp"
-                android:paddingRight="4dp" />
+                tools:src="@drawable/wpa_ico"
+                android:paddingRight="4dp"/>
             <ImageView
                 android:id="@+id/bticon"
                 android:layout_width="wrap_content"
@@ -38,19 +41,29 @@
                 android:paddingStart="0dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="4dp"
-                android:visibility="gone" />
+                android:visibility="gone"/>
             <TextView
                 android:id="@+id/ssid"
                 style="@style/NetDetailSsid"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:gravity="start" />
+                tools:text="TARGET NETWORK"
+                android:gravity="start"/>
+            <ImageButton
+                android:id="@+id/network_back_button"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_weight="0"
+                android:background="#00000000"
+                android:contentDescription="@string/tab_list"
+                android:src="@drawable/cancel"
+                android:gravity="end"/>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/bssid_row"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/na_network_title"
             android:orientation="horizontal">
@@ -433,21 +446,23 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
+        android:paddingBottom="26dp"
+        android:paddingHorizontal="4dp"
         android:visibility="gone"
         tools:visibility="gone"
         >
-    <Button
-        android:id="@+id/query_ble_network"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dip"
-        android:layout_marginTop="5dip"
-        android:layout_marginEnd="2dip"
-        android:layout_marginBottom="3dip"
-        android:layout_weight="4"
-        android:background="@drawable/filter_button"
-        android:minHeight="0dp"
-        android:text="@string/interrogate_ble" />
+        <Button
+            android:id="@+id/query_ble_network"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginEnd="2dip"
+            android:layout_marginBottom="3dip"
+            android:layout_weight="4"
+            android:background="@drawable/filter_button"
+            android:minHeight="0dp"
+            android:text="@string/interrogate_ble" />
     </LinearLayout>
     <LinearLayout
         android:id="@+id/filter_row"
@@ -456,6 +471,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
+        android:paddingBottom="26dp"
+        android:paddingHorizontal="4dp"
         tools:visibility="visible">
         <Button
             android:id="@+id/hide_mac_button"

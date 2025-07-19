@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - Ustawienia</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Informacje</string>
-    <string name="error_report_name">WiGLE Wifi - Ostatnie raporty błędów</string>
+    <string name="error_report_name">Ostatnie raporty błędów</string>
     <string name="speech_name">WiGLE Wifi - Ustawienia mowy</string>
     <string name="network_activity_name">WiGLE Wifi - Sieć</string>
     <string name="data_activity_name">WiGLE Wifi - Baza danych</string>

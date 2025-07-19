@@ -82,9 +82,7 @@ public class DashboardFragment extends Fragment {
     scrollView = (ScrollView) inflater.inflate(R.layout.dash, container, false);
     landscape = inflater.inflate(R.layout.dashlandscape, container, false);
     portrait = inflater.inflate(R.layout.dashportrait, container, false);
-
     switchView();
-
     return scrollView;
   }
 

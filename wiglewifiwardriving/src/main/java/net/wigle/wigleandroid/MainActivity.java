@@ -19,6 +19,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.location.GnssMeasurementRequest;
 import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
@@ -272,7 +274,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // set language
         setLocale(this);
         setContentView(R.layout.main);
-
+        DrawerLayout dl = findViewById(R.id.drawer_layout);
+        if (null != dl) {
+            int [] attrs = { com.google.android.material.R.attr.scrimBackground };
+            try (@SuppressLint("ResourceType") TypedArray typedValues  = obtainStyledAttributes(R.style.AppTheme, attrs)) {
+                int scrimColor = typedValues.getColor(0, Color.parseColor("#99000000"));
+                dl.setScrimColor(scrimColor);
+            }
+        }
         setupPermissions();
         setupMenuDrawer();
 

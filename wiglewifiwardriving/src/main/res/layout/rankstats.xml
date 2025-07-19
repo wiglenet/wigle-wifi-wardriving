@@ -5,9 +5,7 @@
     android:id="@+id/linearlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="4dp"
-    >
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -25,7 +23,8 @@
     </LinearLayout>
     <RelativeLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:padding="4dp">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

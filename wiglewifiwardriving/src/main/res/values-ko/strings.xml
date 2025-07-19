@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - 설정</string>
     <string name="mapping_app_name">WiGLE Wifi - 오픈스트리트맵</string>
     <string name="dashboard_app_name">WiGLE Wifi - 대시보드</string>
-    <string name="error_report_name">WiGLE Wifi - 대부분의 최근 오류 보고서</string>
+    <string name="error_report_name">대부분의 최근 오류 보고서</string>
     <string name="speech_name">WiGLE Wifi - 음성 설정</string>
     <string name="network_activity_name">WiGLE Wifi - 네트워크</string>
     <string name="data_activity_name">WiGLE Wifi - 데이터베이스</string>

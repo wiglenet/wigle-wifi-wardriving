@@ -5,7 +5,7 @@
     <string name="settings_app_name">WiGLE WiFi – 設定</string>
     <string name="mapping_app_name">WiGLE – マップ</string>
     <string name="dashboard_app_name">WiGLE WiFi – ダッシュボード</string>
-    <string name="error_report_name">WiGLE WiFi – 最新のエラーレポート</string>
+    <string name="error_report_name">最新のエラーレポート</string>
     <string name="speech_name">WiGLE WiFi – 音声設定</string>
     <string name="network_activity_name">WiGLE WiFi – ネットワーク</string>
     <string name="data_activity_name">WiGLE WiFi – データベース</string>

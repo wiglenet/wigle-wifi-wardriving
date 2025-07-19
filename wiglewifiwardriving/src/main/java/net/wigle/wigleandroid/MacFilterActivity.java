@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.activity.EdgeToEdge;
+
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
@@ -35,6 +37,7 @@ public class MacFilterActivity extends ScreenChildActivity {
         super.onCreate(savedInstanceState);
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         setContentView(R.layout.addressfiltersettings);
+        EdgeToEdge.enable(this);
 
         Intent intent = getIntent();
         String filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);

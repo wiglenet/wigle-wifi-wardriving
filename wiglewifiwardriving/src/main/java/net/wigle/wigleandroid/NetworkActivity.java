@@ -46,6 +46,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
@@ -154,6 +155,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         setContentView(R.layout.network);
         networkActivity = this;
 
+        EdgeToEdge.enable(this);
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         ThemeUtil.setNavTheme(getWindow(), this, prefs);
 

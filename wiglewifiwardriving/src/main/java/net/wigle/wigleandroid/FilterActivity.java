@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.activity.EdgeToEdge;
+
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
@@ -35,6 +37,7 @@ public class FilterActivity extends ScreenChildActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        EdgeToEdge.enable(this);
         View view = findViewById(android.R.id.content);
         Logging.info("Filter Fragment Selected");
         final EditText regex = findViewById( R.id.edit_regex );

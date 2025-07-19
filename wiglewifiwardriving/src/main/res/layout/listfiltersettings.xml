@@ -15,7 +15,7 @@
         android:background="@color/child_activity_background"
         android:paddingHorizontal="14dp">
         <TextView
-            android:paddingTop="36dp"
+            android:paddingTop="38dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/filter_app_name"

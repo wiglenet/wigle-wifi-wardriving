@@ -40,7 +40,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.util.Base64;
@@ -863,11 +862,11 @@ public final class MappingFragment extends Fragment {
 
             item = menu.add(0, MENU_MAP_TYPE, 0, getString(R.string.menu_map_type));
             item.setIcon(R.drawable.map_layer);
-            MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             item = menu.add(0, MENU_FILTER, 0, getString(R.string.settings_map_head));
             item.setIcon(R.drawable.filter);
-            MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
             item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
@@ -881,18 +880,6 @@ public final class MappingFragment extends Fragment {
                 getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
         item = menu.add(0, MENU_WAKELOCK, 0, wake);
         item.setIcon( android.R.drawable.ic_menu_gallery );
-
-        // item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
-        // item.setIcon( android.R.drawable.ic_menu_add );
-
-        // item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
-        // item.setIcon( android.R.drawable.ic_menu_revert );
-
-        // item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-        // item.setIcon( android.R.drawable.ic_menu_preferences );
-
-        // item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-        // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
 
         super.onCreateOptionsMenu(menu, inflater);
         this.menu = menu;
@@ -1015,6 +1002,7 @@ public final class MappingFragment extends Fragment {
                         edit.apply();
                         googleMap.setMapType(newMapType);
                     });
+                    return true;
                 }
                 case MENU_WAKELOCK: {
                     boolean screenLocked = !MainActivity.isScreenLocked(this);

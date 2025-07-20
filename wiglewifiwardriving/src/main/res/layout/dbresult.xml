@@ -4,15 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="fill_parent">
     <RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_weight="1">
+		android:layout_weight="1"
+		android:paddingTop="40dp">
+		<RelativeLayout
+			android:id="@+id/result_back_button_row"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			<ImageButton
+				android:id="@+id/result_back_button"
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:paddingHorizontal="6dp"
+				android:background="#00000000"
+				android:contentDescription="@string/tab_list"
+				android:src="?attr/homeAsUpIndicator"
+				android:layout_alignParentStart="true"
+				android:gravity="start"/>
+		</RelativeLayout>
 		<fragment
 			android:name="net.wigle.wigleandroid.NetListFragment"
 			android:id="@+id/net_list"
+			android:layout_below="@id/result_back_button_row"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
 			tools:layout="@layout/net_list"
@@ -20,6 +36,7 @@
 		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			android:layout_below="@id/result_back_button_row"
 			android:layout_alignParentTop="true">
 			<ImageView
 				android:id="@+id/search_throbber"

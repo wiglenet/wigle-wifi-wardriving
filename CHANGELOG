@@ -1,3 +1,7 @@
+* 2.92 - 2.9x (07/19/2025)
+Adds MAC/OUI audio hints as a third "filter" type
+A ton of forced busywork for SDK 35
+
 * 2.90 - 2.91 (06/11/2025)
 Bluetooth characteristics and GATT/GAP interrogation
 Major refactor of BT/BLE scanning

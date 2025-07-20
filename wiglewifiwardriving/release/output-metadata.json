@@ -11,11 +11,27 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 291,
-      "versionName": "2.91",
+      "versionCode": 292,
+      "versionName": "2.92",
       "outputFile": "wiglewifiwardriving-release.apk"
     }
   ],
   "elementType": "File",
+  "baselineProfiles": [
+    {
+      "minApi": 28,
+      "maxApi": 30,
+      "baselineProfiles": [
+        "baselineProfiles/1/wiglewifiwardriving-release.dm"
+      ]
+    },
+    {
+      "minApi": 31,
+      "maxApi": 2147483647,
+      "baselineProfiles": [
+        "baselineProfiles/0/wiglewifiwardriving-release.dm"
+      ]
+    }
+  ],
   "minSdkVersionForDexing": 24
 }

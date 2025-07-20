@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +40,7 @@ public class SpeechActivity extends ScreenChildActivity {
         MainActivity.setLocale( this );
         setContentView( R.layout.speech );
         speechActivity = this;
+        EdgeToEdge.enable(this);
 
         // force media volume controls
         this.setVolumeControlStream( AudioManager.STREAM_MUSIC );

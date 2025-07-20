@@ -26,12 +26,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentActivity;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -106,10 +108,15 @@ public class DBResultActivity extends ProgressThrobberActivity {
         // set language
         MainActivity.setLocale( this );
         setContentView( R.layout.dbresult );
-
+        EdgeToEdge.enable(this);
         // force media volume controls
         setVolumeControlStream( AudioManager.STREAM_MUSIC );
         setupList();
+
+        ImageButton back = findViewById(R.id.result_back_button);
+        if (null != back) {
+            back.setOnClickListener( v -> { finish(); });
+        }
 
         QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
         loadingImage = findViewById(R.id.search_throbber);

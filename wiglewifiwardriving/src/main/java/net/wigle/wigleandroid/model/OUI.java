@@ -12,7 +12,7 @@ import java.util.Properties;
 public final class OUI {
     private final Properties properties = new Properties();
     public OUI(final AssetManager assetManager) {
-        try (InputStreamReader isr = new InputStreamReader(assetManager.open("oui.properties"), StandardCharsets.UTF_8.toString())) {
+        try (InputStreamReader isr = new InputStreamReader(assetManager.open("oui.properties"), StandardCharsets.UTF_8)) {
             properties.load(isr);
             Logging.info("oui load complete");
         }

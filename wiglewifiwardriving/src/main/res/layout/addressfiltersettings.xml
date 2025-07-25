@@ -75,7 +75,8 @@
         <ListView
             android:id="@+id/addr_filter_list_view"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent">
+            android:layout_width="match_parent"
+            tools:listitem="@layout/address_filter_list_item">
         </ListView>
     </LinearLayout>
     <LinearLayout

@@ -90,10 +90,12 @@ public class GpxExportRunnableTest {
 
         double lat = 52.2297;
         double lon = 21.0122;
+        double ele = 12.3456;
         long time = new Date().getTime();
         when(mockCursor.getDouble(0)).thenReturn(lat);
         when(mockCursor.getDouble(1)).thenReturn(lon);
-        when(mockCursor.getLong(2)).thenReturn(time);
+        when(mockCursor.getDouble(2)).thenReturn(ele);
+        when(mockCursor.getLong(3)).thenReturn(time);
 
         File tempFile = File.createTempFile("test", ".gpx");
         FileWriter writer = new FileWriter(tempFile);
@@ -106,7 +108,7 @@ public class GpxExportRunnableTest {
 
         String str = new String(Files.readAllBytes(tempFile.toPath()), StandardCharsets.UTF_8);
 
-        String expected = "<trkpt lat=\""+lat+"\" lon=\""+lon+"\"><time>" + df.format(time) + "</time></trkpt>\n";
+        String expected = "<trkpt lat=\""+lat+"\" lon=\""+lon+"\"><ele>" + ele + "</ele><time>" + df.format(time) + "</time></trkpt>\n";
 
         assertEquals(expected, str);
 

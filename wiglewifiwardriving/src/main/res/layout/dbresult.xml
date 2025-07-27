@@ -5,11 +5,13 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <RelativeLayout
+	<RelativeLayout
+		android:id="@+id/db_result_wrapper"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_weight="1"
-		android:paddingTop="40dp">
+		android:paddingTop="40dp"
+		android:background="?attr/colorPrimary">
 		<RelativeLayout
 			android:id="@+id/result_back_button_row"
 			android:layout_width="match_parent"
@@ -69,8 +71,7 @@
 	<RelativeLayout
 		android:id="@+id/db_map_rl"
 		android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1">
-    </RelativeLayout>
-
+		android:layout_height="fill_parent"
+		android:layout_weight="1">
+	</RelativeLayout>
 </LinearLayout>

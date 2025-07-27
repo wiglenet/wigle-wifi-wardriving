@@ -38,8 +38,6 @@ public class GpxExportRunnableTest {
     private Cursor mockCursor;
 
     private MockedStatic<Log> mockedLog;
-    private MockedStatic<Environment> mockedEnvironment;
-    private MockedStatic<FileUtility> mockedFileUtility;
 
     private GpxExportRunnable gpxExportRunnable;
 
@@ -58,14 +56,6 @@ public class GpxExportRunnableTest {
         mockedLog.when(() -> Log.e(anyString(), anyString())).thenReturn(0);
         mockedLog.when(() -> Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
 
-        mockedEnvironment = Mockito.mockStatic(Environment.class);
-        String filePath = "mock/external/storage";
-        File mockExternalStorageDir = new File(filePath);
-        mockedEnvironment.when(Environment::getExternalStorageDirectory).thenReturn(mockExternalStorageDir);
-
-        mockedFileUtility = Mockito.mockStatic(FileUtility.class);
-        mockedFileUtility.when(() -> FileUtility.getGpxPath(any())).thenReturn(filePath);
-
         gpxExportRunnable = new GpxExportRunnable(mockActivity, true, 100, -1);
     }
 
@@ -73,12 +63,6 @@ public class GpxExportRunnableTest {
     public void tearDown() {
         if (mockedLog != null) {
             mockedLog.close();
-        }
-        if (mockedEnvironment != null) {
-            mockedEnvironment.close();
-        }
-        if (mockedFileUtility != null) {
-            mockedFileUtility.close();
         }
     }
 

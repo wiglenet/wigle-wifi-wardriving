@@ -13,6 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
+        android:paddingTop="2dp"
         android:paddingBottom="8dp"
         android:paddingHorizontal="14dp">
         <TextView

@@ -52,8 +52,7 @@ public class FilterActivity extends ScreenChildActivity {
                         @Override
                         public @NonNull WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
                             final Insets innerPadding = insets.getInsets(
-                                    WindowInsetsCompat.Type.statusBars() /*|
-                                    WindowInsetsCompat.Type.displayCutout()*/);
+                                    WindowInsetsCompat.Type.statusBars());
                             v.setPadding(
                                     innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
                             );

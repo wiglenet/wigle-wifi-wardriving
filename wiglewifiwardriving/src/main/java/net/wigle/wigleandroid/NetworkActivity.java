@@ -163,7 +163,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         ThemeUtil.setNavTheme(getWindow(), this, prefs);
 
-        View titleLayout = findViewById(R.id.na_network_title);
+        View titleLayout = findViewById(R.id.na_network_detail_overlay);
         if (null != titleLayout) {
             ViewCompat.setOnApplyWindowInsetsListener(titleLayout, new OnApplyWindowInsetsListener() {
                         @Override

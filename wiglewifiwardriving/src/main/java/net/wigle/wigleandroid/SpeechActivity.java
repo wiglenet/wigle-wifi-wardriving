@@ -7,8 +7,14 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
@@ -41,6 +47,22 @@ public class SpeechActivity extends ScreenChildActivity {
         setContentView( R.layout.speech );
         speechActivity = this;
         EdgeToEdge.enable(this);
+        View wrapperLayout = findViewById(R.id.speech_content_wrapper);
+        if (null != wrapperLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(wrapperLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
 
         // force media volume controls
         this.setVolumeControlStream( AudioManager.STREAM_MUSIC );

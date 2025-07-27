@@ -21,7 +21,6 @@
             android:id="@+id/na_network_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="40dp"
             android:layout_alignParentTop="true"
             android:orientation="horizontal">
             <ImageView
@@ -50,6 +49,7 @@
                 android:layout_weight="10"
                 tools:text="TARGET NETWORK"
                 android:gravity="start"/>
+
             <ImageButton
                 android:id="@+id/network_back_button"
                 android:layout_width="38dp"
@@ -72,16 +72,21 @@
                 style="@style/NetDetailBssid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="6"
                 android:gravity="start"
                 android:paddingStart="4dp"
-                android:paddingEnd="4dp" />
+                android:paddingEnd="4dp"
+                android:maxLines="1"
+                tools:text="00:00:00:00:00:00"/>
             <TextView
                 android:id="@+id/oui"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:gravity="start" />
+                android:layout_weight="2"
+                android:gravity="start"
+                android:scrollHorizontally="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="WiGLE, a subsidiary of Very, Very Long Name, Inc"/>
         </LinearLayout>
 
         <RelativeLayout

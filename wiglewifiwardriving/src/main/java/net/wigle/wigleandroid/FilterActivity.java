@@ -9,11 +9,17 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Building a filter activity for the network list
@@ -37,8 +43,25 @@ public class FilterActivity extends ScreenChildActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        EdgeToEdge.enable(this);
         View view = findViewById(android.R.id.content);
+        EdgeToEdge.enable(this);
+        View titleLayout = findViewById(R.id.filter_settings_title);
+
+        if (null != titleLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(titleLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @NonNull WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() /*|
+                                    WindowInsetsCompat.Type.displayCutout()*/);
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
         Logging.info("Filter Fragment Selected");
         final EditText regex = findViewById( R.id.edit_regex );
         final String regexKey = PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_REGEX;

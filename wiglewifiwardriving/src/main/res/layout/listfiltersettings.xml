@@ -4,7 +4,8 @@
     android:id="@+id/filtersettings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorPrimary">
     <LinearLayout
         android:id="@+id/filter_settings_caption"
         android:layout_width="match_parent"
@@ -12,10 +13,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:background="@color/child_activity_background"
+        android:paddingBottom="8dp"
         android:paddingHorizontal="14dp">
         <TextView
-            android:paddingTop="38dp"
+            android:id="@+id/filter_settings_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/filter_app_name"

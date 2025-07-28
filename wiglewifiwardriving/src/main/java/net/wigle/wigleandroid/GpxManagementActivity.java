@@ -7,7 +7,12 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,17 +75,35 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     public void onCreate( final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gpx_mgmt);
+        EdgeToEdge.enable(this);
+        View backButtonWrapper = findViewById(R.id.gpx_back_layout);
+        if (null != backButtonWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(backButtonWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-        setupMap(prefs);
-        setupList();
         ImageButton backButton = findViewById(R.id.gpx_back_button);
         if (null != backButton) {
             backButton.setOnClickListener(v -> finish());
         }
+        prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        setupMap(prefs);
+        setupList();
     }
 
     @Override

@@ -5,10 +5,14 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="false"
+    android:background="?attr/colorPrimary">
     <!-- The main content view -->
-    <RelativeLayout android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/main_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorPrimary">
         <FrameLayout
             android:layout_alignParentTop="true"
             android:orientation="vertical"

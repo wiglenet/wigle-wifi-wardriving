@@ -41,13 +41,18 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.location.LocationManagerCompat;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -274,6 +279,24 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // set language
         setLocale(this);
         setContentView(R.layout.main);
+        EdgeToEdge.enable(this);
+        View mainWrapper = findViewById(R.id.main_wrapper);
+        if (null != mainWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+
         DrawerLayout dl = findViewById(R.id.drawer_layout);
         if (null != dl) {
             int [] attrs = { com.google.android.material.R.attr.scrimBackground };

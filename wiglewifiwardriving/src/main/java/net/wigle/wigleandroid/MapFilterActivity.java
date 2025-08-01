@@ -11,6 +11,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
@@ -35,7 +39,22 @@ public class MapFilterActivity extends ScreenChildActivity {
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.mapfilter);
         EdgeToEdge.enable(this);
-
+        final View filterWrapper = findViewById(R.id.map_filter_wrapper);
+        if (null != filterWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(filterWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
         //ALIBI: the map view tools reuses the filter options, which includes alert-on.
         Button alerts = findViewById(R.id.alert_filter_button);
         if (alerts != null) {

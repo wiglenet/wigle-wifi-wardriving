@@ -137,11 +137,11 @@
                 />
         </LinearLayout>
     </LinearLayout>
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
         <Button
             android:id="@+id/upload_button"
             android:layout_width="wrap_content"
@@ -268,8 +268,8 @@
             android:paddingBottom="1dip"
             android:paddingStart="3dip"
             android:layout_margin="5dip"
-            android:layout_width="44dip"
-            android:layout_height="44dip"
+            android:layout_width="46dip"
+            android:layout_height="46dip"
             app:srcCompat="@drawable/ic_wifi_simplified"
             android:scaleType="fitCenter"
             android:visibility="gone"
@@ -323,6 +323,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
+        android:background="@color/list_background"
         tools:listitem="@layout/row"
         />
 </LinearLayout>

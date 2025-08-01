@@ -11,16 +11,22 @@
         android:layout_alignParentStart="true"
         android:id="@+id/camera_view"
         />
-    <ImageButton
-        android:id="@+id/activate_back_button"
-        android:layout_marginTop="46dp"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@null"
-        android:contentDescription="@string/menu_settings"
-        android:src="@drawable/arrow_left"
-        android:gravity="start"
-        />
+    <LinearLayout
+        android:id="@+id/activate_back_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start|top">
+        <ImageButton
+            android:id="@+id/activate_back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/menu_settings"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="48dp"
+            style="@style/NetworkViewOverlay"
+            android:src="?attr/homeAsUpIndicator"
+            android:gravity="start"/>
+    </LinearLayout>
     <TextView
         android:text="@string/setting_activate_prompt"
         android:layout_width="wrap_content"

@@ -11,7 +11,7 @@
     tools:visibility="visible"
     android:layout_alignParentBottom="true"
     android:paddingTop="2dp"
-    android:paddingBottom="2dp">
+    android:paddingBottom="22dp">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"

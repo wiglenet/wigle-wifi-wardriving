@@ -296,22 +296,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     }
             );
         }
-        View progressPanel = findViewById(R.id.inline_progress_queue_status);
-        if (null != progressPanel) {
-            ViewCompat.setOnApplyWindowInsetsListener(progressPanel, new OnApplyWindowInsetsListener() {
-                        @Override
-                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
-                            final Insets innerPadding = insets.getInsets(
-                                    WindowInsetsCompat.Type.statusBars() |
-                                            WindowInsetsCompat.Type.displayCutout());
-                            v.setPadding(
-                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
-                            );
-                            return insets;
-                        }
-                    }
-            );
-        }
 
         DrawerLayout dl = findViewById(R.id.drawer_layout);
         if (null != dl) {

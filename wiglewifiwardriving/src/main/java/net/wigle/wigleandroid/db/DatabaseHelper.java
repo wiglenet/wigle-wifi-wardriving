@@ -1416,7 +1416,7 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{String.valueOf(routeId)};
-        return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = ?", args );
+        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = ?", args );
     }
 
     public Cursor routeMetaIterator() throws DBException {
@@ -1431,7 +1431,7 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
+        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
     }
 
     public void clearDefaultRoute() throws DBException {

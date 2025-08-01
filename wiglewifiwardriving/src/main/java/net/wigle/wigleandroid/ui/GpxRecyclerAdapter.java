@@ -166,7 +166,8 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
                     for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
                         final float lat = routeCursor.getFloat(0);
                         final float lon = routeCursor.getFloat(1);
-                        //final long time = routeCursor.getLong(2);
+                        //final float ele = routeCursor.getFloat(2);
+                        //final long time = routeCursor.getLong(3);
                         newRoute.addLatLng(lat, lon, mapMode, nightMode);
                     }
                     Logging.info("Loaded route with " + newRoute.getSegments() + " segments");

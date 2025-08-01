@@ -124,11 +124,18 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
             //}
             final double lat = cursor.getDouble(0);
             final double lon = cursor.getDouble(1);
-            final long time = cursor.getLong(2);
+            final double ele = cursor.getDouble(2);
+            final long time = cursor.getLong(3);
 
-            writer.append("<trkpt lat=\"").append(String.valueOf(lat)).append("\" lon=\"")
-                    .append(String.valueOf(lon)).append("\"><time>").append(
-                            dateFormat.format(new Date(time))).append("</time></trkpt>\n");
+            writer.append("<trkpt lat=\"")
+                    .append(String.valueOf(lat))
+                    .append("\" lon=\"")
+                    .append(String.valueOf(lon))
+                    .append("\"><ele>")
+                    .append(String.valueOf(ele))
+                    .append("</ele><time>")
+                    .append(dateFormat.format(new Date(time)))
+                    .append("</time></trkpt>\n");
             lineCount++;
             if (totalCount == 0) {
                 return totalCount;

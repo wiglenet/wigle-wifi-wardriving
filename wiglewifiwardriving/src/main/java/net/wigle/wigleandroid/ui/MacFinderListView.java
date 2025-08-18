@@ -50,7 +50,7 @@ public class MacFinderListView {
             } else {
                 mfgrInfo = "";
             }
-            result.add(new MacFinderListView(address, configured.contains(address), mfgrInfo));
+            result.add(new MacFinderListView(address, (null != configured && configured.contains(address)), mfgrInfo));
             //DEBUG: Logging.info("ADDED: " + address+" ("+configured.contains(address) +"): " + mfgrInfo);
         }
         return result;

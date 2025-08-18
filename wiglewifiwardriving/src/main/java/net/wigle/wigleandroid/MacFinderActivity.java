@@ -19,6 +19,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
@@ -58,11 +59,6 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Use MLKit OCR to find MAC addresses and OUIs in the device's field of vision, present a
- * checkbox-based list to manage them
- * @author rksh
- */
 public class MacFinderActivity extends AppCompatActivity {
     public static final String MAC_FILTER = "(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}";
     public static final String OUI_FILTER = "(?:[0-9A-Fa-f]{2}[:-]){2}[0-9A-Fa-f]{2}";
@@ -116,9 +112,7 @@ public class MacFinderActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         //what type of filter we're managing
-        String filterType = intent.getStringExtra(MacFilterActivity.SCAN_MAC_FILTER_MESSAGE);
-        filterKey = "";
-        Logging.info(filterType);
+        final String filterType = intent.getStringExtra(MacFilterActivity.SCAN_MAC_FILTER_MESSAGE);
         if (FilterActivity.INTENT_DISPLAY_FILTER.equals(filterType)) {
             filterKey = PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS;
         } else if (FilterActivity.INTENT_LOG_FILTER.equals(filterType)) {
@@ -134,6 +128,8 @@ public class MacFinderActivity extends AppCompatActivity {
         if (values.length > 0) {
             //ALIBI: the java.util.Arrays.ArrayList version is immutable, so a new ArrayList must be made from it.
             macOuiList = new ArrayList<>(Arrays.asList(values));
+        } else {
+            macOuiList = new ArrayList<>();
         }
 
         status = findViewById(R.id.debug_text_area);
@@ -234,7 +230,7 @@ public class MacFinderActivity extends AppCompatActivity {
                                     adapter.clear();
                                     adapter.addAll(listForAddressesAndKnown(matches, macOuiList));
                                     adapter.sort(Comparator.comparing(MacFinderListView::getName));
-                                    runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                    runOnUiThread(() -> {adapter.notifyDataSetChanged();});
                                 }
                                 image.close();
                             })
@@ -257,7 +253,9 @@ public class MacFinderActivity extends AppCompatActivity {
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
         try {
+            //cameraProvider.unbindAll();
             preview.setSurfaceProvider(previewView.getSurfaceProvider());
+            Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis, preview);
         } catch(Exception e) {
             Logging.error("failed to bind to preview: ", e);
         }
@@ -273,6 +271,8 @@ public class MacFinderActivity extends AppCompatActivity {
         super.onDestroy();
         if (null != textRecognizer) {
             textRecognizer.close();
+        }
+        if (null != cameraExecutor) {
             cameraExecutor.shutdown();
         }
     }
@@ -281,11 +281,14 @@ public class MacFinderActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions,
                                            @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CAMERA) {
-            Logging.info("Camera response permissions: " + Arrays.toString(permissions)
-                    + " grantResults: " + Arrays.toString(grantResults));
-        } else {
-            Logging.info("Unhandled onRequestPermissionsResult code: " + requestCode);
+        switch (requestCode) {
+            case REQUEST_CAMERA: {
+                Logging.info( "Camera response permissions: " + Arrays.toString(permissions)
+                        + " grantResults: " + Arrays.toString(grantResults));
+                return;
+            }
+            default:
+                Logging.info( "Unhandled onRequestPermissionsResult code: " + requestCode);
         }
     }
 
@@ -294,4 +297,5 @@ public class MacFinderActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA},
                 REQUEST_CAMERA);
     }
+
 }

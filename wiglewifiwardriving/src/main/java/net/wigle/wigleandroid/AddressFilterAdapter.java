@@ -5,11 +5,12 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
@@ -23,7 +24,7 @@ import java.util.Locale;
  * Created by rksh on 20170901
  */
 
-public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
+public class AddressFilterAdapter extends ArrayAdapter<String> implements ListAdapter {
 
     //enough to make a list and update prefs from it.
     private final List<String> list;
@@ -32,7 +33,9 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
     private final String filterKey;
 
 
-    public AddressFilterAdapter(List<String> list, Context context, final SharedPreferences prefs, final String filterKey) {
+    public AddressFilterAdapter(List<String> list, final int resource, Context context,
+                                final SharedPreferences prefs, final String filterKey) {
+        super(context, resource ,list);
         this.list = list;
         this.context = context;
         this.prefs = prefs;
@@ -45,7 +48,7 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
     }
 
     @Override
-    public Object getItem(int pos) {
+    public String getItem(int pos) {
         return list.get(pos);
     }
 
@@ -60,6 +63,7 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
         return 0L;
     }
 
+    @NonNull
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;

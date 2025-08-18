@@ -5,9 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.graphics.Insets;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
@@ -26,15 +29,17 @@ import java.util.List;
 import br.com.sapereaude.maskedEditText.MaskedEditText;
 
 /**
- * General purpose MAC-address filter creation
- * Created by arkasha on 8/31/17.
+ * General purpose MAC address and OUI filter management
+ * Created by rksh on 8/31/17.
  */
 
 public class MacFilterActivity extends ScreenChildActivity {
-
     private String filterKey;
-    List<String> listItems=new ArrayList<>();
+    ArrayList<String> listItems=new ArrayList<>();
     AddressFilterAdapter filtersAdapter;
+    public static final String SCAN_MAC_FILTER_MESSAGE = "net.wigle.wigleandroid.filter.SCAN_MAC_OR_OUI";
+    public static final String SCAN_MAC_OUI_LIST = "net.wigle.wigleandroid.filter.MAC_OUI_LIST";
+    private ActivityResultLauncher<Intent> startOcrActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +63,6 @@ public class MacFilterActivity extends ScreenChildActivity {
                     }
             );
         }
-
         Intent intent = getIntent();
         String filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
         filterKey = "";
@@ -73,21 +77,52 @@ public class MacFilterActivity extends ScreenChildActivity {
             filterKey = PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS;
         }
 
-        //DEBUG: MainActivity.info(filterKey);
+        this.startOcrActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> refreshMacsAndOuis()
+        );
+
+        ImageButton scanText = findViewById(R.id.scanAddress);
+        if (null != scanText) {
+            scanText.setOnClickListener(view -> {
+                final Intent scanAddressIntent = new Intent(getApplicationContext(), MacFinderActivity.class );
+                scanAddressIntent.putExtra(SCAN_MAC_FILTER_MESSAGE, filterType);
+                scanAddressIntent.putStringArrayListExtra(SCAN_MAC_OUI_LIST, listItems);
+                this.startOcrActivity.launch(scanAddressIntent);
+            });
+        }
+
+        ListView lv = findViewById(R.id.addr_filter_list_view);
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
         if (values.length > 0) {
             //ALIBI: the java.util.Arrays.ArrayList version is immutable, so a new ArrayList must be made from it.
             listItems = new ArrayList<>(Arrays.asList(values));
         }
-
-        ListView lv = findViewById(R.id.addr_filter_list_view);
-
-        filtersAdapter = new AddressFilterAdapter(listItems, this, prefs, filterKey);
+        filtersAdapter = new AddressFilterAdapter(listItems, lv.getId(), this, prefs, filterKey);
         lv.setAdapter(filtersAdapter);
         Button doneButton = findViewById(R.id.finish_address_filter);
         if (doneButton != null) {
             doneButton.setOnClickListener(v -> finish());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshMacsAndOuis();
+    }
+
+    private void refreshMacsAndOuis() {
+        final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        Gson gson = new Gson();
+        String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
+        if (values.length > 0) {
+            //ALIBI: the java.util.Arrays.ArrayList version is immutable, so a new ArrayList must be made from it.
+            listItems = new ArrayList<>(Arrays.asList(values));
+            filtersAdapter.clear();
+            filtersAdapter.addAll(listItems);
+            filtersAdapter.notifyDataSetChanged();
         }
     }
 
@@ -127,14 +162,14 @@ public class MacFilterActivity extends ScreenChildActivity {
      */
     public static boolean addEntry(List<String> entries, SharedPreferences prefs,
                                    final String rawEntry, final String filterKey) {
-        String formatted = "";
+        StringBuilder formatted = new StringBuilder();
         for (int i = 0; i < rawEntry.length(); i++) {
-            if ((i % 2 == 0) && ((i+1) != rawEntry.length())  && (i != 0)) formatted += ":";
-            formatted += Character.toUpperCase(rawEntry.charAt(i));
+            if ((i % 2 == 0) && ((i+1) != rawEntry.length())  && (i != 0)) formatted.append(":");
+            formatted.append(Character.toUpperCase(rawEntry.charAt(i)));
         }
-        if (!entries.contains(formatted)) {
+        if (!entries.contains(formatted.toString())) {
             Logging.info("Adding: " + formatted);
-            entries.add(formatted);
+            entries.add(formatted.toString());
 
             Gson gson = new Gson();
             String serialized = gson.toJson(entries.toArray());

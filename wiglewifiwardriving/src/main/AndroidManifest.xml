@@ -5,6 +5,9 @@
     android:versionCode="292"
     android:versionName="2.92">
 
+    <attribution android:tag="wigle"
+        android:label="@string/app_name" />
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -184,6 +187,22 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".FilterActivity" />
+        </activity>
+        <activity
+            android:name=".MacFinderActivity"
+            android:label="@string/title_activity_activate"
+            android:exported="true"
+            android:parentActivityName=".MacFilterActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.wigle.wigleandroid.MacFilterActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="net.wigle.wigleandroid" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".MapFilterActivity"

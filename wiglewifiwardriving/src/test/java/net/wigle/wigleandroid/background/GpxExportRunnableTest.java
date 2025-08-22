@@ -2,13 +2,11 @@ package net.wigle.wigleandroid.background;
 import static org.mockito.Mockito.*;
 
 import android.database.Cursor;
-import android.os.Environment;
 import android.util.Log;
 
 import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.db.DBException;
-import net.wigle.wigleandroid.util.FileUtility;
 
 import org.junit.After;
 import org.junit.Before;

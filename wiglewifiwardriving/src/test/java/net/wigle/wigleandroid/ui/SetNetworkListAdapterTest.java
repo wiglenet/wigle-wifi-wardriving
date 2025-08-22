@@ -8,7 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -99,22 +98,22 @@ public class SetNetworkListAdapterTest {
 
         System.out.print("Sorting SetBackedNetworkList by signal...");
         start = System.currentTimeMillis();
-        Collections.sort(netlist, NetworkListSorter.signalCompare);
+        netlist.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
         System.out.println(" Sorted in ("+(end-start)+"ms)");
         System.out.print("Sorting SetBackedNetworkList by channel...");
         start = System.currentTimeMillis();
-        Collections.sort(netlist, NetworkListSorter.channelCompare);
+        netlist.sort(NetworkListSorter.channelCompare);
         end = System.currentTimeMillis();
         System.out.println(" Sorted in ("+(end-start)+"ms)");
         System.out.print("Sorting SetBackedNetworkList by encryption ...");
         start = System.currentTimeMillis();
-        Collections.sort(netlist, NetworkListSorter.cryptoCompare);
+        netlist.sort(NetworkListSorter.cryptoCompare);
         end = System.currentTimeMillis();
         System.out.println(" Sorted in ("+(end-start)+"ms)");
         System.out.print("Sorting SetBackedNetworkList by time found ...");
         start = System.currentTimeMillis();
-        Collections.sort(netlist, NetworkListSorter.findTimeCompare);
+        netlist.sort(NetworkListSorter.findTimeCompare);
         end = System.currentTimeMillis();
         System.out.println(" Sorted in ("+(end-start)+"ms)");
 

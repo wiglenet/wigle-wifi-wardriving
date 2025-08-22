@@ -8,6 +8,10 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.gson.Gson;
 
@@ -38,6 +42,22 @@ public class MacFilterActivity extends ScreenChildActivity {
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         setContentView(R.layout.addressfiltersettings);
         EdgeToEdge.enable(this);
+        View addressFilterWrapper = findViewById(R.id.address_filter_wrapper);
+        if (null != addressFilterWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(addressFilterWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
 
         Intent intent = getIntent();
         String filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);

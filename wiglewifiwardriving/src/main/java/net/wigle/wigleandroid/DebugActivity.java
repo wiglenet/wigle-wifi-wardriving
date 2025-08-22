@@ -4,9 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
@@ -29,6 +35,24 @@ public class DebugActivity extends ScreenChildActivity {
         setContentView(R.layout.debug);
         setupSwipeRefresh();
         updateView();
+        EdgeToEdge.enable(this);
+        View wrapperLayout = findViewById(R.id.debug_wrapper);
+        if (null != wrapperLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(wrapperLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+
         final ImageButton backButton = findViewById(R.id.debug_back_button);
         if (null != backButton) {
             backButton.setOnClickListener(v -> finish());

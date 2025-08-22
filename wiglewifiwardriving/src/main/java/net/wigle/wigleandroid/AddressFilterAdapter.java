@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * It seems obvious that you'd want to implement all this junk in every mobile phone app that has a list.
@@ -70,6 +71,14 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
         TextView listItemText = view.findViewById(R.id.list_item_string);
         listItemText.setText(list.get(position));
 
+        TextView listItemOui = view.findViewById(R.id.address_oui);
+        if (null != listItemOui) {
+            final String lookup = list.get(position).replace(":", "").toUpperCase(Locale.ROOT);
+            if (ListFragment.lameStatic.oui != null && lookup.length() >= 6) {
+                String result = ListFragment.lameStatic.oui.getOui(lookup.substring(0, 6));
+                listItemOui.setText(result);
+            }
+        }
         ImageButton deleteBtn = view.findViewById(R.id.delete_btn);
 
         deleteBtn.setOnClickListener(v -> {

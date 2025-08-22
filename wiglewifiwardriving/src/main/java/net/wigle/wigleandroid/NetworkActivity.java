@@ -49,6 +49,10 @@ import android.os.Message;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentActivity;
@@ -158,6 +162,23 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         EdgeToEdge.enable(this);
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         ThemeUtil.setNavTheme(getWindow(), this, prefs);
+
+        View titleLayout = findViewById(R.id.na_network_detail_overlay);
+        if (null != titleLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(titleLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
 
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );

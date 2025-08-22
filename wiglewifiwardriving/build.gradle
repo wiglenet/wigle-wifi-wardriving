@@ -82,10 +82,10 @@ dependencies {
     implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'androidx.test:core:1.6.1'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'androidx.test:core:1.7.0'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
     androidTestImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
 

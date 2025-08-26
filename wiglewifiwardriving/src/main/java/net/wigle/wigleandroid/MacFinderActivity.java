@@ -285,7 +285,17 @@ public class MacFinderActivity extends AppCompatActivity {
             case REQUEST_CAMERA: {
                 Logging.info( "Camera response permissions: " + Arrays.toString(permissions)
                         + " grantResults: " + Arrays.toString(grantResults));
-                return;
+                List<String> deniedPermissions = new ArrayList<>();
+                for (int i = 0; i < permissions.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        deniedPermissions.add(permissions[i]);
+                    }
+                }
+                if (deniedPermissions.isEmpty()) {
+                    startCamera();
+                } else {
+                    finish();
+                }
             }
             default:
                 Logging.info( "Unhandled onRequestPermissionsResult code: " + requestCode);

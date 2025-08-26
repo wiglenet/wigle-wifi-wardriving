@@ -42,7 +42,9 @@ import com.google.mlkit.vision.common.InputImage;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -221,6 +223,17 @@ public class ActivateActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CAMERA) {
             Logging.info("Camera response permissions: " + Arrays.toString(permissions)
                     + " grantResults: " + Arrays.toString(grantResults));
+            List<String> deniedPermissions = new ArrayList<>();
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    deniedPermissions.add(permissions[i]);
+                }
+            }
+            if (deniedPermissions.isEmpty()) {
+                startCamera();
+            } else {
+                finish();
+            }
         } else {
             Logging.info("Unhandled onRequestPermissionsResult code: " + requestCode);
         }

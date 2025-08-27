@@ -1,0 +1,51 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:orientation="horizontal"
+    android:focusable="false"
+    >
+    <CheckBox
+        android:id="@+id/mac_oui_selected"
+        android:buttonTint="#ffae17"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:focusable="false"
+        >
+    </CheckBox>
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:focusable="false"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/text_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="8dp"
+            android:textColor="#ffae17"
+            tools:text="00:00:88:00:00:88"
+            android:textStyle="bold"
+            android:focusable="false"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/mfgr_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#ffae17"
+            android:paddingStart="8dp"
+            android:textSize="14sp"
+            android:gravity="start"
+            android:focusable="false"
+            tools:text="WiGLE, a subsidiary of Very, Very Long Name, Inc"/>
+    </LinearLayout>
+</LinearLayout>

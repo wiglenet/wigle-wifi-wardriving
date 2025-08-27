@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camera_ocr_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <LinearLayout
+        android:id="@+id/recognizer_back_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start|top"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        >
+        <ImageButton
+            android:id="@+id/recognizer_back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/menu_settings"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            style="@style/NetworkViewOverlay"
+            android:src="?attr/homeAsUpIndicator"
+            android:gravity="start"/>
+    </LinearLayout>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_centerline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".50" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_centerline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".50" />
+    <TextView
+        android:id="@+id/debug_text_area"
+        style="@style/NetworkViewOverlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        />
+    <ListView
+        android:id="@+id/select_macs_and_ouis"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:choiceMode="multipleChoice"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/vertical_centerline"
+        tools:listitem="@layout/mac_oui_list_item"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

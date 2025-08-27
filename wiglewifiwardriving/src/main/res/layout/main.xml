@@ -19,7 +19,7 @@
             android:orientation="vertical"
             android:id="@+id/tabcontent"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="0dp"
             android:layout_above="@+id/inline_status_bar"
             tools:layout="@layout/list"/>

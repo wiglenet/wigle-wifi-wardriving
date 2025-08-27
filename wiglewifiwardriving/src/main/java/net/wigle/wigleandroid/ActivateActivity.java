@@ -166,7 +166,6 @@ public class ActivateActivity extends AppCompatActivity {
                                     Logging.info("received detections");
                                     for (Barcode qr : barcodes) {
                                         if (qr.getDisplayValue() != null && qr.getDisplayValue().matches("^.*:[a-zA-Z0-9]*:[a-zA-Z0-9]*$")) {
-                                            Logging.info( qr.getDisplayValue() + " matched.");
                                             String[] tokens = qr.getDisplayValue().split(":");
 
                                             final SharedPreferences prefs = MainActivity.getMainActivity().
@@ -180,8 +179,6 @@ public class ActivateActivity extends AppCompatActivity {
                                             MainActivity.refreshApiManager();
                                             image.close();
                                             finish();
-                                        } else {
-                                            Logging.info( qr.getDisplayValue() + " failed to match token pattern");
                                         }
                                     }
                                 }

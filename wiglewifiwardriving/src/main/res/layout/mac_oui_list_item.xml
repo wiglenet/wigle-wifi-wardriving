@@ -47,6 +47,5 @@
             android:gravity="start"
             android:focusable="false"
             tools:text="WiGLE, a subsidiary of Very, Very Long Name, Inc"/>
-</LinearLayout>
-
+    </LinearLayout>
 </LinearLayout>

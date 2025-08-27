@@ -1,6 +1,12 @@
 * 2.92 - 2.9x (07/19/2025)
-Adds MAC/OUI audio hints as a third "filter" type
-A ton of forced busywork for SDK 35
+MAC/OUI audio presence/proximity hints as a third "filter" type
+GPX now exports with elevation (thanks to https://github.com/karololszacki !)
+Major layout changes necessitated by "edge-to-edge" screen layout requirement
+Added vendor based on OUI for MAC/OUI filter management activity
+Activity launch/classification fixes for SDK 35 compat
+Replacement of Play services vision with Camera X / mlkit
+Adding MAC/OUI camera recognition to simplify filter input
+Various bug and security fixes
 
 * 2.90 - 2.91 (06/11/2025)
 Bluetooth characteristics and GATT/GAP interrogation

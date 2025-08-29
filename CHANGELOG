@@ -1,4 +1,4 @@
-* 2.92 - 2.93 (08/27/2025)
+* 2.92 - 2.94 (08/29/2025)
 MAC/OUI audio presence/proximity hints as a third "filter" type
 GPX now exports with elevation (thanks to https://github.com/karololszacki !)
 Major layout changes necessitated by "edge-to-edge" screen layout requirement

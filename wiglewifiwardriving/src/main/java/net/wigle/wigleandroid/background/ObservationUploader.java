@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
@@ -178,6 +179,15 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
         }
         if (prefs != null) {
+            // validate we have a working token. this can break after device migrations
+            final String apiToken = TokenAccess.getApiToken(prefs);
+            if (apiToken == null || apiToken.isEmpty()) {
+                // clear it out
+                final SharedPreferences.Editor editor = prefs.edit();
+                editor.putString( PreferenceKeys.PREF_AUTHNAME, "" );
+                editor.apply();
+            }
+
             final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
             final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);

@@ -48,6 +48,8 @@ public class TokenAccess {
     private static final String RSA_OLD_CIPHER = "RSA/ECB/PKCS1Padding";
     private static final String RSA_CIPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
+    private static boolean hasHadApiToken = false;
+
     /**
      * test presence of a necessary API key, Keystore entry if applicable
      * @return true if present, otherwise false
@@ -60,8 +62,15 @@ public class TokenAccess {
 
                 if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)
                         || keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    //TODO: it would be best to test decrypt here, but makes this heavier
-                    return true;
+
+                    // see if we have a cached value
+                    if (hasHadApiToken) return true;
+
+                    // do a full decryption
+                    final String apiToken = getApiToken(prefs);
+                    final boolean hasApiToken = apiToken != null && !apiToken.isEmpty();
+                    if (hasApiToken) hasHadApiToken = true;
+                    return hasApiToken;
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
                 Logging.error("[TOKEN] Error trying to test token existence: ", e);
@@ -219,11 +228,13 @@ public class TokenAccess {
                     c.init(Cipher.DECRYPT_MODE, privateKey);
                     return new String(c.doFinal(cypherText), StandardCharsets.UTF_8);
                 } else {
-                    Logging.error("[TOKEN] NULL encoded cyphertext on token decrypt.");
+                    Logging.error("[TOKEN] NULL. encoded cyphertext on token decrypt.");
+                    clearApiToken(prefs);
                     return null;
                 }
             } else {
-                Logging.error("[TOKEN] NULL Private Key on token decrypt.");
+                Logging.error("[TOKEN] NULL. Private Key on token decrypt.");
+                clearApiToken(prefs);
                 return null;
             }
         } catch (CertificateException | NoSuchAlgorithmException | IOException |
@@ -231,6 +242,7 @@ public class TokenAccess {
                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException |
                 InvalidAlgorithmParameterException ex) {
             Logging.error("[TOKEN] Failed to get API Token: ", ex);
+            clearApiToken(prefs);
             return null;
         }
     }

@@ -134,6 +134,7 @@ public class MacFilterActivity extends ScreenChildActivity {
             if (addEntry(listItems, prefs, input, filterKey)) {
                 ouiInput.setText("");
                 filtersAdapter.notifyDataSetChanged();
+                refreshMacsAndOuis();
             }
         }
     }
@@ -146,6 +147,7 @@ public class MacFilterActivity extends ScreenChildActivity {
             if (addEntry(listItems, prefs, input, filterKey))  {
                 macInput.setText("");
                 filtersAdapter.notifyDataSetChanged();
+                refreshMacsAndOuis();
             }
 
         }

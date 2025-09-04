@@ -467,4 +467,5 @@
     <string name="ble_pnp_title">Podłącz i graj</string>
     <string name="ble_appearance_title">Wygląd</string>
     <string name="alert_filter_button">Alert dotyczący adresów MAC/OUI…</string>
+    <string name="status_too_many">Zbyt wiele w określonym czasie</string>
 </resources>

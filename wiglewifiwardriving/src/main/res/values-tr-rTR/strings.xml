@@ -467,5 +467,6 @@
     <string name="ble_pnp_title">Tak ve Çalıştır</string>
     <string name="ble_appearance_title">Dış görünüş</string>
     <string name="alert_filter_button">MAC/OUI uyarısı…</string>
+    <string name="status_too_many">Zaman dilimi içinde çok fazla</string>
 </resources>
 

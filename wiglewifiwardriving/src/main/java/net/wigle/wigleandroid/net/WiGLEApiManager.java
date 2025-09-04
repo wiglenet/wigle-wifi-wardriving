@@ -39,6 +39,7 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -655,8 +656,8 @@ public class WiGLEApiManager {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     if (!response.isSuccessful()) {
-                        Logging.error("Failed to upload file:"+response.code()+" "+response.message());
-                        completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        Logging.error("Failed to upload file: " + response.code() + " " + response.message());
+                        completedListener.onTaskFailed(response.code(), null);
                     } else {
                         if (null != response.body()) {
                             try (ResponseBody responseBody = response.body()) {

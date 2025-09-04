@@ -467,4 +467,5 @@
     <string name="ble_pnp_title">معرف بي إن بي</string>
     <string name="ble_appearance_title">مظهر</string>
     <string name="alert_filter_button">تنبيه بشأن أجهزة MAC/OUIs…</string>
+    <string name="status_too_many">كثير جدًا في الإطار الزمني</string>
 </resources>

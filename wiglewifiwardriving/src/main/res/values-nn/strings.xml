@@ -467,4 +467,5 @@
     <string name="ble_pnp_title">PnP ID</string>
     <string name="ble_appearance_title">Utseende</string>
     <string name="alert_filter_button">Varsel om MAC-er/OUI-er…</string>
+    <string name="status_too_many">For mange innenfor tidsrammen</string>
 </resources>

@@ -467,4 +467,5 @@
     <string name="ble_pnp_title">Подключи и играй</string>
     <string name="ble_appearance_title">внешний вид</string>
     <string name="alert_filter_button">Оповещение о MAC/OUI…</string>
+    <string name="status_too_many">Слишком много в течение определенного периода времени</string>
 </resources>

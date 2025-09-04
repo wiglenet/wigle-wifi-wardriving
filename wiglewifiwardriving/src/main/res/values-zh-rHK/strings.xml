@@ -466,4 +466,5 @@
     <string name="ble_pnp_title">即插即用</string>
     <string name="ble_appearance_title">扮相</string>
     <string name="alert_filter_button">對 MAC/OUI 發出警報…</string>
+    <string name="status_too_many">时间段内数量过多</string>
 </resources>

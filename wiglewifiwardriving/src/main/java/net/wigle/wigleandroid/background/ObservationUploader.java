@@ -294,9 +294,12 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                         try {
                             if (null != error) {
                                 final String e = error.getString("message");
-                                Logging.error(e);
+                                Logging.error("onTaskFailed: " + e);
                                 intent.putExtra("error", e);
                                 status = Status.EXCEPTION;
+                            } else if (httpStatus == 429) {
+                                final String translated = context != null? context.getString(R.string.status_too_many): "Too many within timeframe.";
+                                bundle.putString( BackgroundGuiHandler.ERROR, translated);
                             } else {
                                 final String translated = context != null? context.getString(R.string.no_wigle_conn): "Unable to connect.";
                                 bundle.putString( BackgroundGuiHandler.ERROR, translated+" (data: "+WiGLEApiManager.hasDataConnection(context)+")");

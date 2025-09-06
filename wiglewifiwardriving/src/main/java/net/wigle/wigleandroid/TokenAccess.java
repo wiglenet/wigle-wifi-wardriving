@@ -48,8 +48,6 @@ public class TokenAccess {
     private static final String RSA_OLD_CIPHER = "RSA/ECB/PKCS1Padding";
     private static final String RSA_CIPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
-    private static boolean hasHadApiToken = false;
-
     /**
      * test presence of a necessary API key, Keystore entry if applicable
      * @return true if present, otherwise false
@@ -63,14 +61,9 @@ public class TokenAccess {
                 if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)
                         || keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
 
-                    // see if we have a cached value
-                    if (hasHadApiToken) return true;
-
                     // do a full decryption
                     final String apiToken = getApiToken(prefs);
-                    final boolean hasApiToken = apiToken != null && !apiToken.isEmpty();
-                    if (hasApiToken) hasHadApiToken = true;
-                    return hasApiToken;
+                    return apiToken != null && !apiToken.isEmpty();
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
                 Logging.error("[TOKEN] Error trying to test token existence: ", e);
@@ -171,13 +164,8 @@ public class TokenAccess {
     public static boolean setApiToken(SharedPreferences prefs, String apiToken) {
         try {
             return setApiTokenVersion2(prefs, apiToken);
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
-                IOException | UnrecoverableEntryException | NoSuchPaddingException |
-                InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-            Logging.error("[TOKEN] Failed to set token: ",ex);
-            ex.printStackTrace();
         } catch (Exception e) {
-            Logging.error("[TOKEN] Other error - failed to set token: ",e);
+            Logging.error("[TOKEN] failed to set token: ",e);
             e.printStackTrace();
         }
         return false;
@@ -189,6 +177,18 @@ public class TokenAccess {
      * @return the String token or null if unavailable
      */
     public static String getApiToken(SharedPreferences prefs) {
+        final String apiToken = internalGetApiToken(prefs);
+        if (apiToken == null || apiToken.isEmpty()) {
+            // We should not carry around an API authname without a token.
+            // This can happen during device migrations.
+            final SharedPreferences.Editor editor = prefs.edit();
+            editor.putString( PreferenceKeys.PREF_AUTHNAME, "" );
+            editor.apply();
+        }
+        return apiToken;
+    }
+
+    private static String internalGetApiToken(SharedPreferences prefs) {
         try {
             final KeyStore keyStore = getKeyStore();
 

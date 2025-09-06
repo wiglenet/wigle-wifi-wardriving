@@ -179,21 +179,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
         }
         if (prefs != null) {
-            // validate we have a working token. this can break after device migrations
-            final String apiToken = TokenAccess.getApiToken(prefs);
-            if (apiToken == null || apiToken.isEmpty()) {
-                // clear it out
-                final SharedPreferences.Editor editor = prefs.edit();
-                editor.putString( PreferenceKeys.PREF_AUTHNAME, "" );
-                editor.apply();
-            }
-
+            final boolean hasApiToken = TokenAccess.hasApiToken(prefs);
             final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
             final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
             final String userPass = prefs.getString(PreferenceKeys.PREF_PASSWORD, null);
             Logging.info("authName: " + authName);
-            if ((!beAnonymous) && (authName == null) && (userName != null) && (userPass != null)) {
+            if ((!beAnonymous) && (authName == null || !hasApiToken) && (userName != null) && (userPass != null)) {
                 Logging.info("No authName, going to request token");
                 if (null != fragment) {
                     downloadTokenAndStart(fragment);

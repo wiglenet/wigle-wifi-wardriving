@@ -467,4 +467,5 @@
     <string name="ble_pnp_title">ID PnP</string>
     <string name="ble_appearance_title">Aparência</string>
     <string name="alert_filter_button">Alerta sobre MACs/OUIs…</string>
+    <string name="status_too_many">Muitos dentro do prazo</string>
 </resources>

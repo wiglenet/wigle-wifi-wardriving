@@ -298,7 +298,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                 intent.putExtra("error", e);
                                 status = Status.EXCEPTION;
                             } else if (httpStatus == 429) {
-                                final String translated = context != null? context.getString(R.string.status_too_many): "Too many within timeframe.";
+                                final String translated = context != null
+                                        ? (context.getString(R.string.tab_uploads) + ": " + context.getString(R.string.status_too_many))
+                                        : "Uploads: Too many within timeframe";
                                 bundle.putString( BackgroundGuiHandler.ERROR, translated);
                             } else {
                                 final String translated = context != null? context.getString(R.string.no_wigle_conn): "Unable to connect.";

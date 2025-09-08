@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
@@ -178,12 +179,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
         }
         if (prefs != null) {
+            final boolean hasApiToken = TokenAccess.hasApiToken(prefs);
             final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
             final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
             final String userPass = prefs.getString(PreferenceKeys.PREF_PASSWORD, null);
             Logging.info("authName: " + authName);
-            if ((!beAnonymous) && (authName == null) && (userName != null) && (userPass != null)) {
+            if ((!beAnonymous) && (authName == null || !hasApiToken) && (userName != null) && (userPass != null)) {
                 Logging.info("No authName, going to request token");
                 if (null != fragment) {
                     downloadTokenAndStart(fragment);

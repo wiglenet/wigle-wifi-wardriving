@@ -60,8 +60,10 @@ public class TokenAccess {
 
                 if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)
                         || keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    //TODO: it would be best to test decrypt here, but makes this heavier
-                    return true;
+
+                    // do a full decryption
+                    final String apiToken = getApiToken(prefs);
+                    return apiToken != null && !apiToken.isEmpty();
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
                 Logging.error("[TOKEN] Error trying to test token existence: ", e);
@@ -162,13 +164,8 @@ public class TokenAccess {
     public static boolean setApiToken(SharedPreferences prefs, String apiToken) {
         try {
             return setApiTokenVersion2(prefs, apiToken);
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
-                IOException | UnrecoverableEntryException | NoSuchPaddingException |
-                InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-            Logging.error("[TOKEN] Failed to set token: ",ex);
-            ex.printStackTrace();
         } catch (Exception e) {
-            Logging.error("[TOKEN] Other error - failed to set token: ",e);
+            Logging.error("[TOKEN] failed to set token: ",e);
             e.printStackTrace();
         }
         return false;
@@ -180,6 +177,18 @@ public class TokenAccess {
      * @return the String token or null if unavailable
      */
     public static String getApiToken(SharedPreferences prefs) {
+        final String apiToken = internalGetApiToken(prefs);
+        if (apiToken == null || apiToken.isEmpty()) {
+            // We should not carry around an API authname without a token.
+            // This can happen during device migrations.
+            final SharedPreferences.Editor editor = prefs.edit();
+            editor.putString( PreferenceKeys.PREF_AUTHNAME, "" );
+            editor.apply();
+        }
+        return apiToken;
+    }
+
+    private static String internalGetApiToken(SharedPreferences prefs) {
         try {
             final KeyStore keyStore = getKeyStore();
 
@@ -219,11 +228,13 @@ public class TokenAccess {
                     c.init(Cipher.DECRYPT_MODE, privateKey);
                     return new String(c.doFinal(cypherText), StandardCharsets.UTF_8);
                 } else {
-                    Logging.error("[TOKEN] NULL encoded cyphertext on token decrypt.");
+                    Logging.error("[TOKEN] NULL. encoded cyphertext on token decrypt.");
+                    clearApiToken(prefs);
                     return null;
                 }
             } else {
-                Logging.error("[TOKEN] NULL Private Key on token decrypt.");
+                Logging.error("[TOKEN] NULL. Private Key on token decrypt.");
+                clearApiToken(prefs);
                 return null;
             }
         } catch (CertificateException | NoSuchAlgorithmException | IOException |
@@ -231,6 +242,7 @@ public class TokenAccess {
                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException |
                 InvalidAlgorithmParameterException ex) {
             Logging.error("[TOKEN] Failed to get API Token: ", ex);
+            clearApiToken(prefs);
             return null;
         }
     }

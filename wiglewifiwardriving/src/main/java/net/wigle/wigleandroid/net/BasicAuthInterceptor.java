@@ -18,8 +18,9 @@ public class BasicAuthInterceptor implements Interceptor {
     private final String credentials;
 
     public BasicAuthInterceptor(final SharedPreferences prefs) {
-        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         final String token = TokenAccess.getApiToken(prefs);
+        // get authname second as getApiToken may clear it
+        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         this.credentials = Credentials.basic(authname, token);
     }
 

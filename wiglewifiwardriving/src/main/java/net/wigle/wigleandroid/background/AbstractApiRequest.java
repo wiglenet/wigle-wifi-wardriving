@@ -282,8 +282,9 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         PreConnectConfigurator preConnectConfigurator = null;
         if (doBasicLogin) {
             final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-            final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
+            // get authname second as getting the token may clear it
+            final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String encoded = Base64.encodeToString((authname + ":" + token).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
             // Cannot set request property after connection is made
             preConnectConfigurator = new PreConnectConfigurator() {

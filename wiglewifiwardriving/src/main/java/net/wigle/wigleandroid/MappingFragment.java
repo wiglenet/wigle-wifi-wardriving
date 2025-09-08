@@ -345,8 +345,9 @@ public final class MappingFragment extends Fragment {
                 //TODO: DRY up token composition vs AbstractApiRequest?
                 String ifAuthToken = null;
                 try {
-                    final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
                     final String token = TokenAccess.getApiToken(prefs);
+                    // get authname second, as the token may clear it
+                    final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
                     if ((null != authname) && (null != token)) {
                         final String encoded = Base64.encodeToString((authname + ":" + token).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
                         ifAuthToken = "Basic " + encoded;

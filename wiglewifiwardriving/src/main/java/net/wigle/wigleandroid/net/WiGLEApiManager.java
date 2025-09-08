@@ -726,8 +726,9 @@ public class WiGLEApiManager {
     }
 
     private static boolean hasAuthed(final SharedPreferences prefs) {
-        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         final String token = TokenAccess.getApiToken(prefs);
+        // get authname second as getApiToken may clear it
+        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         return (null != authname && !authname.isEmpty() && null != token);
     }
 

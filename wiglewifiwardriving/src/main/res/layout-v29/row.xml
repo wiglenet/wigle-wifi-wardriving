@@ -20,7 +20,7 @@
 			android:contentDescription="wep icon"
 			android:paddingStart="2dp"
 			android:paddingEnd="10dp"
-			tools:src="@drawable/wep_ico"/>
+			tools:src="@drawable/wpa3_ico"/>
 		<ImageView
 			android:id="@+id/bticon"
 			android:layout_width="wrap_content"

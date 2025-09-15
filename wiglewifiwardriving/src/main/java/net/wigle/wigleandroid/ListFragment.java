@@ -131,9 +131,23 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public Set<String> runNetworks;
         public Set<String> runBtNetworks;
         public QueryArgs queryArgs;
-        public ConcurrentLinkedHashMap<String,Network> networkCache;
+        public final ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;
-        public UniqueTaskExecutorService executorService;
+        public final UniqueTaskExecutorService executorService;
+
+        LameStatic() {
+            final long maxMemory = Runtime.getRuntime().maxMemory();
+            int cacheSize = 128;
+            if (maxMemory > 400_000_000L) {
+                cacheSize = 4000; // cap at 4,000
+            }
+            else if (maxMemory > 50_000_000L) {
+                cacheSize = (int)(maxMemory / 100_000); // 100MiB == 1000 cache
+            }
+            Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
+            networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
+            executorService = new UniqueTaskExecutorService(1);
+        }
     }
     public static final LameStatic lameStatic = new LameStatic();
 
@@ -143,20 +157,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private AnimatedVectorDrawableCompat scanningAnimation = null;
 
     private SharedPreferences prefs;
-
-    static {
-        final long maxMemory = Runtime.getRuntime().maxMemory();
-        int cacheSize = 128;
-        if (maxMemory > 400_000_000L) {
-            cacheSize = 4000; // cap at 4,000
-        }
-        else if (maxMemory > 50_000_000L) {
-            cacheSize = (int)(maxMemory / 100_000); // 100MiB == 1000 cache
-        }
-        Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
-        lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
-        lameStatic.executorService = new UniqueTaskExecutorService(1);
-    }
 
     /**
      * for the doing of things

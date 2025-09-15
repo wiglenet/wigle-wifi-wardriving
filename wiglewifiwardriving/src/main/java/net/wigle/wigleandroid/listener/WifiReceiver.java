@@ -236,6 +236,8 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( results != null ) {
             resultSize = results.size();
             for ( ScanResult result : results ) {
+                if (result == null) continue; // have seen in the wild
+
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
                     network = new Network( result );

@@ -1,3 +1,9 @@
+* 2.95 (09/14/2025)
+Vector based encryption icons
+Check token state to handle device migrations
+Informative 429 error message
+Various bug fixes
+
 * 2.92 - 2.94 (08/29/2025)
 MAC/OUI audio presence/proximity hints as a third "filter" type
 GPX now exports with elevation (thanks to https://github.com/karololszacki !)

@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    android:versionCode="294"
-    android:versionName="2.94">
+    android:versionCode="295"
+    android:versionName="2.95">
 
     <attribution android:tag="wigle"
         android:label="@string/app_name" />

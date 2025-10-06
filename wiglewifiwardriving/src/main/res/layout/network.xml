@@ -1,43 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/network_main"
-    android:fitsSystemWindows="false">
+    android:fitsSystemWindows="false"
+    tools:context=".NetworkActivity">
+
     <RelativeLayout
         android:id="@+id/netmap_rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true" />
-        <RelativeLayout
-            style="@style/NetworkViewOverlay"
-            android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        tools:background="@tools:sample/backgrounds/scenic" />
+    <RelativeLayout
+        style="@style/NetworkViewOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="4dp">
+
+        <LinearLayout
+            android:id="@+id/na_network_detail_overlay"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="4dp">
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+
             <LinearLayout
-                android:id="@+id/na_network_detail_overlay"
+                android:id="@+id/na_network_title"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:id="@+id/na_network_title"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:orientation="horizontal">
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/network_back_button"
+                    android:layout_width="36dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="0"
+                    android:background="#00000000"
+                    android:contentDescription="@string/tab_list"
+                    android:src="@drawable/arrow_left"
+                    android:gravity="start"
+                    app:tint="?attr/colorControlNormal" />
                     <ImageView
                         android:id="@+id/wepicon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/crypto"
-                        android:paddingLeft="4dp"
-                        android:paddingTop="6dp"
+                        android:paddingLeft="6dp"
                         tools:src="@drawable/wpa_ico"
-                        android:paddingRight="4dp"/>
+                        android:paddingRight="6dp"
+                        android:layout_gravity="center_vertical"/>
                     <ImageView
                         android:id="@+id/bticon"
                         android:layout_width="wrap_content"
@@ -56,15 +72,6 @@
                         tools:text="TARGET NETWORK"
                         android:gravity="start"/>
 
-                    <ImageButton
-                        android:id="@+id/network_back_button"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_weight="0"
-                        android:background="#00000000"
-                        android:contentDescription="@string/tab_list"
-                        android:src="@drawable/cancel"
-                        android:gravity="end"/>
                 </LinearLayout>
 
                 <LinearLayout

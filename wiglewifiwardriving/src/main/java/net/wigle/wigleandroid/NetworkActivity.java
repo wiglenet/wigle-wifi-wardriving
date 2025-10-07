@@ -193,11 +193,9 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         TextView tv = findViewById( R.id.bssid );
         tv.setText( bssid );
         tv.setOnLongClickListener(view -> {
-            String textToCopy = ((TextView) view).getText().toString();
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             if (null != clipboard) {
-                ClipData clip = ClipData.newPlainText("Copied BSSID", textToCopy);
-                clipboard.setText(clip.toString());
+                clipboard.setText(bssid);
             }
             return true;
         });
@@ -209,11 +207,9 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             tv = findViewById( R.id.ssid );
             tv.setText( network.getSsid() );
             tv.setOnLongClickListener(view -> {
-                String textToCopy = ((TextView) view).getText().toString();
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 if (null != clipboard) {
-                    ClipData clip = ClipData.newPlainText("Copied SSID", textToCopy);
-                    clipboard.setText(clip.toString());
+                    clipboard.setText(network.getSsid());
                 }
                 return true;
             });

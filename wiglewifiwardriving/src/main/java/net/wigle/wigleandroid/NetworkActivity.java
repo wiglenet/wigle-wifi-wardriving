@@ -31,6 +31,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -191,6 +192,13 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
 
         TextView tv = findViewById( R.id.bssid );
         tv.setText( bssid );
+        tv.setOnLongClickListener(view -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (null != clipboard) {
+                clipboard.setText(bssid);
+            }
+            return true;
+        });
 
         if ( network == null ) {
             Logging.info( "no network found in cache for bssid: " + bssid );
@@ -198,6 +206,13 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             // do gui work
             tv = findViewById( R.id.ssid );
             tv.setText( network.getSsid() );
+            tv.setOnLongClickListener(view -> {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (null != clipboard) {
+                    clipboard.setText(network.getSsid());
+                }
+                return true;
+            });
 
             final String ouiString = network.getOui(ListFragment.lameStatic.oui);
             tv = findViewById( R.id.oui );

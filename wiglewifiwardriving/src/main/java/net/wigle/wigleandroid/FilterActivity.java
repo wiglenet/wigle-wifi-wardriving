@@ -61,6 +61,22 @@ public class FilterActivity extends ScreenChildActivity {
                     }
             );
         }
+
+        View bottomToolsLayout = findViewById(R.id.filter_settings_ok);
+        if (null != bottomToolsLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(bottomToolsLayout, new OnApplyWindowInsetsListener() {
+                @Override
+                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                    final Insets innerPadding = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
+                    v.setPadding(
+                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                    );
+                    return insets;
+                }
+            });
+        }
+
         Logging.info("Filter Fragment Selected");
         final EditText regex = findViewById( R.id.edit_regex );
         final String regexKey = PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_REGEX;

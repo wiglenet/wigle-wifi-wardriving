@@ -116,7 +116,6 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
-            android:paddingBottom="20dp"
             android:background="?attr/colorPrimary">
             <Button
                 android:id="@+id/finish_address_filter"
@@ -125,7 +124,7 @@
                 android:text="@string/listdialog_button"
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"
-                android:layout_marginBottom="6dp"
+                android:layout_marginBottom="3dp"
                 />
         </LinearLayout>
     </RelativeLayout>

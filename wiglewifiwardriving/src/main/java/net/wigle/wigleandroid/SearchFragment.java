@@ -13,8 +13,14 @@ import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.Bundle;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -118,6 +124,21 @@ public class SearchFragment extends Fragment {
         final int orientation = getResources().getConfiguration().orientation;
         Logging.info("SEARCH: onCreateView. orientation: " + orientation);
         final View view = inflater.inflate(R.layout.search_nets, container, false);
+        View bottomToolsLayout = view.findViewById(R.id.network_search_buttons);
+
+        if (null != bottomToolsLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(bottomToolsLayout, new OnApplyWindowInsetsListener() {
+                @Override
+                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                    final Insets innerPadding = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
+                    v.setPadding(
+                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                    );
+                    return insets;
+                }
+            });
+        }
 
         if (ListFragment.lameStatic.queryArgs != null) {
             for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid}) {

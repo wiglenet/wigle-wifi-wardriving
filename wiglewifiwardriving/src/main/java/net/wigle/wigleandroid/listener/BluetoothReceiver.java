@@ -614,6 +614,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         m.bluetoothScan();
                     } catch (Exception ex) {
                         Logging.warn("exception starting bt scan: " + ex, ex);
+                        return false;
                     }
                 }
 

@@ -5,9 +5,8 @@
     android:versionCode="296"
     android:versionName="2.96">
 
-    <attribution android:tag="wigle"
+    <attribution android:tag="@string/empty"
         android:label="@string/app_name" />
-
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -78,10 +77,12 @@
         android:label="@string/app_name"
         android:resizeableActivity="true"
         android:theme="@style/Theme.AppCompat.DayNight"
-        android:supportsRtl="true">
+        android:enableOnBackInvokedCallback="true"
+        android:supportsRtl="true"
+        tools:targetApi="tiramisu">
         <activity
             android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|uiMode"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:label="@string/list_app_name"
             android:exported="true"
             android:launchMode="singleTask">

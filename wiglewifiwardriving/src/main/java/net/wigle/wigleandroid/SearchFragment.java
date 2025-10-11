@@ -14,7 +14,12 @@ import android.media.AudioManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -114,9 +119,35 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        View bottomToolsLayout = view.findViewById(R.id.network_search_buttons);
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                v.requestApplyInsets();
+                v.removeOnAttachStateChangeListener(this);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+            }
+        });
+
+        // Set the insets listener on the view.
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            if (null != bottomToolsLayout) {
+                final Insets innerPadding = insets.getInsets(
+                        WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
+                v.setPadding(
+                        innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                );
+            }
+            return insets; // Pass the insets down to the children
+        });
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final int orientation = getResources().getConfiguration().orientation;
-        Logging.info("SEARCH: onCreateView. orientation: " + orientation);
         final View view = inflater.inflate(R.layout.search_nets, container, false);
 
         if (ListFragment.lameStatic.queryArgs != null) {

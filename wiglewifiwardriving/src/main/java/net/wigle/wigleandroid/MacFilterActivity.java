@@ -63,6 +63,21 @@ public class MacFilterActivity extends ScreenChildActivity {
                     }
             );
         }
+
+        View bottomToolsLayout = findViewById(R.id.address_filter_settings_ok);
+        if (null != bottomToolsLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(bottomToolsLayout, new OnApplyWindowInsetsListener() {
+                @Override
+                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                    final Insets innerPadding = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
+                    v.setPadding(
+                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                    );
+                    return insets;
+                }
+            });
+        }
         Intent intent = getIntent();
         String filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
         filterKey = "";

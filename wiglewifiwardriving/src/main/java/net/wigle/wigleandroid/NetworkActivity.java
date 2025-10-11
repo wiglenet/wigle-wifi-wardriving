@@ -149,7 +149,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         // set language
         numberFormat = NumberFormat.getNumberInstance(MainActivity.getLocale(this, this.getResources().getConfiguration()));
         if (numberFormat instanceof DecimalFormat) {
@@ -181,6 +180,20 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             );
         }
 
+        View bottomToolsLayout = findViewById(R.id.bottom_tools_wrapper);
+        if (null != bottomToolsLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(bottomToolsLayout, new OnApplyWindowInsetsListener() {
+                @Override
+                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                    final Insets innerPadding = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
+                    v.setPadding(
+                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                    );
+                    return insets;
+                }
+            });
+        }
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);

@@ -74,6 +74,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.gson.Gson;
@@ -245,6 +246,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                () -> {
+                    Logging.info("state change on-fold.");
+                    //finish();
+                }
+        );
 
         if (ENABLE_DEBUG_LOGGING) {
             Logging.enableDebugLogging();

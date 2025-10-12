@@ -8,7 +8,6 @@
     android:id="@+id/network_main"
     android:fitsSystemWindows="false"
     tools:context=".NetworkActivity">
-
     <RelativeLayout
         android:id="@+id/netmap_rl"
         android:layout_width="match_parent"
@@ -21,7 +20,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="4dp">
-
         <LinearLayout
             android:id="@+id/na_network_detail_overlay"
             android:layout_width="fill_parent"
@@ -40,11 +38,12 @@
                     android:layout_width="36dp"
                     android:layout_height="38dp"
                     android:layout_weight="0"
-                    android:background="#00000000"
                     android:contentDescription="@string/tab_list"
-                    android:src="@drawable/arrow_left"
+                    android:src="?attr/homeAsUpIndicator"
                     android:gravity="start"
-                    app:tint="?attr/colorControlNormal" />
+                    android:background="#00000000"
+                    android:alpha="1.0"
+                    app:tint="?attr/android:textColor" />
                     <ImageView
                         android:id="@+id/wepicon"
                         android:layout_width="wrap_content"

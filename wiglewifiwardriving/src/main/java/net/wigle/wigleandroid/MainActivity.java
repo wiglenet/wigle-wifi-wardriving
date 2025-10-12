@@ -247,13 +247,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                () -> {
-                    Logging.info("state change on-fold.");
-                    //finish();
-                }
-        );
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> {
+                        Logging.info("state change on-fold.");
+                    }
+            );
+        }
 
         if (ENABLE_DEBUG_LOGGING) {
             Logging.enableDebugLogging();

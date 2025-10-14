@@ -1,7 +1,5 @@
 package net.wigle.wigleandroid.listener;
 
-import static net.wigle.wigleandroid.MainActivity.getMainActivity;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DecimalFormat;
@@ -30,7 +28,6 @@ import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.CellNetworkLegend;
 import net.wigle.wigleandroid.ui.WiGLEToast;
@@ -339,7 +336,9 @@ public class WifiReceiver extends BroadcastReceiver {
                 if (bssidAlertMatcher != null) {
                     bssidAlertMatcher.reset(network.getBssid());
                     if (bssidAlertMatcher.find()) {
-                        getMainActivity().updateLastHighSignal(network.getLevel());
+                        if (null != mainActivity) {
+                            mainActivity.updateLastHighSignal(network.getLevel());
+                        }
                     }
                 }
 

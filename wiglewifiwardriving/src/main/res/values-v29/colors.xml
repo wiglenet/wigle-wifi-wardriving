@@ -25,4 +25,5 @@
     <color name="child_activity_background">#FFF</color>
     <color name="border_background">#B0B0B0</color>
     <color name="list_background">#FFF</color>
+    <color name="list_item_match_background">#3CFF0000</color>
 </resources>

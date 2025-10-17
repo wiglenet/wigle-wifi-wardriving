@@ -837,7 +837,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             if (bssidAlertMatcher != null) {
                 bssidAlertMatcher.reset(network.getBssid());
                 if (bssidAlertMatcher.find()) {
-                    getMainActivity().updateLastHighSignal(network.getLevel());
+                    m.updateLastHighSignal(network.getLevel());
                 }
             }
         }

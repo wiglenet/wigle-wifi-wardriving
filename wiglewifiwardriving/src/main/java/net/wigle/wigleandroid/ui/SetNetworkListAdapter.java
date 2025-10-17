@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
+import static net.wigle.wigleandroid.R.color.list_item_match_background;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Build;
@@ -14,13 +16,16 @@ import androidx.core.widget.ImageViewCompat;
 
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.util.Comparator;
+import java.util.regex.Matcher;
 
 /**
  * the array adapter for a list of networks.
@@ -31,6 +36,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     private final SetBackedNetworkList networks = new SetBackedNetworkList();
 
     private final boolean historical;
+    private final MainActivity mainActivity;
 
     public SetNetworkListAdapter(final Context context, final boolean historical, final int rowLayout) {
         super(context, rowLayout);
@@ -38,8 +44,12 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
+        mainActivity = MainActivity.getMainActivity();
     }
 
+    public void updateBssidFilterMatcher() {
+        MainActivity mainActivity = MainActivity.getMainActivity();
+    }
     public void clearWifiAndCell() {
         networks.clearWifiAndCell();
         notifyDataSetChanged();
@@ -195,6 +205,19 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             return row;
         }
         // info( "listing net: " + network.getBssid() );
+
+        boolean matches = false;
+        Matcher bssidAlertMatcher = null != mainActivity ?
+                mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_ALERT_ADDRS) : null;
+        if (null != bssidAlertMatcher) {
+            bssidAlertMatcher.reset(network.getBssid());
+            matches = bssidAlertMatcher.find();
+        }
+        if (matches) {
+            row.setBackgroundColor(row.getResources().getColor(list_item_match_background));
+        } else {
+            row.setBackgroundColor(0);
+        }
 
         final ImageView ico = row.findViewById(R.id.wepicon);
         ico.setImageResource(NetworkListUtil.getImage(network));

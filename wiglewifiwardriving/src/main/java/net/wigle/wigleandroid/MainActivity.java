@@ -250,9 +250,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (Build.VERSION.SDK_INT >= 33) {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                    () -> {
-                        Logging.info("state change on-fold.");
-                    }
+                    () -> Logging.info("state change on-fold.")
             );
         }
 
@@ -688,7 +686,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         menuItem.setChecked(!menuItem.isChecked());
                     } else {
                         menuItem.setChecked(true);
-
                         if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
                             MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
                             mPreviousMenuItem.setChecked(false);
@@ -1369,7 +1366,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         } catch (final Exception ex) {
             Logging.error("error logging error: " + ex, ex);
-            ex.printStackTrace();
         }
     }
 
@@ -1626,7 +1622,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 editor.apply();
 
                 if (willActivateBt && useBt) {
-                    if (activationMessages.length() > 0) activationMessages += "\n";
+                    if (!activationMessages.isEmpty()) activationMessages += "\n";
                     activationMessages += getString(R.string.turn_on_bt);
                     if (willActivateWifi) {
                         activationMessages += "\n";
@@ -2169,7 +2165,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
 
                 @Override
-                public void onSatelliteStatusChanged(GnssStatus status) {
+                public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
                     if (null != state && null != state.GNSSListener && !isFinishing()) {
                         state.GNSSListener.onGnssStatusChanged(status);
                     }
@@ -2725,7 +2721,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final BluetoothUtil.AppearanceCategory cat = s.btAppearance.get(category);
             if (null != cat && cat.getSubcategories() != null) {
                 return cat.getName() + ": "+cat.getSubcategories().get(subcategory);
-            } else {
+            } else if (null != cat ){
                 return cat.getName();
             }
         }

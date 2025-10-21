@@ -88,7 +88,7 @@
             android:clipToPadding="false"
             android:id="@+id/nav_exit"
             app:showAsAction="always|withText"
-            android:title="@null"
+            android:title="@string/menu_exit"
             android:icon="@null"
             app:actionLayout="@layout/wigle_exit_item"
             />

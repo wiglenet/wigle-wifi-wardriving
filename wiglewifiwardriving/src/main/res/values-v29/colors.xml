@@ -13,7 +13,7 @@
     <color name="gps_none">#990000</color>
     <color name ="colorNavigationItem">#B0B0B0</color>
     <color name ="colorNavigationItemSelected">#303030</color>
-    <color name ="colorNavigationItemExit">#FFEEEE</color>
+    <color name ="colorNavigationItemExit">#FFC0C0</color>
     <color name ="colorNavigationItemFg">#303030</color>
     <color name ="colorNavigationItemSelectedFg">#B0B0B0</color>
     <color name ="colorNavigationItemExitFg">#770000</color>

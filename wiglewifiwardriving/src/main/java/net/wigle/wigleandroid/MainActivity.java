@@ -250,9 +250,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (Build.VERSION.SDK_INT >= 33) {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                    () -> {
-                        Logging.info("state change on-fold.");
-                    }
+                    () -> Logging.info("state change on-fold.")
             );
         }
 
@@ -597,7 +595,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             // Fire off an async request to actually get the permission
             // This will show the standard permission request dialog UI
-            requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+            requestPermissions(permissionsList.toArray(new String[0]),
                     PERMISSIONS_REQUEST);
         }
     }
@@ -688,7 +686,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         menuItem.setChecked(!menuItem.isChecked());
                     } else {
                         menuItem.setChecked(true);
-
                         if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
                             MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
                             mPreviousMenuItem.setChecked(false);
@@ -698,8 +695,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                     // close drawer when item is tapped
                     if (R.id.nav_stats == menuItem.getItemId()) {
-                        Logging.info("Nav stats clicked");
                         showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
+                        applyExitBackground(navigationView);
+                    } else if (R.id.nav_exit == menuItem.getItemId()) {
+                        selectFragment(menuItem.getItemId());
+                        return false;
                     } else {
                         if (R.id.nav_site_stats != menuItem.getItemId() &&
                                 R.id.nav_user_stats != menuItem.getItemId() &&
@@ -707,6 +707,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
                         mDrawerLayout.closeDrawers();
                         selectFragment(menuItem.getItemId());
+                        applyExitBackground(navigationView);
                     }
                     return true;
                 });
@@ -719,23 +720,56 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         //TODO:
         int menuSubColor = 0xE0777777;
         MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
-        SpannableString spanString = new SpannableString("    " + uStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
-        uStats.setTitle(spanString);
+        if (null != uStats.getTitle()) {
+            final SpannableString uSpanString = new SpannableString("    " + uStats.getTitle().toString());
+            uSpanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, uSpanString.length(), 0);
+            uStats.setTitle(uSpanString);
+        }
 
         MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
-        spanString = new SpannableString("    " + sStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
-        sStats.setTitle(spanString);
+        if (null != sStats.getTitle()) {
+            SpannableString sSpanString = new SpannableString("    " + sStats.getTitle().toString());
+            sSpanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, sSpanString.length(), 0);
+            sStats.setTitle(sSpanString);
+        }
 
         MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
-        spanString = new SpannableString("    " + rStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
-        rStats.setTitle(spanString);
+        if (null != rStats.getTitle()) {
+            SpannableString  rSpanString = new SpannableString("    " + rStats.getTitle().toString());
+            rSpanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, rSpanString.length(), 0);
+            rStats.setTitle(rSpanString);
+        }
 
         navigationView.getMenu().getItem(0).setCheckable(true);
         navigationView.getMenu().getItem(0).setChecked(true);
+
+        // Use a custom background for nav_exit menu item
+        MenuItem exitMenuItem = navigationView.getMenu().findItem(R.id.nav_exit);
+        if (exitMenuItem != null) {
+            exitMenuItem.setCheckable(false);
+            navigationView.post(() -> {
+                View exitView = navigationView.findViewById(R.id.nav_exit);
+                if (exitView != null) {
+                    exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
+                }
+            });
+        }
         // end drawer setup
+    }
+
+    /**
+     * Ugly hack to keep the exit button red when other things happen in the menu
+     * @param navigationView the exit view
+     */
+    public static void applyExitBackground(final NavigationView navigationView) {
+        if (navigationView == null) {
+            Logging.error("null exit navigation view.");
+            return;
+        }
+        View exitView = navigationView.findViewById(R.id.nav_exit);
+        if (exitView != null) {
+            exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
+        }
     }
 
     /**
@@ -1110,7 +1144,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static void setLocale(final Context context, final Configuration config) {
         final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
         final String lang = prefs.getString(PreferenceKeys.PREF_LANGUAGE, "");
-        final String current = config.locale.getLanguage();
+        final String current = config.getLocales().get(0).getLanguage();
         Logging.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
         if (!lang.isEmpty() && !current.equals(lang)) {
@@ -1129,7 +1163,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         if (newLocale != null) {
             Locale.setDefault(newLocale);
-            config.locale = newLocale;
+            config.setLocale(newLocale);
             Logging.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
             //ALIBI: loop protection
@@ -1166,7 +1200,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     public static Locale getLocale(final Context context, final Configuration config) {
         final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
-        final String current = config.locale.getLanguage();
+        final String current = config.getLocales().get(0).getLanguage();
         String lang = prefs.getString(PreferenceKeys.PREF_LANGUAGE, current);
         if (lang.isEmpty()) {
             lang = current;
@@ -1369,7 +1403,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         } catch (final Exception ex) {
             Logging.error("error logging error: " + ex, ex);
-            ex.printStackTrace();
         }
     }
 
@@ -1626,7 +1659,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 editor.apply();
 
                 if (willActivateBt && useBt) {
-                    if (activationMessages.length() > 0) activationMessages += "\n";
+                    if (!activationMessages.isEmpty()) activationMessages += "\n";
                     activationMessages += getString(R.string.turn_on_bt);
                     if (willActivateWifi) {
                         activationMessages += "\n";
@@ -1639,9 +1672,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 // tell user, cuz this takes a little while
                 if (!activationMessages.isEmpty()) {
                     String finalActivationMessages = activationMessages;
-                    handler.post(() -> {
-                        WiGLEToast.showOverActivity(this, R.string.app_name, finalActivationMessages, Toast.LENGTH_LONG);
-                    });
+                    handler.post(() -> WiGLEToast.showOverActivity(this, R.string.app_name, finalActivationMessages, Toast.LENGTH_LONG));
                 }
             }
         });
@@ -2169,7 +2200,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
 
                 @Override
-                public void onSatelliteStatusChanged(GnssStatus status) {
+                public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
                     if (null != state && null != state.GNSSListener && !isFinishing()) {
                         state.GNSSListener.onGnssStatusChanged(status);
                     }
@@ -2725,7 +2756,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final BluetoothUtil.AppearanceCategory cat = s.btAppearance.get(category);
             if (null != cat && cat.getSubcategories() != null) {
                 return cat.getName() + ": "+cat.getSubcategories().get(subcategory);
-            } else {
+            } else if (null != cat ){
                 return cat.getName();
             }
         }

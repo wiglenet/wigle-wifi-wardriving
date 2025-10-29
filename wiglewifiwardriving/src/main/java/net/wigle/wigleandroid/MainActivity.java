@@ -695,8 +695,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                     // close drawer when item is tapped
                     if (R.id.nav_stats == menuItem.getItemId()) {
-                        Logging.info("Nav stats clicked");
                         showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
+                    } else if (R.id.nav_exit == menuItem.getItemId()) {
+                        selectFragment(menuItem.getItemId());
+                        return false;
                     } else {
                         if (R.id.nav_site_stats != menuItem.getItemId() &&
                                 R.id.nav_user_stats != menuItem.getItemId() &&

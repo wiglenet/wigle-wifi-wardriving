@@ -696,6 +696,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     // close drawer when item is tapped
                     if (R.id.nav_stats == menuItem.getItemId()) {
                         showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
+                        applyExitBackground(navigationView);
                     } else if (R.id.nav_exit == menuItem.getItemId()) {
                         selectFragment(menuItem.getItemId());
                         return false;
@@ -706,6 +707,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
                         mDrawerLayout.closeDrawers();
                         selectFragment(menuItem.getItemId());
+                        applyExitBackground(navigationView);
                     }
                     return true;
                 });
@@ -744,14 +746,30 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // Use a custom background for nav_exit menu item
         MenuItem exitMenuItem = navigationView.getMenu().findItem(R.id.nav_exit);
         if (exitMenuItem != null) {
+            exitMenuItem.setCheckable(false);
             navigationView.post(() -> {
                 View exitView = navigationView.findViewById(R.id.nav_exit);
                 if (exitView != null) {
-                    exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit);
+                    exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
                 }
             });
         }
         // end drawer setup
+    }
+
+    /**
+     * Ugly hack to keep the exit button red when other things happen in the menu
+     * @param navigationView the exit view
+     */
+    public static void applyExitBackground(final NavigationView navigationView) {
+    x        if (navigationView == null) {
+            Logging.error("null exit navigation view.");
+            return;
+        }
+        View exitView = navigationView.findViewById(R.id.nav_exit);
+        if (exitView != null) {
+            exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
+        }
     }
 
     /**

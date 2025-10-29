@@ -762,7 +762,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * @param navigationView the exit view
      */
     public static void applyExitBackground(final NavigationView navigationView) {
-    x        if (navigationView == null) {
+        if (navigationView == null) {
             Logging.error("null exit navigation view.");
             return;
         }

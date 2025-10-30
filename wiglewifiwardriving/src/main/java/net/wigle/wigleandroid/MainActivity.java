@@ -744,17 +744,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         navigationView.getMenu().getItem(0).setChecked(true);
 
         // Use a custom background for nav_exit menu item
-        MenuItem exitMenuItem = navigationView.getMenu().findItem(R.id.nav_exit);
-        if (exitMenuItem != null) {
-            exitMenuItem.setCheckable(false);
-            navigationView.post(() -> {
-                View exitView = navigationView.findViewById(R.id.nav_exit);
-                if (exitView != null) {
-                    exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
-                }
-            });
-        }
-        // end drawer setup
+        applyExitBackground(navigationView);
+    // end drawer setup
     }
 
     /**
@@ -766,9 +757,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.error("null exit navigation view.");
             return;
         }
-        View exitView = navigationView.findViewById(R.id.nav_exit);
-        if (exitView != null) {
-            exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
+        MenuItem exitMenuItem = navigationView.getMenu().findItem(R.id.nav_exit);
+        if (exitMenuItem != null) {
+            exitMenuItem.setCheckable(false);
+            navigationView.post(() -> {
+                View exitView = navigationView.findViewById(R.id.nav_exit);
+                if (exitView != null) {
+                    exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
+                }
+            });
+        } else {
+            Logging.info("null exit menu item");
         }
     }
 

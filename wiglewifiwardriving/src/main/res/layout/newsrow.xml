@@ -5,15 +5,14 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:layout_margin="8dp"
+	android:layout_margin="12dp"
 	app:cardCornerRadius="8dp"
-	app:cardElevation="4dp"
-
-	>
+	app:cardElevation="4dp">
 	<LinearLayout
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		android:paddingVertical="8dp">
 	<TextView android:id="@+id/subject"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"

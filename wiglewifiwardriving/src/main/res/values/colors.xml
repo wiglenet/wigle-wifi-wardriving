@@ -26,4 +26,5 @@
     <color name="border_background">#282828</color>
     <color name="list_background">#000</color>
     <color name="list_item_match_background">#78FF0000</color>
+    <color name="news_card_background_color">#333333</color>
 </resources>

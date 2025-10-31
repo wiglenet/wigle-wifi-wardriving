@@ -7,7 +7,8 @@
 	android:layout_height="wrap_content"
 	android:layout_margin="12dp"
 	app:cardCornerRadius="8dp"
-	app:cardElevation="4dp">
+	app:cardElevation="4dp"
+	app:cardBackgroundColor="@color/news_card_background_color">
 	<LinearLayout
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
@@ -29,7 +30,7 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
-		android:paddingHorizontal="4dp"
+		android:paddingHorizontal="6dp"
 		style="@style/NewsPostStyle"
 		tools:text="Effective immediately, WiGLE will be converted to a social media, dating, payments, real-time-chat, dessert topping, floor wax!"/>
 	<TextView android:id="@+id/link"
@@ -40,7 +41,7 @@
 		android:textSize="16sp"
 		android:gravity="start"
 		android:layout_marginBottom="4sp"
-		android:paddingHorizontal="4dp"
+		android:paddingHorizontal="6dp"
 		tools:text="https://wigle.net/fortunately-not-a-real-news-article?the=thing"/>
 	</LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -780,6 +780,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             return;
         }
 
+        final NavigationView navigationView = findViewById(R.id.left_drawer);
+        if (null != navigationView) {
+            applyExitBackground(navigationView);
+        }
         final Map<Integer, String> fragmentTitles = new HashMap<>();
         fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
         fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));

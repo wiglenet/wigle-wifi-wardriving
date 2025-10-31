@@ -22,6 +22,7 @@
         android:textSize="22sp"
         android:paddingBottom="4dp"
         android:layout_below="@+id/wifi_loc_label"
+        style="@style/WiFiColor"
         />
     <TextView
         android:id="@+id/wifi_obs_label"
@@ -40,6 +41,7 @@
         android:textSize="22sp"
         android:paddingBottom="4dp"
         android:layout_below="@+id/wifi_obs_label"
+        style="@style/WiFiColor"
         />
 
     <TextView
@@ -59,6 +61,7 @@
         android:textSize="22sp"
         android:paddingBottom="4dp"
         android:layout_below="@+id/bt_loc_label"
+        style="@style/BtColor"
         />
 
     <TextView
@@ -78,6 +81,7 @@
         android:textSize="22sp"
         android:paddingBottom="4dp"
         android:layout_below="@+id/cell_loc_label"
+        style="@style/CellColor"
         />
     <TextView
         android:id="@+id/users_label"

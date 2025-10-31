@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearlayout"
     android:orientation="vertical"
@@ -10,5 +11,9 @@
         android:id="@+id/news_list_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         tools:listitem="@layout/newsrow"/>
-</LinearLayout>
+</RelativeLayout>

@@ -6,11 +6,11 @@ apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
     namespace "net.wigle.wigleandroid"
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
         minSdkVersion 24
-        targetSdkVersion 35
+        targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -57,13 +57,13 @@ ext {
     outputBtCharacteristicAppearanceFile = layout.projectDirectory.file("src/main/assets/appearance_values.yaml")
 }
 
-def camerax_version = "1.4.2"
+def camerax_version = "1.5.1"
 
 dependencies {
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
-    implementation "androidx.core:core:1.16.0"
+    implementation "androidx.core:core:1.17.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
     implementation "com.google.android.material:material:1.13.0"
     implementation "com.google.android.gms:play-services-maps:19.2.0"

@@ -50,6 +50,7 @@ import com.google.android.material.navigation.NavigationView;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.location.LocationManagerCompat;
+import androidx.core.os.BuildCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -288,6 +289,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setLocale(this);
         setContentView(R.layout.main);
         EdgeToEdge.enable(this);
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> {
+                        Logging.info("onKeyDown: not quitting app on back");
+                        selectFragment(R.id.nav_list);
+                        //TODO: anything else required to prevent exit here?
+                    }
+            );
+        }
+
         View mainWrapper = findViewById(R.id.main_wrapper);
         if (null != mainWrapper) {
             ViewCompat.setOnApplyWindowInsetsListener(mainWrapper, new OnApplyWindowInsetsListener() {
@@ -2544,23 +2557,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         super.finish();
     }
 
+    @SuppressLint("GestureBackNavigation")
     @Override
+    /*
+     * ALIBI: handle back on old (pre-predictive back) Android versions
+     */
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Logging.info("onKeyDown: not quitting app on back");
-            selectFragment(R.id.nav_list);
-            return true;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                Logging.info("onKeyDown: not quitting app on back");
+                selectFragment(R.id.nav_list);
+                return true;
+            }
         }
-        // we may want this, but devices with menu button don't get the 3 dots, so we'd have to force on the 3 dots
-        // pry not worth it. leaving in case we do want it in the future
-//        else if (keyCode == KeyEvent.KEYCODE_MENU) {
-//            if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
-//                mDrawerLayout.openDrawer(mDrawerList);
-//            } else if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-//                mDrawerLayout.closeDrawer(mDrawerList);
-//            }
-//            return true;
-//        }
         return super.onKeyDown(keyCode, event);
     }
 

@@ -2,11 +2,14 @@ package net.wigle.wigleandroid;
 
 import static android.view.View.GONE;
 
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -15,6 +18,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.checkbox.MaterialCheckBox;
 
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
@@ -121,12 +126,12 @@ public class MapFilterActivity extends ScreenChildActivity {
 
         PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
-        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true );
-        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true );
-        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true );
+        final CheckBox open = PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true, value -> updateWifiGroupCheckbox(view) );
+        final CheckBox wep = PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true, value -> updateWifiGroupCheckbox(view) );
+        final CheckBox wpa = PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true, value -> updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbt,
@@ -136,10 +141,35 @@ public class MapFilterActivity extends ScreenChildActivity {
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
 
+        updateWifiGroupCheckbox(view);
+        MaterialCheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
+        if (null != wifiCheckBox) {
+            wifiCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
+                for (int subBoxId: WIFI_SUB_BOX_IDS) {
+                    final CheckBox checkSubItem = view.findViewById(subBoxId);
+                    if (null != checkSubItem) {
+                        checkSubItem.setChecked(checked);
+                    }
+                }
+            });
+        }
+
         final Button finishButton = view.findViewById(R.id.finish_map_filter);
         if (null != finishButton) {
             finishButton.setOnClickListener(v -> finish());
         }
+    }
 
+    private static void updateWifiGroupCheckbox(final View view) {
+        PrefsBackedCheckbox.checkBoxGroupControl(view, R.id.showwifi,
+                WIFI_SUB_BOX_IDS,
+                (compoundButton, checked) -> {
+                    for (int subBoxId: WIFI_SUB_BOX_IDS) {
+                        final CheckBox checkSubItem = view.findViewById(subBoxId);
+                        if (null != checkSubItem) {
+                            checkSubItem.setChecked(checked);
+                        }
+                    }
+                });
     }
 }

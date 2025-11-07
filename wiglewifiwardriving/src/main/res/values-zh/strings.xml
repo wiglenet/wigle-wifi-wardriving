@@ -468,4 +468,5 @@
     <string name="ble_appearance_title">外形</string>
     <string name="alert_filter_button">对 MAC/OUI 发出警报…</string>
     <string name="status_too_many">时间段内数量过多</string>
+    <string name="filter_show_wifi">显示WiFi</string>
 </resources>

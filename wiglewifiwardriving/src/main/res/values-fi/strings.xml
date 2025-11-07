@@ -468,4 +468,5 @@
     <string name="ble_appearance_title">Ulkonäkö</string>
     <string name="alert_filter_button">Varoitus MAC-/OUI-osoitteista…</string>
     <string name="status_too_many">Liian monta aikataulussa</string>
+    <string name="filter_show_wifi">Näytä WiFi</string>
 </resources>

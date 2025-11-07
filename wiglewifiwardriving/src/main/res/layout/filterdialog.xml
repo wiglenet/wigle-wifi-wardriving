@@ -20,61 +20,59 @@
 	<CheckBox android:id="@+id/showinvert"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/filter_not_regex" /> 
-        
+        android:text="@string/filter_not_regex" />
+    <CheckBox
+        android:id="@+id/showwifi"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_show_wifi"/>
     <LinearLayout
-              android:orientation="horizontal"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content">	
-        <LinearLayout
-              android:orientation="vertical"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content">	
-	    	
-	    	<CheckBox android:id="@+id/showopen"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/filter_show_open"/> 
-	        
-	    	<CheckBox android:id="@+id/showcell"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/filter_show_cell" /> 
-	           
-     	</LinearLayout>
-        <LinearLayout
-          android:orientation="vertical"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content">
-	    	
-	    	<CheckBox android:id="@+id/showwep"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/filter_show_wep" />	  
-	        	        
-	    	<CheckBox android:id="@+id/showwpa"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/filter_show_wpa" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp">
 
-		</LinearLayout>
+        <CheckBox
+            android:id="@+id/showopen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_show_open"/>
 
+        <CheckBox
+            android:id="@+id/showwep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_show_wep" />
 
+        <CheckBox
+            android:id="@+id/showwpa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_show_wpa" />
     </LinearLayout>
-    <CheckBox android:id="@+id/showbt"
+    <CheckBox
+        android:id="@+id/showcell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_show_cell" />
+    <CheckBox
+        android:id="@+id/showbt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/filter_show_bt" />
 
-	<CheckBox android:id="@+id/showbtle"
+	<CheckBox
+        android:id="@+id/showbtle"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/filter_show_btle" />
 
-    <CheckBox android:id="@+id/enabled"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/filter_enabled" />
+    <CheckBox
+        android:id="@+id/enabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_enabled" />
 
 	<LinearLayout
               android:orientation="horizontal"

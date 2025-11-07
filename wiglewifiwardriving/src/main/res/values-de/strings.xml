@@ -468,4 +468,5 @@
     <string name="ble_appearance_title">Aussehen</string>
     <string name="alert_filter_button">Warnung vor MACs/OUIs…</string>
     <string name="status_too_many">Zu viele im Zeitrahmen</string>
+    <string name="filter_show_wifi">WiFi anzeigen</string>
 </resources>

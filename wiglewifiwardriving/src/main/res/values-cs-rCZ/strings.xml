@@ -468,4 +468,5 @@
     <string name="ble_appearance_title">Vzhled</string>
     <string name="alert_filter_button">Upozornění na MAC/OUI…</string>
     <string name="status_too_many">Příliš mnoho v daném časovém rámci</string>
+    <string name="filter_show_wifi">Zobrazit WiFi</string>
 </resources>

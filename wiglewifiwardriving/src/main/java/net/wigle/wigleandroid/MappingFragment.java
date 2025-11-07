@@ -90,6 +90,7 @@ import net.wigle.wigleandroid.util.StatsUtil;
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
 
 /**
  * show a map depicting current position and configurable stumbling progress information.
@@ -435,7 +436,6 @@ public final class MappingFragment extends Fragment {
                         } catch (IOException e) {
                             Logging.error("Failed while reading bytes from " +
                                     url.toExternalForm() + ": "+ e.getMessage());
-                            e.printStackTrace();
                         } finally {
                             if (is != null) {
                                 try {
@@ -443,7 +443,6 @@ public final class MappingFragment extends Fragment {
                                 } catch (IOException ioex) {
                                     Logging.error("Failed while closing InputStream " +
                                             url.toExternalForm() + ": "+ ioex.getMessage());
-                                    ioex.printStackTrace();
                                 }
                             }
                         }
@@ -1040,15 +1039,28 @@ public final class MappingFragment extends Fragment {
                 final CheckBox invert = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showinvert,
                         prefix + PreferenceKeys.PREF_MAPF_INVERT, false, prefs);
                 final CheckBox open = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showopen,
-                        prefix + PreferenceKeys.PREF_MAPF_OPEN, true, prefs);
+                        prefix + PreferenceKeys.PREF_MAPF_OPEN, true, prefs, value -> updateWifiGroupCheckbox(view));
                 final CheckBox wep = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showwep,
-                        prefix + PreferenceKeys.PREF_MAPF_WEP, true, prefs);
+                        prefix + PreferenceKeys.PREF_MAPF_WEP, true, prefs, value -> updateWifiGroupCheckbox(view));
                 final CheckBox wpa = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showwpa,
-                        prefix + PreferenceKeys.PREF_MAPF_WPA, true, prefs);
+                        prefix + PreferenceKeys.PREF_MAPF_WPA, true, prefs, value -> updateWifiGroupCheckbox(view));
                 final CheckBox cell = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showcell,
                         prefix + PreferenceKeys.PREF_MAPF_CELL, true, prefs);
                 final CheckBox enabled = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.enabled,
                         prefix + PreferenceKeys.PREF_MAPF_ENABLED, true, prefs);
+
+                updateWifiGroupCheckbox(view);
+                CheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
+                if (null != wifiCheckBox) {
+                    wifiCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
+                        for (int subBoxId: WIFI_SUB_BOX_IDS) {
+                            final CheckBox checkSubItem = view.findViewById(subBoxId);
+                            if (null != checkSubItem) {
+                                checkSubItem.setChecked(checked);
+                            }
+                        }
+                    });
+                }
 
                 Button ok = view.findViewById(R.id.ok_button);
                 ok.setOnClickListener(buttonView -> {
@@ -1178,5 +1190,18 @@ public final class MappingFragment extends Fragment {
             return OVERLAY_LIGHT;
         }
         return OVERLAY_DARK;
+    }
+
+    private static void updateWifiGroupCheckbox(final View view) {
+        PrefsBackedCheckbox.checkBoxGroupControl(view, R.id.showwifi,
+                WIFI_SUB_BOX_IDS,
+                (compoundButton, checked) -> {
+                    for (int subBoxId: WIFI_SUB_BOX_IDS) {
+                        final CheckBox checkSubItem = view.findViewById(subBoxId);
+                        if (null != checkSubItem) {
+                            checkSubItem.setChecked(checked);
+                        }
+                    }
+                });
     }
 }

@@ -468,4 +468,5 @@
     <string name="ble_appearance_title">Aspetto</string>
     <string name="alert_filter_button">Attenzione ai MAC/OUI…</string>
     <string name="status_too_many">Troppi entro i tempi previsti</string>
+    <string name="filter_show_wifi">Mostra WiFi</string>
 </resources>

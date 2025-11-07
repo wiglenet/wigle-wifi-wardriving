@@ -306,8 +306,9 @@ public final class WigleService extends Service {
             // no such thing as foreground back then
             return false;
         }
-        final boolean isForeground = getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
-        Logging.info("Service is foreground: " + isForeground);
+        final int foregroundServiceType = getForegroundServiceType();
+        final boolean isForeground = foregroundServiceType != FOREGROUND_SERVICE_TYPE_NONE;
+        Logging.info("Service is foreground: " + isForeground + " ("+foregroundServiceType+")");
         return isForeground;
     }
 

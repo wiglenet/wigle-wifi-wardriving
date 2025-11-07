@@ -72,7 +72,6 @@ import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
-import com.google.android.material.checkbox.MaterialCheckBox;
 
 import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -1051,7 +1050,7 @@ public final class MappingFragment extends Fragment {
                         prefix + PreferenceKeys.PREF_MAPF_ENABLED, true, prefs);
 
                 updateWifiGroupCheckbox(view);
-                MaterialCheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
+                CheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
                 if (null != wifiCheckBox) {
                     wifiCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
                         for (int subBoxId: WIFI_SUB_BOX_IDS) {

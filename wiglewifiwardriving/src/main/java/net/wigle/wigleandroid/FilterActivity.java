@@ -17,8 +17,6 @@ import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.material.checkbox.MaterialCheckBox;
-
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.Logging;
@@ -125,7 +123,7 @@ public class FilterActivity extends ScreenChildActivity {
         PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbtle,
                 PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true);
 
-        MaterialCheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
+        CheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
         updateWifiGroupCheckbox(view);
         if (null != wifiCheckBox) {
             wifiCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {

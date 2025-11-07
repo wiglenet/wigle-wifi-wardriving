@@ -17,11 +17,11 @@
 		/>
 	</com.google.android.material.textfield.TextInputLayout>
 
-	<com.google.android.material.checkbox.MaterialCheckBox android:id="@+id/showinvert"
+	<CheckBox android:id="@+id/showinvert"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/filter_not_regex" />
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/showwifi"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -33,42 +33,42 @@
         android:paddingStart="16dp"
         android:paddingEnd="0dp">
 
-        <com.google.android.material.checkbox.MaterialCheckBox
+        <CheckBox
             android:id="@+id/showopen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/filter_show_open"/>
 
-        <com.google.android.material.checkbox.MaterialCheckBox
+        <CheckBox
             android:id="@+id/showwep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/filter_show_wep" />
 
-        <com.google.android.material.checkbox.MaterialCheckBox
+        <CheckBox
             android:id="@+id/showwpa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/filter_show_wpa" />
     </LinearLayout>
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/showcell"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/filter_show_cell" />
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/showbt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/filter_show_bt" />
 
-	<com.google.android.material.checkbox.MaterialCheckBox
+	<CheckBox
         android:id="@+id/showbtle"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/filter_show_btle" />
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/enabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

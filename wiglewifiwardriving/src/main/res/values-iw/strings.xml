@@ -469,4 +469,5 @@
     <string name="alert_filter_button">התראה על חשבונות MAC/OUI…</string>
     <string name="status_too_many">יותר מדי בתוך מסגרת הזמן</string>
     <string name="filter_show_wifi">הצג WiFi</string>
+    <string name="filter_show_bt_classic">הצג Bluetooth Classic</string>
 </resources>

@@ -468,4 +468,5 @@
     <string name="alert_filter_button">MAC/OUI पर चेतावनी…</string>
     <string name="status_too_many">समय सीमा के भीतर बहुत अधिक</string>
     <string name="filter_show_wifi">WiFi दिखाएं</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic दिखाएं</string>
 </resources>

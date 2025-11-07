@@ -468,4 +468,5 @@
     <string name="alert_filter_button">MAC/OUI に関する警告…</string>
     <string name="status_too_many">時間枠内に多すぎる</string>
     <string name="filter_show_wifi">WiFiを表示</string>
+    <string name="filter_show_bt_classic">Bluetooth Classicを表示</string>
 </resources>

@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Waarschuwing voor MAC\'s/OUI\'s…</string>
     <string name="status_too_many">Te veel binnen het tijdsbestek</string>
     <string name="filter_show_wifi">WiFi weergeven</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic weergeven</string>
 </resources>

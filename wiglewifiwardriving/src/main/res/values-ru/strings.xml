@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Оповещение о MAC/OUI…</string>
     <string name="status_too_many">Слишком много в течение определенного периода времени</string>
     <string name="filter_show_wifi">Показать WiFi</string>
+    <string name="filter_show_bt_classic">Показать Bluetooth Classic</string>
 </resources>

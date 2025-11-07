@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Attenzione ai MAC/OUI…</string>
     <string name="status_too_many">Troppi entro i tempi previsti</string>
     <string name="filter_show_wifi">Mostra WiFi</string>
+    <string name="filter_show_bt_classic">Mostra Bluetooth Classic</string>
 </resources>

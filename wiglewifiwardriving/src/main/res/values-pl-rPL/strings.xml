@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Alert dotyczący adresów MAC/OUI…</string>
     <string name="status_too_many">Zbyt wiele w określonym czasie</string>
     <string name="filter_show_wifi">Pokaż WiFi</string>
+    <string name="filter_show_bt_classic">Pokaż Bluetooth Classic</string>
 </resources>

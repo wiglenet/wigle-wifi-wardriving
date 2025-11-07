@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Varoitus MAC-/OUI-osoitteista…</string>
     <string name="status_too_many">Liian monta aikataulussa</string>
     <string name="filter_show_wifi">Näytä WiFi</string>
+    <string name="filter_show_bt_classic">Näytä Bluetooth Classic</string>
 </resources>

@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Waarschuwing voor MAC\'s/OUI\'s…</string>
     <string name="status_too_many">Tefolle binnen de tiidsperioade</string>
     <string name="filter_show_wifi">WiFi toane</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic toane</string>
 </resources>

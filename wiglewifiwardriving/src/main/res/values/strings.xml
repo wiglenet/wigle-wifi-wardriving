@@ -471,4 +471,5 @@
     <string name="alert_filter_button">Alert on MACs/OUIs…</string>
     <string name="status_too_many">Too many within timeframe</string>
     <string name="filter_show_wifi">Show WiFi</string>
+    <string name="filter_show_bt_classic">Show Bluetooth Classic</string>
 </resources>

@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.BT_SUB_BOX_IDS;
 import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
 
 import android.content.Intent;
@@ -19,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
+import net.wigle.wigleandroid.util.FilterUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -108,33 +110,24 @@ public class FilterActivity extends ScreenChildActivity {
 
         PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
                 PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
-        final CheckBox open = PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
-                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true, value -> updateWifiGroupCheckbox(view));
-        final CheckBox wep = PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
-                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true, value -> updateWifiGroupCheckbox(view));
-        final CheckBox wpa = PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
-                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true, value -> updateWifiGroupCheckbox(view));
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true, value -> FilterUtil.updateWifiGroupCheckbox(view));
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true, value -> FilterUtil.updateWifiGroupCheckbox(view));
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true, value -> FilterUtil.updateWifiGroupCheckbox(view));
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
                 PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
-        PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbt,
-                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BT, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbtc,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BT, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
         PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbtle,
-                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true);
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
 
-        CheckBox wifiCheckBox = view.findViewById(R.id.showwifi);
-        updateWifiGroupCheckbox(view);
-        if (null != wifiCheckBox) {
-            wifiCheckBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                for (int subBoxId: WIFI_SUB_BOX_IDS) {
-                    final CheckBox checkSubItem = view.findViewById(subBoxId);
-                    if (null != checkSubItem) {
-                        checkSubItem.setChecked(checked);
-                    }
-                }
-            });
-        }
+        FilterUtil.updateWifiGroupCheckbox(view);
+        FilterUtil.updateBluetoothGroupCheckbox(view);
+
         final Button filter_display_button = view.findViewById(R.id.display_filter_button);
         filter_display_button.setOnClickListener(view1 -> {
             final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
@@ -160,18 +153,5 @@ public class FilterActivity extends ScreenChildActivity {
         if (null != finishButton) {
             finishButton.setOnClickListener(v -> finish());
         }
-    }
-
-    private static void updateWifiGroupCheckbox(final View view) {
-        PrefsBackedCheckbox.checkBoxGroupControl(view, R.id.showwifi,
-                WIFI_SUB_BOX_IDS,
-                (compoundButton, checked) -> {
-                    for (int subBoxId: WIFI_SUB_BOX_IDS) {
-                        final CheckBox checkSubItem = view.findViewById(subBoxId);
-                        if (null != checkSubItem) {
-                            checkSubItem.setChecked(checked);
-                        }
-                    }
-                });
     }
 }

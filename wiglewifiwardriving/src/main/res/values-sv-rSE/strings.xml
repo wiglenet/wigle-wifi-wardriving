@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Varning om MAC-adresser/OUI-adresser…</string>
     <string name="status_too_many">För många inom tidsramen</string>
     <string name="filter_show_wifi">Visa WiFi</string>
+    <string name="filter_show_bt_classic">Visa Bluetooth Classic</string>
 </resources>

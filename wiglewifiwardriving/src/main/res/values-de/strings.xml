@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Warnung vor MACs/OUIs…</string>
     <string name="status_too_many">Zu viele im Zeitrahmen</string>
     <string name="filter_show_wifi">WiFi anzeigen</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic anzeigen</string>
 </resources>

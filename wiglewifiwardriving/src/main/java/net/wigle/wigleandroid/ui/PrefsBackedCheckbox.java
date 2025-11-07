@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class PrefsBackedCheckbox {
     public static final List<Integer> WIFI_SUB_BOX_IDS = Arrays.asList(R.id.showwpa, R.id.showwep, R.id.showopen);
+    public static final List<Integer> BT_SUB_BOX_IDS = Arrays.asList(R.id.showbtc, R.id.showbtle);
 
     public static CheckBox prefSetCheckBox(final Context context, final View view, final int id,
                                            final String pref, final boolean def, final SharedPreferences prefs) {

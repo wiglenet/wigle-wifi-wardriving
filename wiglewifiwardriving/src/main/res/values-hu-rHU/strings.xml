@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Figyelmeztetés MAC/OUI címekkel kapcsolatban…</string>
     <string name="status_too_many">Túl sok az időkereten belül</string>
     <string name="filter_show_wifi">WiFi megjelenítése</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic megjelenítése</string>
 </resources>

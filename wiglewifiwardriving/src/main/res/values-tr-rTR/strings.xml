@@ -469,5 +469,6 @@
     <string name="alert_filter_button">MAC/OUI uyarısı…</string>
     <string name="status_too_many">Zaman dilimi içinde çok fazla</string>
     <string name="filter_show_wifi">WiFi\'yi Göster</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic\'i Göster</string>
 </resources>
 

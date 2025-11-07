@@ -469,4 +469,5 @@
     <string name="alert_filter_button">MAC/OUI에 대한 경고…</string>
     <string name="status_too_many">시간 내에 너무 많은</string>
     <string name="filter_show_wifi">WiFi 표시</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic 표시</string>
 </resources>

@@ -468,4 +468,5 @@
     <string name="alert_filter_button">Tahadhari kwenye MAC/OUIs…</string>
     <string name="status_too_many">Nyingi mno ndani ya muda uliopangwa</string>
     <string name="filter_show_wifi">Onyesha WiFi</string>
+    <string name="filter_show_bt_classic">Onyesha Bluetooth Classic</string>
 </resources>

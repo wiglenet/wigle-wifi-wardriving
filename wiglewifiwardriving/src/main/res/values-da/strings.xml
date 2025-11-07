@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Advarsel om MAC\'er/OUI\'er…</string>
     <string name="status_too_many">For mange inden for tidsrammen</string>
     <string name="filter_show_wifi">Vis WiFi</string>
+    <string name="filter_show_bt_classic">Vis Bluetooth Classic</string>
 </resources>

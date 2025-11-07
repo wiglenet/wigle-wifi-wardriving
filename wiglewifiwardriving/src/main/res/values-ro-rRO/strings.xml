@@ -469,4 +469,5 @@
     <string name="alert_filter_button">Alertă privind MAC-urile/OUI-urile…</string>
     <string name="status_too_many">Prea multe în intervalul de timp</string>
     <string name="filter_show_wifi">Afișează WiFi</string>
+    <string name="filter_show_bt_classic">Afișează Bluetooth Classic</string>
 </resources>

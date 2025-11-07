@@ -469,4 +469,5 @@
     <string name="alert_filter_button">تنبيه بشأن أجهزة MAC/OUIs…</string>
     <string name="status_too_many">كثير جدًا في الإطار الزمني</string>
     <string name="filter_show_wifi">إظهار WiFi</string>
+    <string name="filter_show_bt_classic">إظهار Bluetooth Classic</string>
 </resources>

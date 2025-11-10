@@ -476,4 +476,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Hide</string>
     <string name="alert">Alert</string>
+    <string name="ignore_battery_permission">Ignore battery optimizations</string>
 </resources>

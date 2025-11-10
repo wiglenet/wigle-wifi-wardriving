@@ -472,4 +472,6 @@
     <string name="status_too_many">Too many within timeframe</string>
     <string name="filter_show_wifi">Show WiFi</string>
     <string name="filter_show_bt_classic">Show Bluetooth Classic</string>
+    <string name="ignore_battery_permission">Ignore battery optimizations</string>
+
 </resources>

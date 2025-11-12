@@ -1327,16 +1327,17 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     private static void checkChangeHandler(final boolean checked, final String ssid, final boolean ouiMode,
                                             final List<String> currentAddresses, String prefKey, SharedPreferences prefs) {
         if (ssid != null) {
+            final String useSsid = ouiMode ? ssid.substring(0,8).toUpperCase(Locale.ROOT) : ssid.toUpperCase(Locale.ROOT);
             final String entryText = ouiMode ? ssid.replace(":", "").substring(0, 6) : ssid.replace(":", "");
             if (checked) {
                 MacFilterActivity.addEntry(currentAddresses,
                         prefs, entryText, prefKey);
             } else {
-                if (currentAddresses.remove(ssid.toUpperCase(Locale.ROOT))) {
+                if (currentAddresses.remove(useSsid)) {
                     MacFilterActivity.updateEntries(currentAddresses,
                             prefs, prefKey);
                 } else {
-                    Logging.error("Attempted to remove " + prefKey + ": " + ssid + " but unable to match. (oui: "+ouiMode+", "+currentAddresses+")");
+                    Logging.error("Attempted to remove " + prefKey + ": " + useSsid + " but unable to match. (oui: "+ouiMode+", "+currentAddresses+")");
                 }
             }
 

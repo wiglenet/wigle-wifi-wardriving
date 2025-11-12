@@ -463,11 +463,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@id/filter_row"
             android:orientation="horizontal"
             android:paddingHorizontal="4dp"
             android:visibility="gone"
-            tools:visibility="gone"
+            tools:visibility="visible"
             >
             <Button
                 android:id="@+id/query_ble_network"
@@ -493,7 +493,8 @@
             android:paddingHorizontal="4dp"
             android:paddingVertical="8dp"
             style="@style/NetworkViewOverlay"
-            tools:visibility="visible">
+            tools:visibility="visible"
+            >
             <LinearLayout
                 android:id="@+id/hide_col"
                 android:layout_width="match_parent"

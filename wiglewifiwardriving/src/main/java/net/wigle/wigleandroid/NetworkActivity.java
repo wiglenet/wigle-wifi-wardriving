@@ -319,8 +319,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         final String mnc = operatorCode.substring(3);
                         final String mcc = operatorCode.substring(0, 3);
 
-                        //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
-
                         try {
                             final MainActivity.State s = MainActivity.getStaticState();
                             if (s != null && s.mxcDbHelper != null) {
@@ -668,9 +666,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     gatt.disconnect();
                     gatt.close();
                     found.set(false);
-                    runOnUiThread(() -> {
-                        WiGLEToast.showOverActivity(activity, R.string.btloc_title, "characteristic change.");
-                    });
+                    runOnUiThread(() -> WiGLEToast.showOverActivity(activity, R.string.btloc_title, "characteristic change."));
                 }
                 @SuppressLint("MissingPermission")
                 @Override
@@ -681,9 +677,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     gatt.close();
                     found.set(false);
                     done.set(true);
-                    runOnUiThread(() -> {
-                        WiGLEToast.showOverActivity(activity, R.string.btloc_title, "service change.");
-                    });
+                    runOnUiThread(() -> WiGLEToast.showOverActivity(activity, R.string.btloc_title, "service change."));
                 }
 
                 @SuppressLint("MissingPermission")
@@ -959,9 +953,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
 
         ImageButton back = findViewById(R.id.network_back_button);
         if (null != back) {
-            back.setOnClickListener( v -> {
-                finish();
-            });
+            back.setOnClickListener( v -> finish());
         }
         if ( ! NetworkType.WIFI.equals(network.getType()) && !NetworkType.isBtType(network.getType())) {
             final View filterRowView = findViewById(R.id.filter_row);
@@ -1008,36 +1000,35 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 }
             }
 
-            hideMacBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                checkChangeHandler(checked, network.getBssid(), false, hideAddresses, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS, prefs);
-            });
+            hideMacBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(checked, network.getBssid(), false, hideAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS, prefs));
 
-            hideOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                checkChangeHandler(checked, network.getBssid(), true, hideAddresses, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS, prefs);
-            });
+            hideOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), true, hideAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS, prefs));
 
-            disableLogMacBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                checkChangeHandler(checked, network.getBssid(), false, blockAddresses, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS, prefs);
-            });
+            disableLogMacBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), false, blockAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS, prefs));
 
-            disableLogOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                checkChangeHandler(checked, network.getBssid(), true, blockAddresses, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS, prefs);
-            });
+            disableLogOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), true, blockAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS, prefs));
 
-            alertMacBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                checkChangeHandler(checked, network.getBssid(), false, alertAddresses, PreferenceKeys.PREF_ALERT_ADDRS, prefs);
-            });
+            alertMacBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), false, alertAddresses,
+                    PreferenceKeys.PREF_ALERT_ADDRS, prefs));
 
-            alertOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> {
-                checkChangeHandler(checked, network.getBssid(), true, alertAddresses, PreferenceKeys.PREF_ALERT_ADDRS, prefs);
-            });
+            alertOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), true, alertAddresses,
+                    PreferenceKeys.PREF_ALERT_ADDRS, prefs));
 
             final Button startSurveyButton = findViewById(R.id.start_survey);
             final Button endSurveyButton = findViewById(R.id.end_survey);
             MainActivity.State state = MainActivity.getStaticState();
             startSurveyButton.setOnClickListener(buttonView -> {
                 final FragmentActivity fa = this;
-                //TDDO: disabled until obsMap DB load complete?
+                //TODO: disabled until obsMap DB load complete?
                 if (null != fa) {
                     final String message = String.format(getString(R.string.confirm_survey),
                             getString(R.string.end_survey), getString(R.string.nonstop));
@@ -1328,7 +1319,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                                             final List<String> currentAddresses, String prefKey, SharedPreferences prefs) {
         if (ssid != null) {
             final String useSsid = ouiMode ? ssid.substring(0,8).toUpperCase(Locale.ROOT) : ssid.toUpperCase(Locale.ROOT);
-            final String entryText = ouiMode ? ssid.replace(":", "").substring(0, 6) : ssid.replace(":", "");
+            final String entryText = useSsid.replace(":", "");
             if (checked) {
                 MacFilterActivity.addEntry(currentAddresses,
                         prefs, entryText, prefKey);
@@ -1340,9 +1331,8 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     Logging.error("Attempted to remove " + prefKey + ": " + useSsid + " but unable to match. (oui: "+ouiMode+", "+currentAddresses+")");
                 }
             }
-
+        } else {
+            Logging.error("null SSID value in checkChangeHandler - unable to modify.");
         }
-
     }
-
 }

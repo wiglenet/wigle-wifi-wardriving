@@ -469,4 +469,8 @@
     <string name="status_too_many">समय सीमा के भीतर बहुत अधिक</string>
     <string name="filter_show_wifi">WiFi दिखाएं</string>
     <string name="filter_show_bt_classic">Bluetooth Classic दिखाएं</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">छिपाएँ</string>
+    <string name="alert">चेतावनी</string>
 </resources>

@@ -469,4 +469,8 @@
     <string name="status_too_many">Nyingi mno ndani ya muda uliopangwa</string>
     <string name="filter_show_wifi">Onyesha WiFi</string>
     <string name="filter_show_bt_classic">Onyesha Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Ficha</string>
+    <string name="alert">Tahadhari</string>
 </resources>

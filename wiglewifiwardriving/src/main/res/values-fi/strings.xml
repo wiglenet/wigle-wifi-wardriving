@@ -470,4 +470,8 @@
     <string name="status_too_many">Liian monta aikataulussa</string>
     <string name="filter_show_wifi">Näytä WiFi</string>
     <string name="filter_show_bt_classic">Näytä Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Piilota</string>
+    <string name="alert">Varoitus</string>
 </resources>

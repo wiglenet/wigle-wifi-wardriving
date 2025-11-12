@@ -470,4 +470,8 @@
     <string name="status_too_many">시간 내에 너무 많은</string>
     <string name="filter_show_wifi">WiFi 표시</string>
     <string name="filter_show_bt_classic">Bluetooth Classic 표시</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">숨기기</string>
+    <string name="alert">경고</string>
 </resources>

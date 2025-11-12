@@ -470,4 +470,8 @@
     <string name="status_too_many">时间段内数量过多</string>
     <string name="filter_show_wifi">显示WiFi</string>
     <string name="filter_show_bt_classic">显示蓝牙经典</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">隐藏</string>
+    <string name="alert">警报</string>
 </resources>

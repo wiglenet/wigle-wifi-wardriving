@@ -470,4 +470,8 @@
     <string name="status_too_many">Túl sok az időkereten belül</string>
     <string name="filter_show_wifi">WiFi megjelenítése</string>
     <string name="filter_show_bt_classic">Bluetooth Classic megjelenítése</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Elrejtés</string>
+    <string name="alert">Figyelmeztetés</string>
 </resources>

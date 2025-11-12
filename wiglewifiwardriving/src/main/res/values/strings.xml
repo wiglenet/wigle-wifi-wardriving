@@ -472,4 +472,8 @@
     <string name="status_too_many">Too many within timeframe</string>
     <string name="filter_show_wifi">Show WiFi</string>
     <string name="filter_show_bt_classic">Show Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Hide</string>
+    <string name="alert">Alert</string>
 </resources>

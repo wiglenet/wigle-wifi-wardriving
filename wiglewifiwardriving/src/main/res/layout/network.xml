@@ -488,45 +488,115 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            style="@style/NetworkViewOverlay"
             tools:visibility="visible">
-            <Button
-                android:id="@+id/hide_mac_button"
+            <LinearLayout
+                android:id="@+id/hide_col"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dip"
-                android:layout_marginTop="5dip"
-                android:layout_marginEnd="2dip"
-                android:layout_marginBottom="3dip"
                 android:layout_weight="4"
-                android:background="@drawable/filter_button"
-                android:minHeight="0dp"
-                android:text="@string/hide_mac" />
-            <Button
-                android:id="@+id/hide_oui_button"
+                android:orientation="vertical"
+                tools:ignore="ExtraText">
+                    <TextView
+                        android:id="@+id/hide_col_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:maxLines="1"
+                        android:text="@string/hide"
+                        android:textStyle="bold"
+                        android:textSize="7.5pt"
+                        android:drawablePadding="4dp"
+                        app:drawableStartCompat="@drawable/hide"
+                        app:tint="?attr/android:textColor"/>
+                        />
+                <CheckBox
+                    android:id="@+id/hide_mac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mac"
+                    />
+                <CheckBox
+                    android:id="@+id/hide_oui"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oui"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/block_col"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dip"
-                android:layout_marginTop="5dip"
-                android:layout_marginEnd="2dip"
-                android:layout_marginBottom="3dip"
                 android:layout_weight="4"
-                android:background="@drawable/filter_button"
-                android:minHeight="0dp"
-                android:text="@string/hide_oui" />
-            <Button
-                android:id="@+id/disable_log_mac_button"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/block_col_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:maxLines="1"
+                    android:text="@string/block_mac"
+                    android:textStyle="bold"
+                    android:textSize="7.5pt"
+                    android:drawablePadding="4dp"
+                    app:drawableStartCompat="@drawable/block"
+                    app:tint="?attr/android:textColor"
+                    />
+                <CheckBox
+                    android:id="@+id/block_mac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mac"
+                    />
+                <CheckBox
+                    android:id="@+id/block_oui"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oui"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/alert_col"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dip"
-                android:layout_marginTop="5dip"
-                android:layout_marginEnd="3dip"
-                android:layout_marginBottom="3dip"
                 android:layout_weight="4"
-                android:background="@drawable/filter_button"
-                android:minHeight="0dp"
-                android:text="@string/block_mac" />
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/alert_col_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:maxLines="1"
+                    android:text="@string/alert"
+                    android:textStyle="bold"
+                    android:textSize="7.5pt"
+                    android:drawablePadding="4dp"
+                    app:drawableStartCompat="@drawable/alert"
+                    app:tint="?attr/android:textColor"
+                    />
+                <CheckBox
+                    android:id="@+id/alert_mac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mac"
+                    />
+                <CheckBox
+                    android:id="@+id/alert_oui"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oui"
+                    />
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

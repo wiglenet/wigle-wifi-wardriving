@@ -579,6 +579,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
         addPermission(permissionsList, Manifest.permission.BLUETOOTH);
         addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+        addPermission(permissionsList, Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
@@ -616,8 +617,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
             permissionsList.add(permission);
             // Check for Rationale Option
-            if (!shouldShowRequestPermissionRationale(permission))
-                return false;
+            return shouldShowRequestPermissionRationale(permission);
         }
         return true;
     }

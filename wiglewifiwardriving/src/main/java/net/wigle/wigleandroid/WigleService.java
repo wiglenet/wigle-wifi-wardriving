@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +19,7 @@ import android.os.IBinder;
 import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 import net.wigle.wigleandroid.ui.UINumberFormat;
@@ -29,6 +31,9 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.FOREGROUND_SERVICE_LOCATION;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
@@ -175,6 +180,7 @@ public final class WigleService extends Service {
     @Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
         Logging.info( "service: onStartCommand" );
+        checkPermission();
         handleCommand( intent );
         setupNotification();
         // We want this service to continue running until it is explicitly
@@ -182,6 +188,18 @@ public final class WigleService extends Service {
         return Service.START_STICKY;
     }
 
+    private void checkPermission() {
+        //if (SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, FOREGROUND_SERVICE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            ) {
+                return;
+            }
+            Logging.error("R+: insufficient permissions");
+            //DEBUG: throw new RuntimeException("Insufficient Permissions for Foreground location access (>= R).");
+        //}
+    }
     private void handleCommand( Intent intent ) {
         Logging.info( "service: handleCommand: intent: " + intent );
         setupNotification();

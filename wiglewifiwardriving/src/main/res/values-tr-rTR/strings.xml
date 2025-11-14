@@ -470,5 +470,9 @@
     <string name="status_too_many">Zaman dilimi içinde çok fazla</string>
     <string name="filter_show_wifi">WiFi\'yi Göster</string>
     <string name="filter_show_bt_classic">Bluetooth Classic\'i Göster</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Gizle</string>
+    <string name="alert">Uyarı</string>
 </resources>
 

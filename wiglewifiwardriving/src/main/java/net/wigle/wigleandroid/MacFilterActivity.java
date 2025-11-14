@@ -196,11 +196,22 @@ public class MacFilterActivity extends ScreenChildActivity {
             editor.apply();
             MainActivity m = MainActivity.getMainActivity();
             if (null != m) {
-                //TODO: should we also update on Suspend/Dispose?
                 m.updateAddressFilter(filterKey);
             }
             return true;
         }
         return false;
+    }
+
+    public static void updateEntries(List<String> entries, SharedPreferences prefs, final String filterKey) {
+        Gson gson = new Gson();
+        String serialized = gson.toJson(entries.toArray());
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(filterKey,serialized);
+        editor.apply();
+        MainActivity m = MainActivity.getMainActivity();
+        if (null != m) {
+            m.updateAddressFilter(filterKey);
+        }
     }
 }

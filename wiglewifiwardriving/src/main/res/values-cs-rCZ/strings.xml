@@ -470,4 +470,8 @@
     <string name="status_too_many">Příliš mnoho v daném časovém rámci</string>
     <string name="filter_show_wifi">Zobrazit WiFi</string>
     <string name="filter_show_bt_classic">Zobrazit Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Skrýt</string>
+    <string name="alert">Upozornění</string>
 </resources>

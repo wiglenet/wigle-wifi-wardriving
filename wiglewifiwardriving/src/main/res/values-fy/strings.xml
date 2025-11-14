@@ -470,4 +470,8 @@
     <string name="status_too_many">Tefolle binnen de tiidsperioade</string>
     <string name="filter_show_wifi">WiFi toane</string>
     <string name="filter_show_bt_classic">Bluetooth Classic toane</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Ferbergje</string>
+    <string name="alert">Warskôging</string>
 </resources>

@@ -470,4 +470,8 @@
     <string name="status_too_many">كثير جدًا في الإطار الزمني</string>
     <string name="filter_show_wifi">إظهار WiFi</string>
     <string name="filter_show_bt_classic">إظهار Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">إخفاء</string>
+    <string name="alert">تنبيه</string>
 </resources>

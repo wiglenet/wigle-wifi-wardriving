@@ -31,7 +31,6 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -180,13 +179,13 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             );
         }
 
-        View bottomToolsLayout = findViewById(R.id.bottom_tools_wrapper);
-        if (null != bottomToolsLayout) {
-            ViewCompat.setOnApplyWindowInsetsListener(bottomToolsLayout, new OnApplyWindowInsetsListener() {
+        View bleToolsLayout = findViewById(R.id.ble_tools_row);
+        if (null != bleToolsLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(bleToolsLayout, new OnApplyWindowInsetsListener() {
                 @Override
                 public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
                     final Insets innerPadding = insets.getInsets(
-                            WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
+                            WindowInsetsCompat.Type.navigationBars());
                     v.setPadding(
                             innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
                     );
@@ -194,6 +193,22 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                 }
             });
         }
+
+        View filterToolsLayout = findViewById(R.id.filter_row);
+        if (null != filterToolsLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(filterToolsLayout, new OnApplyWindowInsetsListener() {
+                @Override
+                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                    final Insets innerPadding = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars());
+                    v.setPadding(
+                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                    );
+                    return insets;
+                }
+            });
+        }
+
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
@@ -304,8 +319,6 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                         final String mnc = operatorCode.substring(3);
                         final String mcc = operatorCode.substring(0, 3);
 
-                        //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
-
                         try {
                             final MainActivity.State s = MainActivity.getStaticState();
                             if (s != null && s.mxcDbHelper != null) {
@@ -362,9 +375,8 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             if (NetworkType.BLE.equals(network.getType())) {
                 setupBleInspection(this, network);
             } else {
-                View interrogateView = findViewById(R.id.ble_tools_row);
-                if (interrogateView != null) {
-                    interrogateView.setVisibility(GONE);
+                if (bleToolsLayout != null) {
+                    bleToolsLayout.setVisibility(GONE);
                 }
             }
             setupQuery();
@@ -654,9 +666,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     gatt.disconnect();
                     gatt.close();
                     found.set(false);
-                    runOnUiThread(() -> {
-                        WiGLEToast.showOverActivity(activity, R.string.btloc_title, "characteristic change.");
-                    });
+                    runOnUiThread(() -> WiGLEToast.showOverActivity(activity, R.string.btloc_title, "characteristic change."));
                 }
                 @SuppressLint("MissingPermission")
                 @Override
@@ -667,9 +677,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     gatt.close();
                     found.set(false);
                     done.set(true);
-                    runOnUiThread(() -> {
-                        WiGLEToast.showOverActivity(activity, R.string.btloc_title, "service change.");
-                    });
+                    runOnUiThread(() -> WiGLEToast.showOverActivity(activity, R.string.btloc_title, "service change."));
                 }
 
                 @SuppressLint("MissingPermission")
@@ -941,70 +949,86 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
     private void setupButtons( final Network network, final SharedPreferences prefs ) {
         final ArrayList<String> hideAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
         final ArrayList<String> blockAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+        final ArrayList<String> alertAddresses = addressListForPref(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
 
         ImageButton back = findViewById(R.id.network_back_button);
         if (null != back) {
-            back.setOnClickListener( v -> {
-                finish();
-            });
+            back.setOnClickListener( v -> finish());
         }
-        if ( ! NetworkType.WIFI.equals(network.getType()) ) {
+        if ( ! NetworkType.WIFI.equals(network.getType()) && !NetworkType.isBtType(network.getType())) {
             final View filterRowView = findViewById(R.id.filter_row);
             filterRowView.setVisibility(GONE);
         } else {
-            final Button hideMacButton = findViewById( R.id.hide_mac_button );
-            final Button hideOuiButton = findViewById( R.id.hide_oui_button );
-            final Button disableLogMacButton = findViewById( R.id.disable_log_mac_button );
-            if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
-                    (hideAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT))) ) {
-                hideMacButton.setEnabled(false);
+            final CheckBox hideMacBox = findViewById( R.id.hide_mac );
+            final CheckBox hideOuiBox = findViewById( R.id.hide_oui );
+            final CheckBox disableLogMacBox = findViewById( R.id.block_mac );
+            final CheckBox disableLogOuiBox = findViewById( R.id.block_oui );
+            final CheckBox alertMacBox = findViewById( R.id.alert_mac );
+            final CheckBox alertOuiBox = findViewById( R.id.alert_oui );
+
+
+            if ( (null == network.getBssid()) || (network.getBssid().length() < 17)) {
+                hideMacBox.setEnabled(false);
+                disableLogMacBox.setEnabled(false);
+                alertMacBox.setEnabled(false);
+            } else {
+                if (hideAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT)) ) {
+                    hideMacBox.setChecked(true);
+                }
+                if (blockAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT))) {
+                    disableLogMacBox.setChecked(true);
+                }
+                if  (alertAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT))) {
+                    alertMacBox.setChecked(true);
+                }
             }
 
-            if ( (null == network.getBssid()) || (network.getBssid().length() < 8) ||
-                    (hideAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT).substring(0, 8)))) {
-                hideOuiButton.setEnabled(false);
+            if ( (null == network.getBssid()) || (network.getBssid().length() < 8) ) {
+                hideOuiBox.setEnabled(false);
+                disableLogOuiBox.setEnabled(false);
+                alertOuiBox.setEnabled(false);
+            } else {
+                final String ouiString = network.getBssid().toUpperCase(Locale.ROOT).substring(0, 8);
+                if (hideAddresses.contains(ouiString)) {
+                    hideOuiBox.setChecked(true);
+                }
+                if (blockAddresses.contains(ouiString)) {
+                    disableLogOuiBox.setChecked(true);
+                }
+                if (alertAddresses.contains(ouiString)) {
+                    alertOuiBox.setChecked(true);
+                }
             }
 
-            if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
-                    (blockAddresses.contains(network.getBssid().toUpperCase(Locale.ROOT))) ) {
-                disableLogMacButton.setEnabled(false);
-            }
+            hideMacBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(checked, network.getBssid(), false, hideAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS, prefs));
 
-            hideMacButton.setOnClickListener(buttonView -> {
-                // add a display-exclude row fot MAC
-                if (network.getBssid() != null) {
-                    MacFilterActivity.addEntry(hideAddresses,
-                            prefs, network.getBssid().replace(":",""), PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
-                    hideMacButton.setEnabled(false);
-                }
-            });
+            hideOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), true, hideAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS, prefs));
 
-            hideOuiButton.setOnClickListener(buttonView -> {
-                // add a display-exclude row fot OUI
-                if (network.getBssid() != null) {
-                    MacFilterActivity.addEntry(hideAddresses,
-                            prefs, network.getBssid().replace(":", "").substring(0, 6),
-                            PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
-                }
-                hideOuiButton.setEnabled(false);
-            });
+            disableLogMacBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), false, blockAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS, prefs));
 
-            disableLogMacButton.setOnClickListener(buttonView -> {
-                // add a log-exclude row fot OUI
-                if (network.getBssid() != null) {
-                    MacFilterActivity.addEntry(blockAddresses,
-                            prefs, network.getBssid().replace(":", ""), PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
-                    //TODO: should this also delete existing records?
-                }
-                disableLogMacButton.setEnabled(false);
-            });
+            disableLogOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), true, blockAddresses,
+                    PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS, prefs));
+
+            alertMacBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), false, alertAddresses,
+                    PreferenceKeys.PREF_ALERT_ADDRS, prefs));
+
+            alertOuiBox.setOnCheckedChangeListener((compoundButton, checked) -> checkChangeHandler(
+                    checked, network.getBssid(), true, alertAddresses,
+                    PreferenceKeys.PREF_ALERT_ADDRS, prefs));
 
             final Button startSurveyButton = findViewById(R.id.start_survey);
             final Button endSurveyButton = findViewById(R.id.end_survey);
             MainActivity.State state = MainActivity.getStaticState();
             startSurveyButton.setOnClickListener(buttonView -> {
                 final FragmentActivity fa = this;
-                //TDDO: disabled until obsMap DB load complete?
+                //TODO: disabled until obsMap DB load complete?
                 if (null != fa) {
                     final String message = String.format(getString(R.string.confirm_survey),
                             getString(R.string.end_survey), getString(R.string.nonstop));
@@ -1289,5 +1313,26 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             results.append(key).append(": ").append(characteristicResults.get(key));
         }
         return results.toString();
+    }
+
+    private static void checkChangeHandler(final boolean checked, final String bssid, final boolean ouiMode,
+                                            final List<String> currentAddresses, String prefKey, SharedPreferences prefs) {
+        if (bssid != null) {
+            final String useBssid = ouiMode ? bssid.substring(0,8).toUpperCase(Locale.ROOT) : bssid.toUpperCase(Locale.ROOT);
+            final String entryText = useBssid.replace(":", "");
+            if (checked) {
+                MacFilterActivity.addEntry(currentAddresses,
+                        prefs, entryText, prefKey);
+            } else {
+                if (currentAddresses.remove(useBssid)) {
+                    MacFilterActivity.updateEntries(currentAddresses,
+                            prefs, prefKey);
+                } else {
+                    Logging.error("Attempted to remove " + prefKey + ": " + useBssid + " but unable to match. (oui: "+ouiMode+", "+currentAddresses+")");
+                }
+            }
+        } else {
+            Logging.error("null BSSID value in checkChangeHandler - unable to modify.");
+        }
     }
 }

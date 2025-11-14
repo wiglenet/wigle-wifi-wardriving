@@ -469,4 +469,8 @@
     <string name="status_too_many">操作が多すぎます</string>
     <string name="filter_show_wifi">WiFiを表示</string>
     <string name="filter_show_bt_classic">Bluetooth Classicを表示</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">を非表示にする</string>
+    <string name="alert">に関する警告</string>
 </resources>

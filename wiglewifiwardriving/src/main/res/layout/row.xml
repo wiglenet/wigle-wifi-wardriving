@@ -26,8 +26,8 @@
                 tools:src="@drawable/wep_ico"/>
             <ImageView
                 android:id="@+id/passpoint_logo_view"
-                android:layout_width="10dp"
-                android:layout_height="9dp"
+                android:layout_width="14dp"
+                android:layout_height="12dp"
                 android:paddingEnd="2dp"
                 android:src="@drawable/passpoint_logo"
                 android:visibility="gone"

@@ -1315,24 +1315,24 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
         return results.toString();
     }
 
-    private static void checkChangeHandler(final boolean checked, final String ssid, final boolean ouiMode,
+    private static void checkChangeHandler(final boolean checked, final String bssid, final boolean ouiMode,
                                             final List<String> currentAddresses, String prefKey, SharedPreferences prefs) {
-        if (ssid != null) {
-            final String useSsid = ouiMode ? ssid.substring(0,8).toUpperCase(Locale.ROOT) : ssid.toUpperCase(Locale.ROOT);
-            final String entryText = useSsid.replace(":", "");
+        if (bssid != null) {
+            final String useBssid = ouiMode ? bssid.substring(0,8).toUpperCase(Locale.ROOT) : bssid.toUpperCase(Locale.ROOT);
+            final String entryText = useBssid.replace(":", "");
             if (checked) {
                 MacFilterActivity.addEntry(currentAddresses,
                         prefs, entryText, prefKey);
             } else {
-                if (currentAddresses.remove(useSsid)) {
+                if (currentAddresses.remove(useBssid)) {
                     MacFilterActivity.updateEntries(currentAddresses,
                             prefs, prefKey);
                 } else {
-                    Logging.error("Attempted to remove " + prefKey + ": " + useSsid + " but unable to match. (oui: "+ouiMode+", "+currentAddresses+")");
+                    Logging.error("Attempted to remove " + prefKey + ": " + useBssid + " but unable to match. (oui: "+ouiMode+", "+currentAddresses+")");
                 }
             }
         } else {
-            Logging.error("null SSID value in checkChangeHandler - unable to modify.");
+            Logging.error("null BSSID value in checkChangeHandler - unable to modify.");
         }
     }
 }

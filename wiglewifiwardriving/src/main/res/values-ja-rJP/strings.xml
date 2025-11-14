@@ -19,7 +19,7 @@
     <string name="donate">データの寄付：商用利用を許可</string>
     <string name="found_sound">実行中にネットワークが見つかったときにサウンドを再生</string>
     <string name="found_new_sound">DB の新しいネットワークでサウンドを再生</string>
-    <string name="reset_maxid_button">ゼロ DB マーカー</string>
+    <string name="reset_maxid_button">DB マーカーのリセット</string>
     <string name="reset_maxid_text">最新のアップロードマーカー：</string>
     <string name="maxout_maxid_button">MaxoutDB マーカー</string>
     <string name="maxout_maxid_text">マーカーを次のように設定：</string>
@@ -80,10 +80,10 @@
     <string name="filter_enabled">フィルタが有効化されています</string>
     <string name="list_waiting_gps">（GPS 同期を待っています…）</string>
     <string name="list_scanning_off">（スキャンがオフになっています）</string>
-    <string name="list_short_lat">Lat：%1$s</string>
-    <string name="list_short_lon">Lon：%1$s</string>
-    <string name="list_short_sats">Sats：%1$d</string>
-    <string name="list_short_alt">Alt： %1$s</string>
+    <string name="list_short_lat">緯度：%1$s</string>
+    <string name="list_short_lon">経度：%1$s</string>
+    <string name="list_short_sats">衛星：%1$d</string>
+    <string name="list_short_alt">代替： %1$s</string>
     <string name="list_status_default">（状態）</string>
     <string name="list_speed">速度：%1$s</string>
     <string name="list_upload">ファイルをアップロードしますか？</string>
@@ -136,9 +136,9 @@
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">マイル</string>
-    <string name="m_short">メートル</string>
+    <string name="m_short">m</string>
     <string name="meters">メートル</string>
-    <string name="ft_short">フィート</string>
+    <string name="ft_short">ft</string>
     <string name="feet">フィート</string>
     <string name="kmph">km/h</string>
     <string name="mph">mph</string>
@@ -185,15 +185,15 @@
     <string name="menu_show_new">新規のみ表示</string>
     <string name="menu_copy_network">ネットワーク BSSID のコピー</string>
     <string name="tts_no_gps_fix">GPS 修正なし</string>
-    <string name="tts_new_wifi">新しい WiFi</string>
-    <string name="tts_new_cell">新しいセル</string>
+    <string name="tts_new_wifi">新規WiFi</string>
+    <string name="tts_new_cell">新規モバイルデータ</string>
     <string name="tts_queue">キュー</string>
     <string name="tts_from">起点：</string>
     <string name="tts_o_clock">クロックを借りている</string>
     <string name="tts_o">借りている</string>
     <string name="tts_battery">バッテリー</string>
     <string name="tts_percent">パーセント</string>
-    <string name="status_unknown">わからない</string>
+    <string name="status_unknown">不明</string>
     <string name="status_unknown_error">不明なエラー</string>
     <string name="status_fail">失敗</string>
     <string name="status_success">成功</string>
@@ -239,7 +239,7 @@
     <string name="language_sv">svenska（スウェーデン語）</string>
     <string name="language_sw">Kiswahili (スワヒリ語)</string>
     <string name="language_tr">Türkçe（トルコ語）</string>
-    <string name="language_zh_cn">简体中文（簡体字中国語：Geekeyes による）</string>
+    <string name="language_zh_cn">简体中文（簡体字中国語：Geekeyes提供）</string>
     <string name="language_zh_tw">繁体中文台灣（繁体字中国語 - 台湾）</string>
     <string name="language_zh_hk">繁体中文香港（繁体字中国語 - 香港）</string>
     <string name="language_text">選択した言語（再起動が必要）</string>
@@ -256,7 +256,7 @@
     <string name="wifi_restart_2">   秒前。WiFi を再起動します。</string>
     <string name="use_wigle_tiles">WiGLEOSM タイルを使用する</string>
     <string name="wigle_service">WiGLEWiFi サービス</string>
-    <string name="disable_toast">トーストポップアップを無効にする</string>
+    <string name="disable_toast">トースト通知を無効にする</string>
     <string name="menu_cluster_off">クラスタリングオフ</string>
     <string name="menu_cluster_on">クラスタリングオン</string>
     <string name="menu_traffic_off">トラフィックオフ</string>
@@ -267,8 +267,8 @@
     <string name="map_toast_hybrid">マップタイプ：ハイブリッド</string>
     <string name="map_toast_terrain">マップタイプ：地形</string>
     <string name="map_needs_playservice">地図には GooglePlay 開発者サービスが必要です</string>
-    <string name="drawer_open">ドローワが開いています</string>
-    <string name="drawer_close">ドローワを閉じる</string>
+    <string name="drawer_open">ドロワーが開いています</string>
+    <string name="drawer_close">ドロワーを閉じる</string>
     <string name="site_stats_app_name">WiGLE.net 統計</string>
     <string name="netloc_title">場所のある WiGLE.netWiFi ネットワーク</string>
     <string name="loctotal_title">WiGLE.netWiFi ネットワークの観察</string>
@@ -289,7 +289,7 @@
     <string name="firsttransid_title">最初のトランザクション ID</string>
     <string name="lasttransid_title">最新のトランザクション ID</string>
     <string name="gps_permission">GPS（ファインロケーション）</string>
-    <string name="cell_permission">セルの場所（粗い場所）</string>
+    <string name="cell_permission">基地局の場所（おおまかな場所）</string>
     <string name="rank_stats_app_name">WiGLE.net ランキング</string>
     <string name="total_cell">総セル</string>
     <string name="tab_rank">ランキング</string>
@@ -466,5 +466,11 @@
     <string name="ble_pnp_title">プラグアンドプレイ ID</string>
     <string name="ble_appearance_title">外観</string>
     <string name="alert_filter_button">MAC/OUI に関する警告…</string>
-    <string name="status_too_many">時間枠内に多すぎる</string>
+    <string name="status_too_many">操作が多すぎます</string>
+    <string name="filter_show_wifi">WiFiを表示</string>
+    <string name="filter_show_bt_classic">Bluetooth Classicを表示</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">を非表示にする</string>
+    <string name="alert">に関する警告</string>
 </resources>

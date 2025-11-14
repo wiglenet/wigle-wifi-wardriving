@@ -59,6 +59,8 @@ public final class Network implements ClusterItem {
 
     private Integer bleAddressType = null;
 
+    private boolean passpoint;
+
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
 
@@ -122,36 +124,41 @@ public final class Network implements ClusterItem {
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null, null, null, null, null);
+                scanResult.level,  NetworkType.WIFI, null, null, null, null, null, scanResult.isPasspointNetwork());
     }
 
     // load from CSV/observation list
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null, null, null);
     }
 
     // new Network, no location
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime, final Integer bleAddressType) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, bleAddressType);
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, bleAddressType, null);
     }
 
     // for WiFiSearchResponse
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null, null, null);
     }
 
     private Network(final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId,
-                    final LatLng latLng, final Long lastTime, final Integer bleAddressType ) {
+                    final LatLng latLng, final Long lastTime, final Integer bleAddressType, final Boolean passpoint ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
+        if (null != passpoint && passpoint) {
+            this.passpoint = true;
+        } else {
+            this.passpoint = false;
+        }
         if (bleAddressType != null) {
             this.bleAddressType = bleAddressType;
         }
@@ -281,6 +288,10 @@ public final class Network implements ClusterItem {
 
     public void setRcois(final String concatenatedRcois) {
         this.concatenatedRcois = concatenatedRcois;
+    }
+
+    public boolean isPasspoint() {
+        return this.passpoint;
     }
 
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.

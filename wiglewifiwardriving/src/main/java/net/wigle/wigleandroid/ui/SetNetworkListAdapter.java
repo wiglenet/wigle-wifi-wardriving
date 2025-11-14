@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static net.wigle.wigleandroid.R.color.list_item_match_background;
 
 import android.content.Context;
@@ -235,6 +237,13 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             }
         } else {
             btico.setVisibility(View.GONE);
+        }
+
+        final ImageView passpointIcon = row.findViewById(R.id.passpoint_logo_view);
+        if (network.isPasspoint()) {
+            passpointIcon.setVisibility(VISIBLE);
+        } else {
+            passpointIcon.setVisibility(GONE);
         }
 
         final ImageView btRandom = row.findViewById(R.id.btrandom);

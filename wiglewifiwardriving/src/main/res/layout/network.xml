@@ -504,6 +504,11 @@
                 android:orientation="vertical"
                 android:paddingTop="8dp"
                 tools:ignore="ExtraText">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center">
                     <TextView
                         android:id="@+id/hide_col_label"
                         android:layout_width="wrap_content"
@@ -519,18 +524,19 @@
                         app:drawableStartCompat="@drawable/hide"
                         app:tint="?attr/android:textColor"/>
                         />
-                <CheckBox
-                    android:id="@+id/hide_mac"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/mac"
-                    />
-                <CheckBox
-                    android:id="@+id/hide_oui"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/oui"
-                    />
+                    <CheckBox
+                        android:id="@+id/hide_mac"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mac"
+                        />
+                    <CheckBox
+                        android:id="@+id/hide_oui"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/oui"
+                        />
+                </LinearLayout>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/block_col"
@@ -539,33 +545,39 @@
                 android:layout_weight="4"
                 android:paddingTop="8dp"
                 android:orientation="vertical">
-                <TextView
-                    android:id="@+id/block_col_label"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="4dp"
-                    android:maxLines="1"
-                    android:text="@string/block_mac"
-                    android:textStyle="bold"
-                    android:textSize="7.5pt"
-                    android:drawablePadding="4dp"
-                    app:drawableStartCompat="@drawable/block"
-                    app:tint="?attr/android:textColor"
-                    />
-                <CheckBox
-                    android:id="@+id/block_mac"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/mac"
-                    />
-                <CheckBox
-                    android:id="@+id/block_oui"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/oui"
-                    />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center">
+                    <TextView
+                        android:id="@+id/block_col_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:maxLines="1"
+                        android:text="@string/block_mac"
+                        android:textStyle="bold"
+                        android:textSize="7.5pt"
+                        android:drawablePadding="4dp"
+                        app:drawableStartCompat="@drawable/block"
+                        app:tint="?attr/android:textColor"
+                        />
+                    <CheckBox
+                        android:id="@+id/block_mac"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mac"
+                        />
+                    <CheckBox
+                        android:id="@+id/block_oui"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/oui"
+                        />
+                </LinearLayout>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/alert_col"
@@ -574,33 +586,39 @@
                 android:layout_weight="4"
                 android:paddingTop="8dp"
                 android:orientation="vertical">
-                <TextView
-                    android:id="@+id/alert_col_label"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="4dp"
-                    android:maxLines="1"
-                    android:text="@string/alert"
-                    android:textStyle="bold"
-                    android:textSize="7.5pt"
-                    android:drawablePadding="4dp"
-                    app:drawableStartCompat="@drawable/alert"
-                    app:tint="?attr/android:textColor"
-                    />
-                <CheckBox
-                    android:id="@+id/alert_mac"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/mac"
-                    />
-                <CheckBox
-                    android:id="@+id/alert_oui"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/oui"
-                    />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center">
+                    <TextView
+                        android:id="@+id/alert_col_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:maxLines="1"
+                        android:text="@string/alert"
+                        android:textStyle="bold"
+                        android:textSize="7.5pt"
+                        android:drawablePadding="4dp"
+                        app:drawableStartCompat="@drawable/alert"
+                        app:tint="?attr/android:textColor"
+                        />
+                    <CheckBox
+                        android:id="@+id/alert_mac"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mac"
+                        />
+                    <CheckBox
+                        android:id="@+id/alert_oui"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/oui"
+                        />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

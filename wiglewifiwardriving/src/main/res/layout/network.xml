@@ -567,13 +567,13 @@
                         />
                     <CheckBox
                         android:id="@+id/block_mac"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mac"
                         />
                     <CheckBox
                         android:id="@+id/block_oui"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/oui"
                         />
@@ -608,13 +608,13 @@
                         />
                     <CheckBox
                         android:id="@+id/alert_mac"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mac"
                         />
                     <CheckBox
                         android:id="@+id/alert_oui"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/oui"
                         />

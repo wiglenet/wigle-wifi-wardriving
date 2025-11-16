@@ -470,4 +470,8 @@
     <string name="status_too_many">יותר מדי בתוך מסגרת הזמן</string>
     <string name="filter_show_wifi">הצג WiFi</string>
     <string name="filter_show_bt_classic">הצג Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">הסתר</string>
+    <string name="alert">התראה</string>
 </resources>

@@ -470,4 +470,8 @@
     <string name="status_too_many">För många inom tidsramen</string>
     <string name="filter_show_wifi">Visa WiFi</string>
     <string name="filter_show_bt_classic">Visa Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Dölj</string>
+    <string name="alert">Varning</string>
 </resources>

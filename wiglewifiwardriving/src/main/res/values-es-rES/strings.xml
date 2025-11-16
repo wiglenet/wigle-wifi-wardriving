@@ -469,4 +469,8 @@
     <string name="status_too_many">Demasiadas dentro de plazo</string>
     <string name="filter_show_wifi">Mostrar WiFi</string>
     <string name="filter_show_bt_classic">Mostrar Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Ocultar</string>
+    <string name="alert">Alerta</string>
 </resources>

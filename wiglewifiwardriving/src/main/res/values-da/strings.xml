@@ -470,4 +470,8 @@
     <string name="status_too_many">For mange inden for tidsrammen</string>
     <string name="filter_show_wifi">Vis WiFi</string>
     <string name="filter_show_bt_classic">Vis Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Skjul</string>
+    <string name="alert">Advarsel</string>
 </resources>

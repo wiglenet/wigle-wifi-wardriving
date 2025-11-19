@@ -44,15 +44,30 @@
                     android:background="#00000000"
                     android:alpha="1.0"
                     app:tint="?attr/android:textColor" />
-                    <ImageView
-                        android:id="@+id/wepicon"
+                    <FrameLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/crypto"
-                        android:paddingLeft="6dp"
-                        tools:src="@drawable/wpa_ico"
-                        android:paddingRight="6dp"
-                        android:layout_gravity="center_vertical"/>
+                        android:layout_height="match_parent"
+                        >
+                        <ImageView
+                            android:id="@+id/wepicon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/crypto"
+                            android:paddingLeft="6dp"
+                            tools:src="@drawable/wpa_ico"
+                            android:paddingRight="6dp"
+                            android:layout_gravity="center_vertical"/>
+                        <ImageView
+                            android:id="@+id/passpoint_logo_net"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:paddingEnd="1dp"
+                            android:layout_marginTop="8dp"
+                            android:src="@drawable/passpoint_logo"
+                            android:visibility="gone"
+                            android:layout_gravity="top|end"
+                            tools:visibility="visible"/>
+                    </FrameLayout>
                     <ImageView
                         android:id="@+id/bticon"
                         android:layout_width="wrap_content"

@@ -13,14 +13,27 @@
 		android:paddingTop="1sp"
 		android:layout_gravity="start">
 		<!-- First row -->
-		<ImageView
-			android:id="@+id/wepicon"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:contentDescription="wep icon"
-			android:paddingStart="2dp"
-			android:paddingEnd="10dp"
-			tools:src="@drawable/wpa3_ico"/>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/wepicon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="wep icon"
+                android:paddingStart="2dp"
+                android:paddingEnd="10dp"
+                tools:src="@drawable/wep_ico"/>
+            <ImageView
+                android:id="@+id/passpoint_logo_view"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:paddingEnd="2dp"
+                android:src="@drawable/passpoint_logo"
+                android:visibility="gone"
+                android:layout_gravity="end"
+                tools:visibility="visible"/>
+        </FrameLayout>
 		<ImageView
 			android:id="@+id/bticon"
 			android:layout_width="wrap_content"

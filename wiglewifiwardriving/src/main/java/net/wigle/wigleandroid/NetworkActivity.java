@@ -301,6 +301,12 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             tv = findViewById( R.id.na_cap );
             tv.setText( network.getCapabilities().replace("][", "]  [") );
 
+            final ImageView ppImg = findViewById(R.id.passpoint_logo_net);
+            if (network.isPasspoint()) {
+                ppImg.setVisibility(VISIBLE);
+            } else {
+                ppImg.setVisibility(GONE);
+            }
             tv = findViewById( R.id.na_rcois );
             if (network.getRcois() != null) {
                 tv.setText( network.getRcois() );

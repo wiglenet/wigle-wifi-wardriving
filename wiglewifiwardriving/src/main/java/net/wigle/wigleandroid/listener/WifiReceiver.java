@@ -548,20 +548,12 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( tele != null ) {
             try {
                 //DEBUG: MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
-                CellLocation currentCell = tele.getCellLocation();
-                if (currentCell != null) {
-                    Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                    if (currentNetwork != null) {
-                        networks.put(currentNetwork.getBssid(), currentNetwork);
-                        ListFragment.lameStatic.currCells = 1;
-                    }
-                }
 
-                // we can survey cells
                 List<CellInfo> infos = tele.getAllCellInfo();
                 if (null != infos) {
                     for (final CellInfo cell : infos) {
                         Network network = handleSingleCellInfo(cell, tele, location);
+                        //DEBUG: Logging.info("list cell: "+cell.toString());
                         if (null != network) {
                             if (networks.containsKey(network.getBssid())) {
                                 //DEBUG: MainActivity.info("matching network already in map: " + network.getBssid());
@@ -574,19 +566,28 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                     }
                     ListFragment.lameStatic.currCells = infos.size();
-                }
-                //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
-                //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
-
-
-                /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
-                if (null != list) {
-                    for (final NeighboringCellInfo cell : list) {
-                        //networks.put(
-                        handleSingleNeighboringCellInfo(cell, tele, location);
-                        //);
+                } else if (Build.VERSION.SDK_INT < 26) {
+                    //NB: common source of ANRs
+                    CellLocation currentCell = tele.getCellLocation();
+                    if (currentCell != null) {
+                        Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
+                        //DEBUG: Logging.info("single cell: "+currentCell.toString());
+                        if (currentNetwork != null) {
+                            networks.put(currentNetwork.getBssid(), currentNetwork);
+                            ListFragment.lameStatic.currCells = 1;
+                        }
                     }
-                }*/
+                    //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
+                    //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
+                    /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
+                    if (null != list) {
+                        for (final NeighboringCellInfo cell : list) {
+                            //networks.put(
+                            handleSingleNeighboringCellInfo(cell, tele, location);
+                            //);
+                        }
+                    }*/
+                }
             } catch (SecurityException sex) {
                 Logging.warn("unable to scan cells due to permission issue: ", sex);
             } catch (NullPointerException ex) {

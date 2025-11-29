@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static net.wigle.wigleandroid.R.color.list_item_match_background;
+import static net.wigle.wigleandroid.model.NetworkType.BLE;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -216,6 +217,14 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             bssidAlertMatcher.reset(network.getBssid());
             matches = bssidAlertMatcher.find();
         }
+        if (BLE.equals(network.getType())) {
+            Matcher mfgrAlertMatcher = null != mainActivity ?
+                    mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS) : null;
+            if (null != mfgrAlertMatcher) {
+                mfgrAlertMatcher.reset(network.getBssid());
+                matches |= mfgrAlertMatcher.find();
+            }
+        }
         if (matches) {
             row.setBackgroundColor(row.getResources().getColor(list_item_match_background));
         } else {
@@ -226,7 +235,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         ico.setImageResource(NetworkListUtil.getImage(network));
 
         final ImageView btico = row.findViewById(R.id.bticon);
-        if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
+        if (NetworkType.BT.equals(network.getType()) || BLE.equals(network.getType())) {
             btico.setVisibility(View.VISIBLE);
             Integer btImageId = NetworkListUtil.getBtImage(network);
             if (null == btImageId) {
@@ -247,10 +256,12 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             } else {
                 passpointIcon.setVisibility(GONE);
             }
+        } else {
+            passpointIcon.setVisibility(GONE);
         }
 
         final ImageView btRandom = row.findViewById(R.id.btrandom);
-        if (NetworkType.BLE.equals(network.getType())) {
+        if (BLE.equals(network.getType())) {
             final Integer bleAddressType = network.getBleAddressType();
             if (null != bleAddressType /*&& (bleAddressType == ADDRESS_TYPE_RANDOM || bleAddressType == ADDRESS_TYPE_ANONYMOUS)*/) {
                 final Integer img = NetworkListUtil.getBleAddrTypeImage(bleAddressType);
@@ -281,7 +292,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
-        if (NetworkType.BLE.equals(network.getType())) {
+        if (BLE.equals(network.getType())) {
             tv.setTextAppearance(R.style.ListBt);
         } else {
             tv.setTextAppearance(R.style.ListOui);
@@ -305,7 +316,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         tv = row.findViewById(R.id.chan_freq_string);
         if (NetworkType.WIFI.equals(network.getType())) {
             tv.setText(network.getFrequency()+"MHz");
-        } else if (NetworkType.BLE.equals(network.getType())) {
+        } else if (BLE.equals(network.getType())) {
             tv.setText(network.getType().toString());
         } else {
             tv.setText("");

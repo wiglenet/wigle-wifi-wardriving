@@ -362,7 +362,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     v = findViewById(R.id.ble_vendor_row);
                     v.setVisibility(VISIBLE);
                     tv = findViewById( R.id.na_ble_vendor_id );
-                    tv.setText((null != network.getBleMfgrId())?network.getBleMfgrId()+"":"-");
+                    tv.setText((null != network.getBleMfgrId())?"0x"+Integer.toHexString(network.getBleMfgrId()):"-");
                     tv = findViewById( R.id.na_ble_vendor_lookup );
                     tv.setText(network.getBleMfgr() );
                 }

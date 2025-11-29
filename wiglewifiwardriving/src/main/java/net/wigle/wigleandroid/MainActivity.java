@@ -176,6 +176,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
         Matcher bssidAlertList;
+        Matcher bleMfgrIdList;
         int uiMode;
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
@@ -1504,6 +1505,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
             state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
             state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
+            state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
             //TODO: port SSID matcher over as well?
             if (null != state.bssidAlertList ) {
                 startHeartbeat(prefs);
@@ -1526,7 +1528,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
             } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
                 state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
-                if (null != state.bssidAlertList) {
+                if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
+                    startHeartbeat(prefs);
+                } else {
+                    stopHeartbeat();
+                }
+            } else if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(addressKey)) {
+                state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
+                if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
                     startHeartbeat(prefs);
                 } else {
                     stopHeartbeat();
@@ -1548,6 +1557,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 return state.bssidLogExclusions;
             } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
                 return state.bssidAlertList;
+            } else if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(addressKey)) {
+                return state.bleMfgrIdList;
             }
         }
         return null;
@@ -1583,7 +1594,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Pattern pattern = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
             matcher = pattern.matcher("");
         }
-
         return matcher;
     }
 

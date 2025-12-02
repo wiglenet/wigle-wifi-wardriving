@@ -841,7 +841,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 }
             }
             if (mfgrIdMatcher != null && network.getBleMfgrId() != null) {
-                mfgrIdMatcher.reset(network.getBleMfgrIdAsInt()+"");
+                mfgrIdMatcher.reset(String.format("%04X", network.getBleMfgrId()));
                 if (mfgrIdMatcher.find()) {
                     m.updateLastHighSignal(network.getLevel());
                 }

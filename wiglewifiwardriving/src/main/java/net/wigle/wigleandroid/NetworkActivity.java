@@ -1328,7 +1328,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             final String entryText = useBssid.replace(":", "");
             if (checked) {
                 MacFilterActivity.addEntry(currentAddresses,
-                        prefs, entryText, prefKey);
+                        prefs, entryText, prefKey, true);
             } else {
                 if (currentAddresses.remove(useBssid)) {
                     MacFilterActivity.updateEntries(currentAddresses,

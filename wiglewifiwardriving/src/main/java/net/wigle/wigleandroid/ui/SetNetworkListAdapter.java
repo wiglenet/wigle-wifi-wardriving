@@ -221,7 +221,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             Matcher mfgrAlertMatcher = null != mainActivity ?
                     mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS) : null;
             if (null != mfgrAlertMatcher) {
-                mfgrAlertMatcher.reset(network.getBssid());
+                mfgrAlertMatcher.reset(String.format("%04X", network.getBleMfgrId()));
                 matches |= mfgrAlertMatcher.find();
             }
         }

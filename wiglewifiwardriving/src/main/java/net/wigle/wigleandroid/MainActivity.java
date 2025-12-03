@@ -1578,14 +1578,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             StringBuilder sb = new StringBuilder("^(");
             boolean first = true;
             for (String value : values) {
-
                 if (first) {
                     first = false;
                 } else {
                     sb.append("|");
                 }
                 sb.append(value);
-                if (value.length() == 17) {
+                if (value.length() == 17 || value.length() == 4) {
                     sb.append("$");
                 }
             }

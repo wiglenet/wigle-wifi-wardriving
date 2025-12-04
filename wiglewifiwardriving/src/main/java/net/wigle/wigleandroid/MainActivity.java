@@ -1507,7 +1507,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
             state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
             //TODO: port SSID matcher over as well?
-            if (null != state.bssidAlertList ) {
+            if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
                 startHeartbeat(prefs);
             } else {
                 stopHeartbeat();
@@ -1528,17 +1528,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
             } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
                 state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
-                if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
-                    startHeartbeat(prefs);
-                } else {
+                if (null == state.bssidAlertList && null == state.bleMfgrIdList) {
                     stopHeartbeat();
+                } else {
+                    startHeartbeat(prefs);
                 }
             } else if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(addressKey)) {
-                state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
-                if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
-                    startHeartbeat(prefs);
-                } else {
+
+                state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
+                if (null == state.bssidAlertList && null == state.bleMfgrIdList) {
                     stopHeartbeat();
+                } else {
+                    startHeartbeat(prefs);
                 }
             }
         }

@@ -362,7 +362,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
                     v = findViewById(R.id.ble_vendor_row);
                     v.setVisibility(VISIBLE);
                     tv = findViewById( R.id.na_ble_vendor_id );
-                    tv.setText((null != network.getBleMfgrId())?network.getBleMfgrId()+"":"-");
+                    tv.setText((null != network.getBleMfgrId())?"0x"+String.format("%04X", network.getBleMfgrId()):"-");
                     tv = findViewById( R.id.na_ble_vendor_lookup );
                     tv.setText(network.getBleMfgr() );
                 }
@@ -1328,7 +1328,7 @@ public class NetworkActivity extends ScreenChildActivity implements DialogListen
             final String entryText = useBssid.replace(":", "");
             if (checked) {
                 MacFilterActivity.addEntry(currentAddresses,
-                        prefs, entryText, prefKey);
+                        prefs, entryText, prefKey, true);
             } else {
                 if (currentAddresses.remove(useBssid)) {
                     MacFilterActivity.updateEntries(currentAddresses,

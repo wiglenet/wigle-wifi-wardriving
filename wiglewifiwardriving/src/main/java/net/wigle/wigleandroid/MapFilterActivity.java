@@ -10,7 +10,6 @@ import android.os.Bundle;
 
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -60,10 +59,14 @@ public class MapFilterActivity extends ScreenChildActivity {
                     }
             );
         }
-        //ALIBI: the map view tools reuses the filter options, which includes alert-on.
+        //ALIBI: the map view tools reuses the filter options, need to exclude alerts.
         Button alerts = findViewById(R.id.alert_filter_button);
         if (alerts != null) {
             alerts.setVisibility(GONE);
+        }
+        Button alertMfgrss = findViewById(R.id.alert_ble_mfgr_filter_button);
+        if (alertMfgrss != null) {
+            alertMfgrss.setVisibility(GONE);
         }
 
         final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();

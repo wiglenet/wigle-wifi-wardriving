@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.util.List;
 import java.util.Locale;
@@ -69,18 +70,31 @@ public class AddressFilterAdapter extends ArrayAdapter<String> implements ListAd
         View view = convertView;
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.address_filter_list_item, parent, false);
+            if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(filterKey)) {
+                view = inflater.inflate(R.layout.ble_mfgr_id_filter_list_item, parent, false);
+            } else {
+                view = inflater.inflate(R.layout.address_filter_list_item, parent, false);
+            }
         }
 
         TextView listItemText = view.findViewById(R.id.list_item_string);
-        listItemText.setText(list.get(position));
+        final String address = list.get(position);
+        listItemText.setText(address);
 
         TextView listItemOui = view.findViewById(R.id.address_oui);
         if (null != listItemOui) {
-            final String lookup = list.get(position).replace(":", "").toUpperCase(Locale.ROOT);
+
+            final String lookup = address.replace(":", "").toUpperCase(Locale.ROOT);
             if (ListFragment.lameStatic.oui != null && lookup.length() >= 6) {
                 String result = ListFragment.lameStatic.oui.getOui(lookup.substring(0, 6));
                 listItemOui.setText(result);
+            } else if (lookup.length() == 4) {
+                try {
+                    String result = MainActivity.getMainActivity().getBleMfgr(Integer.parseInt(address, 16));
+                    listItemOui.setText(result);
+                } catch (Exception e) {
+                    Logging.error("unable to lookup BLE manufacturer: ",e);
+                }
             }
         }
         ImageButton deleteBtn = view.findViewById(R.id.delete_btn);

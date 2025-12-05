@@ -154,7 +154,6 @@ public class MacFilterActivity extends ScreenChildActivity {
         final MaskedEditText ouiInput = findViewById(R.id.oui_input);
         final String input = ouiInput.getRawText();
         if (input.length() == 6) {
-            final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (addFilterElement(input, true)) {
                 ouiInput.setText("");
             }
@@ -182,13 +181,12 @@ public class MacFilterActivity extends ScreenChildActivity {
     }
 
     public boolean addFilterElement(final String rawText, final boolean colonDelimited) {
+        //ALIBI: we need to get the current list before adding, since delete doesn't call us back to update.
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         Gson gson = new Gson();
-        //ALIBI: we need to get the current list before adding, since delete doesn't call us back to update.
         String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
-        if (values.length > 0) {
-            listItems = new ArrayList<>(Arrays.asList(values));
-        }
+        listItems = new ArrayList<>(Arrays.asList(values));
+
         if (addEntry(listItems, prefs, rawText, filterKey, colonDelimited))  {
             filtersAdapter.notifyDataSetChanged();
             refreshFilterElements();

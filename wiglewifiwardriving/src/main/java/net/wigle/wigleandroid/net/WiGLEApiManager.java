@@ -16,6 +16,8 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.appmattus.certificatetransparency.CTInterceptorBuilder;
+import com.appmattus.certificatetransparency.CTLogger;
+import com.appmattus.certificatetransparency.VerificationResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -102,9 +104,16 @@ public class WiGLEApiManager {
 
     private static final CTInterceptorBuilder ctIB = new CTInterceptorBuilder();
 
+    private static final CTLogger ctLogger = new CTLogger() {
+        @Override
+        public void log(@NonNull String host, @NonNull VerificationResult result) {
+            Logging.info("[CERTTRANS] "+result);
+        }
+    };
+
     // certificate transparency interceptor
-    private final static Interceptor certTransparencyInterceptor = ctIB.includeHost(API_DOMAIN).setLogger(
-            (s, verificationResult) -> Logging.info("[CERTTRANS] "+verificationResult)).build();
+    private final static Interceptor certTransparencyInterceptor = ctIB.includeHost(API_DOMAIN)
+            .setLogger(ctLogger).build();
 
     /**
      * Build a WiGLEApiManager

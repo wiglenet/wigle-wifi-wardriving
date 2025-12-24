@@ -57,9 +57,10 @@ ext {
     outputBtCharacteristicAppearanceFile = layout.projectDirectory.file("src/main/assets/appearance_values.yaml")
 }
 
-def camerax_version = "1.5.1"
+def camerax_version = "1.5.2"
 
 dependencies {
+    implementation 'com.android.tools:desugar_jdk_libs:2.1.5' // unbreak oldroid lack of Duration, etc.
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"

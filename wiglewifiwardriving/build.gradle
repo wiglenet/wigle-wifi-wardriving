@@ -65,7 +65,6 @@ ext {
 def camerax_version = "1.5.2"
 
 dependencies {
-    implementation 'com.android.tools:desugar_jdk_libs:2.1.5' // unbreak oldroid lack of Duration, etc.
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
@@ -99,7 +98,7 @@ dependencies {
     androidTestImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    coreLibraryDesugaring 'com.appmattus.certificatetransparency:certificatetransparency-android:2.8.20'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
 import groovy.json.JsonSlurper

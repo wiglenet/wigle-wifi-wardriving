@@ -30,6 +30,11 @@ android {
             excludes += ['META-INF/ASL2.0', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/LICENSE.txt', 'META-INF/MANIFEST.MF']
         }
     }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 configurations {
@@ -57,7 +62,7 @@ ext {
     outputBtCharacteristicAppearanceFile = layout.projectDirectory.file("src/main/assets/appearance_values.yaml")
 }
 
-def camerax_version = "1.5.1"
+def camerax_version = "1.5.2"
 
 dependencies {
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
@@ -80,7 +85,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation (name:'MaskedEditText-1.0.5', ext:'aar')
     implementation 'com.goebl:simplify:1.0.0'
-    implementation "com.appmattus.certificatetransparency:certificatetransparency-android:2.8.19"
+    implementation "com.appmattus.certificatetransparency:certificatetransparency-android:2.8.20"
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
@@ -93,6 +98,7 @@ dependencies {
     androidTestImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
 import groovy.json.JsonSlurper

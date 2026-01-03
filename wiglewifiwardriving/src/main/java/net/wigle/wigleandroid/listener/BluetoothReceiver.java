@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.listener;
 
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_PUBLIC;
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
 import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_CLASSIC;
 import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_DUAL;
 import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_LE;
@@ -74,6 +76,13 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     private final static long LE_REPORT_DELAY_MILLIS = 15000; // ALIBI: experimental - should this be settable?
 
     private final byte RANDOM_ADDRESS_BIT = 0x01;
+
+    // Address type constants for pattern-based detection
+    // Note: These extend beyond Android's API constants to include sub-types
+    private static final int PATTERN_ADDRESS_TYPE_PUBLIC = 0;
+    private static final int PATTERN_ADDRESS_TYPE_RANDOM_STATIC = 1;        // bits [1:0] = 01
+    private static final int PATTERN_ADDRESS_TYPE_RANDOM_RESOLVABLE = 2;    // bits [1:0] = 10
+    private static final int PATTERN_ADDRESS_TYPE_RANDOM_NON_RESOLVABLE = 3; // bits [1:0] = 11
 
     private static final Map<Integer, String> DEVICE_TYPE_LEGEND;
 
@@ -218,18 +227,45 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             final ScanRecord scanRecord = scanResult.getScanRecord();
             if (scanRecord != null) {
                 final BluetoothDevice device = scanResult.getDevice();
-                final Integer bleAddressType =
+                Integer bleAddressType =
                         (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) ?
                                 device.getAddressType() : null;
-                /*
-                //ALIBI: manual check, since bleAddressType is always public in testing - DOES NOT APPEAR CORRECT (scanRecord does not appear to container PDU header)
-                final boolean isRandom = ((scanRecord.getBytes()[0] & RANDOM_ADDRESS_BIT) == RANDOM_ADDRESS_BIT);
-                if (bleAddressType != null && bleAddressType.equals(ADDRESS_TYPE_PUBLIC) && isRandom) {
-                    Logging.error("disagreement (bit RANDOM, android PUBLIC) on "+device.getAddress());
+
+                final String address = device.getAddress();
+                final int deviceType = device.getType();
+                Integer patternAddressType = null;
+
+                if (deviceType == DEVICE_TYPE_LE || deviceType == DEVICE_TYPE_DUAL) {
+                    patternAddressType = getAddressTypeFromPattern(address);
+                }
+
+                if (bleAddressType == null) {
+                    // API unavailable - use pattern detection (only for BLE devices)
+                    if (patternAddressType != null) {
+                        bleAddressType = patternAddressType;
+                        if (DEBUG_BLUETOOTH_DATA && patternAddressType == ADDRESS_TYPE_RANDOM) {
+                            Logging.info("API unavailable, detected random address via pattern: " + address);
+                        }
+                    } else {
+                        // default to public
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            bleAddressType = ADDRESS_TYPE_PUBLIC;
+                        } else {
+                            bleAddressType = 0;
+                        }
+                    }
+                } else if (bleAddressType == ADDRESS_TYPE_PUBLIC && patternAddressType != null && patternAddressType == ADDRESS_TYPE_RANDOM) {
+                    // API says PUBLIC but pattern suggests RANDOM - trust pattern (with OUI verification)
+                    if (DEBUG_BLUETOOTH_DATA) {
+                        Logging.warn("API + OUI check indicates RANDOM for " + address);
+                    }
                     bleAddressType = ADDRESS_TYPE_RANDOM;
-                } else if (bleAddressType != null && bleAddressType.equals(ADDRESS_TYPE_RANDOM) && !isRandom) {
-                    Logging.error("disagreement (android RANDOM, bit PUBLIC) on "+device.getAddress());
-                }*/
+                } else if (bleAddressType == ADDRESS_TYPE_RANDOM && patternAddressType != null && patternAddressType == ADDRESS_TYPE_PUBLIC) {
+                    // API says RANDOM but pattern indicates PUBLIC
+                    if (DEBUG_BLUETOOTH_DATA) {
+                        Logging.warn("API returned RANDOM but pattern indicates PUBLIC for " + address + " (trusting API)");
+                    }
+                }
 
                 final String bssid = device.getAddress();
                 latestBtle.add(bssid);
@@ -270,7 +306,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                                     + "\n\tUUIDs:\t" + Arrays.toString(device.getUuids())
                                     + "\n\tService UUIDs:\t" + scanRecord.getServiceUuids()
                                     );
-                    if (bleAddressType != null && bleAddressType != 0) {
+                    if (bleAddressType != 0) {
                         Logging.info("\tinteresting addressType: "+bleAddressType);
                     }
                 }
@@ -1094,4 +1130,77 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 return NetworkType.BT;
         }
     }
+
+    /**
+     * Guess BLE address types
+     * - 00 = Public address
+     * - 01 = Random static address
+     * - 10 = Random private resolvable address
+     * - 11 = Random private non-resolvable address
+     * @param address MAC address string in format "XX:XX:XX:XX:XX:XX"
+     * @return Integer address type: ADDRESS_TYPE_PUBLIC (0), ADDRESS_TYPE_RANDOM (1) for any random type,
+     *         or null if address is invalid or OUI check indicates it's likely public
+     */
+    private Integer getAddressTypeFromPattern(String address) {
+        if (address == null || address.length() < 2) {
+            return null;
+        }
+
+        try {
+            String firstByteStr = address.substring(0, 2);
+            int firstByte = Integer.parseInt(firstByteStr, 16);
+            int addressTypeBits = firstByte & 0x03;
+
+            // 00 -> public for sure
+            if (addressTypeBits == PATTERN_ADDRESS_TYPE_PUBLIC) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    return ADDRESS_TYPE_PUBLIC;
+                } else {
+                    return 0;
+                }
+            }
+
+            // check first 24 bits, make sure we have no OUI matching this
+            String addressNoColons = address.replace(":", "").toUpperCase();
+            if (addressNoColons.length() < 6) {
+                return null;
+            }
+
+            String ouiPrefix = addressNoColons.substring(0, 6);
+            if (ListFragment.lameStatic.oui != null) {
+                String ouiResult = ListFragment.lameStatic.oui.getOui(ouiPrefix);
+                if (ouiResult != null && !ouiResult.isEmpty()) {
+                    if (DEBUG_BLUETOOTH_DATA) {
+                        Logging.info("Address " + address + " has random bit pattern (type bits: " + addressTypeBits +
+                                ") but OUI " + ouiPrefix + " is in database (" + ouiResult + "), treating as public");
+                    }
+                    return ADDRESS_TYPE_PUBLIC;
+                }
+            }
+            if (DEBUG_BLUETOOTH_DATA) {
+                String subType = "unknown";
+                switch (addressTypeBits) {
+                    case PATTERN_ADDRESS_TYPE_RANDOM_STATIC:
+                        subType = "static";
+                        break;
+                    case PATTERN_ADDRESS_TYPE_RANDOM_RESOLVABLE:
+                        subType = "resolvable";
+                        break;
+                    case PATTERN_ADDRESS_TYPE_RANDOM_NON_RESOLVABLE:
+                        subType = "non-resolvable";
+                        break;
+                }
+                Logging.info("Detected random address type: " + subType + " (bits: " + addressTypeBits + ") for " + address);
+            }
+            return ADDRESS_TYPE_RANDOM;
+        } catch (NumberFormatException e) {
+            Logging.warn("Failed to parse MAC address for random address detection: " + address, e);
+            return null;
+        } catch (Exception e) {
+            //presume public on error.
+            Logging.warn("Error checking OUI database for address: " + address, e);
+            return null;
+        }
+    }
+
 }

@@ -656,7 +656,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void setupMenuDrawer() {
-
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -699,10 +698,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         menuItem.setChecked(!menuItem.isChecked());
                     } else {
                         menuItem.setChecked(true);
-                        if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
-                            MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
-                            mPreviousMenuItem.setChecked(false);
-                        }
+                    }
+                    if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
+                        MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                        mPreviousMenuItem.setChecked(false);
                     }
                     state.previousTab = menuItem.getItemId();
 
@@ -839,7 +838,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {
-        menu.setGroupVisible(submenuGroupId, visible);
+        runOnUiThread(() -> {
+            // Your menu modification code here
+            menu.setGroupVisible(submenuGroupId, visible);
+        });
     }
 
     @Override

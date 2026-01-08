@@ -70,7 +70,8 @@ dependencies {
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
     implementation "androidx.core:core:1.17.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
-    implementation "com.google.android.material:material:1.13.0"
+    //NB: 1.12 -  1.14.0-alpha08 are unstable - see byzantine failures in https://stackoverflow.com/questions/79128940/mysterious-accessibility-related-crash
+    implementation "com.google.android.material:material:1.11.0"
     implementation "com.google.android.gms:play-services-maps:19.2.0"
     implementation "androidx.camera:camera-camera2:$camerax_version"
     implementation "androidx.camera:camera-lifecycle:$camerax_version"

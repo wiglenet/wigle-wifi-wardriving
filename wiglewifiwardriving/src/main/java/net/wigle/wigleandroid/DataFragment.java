@@ -11,6 +11,7 @@ import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.model.NetworkFilterType;
+import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
@@ -24,7 +25,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.WindowInsets;
+
+import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -39,7 +48,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
-import static net.wigle.wigleandroid.MainActivity.getMainActivity;
 import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -79,6 +87,7 @@ public final class DataFragment extends Fragment implements DialogListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.data, container, false);
+
         setupQueryInputs( view );
         setupQueryButtons( view );
         setupCsvButtons( view );
@@ -89,6 +98,26 @@ public final class DataFragment extends Fragment implements DialogListener {
         setupM8bExport(view);
         setupGpxExport(view);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            final Insets navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, navBars.bottom);
+            return insets;
+        });
+        //hack manual padding
+        view.post(() -> {
+            int navBarHeight = LayoutUtil.getNavigationBarHeight(getActivity(), getResources());
+            if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
+                view.setPadding(0, 0, 0, navBarHeight);
+            }
+            if (view.isAttachedToWindow()) {
+                ViewCompat.requestApplyInsets(view);
+            }
+        });
     }
 
     private void setupQueryInputs( final View view ) {

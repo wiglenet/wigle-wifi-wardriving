@@ -20,6 +20,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -45,6 +49,7 @@ import android.widget.TextView;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
+import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.FileUtility;
@@ -104,10 +109,34 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
 
-        // don't let the textbox have focus to start with, so we don't see a keyboard right away
         final LinearLayout linearLayout = view.findViewById(R.id.settingslayout);
-        linearLayout.setFocusableInTouchMode(true);
-        linearLayout.requestFocus();
+        if (null != linearLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(linearLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.navigationBars());
+                            v.setPadding(0, 0, 0, innerPadding.bottom);
+                            return insets;
+                        }
+                    }
+            );
+            linearLayout.setFocusableInTouchMode(true);
+            linearLayout.requestFocus();
+            // don't let the textbox have focus to start with, so we don't see a keyboard right away
+        }
+
+        //hack manual padding - apply to root ScrollView
+        view.post(() -> {
+            int navBarHeight = LayoutUtil.getNavigationBarHeight(getActivity(), getResources());
+            if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
+                view.setPadding(0, 0, 0, navBarHeight);
+            }
+            if (view.isAttachedToWindow()) {
+                ViewCompat.requestApplyInsets(view);
+            }
+        });
+
         updateView(view);
         return view;
     }

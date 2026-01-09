@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
@@ -121,29 +122,20 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        View bottomToolsLayout = view.findViewById(R.id.network_search_buttons);
-        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-                v.requestApplyInsets();
-                v.removeOnAttachStateChangeListener(this);
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-            }
-        });
-
-        // Set the insets listener on the view.
         ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-            if (null != bottomToolsLayout) {
-                final Insets innerPadding = insets.getInsets(
-                        WindowInsetsCompat.Type.navigationBars() /*TODO:  | cutouts?*/);
-                v.setPadding(
-                        innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
-                );
+            final Insets navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, navBars.bottom);
+            return insets;
+        });
+        //hack manual padding
+        view.post(() -> {
+            int navBarHeight = LayoutUtil.getNavigationBarHeight(getActivity(), getResources());
+            if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
+                view.setPadding(0, 0, 0, navBarHeight);
             }
-            return insets; // Pass the insets down to the children
+            if (view.isAttachedToWindow()) {
+                ViewCompat.requestApplyInsets(view);
+            }
         });
     }
     @Override

@@ -316,6 +316,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         }
                     }
             );
+            // propagate insets to fragments
+            mainWrapper.post(() -> ViewCompat.requestApplyInsets(mainWrapper));
         }
 
         DrawerLayout dl = findViewById(R.id.drawer_layout);

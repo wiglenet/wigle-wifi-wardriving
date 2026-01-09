@@ -397,6 +397,12 @@
             />
     </LinearLayout>
 
+    <CheckBox android:id="@+id/bluetooth_le_guess"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/guess_le_address_type" />
+
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

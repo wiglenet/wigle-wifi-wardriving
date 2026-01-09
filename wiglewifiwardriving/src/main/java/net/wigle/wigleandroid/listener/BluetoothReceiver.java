@@ -62,6 +62,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
+import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_GUESS_BLE_ADDRESS_TYPE;
 
 /**
  * Central class for compound BT scanning: BT Scan intent receiver and (if supported) LE scan
@@ -222,7 +223,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
      * @param batch whether this scan result is part of a batch (invalidate the UI immediately or later in addOrUpdateBt)
      */
     @SuppressLint("MissingPermission")
-    public void handleLeScanResult(final ScanResult scanResult, Location location, final boolean batch) {
+    public void handleLeScanResult(final ScanResult scanResult, Location location, final boolean batch, final boolean guessLeAddressType) {
         try {
             final ScanRecord scanRecord = scanResult.getScanRecord();
             if (scanRecord != null) {
@@ -235,11 +236,10 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 final int deviceType = device.getType();
                 Integer patternAddressType = null;
 
-                if (deviceType == DEVICE_TYPE_LE || deviceType == DEVICE_TYPE_DUAL) {
+                if ((deviceType == DEVICE_TYPE_LE || deviceType == DEVICE_TYPE_DUAL)) {
                     patternAddressType = getAddressTypeFromPattern(address);
                 }
-
-                if (bleAddressType == null) {
+                if (bleAddressType == null && guessLeAddressType) {
                     // API unavailable - use pattern detection (only for BLE devices)
                     if (patternAddressType != null) {
                         bleAddressType = patternAddressType;
@@ -950,12 +950,14 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         public void onScanResult(int callbackType, ScanResult scanResult) {
             final MainActivity m = MainActivity.getMainActivity();
             Location location = null;
+            final boolean guessLeAddressType = prefs != null && prefs.getBoolean(PREF_GUESS_BLE_ADDRESS_TYPE, false);
             if (m != null) {
                 final GNSSListener gpsListener = m.getGPSListener();
                 //DEBUG: Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
                 if (gpsListener != null) {
                     final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
                     final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
+
                     gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                     location = gpsListener.getCurrentLocation();
                 } else {
@@ -965,7 +967,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
             final LeScanUpdater update = updater.get();
             if (null != update) {
-                update.handleLeScanResult(scanResult, location, false);
+                update.handleLeScanResult(scanResult, location, false, guessLeAddressType);
             }
             ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
             ListFragment.lameStatic.runBt = runNetworks.size();
@@ -981,6 +983,8 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         public void onBatchScanResults(List<ScanResult> results) {
             long responseClockTime = System.currentTimeMillis();
             long diff = responseClockTime - lastLeBatchResponseTime.longValue();
+            final boolean guessLeAddressType = prefs != null && prefs.getBoolean(PREF_GUESS_BLE_ADDRESS_TYPE, false);
+
             lastLeBatchResponseTime.set(responseClockTime);
             if (diff < MIN_LE_BATCH_GAP_MILLIS) {
                 Logging.debug("Tried to update BTLE batch in improbably short time: " + diff + " ("+results.size()+" results)");
@@ -1033,7 +1037,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             final LeScanUpdater update = updater.get();
             if (null != update) {
                 for (final ScanResult scanResult : results) {
-                    update.handleLeScanResult(scanResult, location, true);
+                    update.handleLeScanResult(scanResult, location, true, guessLeAddressType);
                 }
             }
             //DEBUG:Logging.error("**LE.onBatchScanResults** Previous BTLE: "+(prevBtle != null ? prevBtle.size() : "N/A")+ " Latest BTLE: "+(latestBtle != null ? latestBtle.size() : "N/A"));

@@ -473,4 +473,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Ficha</string>
     <string name="alert">Tahadhari</string>
+    <string name="guess_le_address_type">Infer aina ya anwani BLE</string>
 </resources>

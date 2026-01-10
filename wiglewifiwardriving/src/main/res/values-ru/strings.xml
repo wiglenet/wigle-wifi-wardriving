@@ -474,4 +474,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Скрыть</string>
     <string name="alert">Оповещение</string>
+    <string name="guess_le_address_type">Определить тип адреса BLE</string>
 </resources>

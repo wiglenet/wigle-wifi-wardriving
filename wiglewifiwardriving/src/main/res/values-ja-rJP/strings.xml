@@ -477,4 +477,5 @@ KMLにエクスポート</string>
     <string name="mac">MAC</string>
     <string name="hide">を非表示にする</string>
     <string name="alert">に関する警告</string>
+    <string name="guess_le_address_type">BLEアドレスタイプを推測</string>
 </resources>

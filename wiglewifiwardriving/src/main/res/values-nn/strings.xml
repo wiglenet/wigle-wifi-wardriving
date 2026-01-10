@@ -474,4 +474,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Skjul</string>
     <string name="alert">Varsel</string>
+    <string name="guess_le_address_type">Utleia BLE-adresstype</string>
 </resources>

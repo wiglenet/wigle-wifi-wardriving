@@ -478,4 +478,5 @@
     <string name="alert">Alert</string>
     <string name="add_mfgr_filter_button">Add Mfgr Id</string>
     <string name="alert_ble_mfgrs_filter_button">Alert on BLE Manufacturers</string>
+    <string name="guess_le_address_type">Infer BLE Address Type</string>
 </resources>

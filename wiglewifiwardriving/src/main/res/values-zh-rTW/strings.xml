@@ -473,4 +473,5 @@
     <string name="mac">MAC</string>
     <string name="hide">隐藏</string>
     <string name="alert">警報</string>
+    <string name="guess_le_address_type">推斷BLE地址類型</string>
 </resources>

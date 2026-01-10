@@ -474,4 +474,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Elrejtés</string>
     <string name="alert">Figyelmeztetés</string>
+    <string name="guess_le_address_type">BLE-címtípus következtetése</string>
 </resources>

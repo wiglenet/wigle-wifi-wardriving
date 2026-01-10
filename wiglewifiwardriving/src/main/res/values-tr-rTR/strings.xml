@@ -474,5 +474,6 @@
     <string name="mac">MAC</string>
     <string name="hide">Gizle</string>
     <string name="alert">Uyarı</string>
+    <string name="guess_le_address_type">BLE Adres Türünü Çıkar</string>
 </resources>
 

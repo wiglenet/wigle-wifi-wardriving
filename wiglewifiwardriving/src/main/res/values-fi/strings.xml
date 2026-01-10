@@ -474,4 +474,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Piilota</string>
     <string name="alert">Varoitus</string>
+    <string name="guess_le_address_type">Päättele BLE-osoitetyyppi</string>
 </resources>

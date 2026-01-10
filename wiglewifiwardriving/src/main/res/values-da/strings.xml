@@ -474,4 +474,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Skjul</string>
     <string name="alert">Advarsel</string>
+    <string name="guess_le_address_type">Udled BLE-adresstype</string>
 </resources>

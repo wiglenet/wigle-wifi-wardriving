@@ -98,6 +98,26 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            final Insets navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, navBars.bottom);
+            return insets;
+        });
+        //hack manual padding
+        view.post(() -> {
+            int navBarHeight = LayoutUtil.getNavigationBarHeight(getActivity(), getResources());
+            if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
+                view.setPadding(0, 0, 0, navBarHeight);
+            }
+            if (view.isAttachedToWindow()) {
+                ViewCompat.requestApplyInsets(view);
+            }
+        });
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,31 +131,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         final LinearLayout linearLayout = view.findViewById(R.id.settingslayout);
         if (null != linearLayout) {
-            ViewCompat.setOnApplyWindowInsetsListener(linearLayout, new OnApplyWindowInsetsListener() {
-                        @Override
-                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
-                            final Insets innerPadding = insets.getInsets(
-                                    WindowInsetsCompat.Type.navigationBars());
-                            v.setPadding(0, 0, 0, innerPadding.bottom);
-                            return insets;
-                        }
-                    }
-            );
             linearLayout.setFocusableInTouchMode(true);
             linearLayout.requestFocus();
             // don't let the textbox have focus to start with, so we don't see a keyboard right away
         }
-
-        //hack manual padding - apply to root ScrollView
-        view.post(() -> {
-            int navBarHeight = LayoutUtil.getNavigationBarHeight(getActivity(), getResources());
-            if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
-                view.setPadding(0, 0, 0, navBarHeight);
-            }
-            if (view.isAttachedToWindow()) {
-                ViewCompat.requestApplyInsets(view);
-            }
-        });
 
         updateView(view);
         return view;

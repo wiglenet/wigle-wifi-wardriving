@@ -108,7 +108,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
         //hack manual padding
         view.post(() -> {
-            int navBarHeight = LayoutUtil.getNavigationBarHeight(getActivity(), getResources());
+            final Context context = getContext();
+            int navBarHeight = context == null ? 0 : LayoutUtil.getNavigationBarHeight(getActivity(), context.getResources());
             if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
                 view.setPadding(0, 0, 0, navBarHeight);
             }

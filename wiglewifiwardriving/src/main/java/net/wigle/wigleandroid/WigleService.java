@@ -249,7 +249,9 @@ public final class WigleService extends Service {
                 final MainActivity ma = MainActivity.getMainActivity();
                 Notification notification = null;
 
-                if (null != ma) {
+                if (null == ma) {
+                    Logging.info("MainActivity is null");
+                } else {
                     final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     final Intent scanSharedIntent = new Intent();
                     scanSharedIntent.setAction(SCAN_INTENT);
@@ -425,7 +427,10 @@ public final class WigleService extends Service {
                                            final PendingIntent uploadIntent) {
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager == null) return null;
+        if (notificationManager == null) {
+            Logging.info( "notificationManager is null" );
+            return null;
+        }
 
         final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                 title, NotificationManager.IMPORTANCE_DEFAULT);

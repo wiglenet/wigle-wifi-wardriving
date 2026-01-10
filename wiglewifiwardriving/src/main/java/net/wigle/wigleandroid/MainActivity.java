@@ -1056,6 +1056,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onResume() {
         Logging.info("MAIN: resume.");
         super.onResume();
+        mainActivity = this;
 
         // deal with wake lock
         if (!state.wakeLock.isHeld() && state.screenLocked) {
@@ -1117,6 +1118,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             startActivity(intent);
         }
         super.onStart();
+        mainActivity = this;
     }
 
     @Override
@@ -1129,6 +1131,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onRestart() {
         Logging.info("MAIN: restart.");
         super.onRestart();
+        mainActivity = this;
     }
 
     public static Throwable getBaseThrowable(final Throwable throwable) {

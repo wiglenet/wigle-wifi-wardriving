@@ -5,13 +5,24 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <RelativeLayout
         android:id="@+id/map_search"
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        tools:context=".SearchFragment"/>
-        <RelativeLayout
+        android:orientation="vertical"
+        tools:context=".SearchFragment" />
+    <TextView
+        android:paddingTop="55dp"
+        android:paddingHorizontal="15dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/mapless"
+        style="@style/NetDetailSsid"
+        />
+
+
+    <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"

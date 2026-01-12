@@ -21,6 +21,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
             </RelativeLayout>
+            <TextView
+                android:paddingTop="5dp"
+                android:paddingHorizontal="10dp"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text="@string/mapless"
+                style="@style/NetDetailSsid"
+                />
             <LinearLayout
                 android:id="@+id/gpx_back_layout"
                 android:layout_width="wrap_content"

@@ -35,13 +35,14 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.model.CameraPosition;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.LatLngBounds;
 
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.LayoutUtil;
@@ -65,8 +66,8 @@ public class SearchFragment extends Fragment {
 
     private static final int DEFAULT_ZOOM = 15;
     private AtomicBoolean finishing;
-    private MapView mapView;
-    private MapRender mapRender;
+    //private MapView mapView;
+    //private MapRender mapRender;
     private boolean mLocalSearch;
 
     @Override
@@ -85,38 +86,38 @@ public class SearchFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (mapView != null) {
+        /*if (mapView != null) {
             mapView.onDestroy();
-        }
+        }*/
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (null != mapView) {
+        /*if (null != mapView) {
             mapView.onResume();
-        }
+        }*/
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (mapView != null) {
+        /*if (mapView != null) {
             mapView.onPause();
-        }
-        if (mapRender != null) {
+        }*/
+        /*if (mapRender != null) {
             // save memory
             mapRender.clear();
-        }
+        }*/
     }
 
     @Override
     public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mapView != null) {
+        /*if (mapView != null) {
             mapView.onSaveInstanceState(outState);
-        }
+        }*/
     }
 
     @Override
@@ -264,9 +265,9 @@ public class SearchFragment extends Fragment {
 
         setupQueryButtons( view );
         LatLng centerPoint = new LatLng(0.0,0.0);
-        if ((ListFragment.lameStatic.queryArgs != null) && (ListFragment.lameStatic.queryArgs.getLocationBounds() != null)) {
+        /*if ((ListFragment.lameStatic.queryArgs != null) && (ListFragment.lameStatic.queryArgs.getLocationBounds() != null)) {
             centerPoint = ListFragment.lameStatic.queryArgs.getLocationBounds().getCenter();
-        } else if (null != ListFragment.lameStatic.location) {
+        } else*/ if (null != ListFragment.lameStatic.location) {
             centerPoint = new LatLng(ListFragment.lameStatic.location.getLatitude(), ListFragment.lameStatic.location.getLongitude());
         }
         setupMap(this.getActivity().getApplicationContext(), view, centerPoint, savedInstanceState, prefs );
@@ -306,7 +307,7 @@ public class SearchFragment extends Fragment {
     @SuppressLint("DefaultLocale")
     private void setupMap(final Context context, final View parentView, final LatLng center,
                           final Bundle savedInstanceState, final SharedPreferences prefs ) {
-        mapView = new MapView( context );
+        /*mapView = new MapView( context );
         try {
             mapView.onCreate(savedInstanceState);
             mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(),
@@ -340,10 +341,10 @@ public class SearchFragment extends Fragment {
             }
         } catch (Exception ex) {
             Logging.error("npe in mapView.onCreate: " + ex, ex);
-        }
+        }*/
 
         final RelativeLayout rlView = parentView.findViewById( R.id.map_search );
-        rlView.addView( mapView );
+        //rlView.addView( mapView );
     }
 
     private void setupAddressSearch(final Context context, final View view) {
@@ -365,9 +366,9 @@ public class SearchFragment extends Fragment {
                             Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
                             if (null != address) {
                                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                                mapView.getMapAsync(googleMap -> {
+                                /*mapView.getMapAsync(googleMap -> {
                                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-                                });
+                                });*/
                                 return true;
                             }
                         }

@@ -97,9 +97,9 @@ public class SearchUtil {
                 if (id == R.id.query_address) {
                     //TODO: this only applies for the search UI, NOT for the database tab. :(
                     //ALIBI: these aren't directly editable, so we have to persist them into the new queryArgs if set via the UI
-                    if (null != ListFragment.lameStatic.queryArgs && null != ListFragment.lameStatic.queryArgs.getLocationBounds()) {
+                    /*if (null != ListFragment.lameStatic.queryArgs && null != ListFragment.lameStatic.queryArgs.getLocationBounds()) {
                         queryArgs.setLocationBounds(ListFragment.lameStatic.queryArgs.getLocationBounds());
-                    }
+                    }*/
                 }
                 continue;
             }

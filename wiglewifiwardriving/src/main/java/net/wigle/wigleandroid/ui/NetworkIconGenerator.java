@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.google.maps.android.ui.RotationLayout;
+//import com.google.maps.android.ui.RotationLayout;
 
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
@@ -32,8 +32,8 @@ import net.wigle.wigleandroid.util.Logging;
 public class NetworkIconGenerator {
     private final Context mContext;
     private TextView mTextView;
-    private final ViewGroup mContainer;
-    private final RotationLayout mRotationLayout;
+    //private final ViewGroup mContainer;
+    //private final RotationLayout mRotationLayout;
     private final NetworkBubbleDrawable mBackground;
     private int mRotation;
     private View mContentView;
@@ -59,9 +59,9 @@ public class NetworkIconGenerator {
     public NetworkIconGenerator(Context context) {
         mContext = context;
         mBackground = new NetworkBubbleDrawable(this.mContext.getResources());
-        mContainer = (ViewGroup) LayoutInflater.from(mContext).inflate(com.google.maps.android.R.layout.amu_text_bubble, null);
-        mRotationLayout = (RotationLayout) mContainer.getChildAt(0);
-        mContentView = mTextView = (TextView) mRotationLayout.findViewById(com.google.maps.android.R.id.amu_text);
+        //mContainer = (ViewGroup) LayoutInflater.from(mContext).inflate(com.google.maps.android.R.layout.amu_text_bubble, null);
+        //mRotationLayout = (RotationLayout) mContainer.getChildAt(0);
+        //mContentView = mTextView = (TextView) mRotationLayout.findViewById(com.google.maps.android.R.id.amu_text);
         setStyle(STYLE_DEFAULT);
     }
 
@@ -78,10 +78,11 @@ public class NetworkIconGenerator {
             mTextView.setCompoundDrawablesWithIntrinsicBounds(getIconId(network.getType(), network.getCrypto()), 0, 0, 0);
             setStyle(styleForNetworkType(network.getType(), isNew));
         }
-        return this.makeIcon();
+        //return this.makeIcon();
+        return null;
     }
 
-    public Bitmap makeIcon() {
+    /*public Bitmap makeIcon() {
         int measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         mContainer.measure(measureSpec, measureSpec);
 
@@ -117,19 +118,19 @@ public class NetworkIconGenerator {
         }
         mContainer.draw(canvas);
         return r;
-    }
+    }*/
 
     public void setContentView(View contentView) {
-        mRotationLayout.removeAllViews();
-        mRotationLayout.addView(contentView);
+        //mRotationLayout.removeAllViews();
+        //mRotationLayout.addView(contentView);
         mContentView = contentView;
-        final View view = mRotationLayout.findViewById(com.google.maps.android.R.id.amu_text);
-        mTextView = view instanceof TextView ? (TextView) view : null;
+        //final View view = mRotationLayout.findViewById(com.google.maps.android.R.id.amu_text);
+        //mTextView = view instanceof TextView ? (TextView) view : null;
     }
 
-    public void setContentRotation(int degrees) {
+    /*public void setContentRotation(int degrees) {
         mRotationLayout.setViewRotation(degrees);
-    }
+    }*/
 
     private float rotateAnchor(float u, float v) {
         switch (this.mRotation) {
@@ -154,7 +155,7 @@ public class NetworkIconGenerator {
 
     public void setStyle(int style) {
         this.setColor(getStyleColor(style));
-        this.setTextAppearance(this.mContext, getTextStyle(style));
+        //this.setTextAppearance(this.mContext, getTextStyle(style));
     }
 
     public void setTextAppearance(Context context, int resid) {
@@ -169,15 +170,14 @@ public class NetworkIconGenerator {
     }
 
     public void setBackground(Drawable background) {
-        this.mContainer.setBackgroundDrawable(background);
+        /*this.mContainer.setBackgroundDrawable(background);
         if (background != null) {
             Rect rect = new Rect();
             background.getPadding(rect);
             this.mContainer.setPadding(rect.left, rect.top, rect.right, rect.bottom);
         } else {
             this.mContainer.setPadding(0, 0, 0, 0);
-        }
-
+        }*/
     }
 
     public void setContentPadding(int left, int top, int right, int bottom) {
@@ -205,7 +205,7 @@ public class NetworkIconGenerator {
         }
     }
 
-    private static int getTextStyle(int style) {
+    /*private static int getTextStyle(int style) {
         switch (style) {
             case 1:
             case 2:
@@ -219,7 +219,7 @@ public class NetworkIconGenerator {
             case 8:
                 return com.google.maps.android.R.style.amu_Bubble_TextAppearance_Light;//style.amu_Bubble_TextAppearance_Light;
         }
-    }
+    }*/
 
 
     private int getIconId(NetworkType type, int crypto) {

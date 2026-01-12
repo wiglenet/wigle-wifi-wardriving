@@ -2,8 +2,8 @@ package net.wigle.wigleandroid.model;
 
 import android.location.Address;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
  *  Search query arguments
@@ -14,7 +14,7 @@ public class QueryArgs {
     private static final Double ONLINE_RANGE = 0.001d; //ALIBI: online DB coverage mandates tighter bounds.
 
     private Address address;
-    private LatLngBounds locationBounds;
+    //private LatLngBounds locationBounds;
     private String ssid;
     private String bssid;
     private String cellOp;
@@ -42,18 +42,18 @@ public class QueryArgs {
             final double centerLat = address.getLatitude();
             final double centerLon = address.getLongitude();
             final Double range = searchWiGLE?ONLINE_RANGE:LOCAL_RANGE;
-            locationBounds = new LatLngBounds(new LatLng(centerLat-range, centerLon-range), new LatLng(centerLat+range, centerLon+range));
+            //locationBounds = new LatLngBounds(new LatLng(centerLat-range, centerLon-range), new LatLng(centerLat+range, centerLon+range));
         }
         this.address = address;
     }
 
-    public LatLngBounds getLocationBounds() {
+    /*public LatLngBounds getLocationBounds() {
         return locationBounds;
-    }
+    }*/
 
-    public void setLocationBounds(LatLngBounds locationBounds) {
+    /*public void setLocationBounds(LatLngBounds locationBounds) {
         this.locationBounds = locationBounds;
-    }
+    }*/
 
     public String getSSID() {
         return ssid;

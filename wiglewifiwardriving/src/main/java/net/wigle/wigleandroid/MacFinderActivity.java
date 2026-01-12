@@ -36,11 +36,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
-import com.google.mlkit.vision.common.InputImage;
+/*import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;*/
 
 import net.wigle.wigleandroid.ui.MacFinderListAdapter;
 import net.wigle.wigleandroid.ui.MacFinderListView;
@@ -65,7 +65,7 @@ public class MacFinderActivity extends AppCompatActivity {
 
     private static final Pattern MAC_REGEX = Pattern.compile(MAC_FILTER);
     private static final Pattern OUI_REGEX = Pattern.compile(OUI_FILTER);
-    private TextRecognizer textRecognizer;
+    //private TextRecognizer textRecognizer;
     private ExecutorService cameraExecutor;
     private static final int REQUEST_CAMERA = 0;
     private PreviewView previewView;
@@ -82,7 +82,7 @@ public class MacFinderActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        //textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         setContentView(R.layout.camera_text_recognizer);
         previewView = findViewById(R.id.camera_ocr_view);
         EdgeToEdge.enable(this);
@@ -201,7 +201,7 @@ public class MacFinderActivity extends AppCompatActivity {
             public void analyze(@NonNull ImageProxy image) {
                 Image mediaImage = image.getImage();
                 if (mediaImage != null) {
-                    InputImage inputImage =
+                    /*InputImage inputImage =
                             InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
                     textRecognizer.process(inputImage)
                             .addOnSuccessListener(visionText -> {
@@ -218,9 +218,6 @@ public class MacFinderActivity extends AppCompatActivity {
                                         while (ouiMatcher.find()) {
                                             //Logging.info("OUI MATCH: "+ t.getBoundingBox());
                                             matches.add(ouiMatcher.group());
-                                        }/* else {
-
-                                        }*/
                                     }
                                 }
                                 if (null != status) {
@@ -238,6 +235,7 @@ public class MacFinderActivity extends AppCompatActivity {
                                     Logging.error("Failed to process image for text: ",e);
                                     image.close();
                             });
+                     */
                 }
                 //image.close();
             }
@@ -269,9 +267,9 @@ public class MacFinderActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (null != textRecognizer) {
+        /*if (null != textRecognizer) {
             textRecognizer.close();
-        }
+        }*/
         if (null != cameraExecutor) {
             cameraExecutor.shutdown();
         }

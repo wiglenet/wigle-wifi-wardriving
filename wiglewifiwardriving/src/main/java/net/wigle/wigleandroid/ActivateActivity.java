@@ -3,6 +3,7 @@ package net.wigle.wigleandroid;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,15 +34,19 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.google.common.util.concurrent.ListenableFuture;
-/*import com.google.mlkit.vision.barcode.BarcodeScanner;
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
-import com.google.mlkit.vision.barcode.BarcodeScanning;
-import com.google.mlkit.vision.barcode.common.Barcode;
-import com.google.mlkit.vision.common.InputImage;*/
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.LuminanceSource;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.Result;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.QRCodeReader;
 
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +66,7 @@ public class ActivateActivity extends AppCompatActivity {
     //log tag for activity
     private static final String LOG_TAG = "wigle.activate";
 
-    //private BarcodeScanner barcodeScanner;
+    private QRCodeReader qrCodeReader;
     private ExecutorService cameraExecutor;
 
     private PreviewView cameraView;
@@ -112,12 +117,7 @@ public class ActivateActivity extends AppCompatActivity {
     private void launchBarcodeScanning() {
         setContentView(R.layout.activity_activate);
         cameraView = findViewById(R.id.camera_view);
-        /*BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(
-                                Barcode.FORMAT_QR_CODE)
-                        .build();
-        barcodeScanner = BarcodeScanning.getClient(options);*/
+        qrCodeReader = new QRCodeReader();
         cameraExecutor = Executors.newSingleThreadExecutor();
         if (allPermissionsGranted()) {
             startCamera();
@@ -129,9 +129,7 @@ public class ActivateActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        /*if (null != barcodeScanner) {
-            barcodeScanner.close();
-        }*/
+        qrCodeReader = null;
         if (null != cameraExecutor) {
             cameraExecutor.shutdown();
         }
@@ -142,53 +140,74 @@ public class ActivateActivity extends AppCompatActivity {
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-                //bindImageAnalysis(cameraProvider);
+                bindImageAnalysis(cameraProvider);
             } catch (ExecutionException | InterruptedException e) {
                 Logging.error("Failed to start camera: ",e);
             }
         }, ContextCompat.getMainExecutor(this));
     }
-    /*private void bindImageAnalysis(@NonNull ProcessCameraProvider cameraProvider) {
+    private void bindImageAnalysis(@NonNull ProcessCameraProvider cameraProvider) {
         ImageAnalysis imageAnalysis =
                 new ImageAnalysis.Builder().setTargetResolution(new Size(1280, 720))
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
-        imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), new ImageAnalysis.Analyzer() {
+        imageAnalysis.setAnalyzer(cameraExecutor, new ImageAnalysis.Analyzer() {
             @OptIn(markerClass = ExperimentalGetImage.class)
             @Override
             public void analyze(@NonNull ImageProxy image) {
                 Image mediaImage = image.getImage();
-                if (mediaImage != null) {
-                    InputImage inputImage =
-                            InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
-                    barcodeScanner.process(inputImage).addOnSuccessListener(
-                            barcodes -> {
-                                if (!barcodes.isEmpty()) {
-                                    Logging.info("received detections");
-                                    for (Barcode qr : barcodes) {
-                                        if (qr.getDisplayValue() != null && qr.getDisplayValue().matches("^.*:[a-zA-Z0-9]*:[a-zA-Z0-9]*$")) {
-                                            String[] tokens = qr.getDisplayValue().split(":");
-
-                                            final SharedPreferences prefs = MainActivity.getMainActivity().
-                                                    getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                                            final SharedPreferences.Editor editor = prefs.edit();
-                                            editor.putString(PreferenceKeys.PREF_USERNAME, tokens[0]);
-                                            editor.putString(PreferenceKeys.PREF_AUTHNAME, tokens[1]);
-                                            editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
-                                            editor.apply();
-                                            TokenAccess.setApiToken(prefs, tokens[2]);
-                                            MainActivity.refreshApiManager();
-                                            image.close();
-                                            finish();
-                                        }
-                                    }
-                                }
-                                image.close();
-                            }).addOnFailureListener(e -> {
-                                    Logging.error("Failed to process image for barcodes: ",e);
+                if (mediaImage != null && mediaImage.getFormat() == ImageFormat.YUV_420_888 && qrCodeReader != null) {
+                    try {
+                        Image.Plane yPlane = mediaImage.getPlanes()[0];
+                        ByteBuffer yBuffer = yPlane.getBuffer();
+                        int yRowStride = yPlane.getRowStride();
+                        int yPixelStride = yPlane.getPixelStride();
+                        int width = mediaImage.getWidth();
+                        int height = mediaImage.getHeight();
+                        
+                        byte[] yBytes = new byte[yBuffer.remaining()];
+                        yBuffer.get(yBytes);
+                        yBuffer.rewind();
+                        
+                        // Create a LuminanceSource that handles row stride correctly
+                        LuminanceSource source = new YPlaneLuminanceSource(yBytes, width, height, yRowStride, yPixelStride);
+                        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                        
+                        Result result = qrCodeReader.decode(bitmap);
+                        if (result != null && result.getText() != null) {
+                            String qrText = result.getText();
+                            Logging.info("received QR code detection: " + qrText);
+                            if (qrText.matches("^.*:[a-zA-Z0-9]*:[a-zA-Z0-9]*$")) {
+                                String[] tokens = qrText.split(":");
+                                
+                                runOnUiThread(() -> {
+                                    final SharedPreferences prefs = MainActivity.getMainActivity().
+                                            getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                    final SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putString(PreferenceKeys.PREF_USERNAME, tokens[0]);
+                                    editor.putString(PreferenceKeys.PREF_AUTHNAME, tokens[1]);
+                                    editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+                                    editor.apply();
+                                    TokenAccess.setApiToken(prefs, tokens[2]);
+                                    MainActivity.refreshApiManager();
                                     image.close();
+                                    finish();
                                 });
+                                return;
                             }
-            }});
+                        }
+                    } catch (NotFoundException e) {
+                        // QR code not found in this frame, continue scanning
+                    } catch (ChecksumException | FormatException e) {
+                        Logging.error("Failed to decode QR code: ", e);
+                    } catch (Exception e) {
+                        Logging.error("Failed to process image for QR codes: ", e);
+                    }
+                } else {
+                    Logging.error("Failed to process image for QR codes - incorrect image type.");
+                }
+                image.close();
+            }
+        });
 
         OrientationEventListener orientationEventListener = new OrientationEventListener(this) {
             @Override
@@ -206,7 +225,75 @@ public class ActivateActivity extends AppCompatActivity {
         } catch(Exception e) {
             Logging.error("failed to bind to preview: ", e);
         }
-    }*/
+    }
+    
+    /**
+     * Custom LuminanceSource for Y plane data from YUV_420_888 images
+     */
+    private static class YPlaneLuminanceSource extends LuminanceSource {
+        private final byte[] yBytes;
+        private final int dataWidth;
+        private final int dataHeight;
+        private final int rowStride;
+        private final int pixelStride;
+        
+        YPlaneLuminanceSource(byte[] yBytes, int width, int height, int rowStride, int pixelStride) {
+            super(width, height);
+            this.yBytes = yBytes;
+            this.dataWidth = width;
+            this.dataHeight = height;
+            this.rowStride = rowStride;
+            this.pixelStride = pixelStride;
+        }
+        
+        @Override
+        public byte[] getRow(int y, byte[] row) {
+            if (y < 0 || y >= getHeight()) {
+                throw new IllegalArgumentException("Requested row is outside the image: " + y);
+            }
+            int width = getWidth();
+            if (row == null || row.length < width) {
+                row = new byte[width];
+            }
+            int offset = y * rowStride;
+            if (pixelStride == 1) {
+                System.arraycopy(yBytes, offset, row, 0, width);
+            } else {
+                for (int x = 0; x < width; x++) {
+                    row[x] = yBytes[offset + x * pixelStride];
+                }
+            }
+            return row;
+        }
+        
+        @Override
+        public byte[] getMatrix() {
+            int width = getWidth();
+            int height = getHeight();
+            if (rowStride == width && pixelStride == 1) {
+                return yBytes.clone();
+            }
+            byte[] matrix = new byte[width * height];
+            int outputOffset = 0;
+            for (int y = 0; y < height; y++) {
+                int inputOffset = y * rowStride;
+                for (int x = 0; x < width; x++) {
+                    matrix[outputOffset++] = yBytes[inputOffset + x * pixelStride];
+                }
+            }
+            return matrix;
+        }
+        
+        @Override
+        public boolean isCropSupported() {
+            return true;
+        }
+        
+        @Override
+        public LuminanceSource crop(int left, int top, int width, int height) {
+            return super.crop(left, top, width, height);
+        }
+    }
 
     private boolean allPermissionsGranted() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)

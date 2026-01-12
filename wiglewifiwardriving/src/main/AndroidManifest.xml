@@ -189,7 +189,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".FilterActivity" />
         </activity>
-        <activity
+        <!-- activity
             android:name=".MacFinderActivity"
             android:label="@string/title_activity_activate"
             android:exported="true"
@@ -204,7 +204,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="net.wigle.wigleandroid" />
             </intent-filter>
-        </activity>
+        </activity -->
         <activity
             android:name=".MapFilterActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"

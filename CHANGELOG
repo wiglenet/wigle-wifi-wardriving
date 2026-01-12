@@ -1,3 +1,93 @@
+* 2.101 - 2.103 (01/10/2026)
+More manual layout to handle bottom nav bar after being forced to use Android's broken edge-to-edge
+Downgrade Google Material lib to 1.11.0 to solve menu crash
+Desugaring for cert transparency lib to support very old Android
+
+* 2.100 (12/10/2025)
+Bump certificatetransparency-android version
+
+* 2.99 (11/19/2025)
+Japanese language fixes (thanks A-vrice!)
+Wifi/BT filtering revamp
+Icon for PassPoint networks
+Styling to news and site stats
+Menu changes to hopefully prevent rare crash
+Updating build target
+
+* 2.98 (10/29/2025)
+Part man. Part machine. All Exit Button.
+
+* 2.97 (10/18/2025)
+SSID visual alerter
+Bottom controls handle multiple nav styles
+Left arrow is back
+Fix on-fold exits
+Bug fixes too
+
+* 2.95 - 2.96 (09/25/2025)
+Vector based encryption icons
+Check token state to handle device migrations
+Informative 429 error message
+Various bug fixes
+
+* 2.92 - 2.94 (08/29/2025)
+MAC/OUI audio presence/proximity hints as a third "filter" type
+GPX now exports with elevation (thanks to https://github.com/karololszacki !)
+Major layout changes necessitated by "edge-to-edge" screen layout requirement
+Added vendor based on OUI for MAC/OUI filter management activity
+Activity launch/classification fixes for SDK 35 compat
+Replacement of Play services vision with Camera X / mlkit
+Adding MAC/OUI camera recognition to simplify filter input
+Various bug and security fixes
+
+* 2.90 - 2.91 (06/11/2025)
+Bluetooth characteristics and GATT/GAP interrogation
+Major refactor of BT/BLE scanning
+Various bug fixes
+
+* 2.89 (01/05/2025)
+Adding site survey function
+Icon vector updates
+Search cleanup
+zh-rCN translation update (thanks Mingye!)
+Various bug fixes
+
+* 2.88 (07/11/2024)
+Bump target to Android 14 (API level 34)
+Various other bug fixes
+
+* 2.86 (04/19/2024)
+Visual improvement using SVGs
+Fixing scrolling regression
+Various other bug fixes
+
+* 2.85 (02/14/2024)
+Animated GPS searching logo
+Background task overhaul
+Various layout/bug/leak fixes
+
+* 2.84 (01/14/2024)
+Star number of observations not yet uploaded
+Fix crash on Android 7
+Fix submenu spacing on some devices
+
+* 2.83 (01/04/2024)
+Map UI improvements with icon bubbles
+Jobs system refactor
+Many linting and UI fixes
+Icon updates
+Build modernization and fixes
+
+* 2.81 - 2.82 (11/28/2023)
+Bluetooth is now in text-to-speech
+Roaming Consortium ID's added to local DB and file upload (thanks MarkG!)
+Added GNSS full tracking option (impacts battery, use with power source)
+Upload file at 1.6 version with UTF-8 support
+Distance now shown on list view
+Refactor DB search fragments
+Silence notification sounds
+Various bug fixes
+
 * 2.79 - 2.80 (09/07/2023)
 Bluetooth device manufacturer information displayed (thanks XenoKovah for insight)
 Stop multiple notification alerts on older devices

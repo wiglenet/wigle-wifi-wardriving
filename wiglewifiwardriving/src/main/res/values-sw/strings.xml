@@ -5,7 +5,7 @@
     <string name="settings_app_name">WiGLE WiFi - Mipangilio</string>
     <string name="mapping_app_name">WiGLE - Ramani</string>
     <string name="dashboard_app_name">WiGLE WiFi - Dashibodi</string>
-    <string name="error_report_name">WiGLE WiFi - Ripoti ya Makosa ya Hivi Karibuni</string>
+    <string name="error_report_name">Ripoti ya Makosa ya Hivi Karibuni</string>
     <string name="speech_name">WiGLE WiFi - Mipangilio ya Usemi</string>
     <string name="network_activity_name">WiGLE WiFi - Mtandao</string>
     <string name="data_activity_name">WiGLE WiFi - Hifadhidata</string>
@@ -94,6 +94,7 @@
     <string name="network_channel">Mkondo:</string>
     <string name="network_observations">Uchunguzi:</string>
     <string name="network_querying">(Kuuliza…)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Onyesha Nywila</string>
     <string name="setting_db_marker">Alama ya DB (ambapo upakiaji unaanzia):</string>
     <string name="setting_high_up">Kitambulisho cha juu kabisa kilichopakiwa:</string>
@@ -445,4 +446,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Sajili&lt;/a&gt; @WiGLE.net au &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;uwashe sasa ukitumia msimbo wa QR&lt;/a&gt;</string>
     <string name="ble_services">BLE UUIDs:</string>
     <string name="ble_vendor">Kitambulisho cha Muuzaji cha BLE:</string>
+    <string name="speech_new_bt">Bluetooth mpya kwa DB</string>
+    <string name="tts_new_bt">Bluetooth mpya</string>
+    <string name="gnss_full">Tumia ufuatiliaji kamili wa GNSS (kukimbia kwa betri kubwa)</string>
+    <string name="search_area">Eneo la Utafutaji:</string>
+    <string name="queued_jobs">(Kazi %1$d zilizowekwa kwenye foleni)</string>
+    <string name="duplicate_job">Kazi ya aina hii tayari inaendeshwa au inasubiri kufanya kazi.</string>
+    <string name="start_survey">Utafiti wa Tovuti</string>
+    <string name="end_survey">Maliza Utafiti</string>
+    <string name="confirm_survey">LAZIMA ubofye \"%1$s\" ili kukamilisha utafiti na kuhifadhi matokeo yako kabla ya kuondoka kwenye shughuli!\n\n Tunapendekeza uweke \"%2$s\" uchanganuzi chini ya mipangilio ya kasi yako ya usafiri ili kupata matokeo bora zaidi. (Hii ITAKUWA na matokeo ya betri)</string>
+    <string name="interrogate_ble">uliza kwa undani</string>
+    <string name="ble_mfgr_title">Mtengenezaji</string>
+    <string name="ble_model_title">Mfano</string>
+    <string name="ble_serial_title">Nambari ya Ufuatiliaji</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Vifaa</string>
+    <string name="ble_sw_title">Programu</string>
+    <string name="ble_name_title">Jina</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Muonekano</string>
+    <string name="alert_filter_button">Tahadhari kwenye MAC/OUIs…</string>
+    <string name="status_too_many">Nyingi mno ndani ya muda uliopangwa</string>
+    <string name="filter_show_wifi">Onyesha WiFi</string>
+    <string name="filter_show_bt_classic">Onyesha Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Ficha</string>
+    <string name="alert">Tahadhari</string>
 </resources>

@@ -52,10 +52,14 @@ public class PreferenceKeys {
     public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
     public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
     public static final String PREF_GPS_KALMAN_FILTER = "gpsKalmanFilter";
+    public static final String PREF_GPS_GNSS_FULL = "gpsGnssFull";
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
     public static final String PREF_START_AT_BOOT = "startAtBoot";
     public static final String PREF_LOG_ROUTES = "logRoutes";
     public static final String PREF_DAYNIGHT_MODE = "dayNightMode";
+    public static final String PREF_ALERT_ADDRS = "alertOnAddresses";
+
+    public static final String PREF_ALERT_BLE_MFGR_IDS = "alertOnBleMfgrId";
 
     // map prefs
     public static final String PREF_MAP_NO_TILE = "NONE";
@@ -81,6 +85,7 @@ public class PreferenceKeys {
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
     public static final String PREF_SPEAK_NEW_CELL = "speakNewCell";
+    public static final String PREF_SPEAK_NEW_BT = "speakNewBt";
     public static final String PREF_SPEAK_QUEUE = "speakQueue";
     public static final String PREF_SPEAK_MILES = "speakMiles";
     public static final String PREF_SPEAK_TIME = "speakTime";

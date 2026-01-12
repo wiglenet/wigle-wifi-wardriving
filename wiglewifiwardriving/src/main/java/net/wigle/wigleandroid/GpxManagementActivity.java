@@ -1,14 +1,18 @@
 package net.wigle.wigleandroid;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,14 +24,15 @@ import androidx.recyclerview.widget.RecyclerView;
 //import com.google.android.gms.maps.model.LatLngBounds;
 //import com.google.android.gms.maps.model.Polyline;
 
+import net.wigle.wigleandroid.background.GpxExportRunnable;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.PolylineRoute;
 import net.wigle.wigleandroid.ui.GpxRecyclerAdapter;
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
-import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -36,11 +41,12 @@ import net.wigle.wigleandroid.util.RouteExportSelector;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
 
 import static android.view.View.GONE;
-import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
+import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
-public class GpxManagementActivity extends AppCompatActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
+public class GpxManagementActivity extends ScreenChildActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
 
     private final NumberFormat numberFormat;
     private final int DEFAULT_MAP_PADDING = 25;
@@ -51,11 +57,15 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
 //    private Polyline routePolyline;
     private final String CURRENT_ROUTE_LINE_TAG = "currentRoutePolyline";
     private SharedPreferences prefs;
-    private ProgressDialog pd;
     private long exportRouteId = -1L;
 
     public GpxManagementActivity() {
-        this.dbHelper = MainActivity.getStaticState().dbHelper;
+        final MainActivity.State s = MainActivity.getStaticState();
+        if (null != s) {
+            this.dbHelper = s.dbHelper;
+        } else {
+            this.dbHelper = null;
+        }
         Locale locale = Locale.getDefault();
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(1);
@@ -65,9 +75,31 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     public void onCreate( final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gpx_mgmt);
+        EdgeToEdge.enable(this);
+        View backButtonWrapper = findViewById(R.id.gpx_back_layout);
+        if (null != backButtonWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(backButtonWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        ImageButton backButton = findViewById(R.id.gpx_back_button);
+        if (null != backButton) {
+            backButton.setOnClickListener(v -> finish());
         }
         prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         setupMap(prefs);
@@ -155,14 +187,16 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         RecyclerView recyclerView = findViewById(R.id.gpx_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        try {
-            Cursor cursor = dbHelper.routeMetaIterator();
-            final DateFormat itemDateFormat = android.text.format.DateFormat.getDateFormat(this.getApplicationContext());
-            final DateFormat itemTimeFormat = android.text.format.DateFormat.getTimeFormat(this.getApplicationContext());
-            GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
-            recyclerView.setAdapter(adapter);
-        } catch (DBException dbex) {
-            Logging.error("Failed to setup list for GPX management: ", dbex);
+        if (null != dbHelper) {
+            try {
+                Cursor cursor = dbHelper.routeMetaIterator();
+                final DateFormat itemDateFormat = android.text.format.DateFormat.getDateFormat(this.getApplicationContext());
+                final DateFormat itemTimeFormat = android.text.format.DateFormat.getTimeFormat(this.getApplicationContext());
+                GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
+                recyclerView.setAdapter(adapter);
+            } catch (DBException dbex) {
+                Logging.error("Failed to setup list for GPX management: ", dbex);
+            }
         }
     }
 
@@ -172,8 +206,8 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile(exportRouteId)) {
                     Logging.warn("Failed to export gpx.");
-                    WiGLEToast.showOverFragment(this, R.string.error_general,
-                            getString(R.string.gpx_failed));
+                    //WiGLEToast.showOverFragment(this, R.string.error_general,
+                    //        getString(R.string.gpx_failed));
                 }
                 break;
             }
@@ -185,12 +219,23 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     private boolean exportRouteGpxFile(long runId) {
         final long totalRoutePoints = ListFragment.lameStatic.dbHelper.getRoutePointCount(runId);
         if (totalRoutePoints > 1) {
-            new AsyncGpxExportTask(this, this,
-                    pd, runId).execute(totalRoutePoints);
+            ExecutorService es = ListFragment.lameStatic.executorService;
+            if (null != es) {
+                try {
+                    es.submit(new GpxExportRunnable(this, true, totalRoutePoints, runId));
+                } catch (IllegalArgumentException e) {
+                    Logging.error("failed to submit job: ", e);
+                    WiGLEToast.showOverFragment(this, R.string.export_gpx,
+                            getResources().getString(R.string.duplicate_job));
+                    return false;
+                }
+            } else {
+                Logging.error("null LameStatic ExecutorService - unable to submit route export");
+            }
         } else {
             Logging.error("no points to create route");
             WiGLEToast.showOverFragment(this, R.string.gpx_failed,
-                    getString(R.string.gpx_no_points));
+                    getResources().getString(R.string.gpx_no_points));
             //NO POINTS
         }
         return true;

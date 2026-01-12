@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.db;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -24,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,7 +42,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private final Context context;
     private final boolean hasSD;
     private SQLiteDatabase db;
-    private SharedPreferences prefs;
+    private final SharedPreferences prefs;
 
     // query when you just need opname
     private static final String OPERATOR_FOR_MCC_MNC = "SELECT operator FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
@@ -89,7 +92,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
+                                    if (null != dialog) {
+                                        dialog.dismiss();
+                                    }
                                 }
                             });
 
@@ -111,7 +116,6 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                     final File outputFile = getMxcFile();
                     Logging.info("Installing mxc file at: " + outputFile);
                     mxcOutput = new FileOutputStream(outputFile);
-
                     byte[] buffer = new byte[1024];
                     int length;
                     while ((length = assetInputData.read(buffer)) > 0) {
@@ -151,12 +155,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         //ALIBI: pre-created during build
     }
 
+    @SuppressLint("Range")
     public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
-        // ALIBI: old, incompatible DB implementation
-        if (android.os.Build.VERSION.SDK_INT <= 19) {
-            return null;
-        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");
@@ -169,7 +170,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
 
-                    MccMncRecord operator = new MccMncRecord(
+                    return new MccMncRecord(
                             cursor.getString(cursor.getColumnIndex("type")),
                             cursor.getString(cursor.getColumnIndex("countryName")),
                             cursor.getString(cursor.getColumnIndex("countryCode")),
@@ -180,7 +181,6 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndex("status")),
                             cursor.getString(cursor.getColumnIndex("bands")),
                             cursor.getString(cursor.getColumnIndex("notes")));
-                    return operator;
                 }
             } else {
                 Logging.error("unable to open mcc/mnc database for record.");
@@ -199,14 +199,10 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    @SuppressLint("Range")
     public String networkNameForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
         String operator = null;
-
-        // ALIBI: old, incompatible DB implementation
-        if (android.os.Build.VERSION.SDK_INT <= 19) {
-            return null;
-        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");
@@ -235,7 +231,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 db.close();
             }
         }
-        return operator;
+        return null;
     }
 
     private boolean openDataBase() throws SQLException {

@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi - Impostazioni</string>
     <string name="mapping_app_name">Lista geografica</string>
     <string name="dashboard_app_name">WiGLE WiFi - Riepilogo</string>
-    <string name="error_report_name">WiGLE WiFi - Segnalazioni di errore</string>
+    <string name="error_report_name">Segnalazioni di errore</string>
     <string name="speech_name">WiGLE WiFi - Impostazioni sintesi vocale</string>
     <string name="network_activity_name">WiGLE WiFi - Rete</string>
     <string name="data_activity_name">WiGLE WiFi - Database</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Canale:</string>
     <string name="network_observations">Osservazioni:</string>
     <string name="network_querying">(ricerca&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Mostra Password</string>
     <string name="setting_db_marker">Segnalibro del database (da cui inizia il caricamento):</string>
     <string name="setting_high_up">Più alto ID caricato:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrarsi&lt;/a&gt; @WiGLE.net o &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;attiva ora con il codice QR&lt;/a&gt;</string>
     <string name="ble_services">UUID BLE:</string>
     <string name="ble_vendor">ID fornitore BLE:</string>
+    <string name="speech_new_bt">Nuovo Bluetooth su DB</string>
+    <string name="tts_new_bt">Nuovo Bluetooth</string>
+    <string name="gnss_full">Utilizza il rilevamento completo GNSS (grande consumo della batteria)</string>
+    <string name="search_area">Area di ricerca:</string>
+    <string name="queued_jobs">(%1$d attività in coda)</string>
+    <string name="duplicate_job">Un lavoro di questo tipo è già in esecuzione o in attesa di essere eseguito.</string>
+    <string name="start_survey">Sondaggio del sito</string>
+    <string name="end_survey">Fine sondaggio</string>
+    <string name="confirm_survey">DEVI fare clic su \"%1$s\" per completare il sondaggio e salvare i risultati prima di uscire dall\'attività!\n\n Ti consigliamo di impostare la scansione \"%2$s\" nelle impostazioni per la velocità di viaggio per ottenere i migliori risultati. (Ciò avrà conseguenze sulla batteria)</string>
+    <string name="interrogate_ble">chiedere dettagli</string>
+    <string name="ble_mfgr_title">Fabbricante</string>
+    <string name="ble_model_title">Modello</string>
+    <string name="ble_serial_title"># di serie</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Nome</string>
+    <string name="ble_pnp_title">ID PnP</string>
+    <string name="ble_appearance_title">Aspetto</string>
+    <string name="alert_filter_button">Attenzione ai MAC/OUI…</string>
+    <string name="status_too_many">Troppi entro i tempi previsti</string>
+    <string name="filter_show_wifi">Mostra WiFi</string>
+    <string name="filter_show_bt_classic">Mostra Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Nascondi</string>
+    <string name="alert">Attenzione</string>
 </resources>

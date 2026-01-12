@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="162dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:id="@+id/notif_lg">
     <TextView
@@ -21,7 +20,8 @@
         android:weightSum="3"
         android:paddingTop="2dp"
         android:layout_height="108dp"
-        android:layout_below="@+id/notif_title">
+        android:layout_below="@+id/notif_title"
+        android:baselineAligned="false">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -134,13 +134,14 @@
         android:orientation="horizontal"
         android:weightSum="2"
         android:paddingTop="10dp"
-        android:layout_below="@+id/notif_nets">
+        android:layout_below="@+id/notif_nets"
+        android:baselineAligned="false">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="left"
+            android:gravity="start"
             android:layout_marginEnd="10dp"
             android:background="@drawable/notification_border">
             <ImageView
@@ -151,7 +152,8 @@
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="4dp"
                 android:paddingTop="1dp"
-                android:paddingBottom="1dp"/>
+                android:paddingBottom="1dp"
+                android:contentDescription="@string/total_seen"/>
             <TextView
                 android:id="@+id/db_total_notif"
                 android:layout_width="wrap_content"
@@ -169,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="left"
+            android:gravity="start"
             android:background="@drawable/notification_border">
             <ImageView
                 android:layout_width="22dp"
@@ -178,7 +180,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="4dp"
-                android:paddingBottom="1dp"/>
+                android:paddingBottom="1dp"
+                android:contentDescription="@string/dash_dist_run"/>
             <TextView
                 android:id="@+id/dist_notif"
                 android:layout_width="wrap_content"

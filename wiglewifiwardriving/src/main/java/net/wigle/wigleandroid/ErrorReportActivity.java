@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -11,10 +12,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.util.FileUtility;
@@ -44,6 +54,24 @@ public class ErrorReportActivity extends AppCompatActivity {
         MainActivity.setLocale( this );
         setContentView( R.layout.error );
 
+        EdgeToEdge.enable(this);
+        View wrapperLayout = findViewById(R.id.error_wrapper);
+        if (null != wrapperLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(wrapperLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+
         // get stack from file
         stackFilePath = FileUtility.getLatestStackfilePath(getApplicationContext());
         if (stackFilePath == null || stackFilePath.isEmpty()) {
@@ -70,45 +98,49 @@ public class ErrorReportActivity extends AppCompatActivity {
             shutdownRestOfApp();
 
             final Handler handler = new Handler();
-            final Runnable dialogTask = new Runnable() {
-                @Override
-                public void run() {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder( ErrorReportActivity.this );
-                    builder.setCancelable( false );
-                    builder.setTitle( getString(R.string.fatal_title) );
-                    String fatalDbWarn = "";
-                    if ( dialogMessage.contains("SQL") ) {
-                        fatalDbWarn = getString(R.string.fatal_db_warn);
-                    }
-                    builder.setMessage( fatalDbWarn + "\n\n*** " + getString(R.string.fatal_pre_message) + ": ***\n" + dialogMessage
-                            + "\n\n" + getString(R.string.fatal_post_message) );
+            final Runnable dialogTask = () -> {
+                final AlertDialog.Builder builder = new AlertDialog.Builder( ErrorReportActivity.this );
+                builder.setCancelable( false );
+                builder.setTitle( getString(R.string.fatal_title) );
+                String fatalDbWarn = "";
+                if ( dialogMessage.contains("SQL") ) {
+                    fatalDbWarn = getString(R.string.fatal_db_warn);
+                }
+                builder.setMessage( fatalDbWarn + "\n\n*** " + getString(R.string.fatal_pre_message) + ": ***\n" + dialogMessage
+                        + "\n\n" + getString(R.string.fatal_post_message) );
 
-                    final AlertDialog ad = builder.create();
-                    ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick( final DialogInterface dialog, final int which ) {
-                            try {
-                                dialog.dismiss();
-                            }
-                            catch ( Exception ex ) {
-                                // guess it wasn't there anyways
-                                Logging.info( "exception dismissing alert dialog: " + ex );
-                            }
-                        } });
-
+                final AlertDialog ad = builder.create();
+                ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", (dialog, which) -> {
                     try {
-                        if (!isFinishing()) {
-                            ad.show();
+                        if (null != dialog) {
+                            dialog.dismiss();
                         }
+                    }  catch ( Exception ex ) {
+                        // guess it wasn't there anyways
+                        Logging.info( "exception dismissing alert dialog: " + ex );
                     }
-                    catch ( WindowManager.BadTokenException windowEx ) {
-                        Logging.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
+                });
+
+                try {
+                    if (!isFinishing()) {
+                        ad.show();
                     }
+                }
+                catch ( WindowManager.BadTokenException windowEx ) {
+                    Logging.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
                 }
             };
 
             handler.removeCallbacks( dialogTask );
             handler.postDelayed( dialogTask, 100 );
+        }
+        final ImageButton backButton = findViewById(R.id.error_back_button);
+        if (null != backButton) {
+            backButton.setOnClickListener(v -> finish());
+        }
+        final ImageButton shareButton = findViewById(R.id.error_share_button);
+        if (shareButton != null) {
+            shareButton.setOnClickListener(v -> setupEmail( stack, stackFilePath));
         }
     }
 
@@ -131,7 +163,7 @@ public class ErrorReportActivity extends AppCompatActivity {
         StringBuilder builder = new StringBuilder( "No Error Report found" );
         if (filePath == null) return builder.toString();
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader( new FileInputStream( filePath ), "UTF-8") )) {
+                new InputStreamReader( new FileInputStream( filePath ), StandardCharsets.UTF_8) )) {
             String line = reader.readLine();
             builder.setLength( 0 );
             while ( line != null ) {

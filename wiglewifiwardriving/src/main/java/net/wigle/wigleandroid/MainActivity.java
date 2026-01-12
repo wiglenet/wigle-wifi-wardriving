@@ -19,6 +19,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.location.GnssMeasurementRequest;
+import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -27,6 +31,7 @@ import android.media.MediaPlayer;
 import android.net.TrafficStats;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,12 +41,18 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 
 //import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.location.LocationManagerCompat;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -63,10 +74,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
 
 //import com.google.android.gms.common.ConnectionResult;
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.background.BssidMatchingAudioThread;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -82,6 +95,7 @@ import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -112,6 +126,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,6 +137,9 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+/**
+ * MainActivity for WiGLE Wireless logging and visualization client
+ */
 public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     //*** state that is retained ***
     public static class State {
@@ -133,6 +151,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         AtomicBoolean transferring;
         MediaPlayer soundPop;
         MediaPlayer soundNewPop;
+        MediaPlayer soundScanning;
+        MediaPlayer soundContact;
         WifiLock wifiLock;
         GNSSListener GNSSListener;
         WifiReceiver wifiReceiver;
@@ -155,17 +175,26 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
+        Matcher bssidAlertList;
+        Matcher bleMfgrIdList;
         int uiMode;
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
-        WiGLEApiManager apiManager;
-        Map<Integer, String> btVendors;
-        Map<Integer, String> btMfgrIds;
+        public WiGLEApiManager apiManager;
+        Map<Integer, String> btVendors = Collections.emptyMap();
+        Map<Integer, String> btMfgrIds = Collections.emptyMap();
+        Map<Integer, String> btServiceUuids = Collections.emptyMap();
+        Map<Integer, String> btCharUuids = Collections.emptyMap();
+        Map<Integer, BluetoothUtil.AppearanceCategory> btAppearance = Collections.emptyMap();
+        Thread bssidMatchHeartbeat;
+        // ALIBI set to -80 if you want a test ping on startup, Integer.MIN_VALUE for quiet start.
+        AtomicInteger lastHighestSignal = new AtomicInteger(-80);
     }
 
     private State state;
     // *** end of state that is retained ***
     private GnssStatus.Callback gnssStatusCallback = null;
+    private GnssMeasurementsEvent.Callback gnssMeasurementsCallback = null;
     static Locale ORIG_LOCALE = Locale.getDefault();
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
@@ -219,6 +248,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> Logging.info("state change on-fold.")
+            );
+        }
+
         if (ENABLE_DEBUG_LOGGING) {
             Logging.enableDebugLogging();
             Logging.info("Debug log-level is enabled.");
@@ -252,7 +288,46 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // set language
         setLocale(this);
         setContentView(R.layout.main);
+        EdgeToEdge.enable(this);
 
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> {
+                        Logging.info("onKeyDown: not quitting app on back");
+                        selectFragment(R.id.nav_list);
+                        //TODO: anything else required to prevent exit here?
+                    }
+            );
+        }
+
+        View mainWrapper = findViewById(R.id.main_wrapper);
+        if (null != mainWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+            // propagate insets to fragments
+            mainWrapper.post(() -> ViewCompat.requestApplyInsets(mainWrapper));
+        }
+
+        DrawerLayout dl = findViewById(R.id.drawer_layout);
+        if (null != dl) {
+            int [] attrs = { com.google.android.material.R.attr.scrimBackground };
+            try (@SuppressLint("ResourceType") TypedArray typedValues  = obtainStyledAttributes(R.style.AppTheme, attrs)) {
+                int scrimColor = typedValues.getColor(0, Color.parseColor("#99000000"));
+                dl.setScrimColor(scrimColor);
+            }
+        }
         setupPermissions();
         setupMenuDrawer();
 
@@ -323,6 +398,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         }
 
+        @SuppressLint("HardwareIds")
         final String id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // DO NOT turn these into |=, they will cause older dalvik verifiers to freak out
@@ -496,43 +572,46 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void setupPermissions() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            final List<String> permissionsNeeded = new ArrayList<>();
-            final List<String> permissionsList = new ArrayList<>();
-            if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                permissionsNeeded.add(mainActivity.getString(R.string.gps_permission));
-            }
-            if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
-            }
-            addPermission(permissionsList, Manifest.permission.BLUETOOTH);
-            addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+        final List<String> permissionsNeeded = new ArrayList<>();
+        final List<String> permissionsList = new ArrayList<>();
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permissionsNeeded.add(mainActivity.getString(R.string.gps_permission));
+        }
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
+        }
+        addPermission(permissionsList, Manifest.permission.BLUETOOTH);
+        addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
             addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
-            if (!permissionsList.isEmpty()) {
-                // The permission is NOT already granted.
-                // Check if the user has been asked about this permission already and denied
-                // it. If so, we want to give more explanation about why the permission is needed.
-                // 20170324 rksh: disabled due to
-                // https://stackoverflow.com/questions/35453759/android-screen-overlay-detected-message-if-user-is-trying-to-grant-a-permissio
-                /*String message = mainActivity.getString(R.string.please_allow);
-                for (int i = 0; i < permissionsNeeded.size(); i++) {
-                    if (i > 0) message += ", ";
-                    message += permissionsNeeded.get(i);
-                }
-
-                if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    message = mainActivity.getString(R.string.allow_storage);
-                } */
-
-                Logging.info("no permission for " + permissionsNeeded);
-
-                // Fire off an async request to actually get the permission
-                // This will show the standard permission request dialog UI
-                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
-                        PERMISSIONS_REQUEST);
+        }
+        if (!permissionsList.isEmpty()) {
+            // The permission is NOT already granted.
+            // Check if the user has been asked about this permission already and denied
+            // it. If so, we want to give more explanation about why the permission is needed.
+            // 20170324 rksh: disabled due to
+            // https://stackoverflow.com/questions/35453759/android-screen-overlay-detected-message-if-user-is-trying-to-grant-a-permissio
+            /*String message = mainActivity.getString(R.string.please_allow);
+            for (int i = 0; i < permissionsNeeded.size(); i++) {
+                if (i > 0) message += ", ";
+                message += permissionsNeeded.get(i);
             }
+
+            if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                message = mainActivity.getString(R.string.allow_storage);
+            } */
+
+            Logging.info("no permission for " + permissionsNeeded);
+
+            // Fire off an async request to actually get the permission
+            // This will show the standard permission request dialog UI
+            requestPermissions(permissionsList.toArray(new String[0]),
+                    PERMISSIONS_REQUEST);
         }
     }
 
@@ -579,7 +658,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void setupMenuDrawer() {
-
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -622,18 +700,20 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         menuItem.setChecked(!menuItem.isChecked());
                     } else {
                         menuItem.setChecked(true);
-
-                        if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
-                            MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
-                            mPreviousMenuItem.setChecked(false);
-                        }
+                    }
+                    if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
+                        MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                        mPreviousMenuItem.setChecked(false);
                     }
                     state.previousTab = menuItem.getItemId();
 
                     // close drawer when item is tapped
                     if (R.id.nav_stats == menuItem.getItemId()) {
-                        Logging.info("Nav stats clicked");
                         showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
+                        applyExitBackground(navigationView);
+                    } else if (R.id.nav_exit == menuItem.getItemId()) {
+                        selectFragment(menuItem.getItemId());
+                        return false;
                     } else {
                         if (R.id.nav_site_stats != menuItem.getItemId() &&
                                 R.id.nav_user_stats != menuItem.getItemId() &&
@@ -641,6 +721,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
                         mDrawerLayout.closeDrawers();
                         selectFragment(menuItem.getItemId());
+                        applyExitBackground(navigationView);
                     }
                     return true;
                 });
@@ -653,23 +734,55 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         //TODO:
         int menuSubColor = 0xE0777777;
         MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
-        SpannableString spanString = new SpannableString("    " + uStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
-        uStats.setTitle(spanString);
+        if (null != uStats.getTitle()) {
+            final SpannableString uSpanString = new SpannableString("    " + uStats.getTitle().toString());
+            uSpanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, uSpanString.length(), 0);
+            uStats.setTitle(uSpanString);
+        }
 
         MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
-        spanString = new SpannableString("    " + sStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
-        sStats.setTitle(spanString);
+        if (null != sStats.getTitle()) {
+            SpannableString sSpanString = new SpannableString("    " + sStats.getTitle().toString());
+            sSpanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, sSpanString.length(), 0);
+            sStats.setTitle(sSpanString);
+        }
 
         MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
-        spanString = new SpannableString("    " + rStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
-        rStats.setTitle(spanString);
+        if (null != rStats.getTitle()) {
+            SpannableString  rSpanString = new SpannableString("    " + rStats.getTitle().toString());
+            rSpanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, rSpanString.length(), 0);
+            rStats.setTitle(rSpanString);
+        }
 
         navigationView.getMenu().getItem(0).setCheckable(true);
         navigationView.getMenu().getItem(0).setChecked(true);
-        // end drawer setup
+
+        // Use a custom background for nav_exit menu item
+        applyExitBackground(navigationView);
+    // end drawer setup
+    }
+
+    /**
+     * Ugly hack to keep the exit button red when other things happen in the menu
+     * @param navigationView the exit view
+     */
+    public static void applyExitBackground(final NavigationView navigationView) {
+        if (navigationView == null) {
+            Logging.error("null exit navigation view.");
+            return;
+        }
+        MenuItem exitMenuItem = navigationView.getMenu().findItem(R.id.nav_exit);
+        if (exitMenuItem != null) {
+            exitMenuItem.setCheckable(false);
+            navigationView.post(() -> {
+                View exitView = navigationView.findViewById(R.id.nav_exit);
+                if (exitView != null) {
+                    exitView.setBackgroundResource(R.drawable.wigle_menu_item_exit_selector);
+                }
+            });
+        } else {
+            Logging.info("null exit menu item");
+        }
     }
 
     /**
@@ -681,6 +794,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             return;
         }
 
+        final NavigationView navigationView = findViewById(R.id.left_drawer);
+        if (null != navigationView) {
+            applyExitBackground(navigationView);
+        }
         final Map<Integer, String> fragmentTitles = new HashMap<>();
         fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
         fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
@@ -723,7 +840,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {
-        menu.setGroupVisible(submenuGroupId, visible);
+        runOnUiThread(() -> {
+            // Your menu modification code here
+            menu.setGroupVisible(submenuGroupId, visible);
+        });
     }
 
     @Override
@@ -746,31 +866,30 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private static Class classForFragmentNavId(final int navId) {
-        switch (navId) {
-            case R.id.nav_list:
-                return ListFragment.class;
-            case R.id.nav_dash:
-                return DashboardFragment.class;
-            case R.id.nav_data:
-                return DataFragment.class;
-            case R.id.nav_search:
-                return SearchFragment.class;
-            case R.id.nav_map:
-                return MappingFragment.class;
-            case R.id.nav_user_stats:
-                return UserStatsFragment.class;
-            case R.id.nav_rank:
-                return RankStatsFragment.class;
-            case R.id.nav_site_stats:
-                return SiteStatsFragment.class;
-            case R.id.nav_news:
-                return NewsFragment.class;
-            case R.id.nav_uploads:
-                return UploadsFragment.class;
-            case R.id.nav_settings:
-                return SettingsFragment.class;
-            default:
-                return ListFragment.class;
+        if (navId == R.id.nav_list) {
+            return ListFragment.class;
+        } else if (navId == R.id.nav_dash) {
+            return DashboardFragment.class;
+        } else if (navId == R.id.nav_data) {
+            return DataFragment.class;
+        } else if (navId == R.id.nav_search) {
+            return SearchFragment.class;
+        } else if (navId == R.id.nav_map) {
+            return MappingFragment.class;
+        } else if (navId == R.id.nav_user_stats) {
+            return UserStatsFragment.class;
+        } else if (navId == R.id.nav_rank) {
+            return RankStatsFragment.class;
+        } else if (navId == R.id.nav_site_stats) {
+            return SiteStatsFragment.class;
+        } else if (navId == R.id.nav_news) {
+            return NewsFragment.class;
+        } else if (navId == R.id.nav_uploads) {
+            return UploadsFragment.class;
+        } else if (navId == R.id.nav_settings) {
+            return SettingsFragment.class;
+        } else {
+            return ListFragment.class;
         }
     }
 
@@ -870,7 +989,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onDestroy() {
         Logging.info("MAIN: destroy.");
         super.onDestroy();
-
+        stopHeartbeat();
         if (!state.uiRestart.get()) {
             try {
                 Logging.info("unregister batteryLevelReceiver");
@@ -887,7 +1006,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
 
             if (state.tts != null) state.tts.shutdown();
-
             //TODO: redundant with endBluetooth?
             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             try {
@@ -938,6 +1056,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onResume() {
         Logging.info("MAIN: resume.");
         super.onResume();
+        mainActivity = this;
 
         // deal with wake lock
         if (!state.wakeLock.isHeld() && state.screenLocked) {
@@ -999,6 +1118,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             startActivity(intent);
         }
         super.onStart();
+        mainActivity = this;
     }
 
     @Override
@@ -1011,6 +1131,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onRestart() {
         Logging.info("MAIN: restart.");
         super.onRestart();
+        mainActivity = this;
     }
 
     public static Throwable getBaseThrowable(final Throwable throwable) {
@@ -1046,7 +1167,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static void setLocale(final Context context, final Configuration config) {
         final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
         final String lang = prefs.getString(PreferenceKeys.PREF_LANGUAGE, "");
-        final String current = config.locale.getLanguage();
+        final String current = config.getLocales().get(0).getLanguage();
         Logging.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
         if (!lang.isEmpty() && !current.equals(lang)) {
@@ -1065,7 +1186,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         if (newLocale != null) {
             Locale.setDefault(newLocale);
-            config.locale = newLocale;
+            config.setLocale(newLocale);
             Logging.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
             //ALIBI: loop protection
@@ -1102,7 +1223,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     public static Locale getLocale(final Context context, final Configuration config) {
         final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
-        final String current = config.locale.getLanguage();
+        final String current = config.getLocales().get(0).getLanguage();
         String lang = prefs.getString(PreferenceKeys.PREF_LANGUAGE, current);
         if (lang.isEmpty()) {
             lang = current;
@@ -1305,7 +1426,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         } catch (final Exception ex) {
             Logging.error("error logging error: " + ex, ex);
-            ex.printStackTrace();
         }
     }
 
@@ -1355,6 +1475,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.soundNewPop == null) {
             state.soundNewPop = MediaPlayer.create(getApplicationContext(), R.raw.newpop);
         }
+        if (state.soundScanning == null) {
+            state.soundScanning = MediaPlayer.create(getApplicationContext(), R.raw.scanning);
+        }
+        if (state.soundContact == null) {
+            state.soundContact = MediaPlayer.create(getApplicationContext(), R.raw.contact);
+        }
 
         // make volume change "media"
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -1385,7 +1511,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null != state) {
             state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
             state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+            state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
+            state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
             //TODO: port SSID matcher over as well?
+            if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
+                startHeartbeat(prefs);
+            } else {
+                stopHeartbeat();
+            }
         }
     }
 
@@ -1400,6 +1533,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
             } else if (PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
                 state.bssidLogExclusions = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+            } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
+                state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
+                if (null == state.bssidAlertList && null == state.bleMfgrIdList) {
+                    stopHeartbeat();
+                } else {
+                    startHeartbeat(prefs);
+                }
+            } else if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(addressKey)) {
+
+                state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
+                if (null == state.bssidAlertList && null == state.bleMfgrIdList) {
+                    stopHeartbeat();
+                } else {
+                    startHeartbeat(prefs);
+                }
             }
         }
     }
@@ -1415,6 +1563,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 return state.bssidDisplayExclusions;
             } else if (PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
                 return state.bssidLogExclusions;
+            } else if (PreferenceKeys.PREF_ALERT_ADDRS.equals(addressKey)) {
+                return state.bssidAlertList;
+            } else if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(addressKey)) {
+                return state.bleMfgrIdList;
             }
         }
         return null;
@@ -1434,14 +1586,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             StringBuilder sb = new StringBuilder("^(");
             boolean first = true;
             for (String value : values) {
-
                 if (first) {
                     first = false;
                 } else {
                     sb.append("|");
                 }
                 sb.append(value);
-                if (value.length() == 17) {
+                if (value.length() == 17 || value.length() == 4) {
                     sb.append("$");
                 }
             }
@@ -1450,7 +1601,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Pattern pattern = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
             matcher = pattern.matcher("");
         }
-
         return matcher;
     }
 
@@ -1541,7 +1691,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 editor.apply();
 
                 if (willActivateBt && useBt) {
-                    if (activationMessages.length() > 0) activationMessages += "\n";
+                    if (!activationMessages.isEmpty()) activationMessages += "\n";
                     activationMessages += getString(R.string.turn_on_bt);
                     if (willActivateWifi) {
                         activationMessages += "\n";
@@ -1554,9 +1704,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 // tell user, cuz this takes a little while
                 if (!activationMessages.isEmpty()) {
                     String finalActivationMessages = activationMessages;
-                    handler.post(() -> {
-                        WiGLEToast.showOverActivity(this, R.string.app_name, finalActivationMessages, Toast.LENGTH_LONG);
-                    });
+                    handler.post(() -> WiGLEToast.showOverActivity(this, R.string.app_name, finalActivationMessages, Toast.LENGTH_LONG));
                 }
             }
         });
@@ -1655,7 +1803,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("register BroadcastReceiver");
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        registerReceiver(state.wifiReceiver, intentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(state.wifiReceiver, intentFilter, RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(state.wifiReceiver, intentFilter);
+        }
     }
 
     private boolean canBtBeActivated() {
@@ -1700,41 +1852,77 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     // dynamically detect BTLE feature - prevents occasional NPEs
                     boolean hasLeSupport = getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
                     if (hasLeSupport) {
-                        //initialize the two global maps.
-                        try (BufferedReader reader = new BufferedReader(
-                                new InputStreamReader((getAssets().open("btmember.yaml"))))) {
-                            Constructor constructor = new Constructor(new LoaderOptions());
-                            Yaml yaml = new Yaml(constructor);
-                            final HashMap<String,Object> data = yaml.load(reader);
-                            final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
-                            state.btVendors = new HashMap<>();
-                            if (null != entries) {
-                                for (LinkedHashMap<String, Object> entry : entries) {
-                                    state.btVendors.put((Integer) entry.get("uuid"), (String) entry.get("name"));
+                        //initialize the two global maps for BT mfgr/service UUID lookups
+                        AsyncTask.execute(() -> {
+                            try (BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader((getAssets().open("btmember.yaml"))))) {
+                                Constructor constructor = new Constructor(new LoaderOptions());
+                                Yaml yaml = new Yaml(constructor);
+                                final HashMap<String, Object> data = yaml.load(reader);
+                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
+                                state.btVendors = new HashMap<>();
+                                if (null != entries) {
+                                    for (LinkedHashMap<String, Object> entry : entries) {
+                                        state.btVendors.put((Integer) entry.get("uuid"), (String) entry.get("name"));
+                                    }
+                                    Logging.info("BLE members initialized: " + entries.size() + " entries");
                                 }
-                                Logging.info("BLE members initialized: "+entries.size()+" entries");
+                            } catch (IOException e) {
+                                Logging.error("Failed to load BLE member yaml:", e);
                             }
-                        } catch (IOException e) {
-                            Logging.error("Failed to load BLE member yaml:",e);
-                        }
-
-                        try (BufferedReader reader = new BufferedReader(
-                                new InputStreamReader((getAssets().open("btco.yaml"))))) {
-                            Constructor constructor = new Constructor(new LoaderOptions());
-                            Yaml yaml = new Yaml(constructor);
-                            final HashMap<String, Object> data = yaml.load(reader);
-                            final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("company_identifiers");
-                            state.btMfgrIds = new HashMap<>();
-                            if (null != entries) {
-                                for (LinkedHashMap<String, Object> entry : entries) {
-                                    state.btMfgrIds.put((Integer) entry.get("value"), (String) entry.get("name"));
+                            try (BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader((getAssets().open("btco.yaml"))))) {
+                                Constructor constructor = new Constructor(new LoaderOptions());
+                                Yaml yaml = new Yaml(constructor);
+                                final HashMap<String, Object> data = yaml.load(reader);
+                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("company_identifiers");
+                                state.btMfgrIds = new HashMap<>();
+                                if (null != entries) {
+                                    for (LinkedHashMap<String, Object> entry : entries) {
+                                        state.btMfgrIds.put((Integer) entry.get("value"), (String) entry.get("name"));
+                                    }
+                                    Logging.info("BLE mfgrs initialized: "+entries.size()+" entries");
                                 }
-                                Logging.info("BLE mfgrs initialized: "+entries.size()+" entries");
+                            } catch (IOException e) {
+                                Logging.error("Failed to load BLE mfgr yaml: ",e);
                             }
-                        } catch (IOException e) {
-                            Logging.error("Failed to load BLE mfgr yaml: ",e);
-                        }
+                            state.btServiceUuids = new HashMap<>();
+                            state.btCharUuids = new HashMap<>();
+                            setupBleUuids("ble_svc_uuids.yaml", state.btServiceUuids);
+                            setupBleUuids("ble_char_uuids.yaml", state.btCharUuids);
+                            try (BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader((getAssets().open("appearance_values.yaml"))))) {
+                                Constructor constructor = new Constructor(new LoaderOptions());
+                                Yaml yaml = new Yaml(constructor);
+                                final HashMap<Integer, Object> data = yaml.load(reader);
+                                final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("appearance_values");
+                                state.btAppearance = new HashMap<>();
+                                if (null != entries) {
+                                    for (LinkedHashMap<String, Object> entry : entries) {
+                                        final List<LinkedHashMap<String, Object>> subEntries = (List<LinkedHashMap<String, Object>>) entry.get("subcategory");
+                                        Map<Integer, String> subcategories = null;
+                                        if (null != subEntries) {
+                                            subcategories = new HashMap<>();
+                                            for (LinkedHashMap<String, Object> subEntry : subEntries) {
+                                                if (null != subEntry) {
+                                                    int value = (Integer) subEntry.get("value");
+                                                    String name = (String) subEntry.get("name");
+                                                    if (null != name) {
+                                                        subcategories.put(value, name);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        state.btAppearance.put((Integer) entry.get("category"), new BluetoothUtil.AppearanceCategory( (String) entry.get("name"), subcategories));
+                                    }
+                                    Logging.info("BLE appearance initialized: " + entries.size() + " categories");
+                                }
+                            } catch (IOException e) {
+                                Logging.error("Failed to load BLE appearance yaml:", e);
+                            }
+                        });
                     }
+
                     // bluetooth scan listener
                     // this receiver is the main workhorse of bluetooth scanning
                     state.bluetoothReceiver = new BluetoothReceiver(state.dbHelper,
@@ -1744,7 +1932,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 Logging.info("\tregister bluetooth BroadcastReceiver");
                 final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-                registerReceiver(state.bluetoothReceiver, intentFilter);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    registerReceiver(state.bluetoothReceiver, intentFilter, RECEIVER_EXPORTED);
+                } else {
+                    registerReceiver(state.bluetoothReceiver, intentFilter);
+                }
             }
         } catch (SecurityException e) {
             Logging.error("exception initializing bluetooth: ", e);
@@ -2014,11 +2206,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (gnssStatusCallback != null) {
                 locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
             }
+            if (gnssMeasurementsCallback != null) {
+                locationManager.unregisterGnssMeasurementsCallback(gnssMeasurementsCallback);
+            }
         }
 
         // create a new listener to try and get around the gps stopping bug
         state.GNSSListener = new GNSSListener(this, state.dbHelper);
         state.GNSSListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
 
         try {
             gnssStatusCallback = new GnssStatus.Callback() {
@@ -2036,20 +2232,37 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
 
                 @Override
-                public void onSatelliteStatusChanged(GnssStatus status) {
+                public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
                     if (null != state && null != state.GNSSListener && !isFinishing()) {
                         state.GNSSListener.onGnssStatusChanged(status);
                     }
                 }
             };
             locationManager.registerGnssStatusCallback(gnssStatusCallback);
+
+            // gnss full tracking option, available in android sdk 31
+            final boolean useGnssFull = prefs.getBoolean(PreferenceKeys.PREF_GPS_GNSS_FULL, false);
+            if (useGnssFull && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                gnssMeasurementsCallback = new GnssMeasurementsEvent.Callback() {
+                    @Override
+                    public void onGnssMeasurementsReceived(GnssMeasurementsEvent eventArgs) {
+                        Logging.debug("GnssMeasurements clock: " + eventArgs.getClock());
+                    }
+                };
+
+                final GnssMeasurementRequest request = new GnssMeasurementRequest.Builder()
+                        .setFullTracking(useGnssFull).build();
+                locationManager.registerGnssMeasurementsCallback(request,
+                        ContextCompat.getMainExecutor(getApplicationContext()),
+                        gnssMeasurementsCallback
+                );
+            }
         } catch (final SecurityException ex) {
             Logging.info("\tSecurity exception adding status listener: " + ex, ex);
         } catch (final Exception ex) {
             Logging.error("Error registering for gnss: " + ex, ex);
         }
 
-        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
         final boolean useNetworkLoc = prefs.getBoolean(PreferenceKeys.PREF_USE_NETWORK_LOC, false);
 
         final List<String> providers = locationManager.getAllProviders();
@@ -2077,11 +2290,34 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
+                    if (gnssMeasurementsCallback != null) {
+                        locationManager.unregisterGnssMeasurementsCallback(gnssMeasurementsCallback);
+                    }
                     locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {
                     Logging.info("Security exception removing status listener: " + ex, ex);
                 }
             }
+        }
+    }
+
+    private void setupBleUuids (final String uuidFileName, Map<Integer, String> uuidDestination) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader((getAssets().open(uuidFileName))))) {
+            Constructor constructor = new Constructor(new LoaderOptions());
+            Yaml yaml = new Yaml(constructor);
+            final HashMap<String, Object> data = yaml.load(reader);
+            final List<LinkedHashMap<String, Object>> entries =
+                    (List<LinkedHashMap<String, Object>>) data.get("uuids");
+            if (null != entries) {
+                for (LinkedHashMap<String, Object> entry : entries) {
+                    uuidDestination.put(((Integer) entry.get("uuid")), (String) entry.get("id"));
+                }
+                Logging.info("BLE " + uuidFileName + " initialized: " +
+                        entries.size()+" entries");
+            }
+        } catch (IOException e) {
+            Logging.error("Failed to load BLE "+uuidFileName+": ",e);
         }
     }
 
@@ -2186,7 +2422,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
         return mDrawerToggle.onOptionsItemSelected(item);
@@ -2274,6 +2510,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
+                    if (gnssMeasurementsCallback != null) {
+                        locationManager.unregisterGnssMeasurementsCallback(gnssMeasurementsCallback);
+                    }
                     locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {
                     Logging.error("SecurityException on finish: " + ex, ex);
@@ -2289,7 +2528,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             stopService(serviceIntent);
             try {
                 // have to use the app context to bind to the service, cuz we're in tabs
-                getApplicationContext().unbindService(state.serviceConnection);
+                final Context c = getApplicationContext();
+                if (null != c) {
+                    c.unbindService(state.serviceConnection);
+                }
             } catch (final IllegalArgumentException ex) {
                 Logging.info("serviceConnection not registered: " + ex, ex);
             }
@@ -2331,43 +2573,33 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         super.finish();
     }
 
+    @SuppressLint("GestureBackNavigation")
     @Override
+    /*
+     * ALIBI: handle back on old (pre-predictive back) Android versions
+     */
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Logging.info("onKeyDown: not quitting app on back");
-            selectFragment(R.id.nav_list);
-            return true;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                Logging.info("onKeyDown: not quitting app on back");
+                selectFragment(R.id.nav_list);
+                return true;
+            }
         }
-        // we may want this, but devices with menu button don't get the 3 dots, so we'd have to force on the 3 dots
-        // pry not worth it. leaving in case we do want it in the future
-//        else if (keyCode == KeyEvent.KEYCODE_MENU) {
-//            if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
-//                mDrawerLayout.openDrawer(mDrawerList);
-//            } else if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-//                mDrawerLayout.closeDrawer(mDrawerList);
-//            }
-//            return true;
-//        }
         return super.onKeyDown(keyCode, event);
     }
 
-    public void doUpload() {
-        selectFragment(R.id.nav_list);
-        ListFragment listFragment = getListFragmentIfCurrent();
-        if (null != listFragment) {
-            listFragment.makeUploadDialog(this);
-        }
-    }
-
     /**
-     * pure-background upload method fo intent-based uploads
+     * pure-background upload method for intent-based uploads
      */
     public void backgroundUploadFile(){
         Logging.info( "background upload file" );
         final State state = getState();
         setTransferring();
         state.observationUploader = new ObservationUploader(this,
-                ListFragment.lameStatic.dbHelper, null, false, false, false);
+                ListFragment.lameStatic.dbHelper,
+                (json, isCache) -> { transferComplete();},
+                false, false, false);
         try {
             state.observationUploader.startDownload(null);
         } catch (WiGLEAuthException x) {
@@ -2392,7 +2624,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     iseDlgBuilder.setMessage(external?R.string.no_external_space_message:R.string.no_internal_space_message)
                             .setTitle(external?R.string.no_external_space_title:R.string.no_internal_space_title)
                             .setCancelable(true)
-                            .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
+                            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                                if (null != dialog) {
+                                    dialog.dismiss();
+                                }});
                     final Dialog dialog = iseDlgBuilder.create();
                     if (!isFinishing()) {
                         dialog.show();
@@ -2504,11 +2739,84 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public String getBleVendor(final int i) {
-        return state.btVendors.get(i);
+        final State s = state;
+        return s == null ? null : s.btVendors.get(i);
     }
 
     public String getBleMfgr(final int i) {
-        return state.btMfgrIds.get(i);
+        final State s = state;
+        return s == null ? null : s.btMfgrIds.get(i);
     }
 
+    public String getBleService(final String uuid) {
+        final State s = state;
+        int key = Integer.parseInt(uuid, 16);
+        return s == null ? null : s.btServiceUuids.get(key);
+    }
+
+    public String getBleCharacteristic(final String uuid) {
+        final State s = state;
+        int key = Integer.parseInt(uuid, 16);
+        return s == null ? null : s.btCharUuids.get(key);
+    }
+
+    /**
+     * Update the last highest level seen matching the current BSSID alert filter (since last announcement)
+     * @param value the candidate to update if higher
+     */
+    public void updateLastHighSignal(final Integer value) {
+        final State s = state;
+        if (null != value && !value.equals(Integer.MIN_VALUE)) {
+            s.lastHighestSignal.updateAndGet(currentValue -> value > currentValue ?
+                    value : currentValue);
+        }
+    }
+
+    /**
+     * Get the related String for category and sub-category.
+     * @param category category int ID
+     * @param subcategory subcategory int ID
+     * @return the composite string name
+     */
+    public String getBleAppearance(final Integer category, final Integer subcategory) {
+        final State s = state;
+        if (s.btAppearance != null) {
+            final BluetoothUtil.AppearanceCategory cat = s.btAppearance.get(category);
+            if (null != cat && cat.getSubcategories() != null) {
+                return cat.getName() + ": "+cat.getSubcategories().get(subcategory);
+            } else if (null != cat ){
+                return cat.getName();
+            }
+        }
+        return null;
+    }
+
+    public boolean hasWakeLock() {
+        final State s = state;
+        return s != null && s.screenLocked;
+    }
+
+    private void startHeartbeat(SharedPreferences prefs) {
+        if (null != state.bssidMatchHeartbeat) {
+            state.bssidMatchHeartbeat.interrupt();
+            state.bssidMatchHeartbeat = null;
+        }
+        state.bssidMatchHeartbeat = new BssidMatchingAudioThread(
+                prefs,
+                state.soundScanning,
+                state.soundContact, state.lastHighestSignal, state.wifiReceiver);
+        state.bssidMatchHeartbeat.start();
+    }
+
+    private void stopHeartbeat() {
+        if (null != state.bssidMatchHeartbeat) {
+            state.bssidMatchHeartbeat.interrupt();
+            try {
+                state.bssidMatchHeartbeat.join();
+            } catch (InterruptedException e) {
+                Logging.error("Failed to join bssidMatchHeartbeat");
+            }
+            state.bssidMatchHeartbeat = null;
+        }
+    }
 }

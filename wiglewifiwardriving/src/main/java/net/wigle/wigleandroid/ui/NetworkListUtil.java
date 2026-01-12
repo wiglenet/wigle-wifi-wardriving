@@ -1,13 +1,18 @@
 package net.wigle.wigleandroid.ui;
 
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_PUBLIC;
+import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
+
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.provider.Settings;
+import android.text.format.DateFormat;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
@@ -33,6 +38,16 @@ import static net.wigle.wigleandroid.R.*;
  * Common utility methods for the network list
  */
 public class NetworkListUtil {
+    //ALIBI: while this means you need a restart to get new date/time formats, dynamic calls for each refresh would be heavy.
+    private static final Locale l = Locale.getDefault();
+    private static final  String timePattern = DateFormat.getBestDateTimePattern(l, "h:mm:ss a");
+    private static final  String timePattern24 = DateFormat.getBestDateTimePattern(l, "H:mm:ss");
+    private static final String dateTimePattern = DateFormat.getBestDateTimePattern(l, "yyyy-MM-dd h:mm:ss a");
+    private static final  String dateTimePattern24 = DateFormat.getBestDateTimePattern(l, "yyyy-MM-dd H:mm:ss");
+    private static  final SimpleDateFormat timeFormatter = new SimpleDateFormat(timePattern, l);
+    private static  final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(dateTimePattern, l);
+    private static  final SimpleDateFormat timeFormatter24 = new SimpleDateFormat(timePattern24, l);
+    private static  final SimpleDateFormat dateTimeFormatter24 = new SimpleDateFormat(dateTimePattern24, l);
 
     //color by signal strength
     private static final int COLOR_1 = Color.rgb(0, 255, 0);
@@ -51,19 +66,26 @@ public class NetworkListUtil {
     private static final int COLOR_6A = Color.argb(128, 255, 85, 0);
     private static final int COLOR_7A = Color.argb(128, 255, 0, 0);
 
-    public static String getConstructionTime(final SimpleDateFormat format, final Network network) {
-        return format.format(new Date(network.getConstructionTime()));
-    }
-
-    public static SimpleDateFormat getConstructionTimeFormater(final Context context) {
-        final int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
-        SimpleDateFormat format;
-        if (value == 24) {
-            format = new SimpleDateFormat("H:mm:ss", Locale.getDefault());
-        } else {
-            format = new SimpleDateFormat("h:mm:ss a", Locale.getDefault());
+    public static String getTime(@NonNull  final Network network, final boolean historical, @NonNull final Context context) {
+        final Long last = network.getLastTime();
+        if (null == last) {
+            if (historical) {
+                //ALIBI: if this is a historical/non-live view, we don't want construction times.
+                return "";
+            }
+            if (DateFormat.is24HourFormat(context)) {
+                return timeFormatter24.format(new Date(network.getConstructionTime()));
+            } else {
+                return timeFormatter.format(new Date(network.getConstructionTime()));
+            }
+            // SOMEDAY (SDK26+: return Instant.ofEpochSecond(network.getConstructionTime()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(timePattern));
         }
-        return format;
+        if (DateFormat.is24HourFormat(context)) {
+            return dateTimeFormatter24.format(new Date(network.getLastTime()));
+        } else {
+            return dateTimeFormatter.format(new Date(network.getLastTime()));
+        }
+        // SOMEDAY (SDK 26+): return Instant.ofEpochSecond(network.getConstructionTime()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(timePattern));
     }
 
     public static int getSignalColor(final int level, final boolean alpha) {
@@ -161,11 +183,10 @@ public class NetworkListUtil {
         } else if (NetworkType.BLE.equals(network.getType())) {
             resource = drawable.ic_btle;
         } else if (NetworkType.NR.equals(network.getType())) {
-            resource = drawable.cell_5g;
+            resource = drawable.ic_cell_5g;
         } else {
             resource = drawable.ic_cell;
         }
-
         return resource;
     }
 
@@ -200,6 +221,7 @@ public class NetworkListUtil {
                 resource = drawable.av_settop_f;
                 break;
             case BluetoothClass.Device.AUDIO_VIDEO_UNCATEGORIZED:
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER:
                 resource = drawable.av_receiver_f;
                 break;
             case BluetoothClass.Device.AUDIO_VIDEO_VCR:
@@ -211,12 +233,6 @@ public class NetworkListUtil {
             case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_CONFERENCING:
                 resource = drawable.av_conference;
                 break;
-            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER:
-                resource = drawable.av_receiver_f;
-                break;
-            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_GAMING_TOY:
-                resource = drawable.av_toy;
-                break;
             case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_MONITOR:
                 resource = drawable.av_monitor;
                 break;
@@ -224,6 +240,7 @@ public class NetworkListUtil {
                 resource = drawable.comp_desk_f;
                 break;
             case BluetoothClass.Device.COMPUTER_HANDHELD_PC_PDA:
+            case BluetoothClass.Device.PHONE_SMART:
                 resource = drawable.comp_handheld;
                 break;
             case BluetoothClass.Device.COMPUTER_LAPTOP:
@@ -241,12 +258,10 @@ public class NetworkListUtil {
             case BluetoothClass.Device.COMPUTER_WEARABLE:
                 resource = drawable.comp_ar_f;
                 break;
-            case BluetoothClass.Device.HEALTH_BLOOD_PRESSURE:
-                resource = drawable.med_heart;
-                break;
             case BluetoothClass.Device.HEALTH_DATA_DISPLAY:
                 resource = drawable.med_heart_display_o;
                 break;
+            case BluetoothClass.Device.HEALTH_BLOOD_PRESSURE:
             case BluetoothClass.Device.HEALTH_PULSE_OXIMETER:
             case BluetoothClass.Device.HEALTH_PULSE_RATE:
                 resource = drawable.med_heart;
@@ -271,26 +286,20 @@ public class NetworkListUtil {
             case BluetoothClass.Device.PHONE_MODEM_OR_GATEWAY:
                 resource = drawable.tel_modem;
                 break;
-            case BluetoothClass.Device.PHONE_SMART:
-                resource = drawable.comp_handheld;
-                break;
             case BluetoothClass.Device.PHONE_UNCATEGORIZED:
                 resource = drawable.tel_phone_2;
                 break;
             case BluetoothClass.Device.TOY_CONTROLLER:
                 resource = drawable.toy_controller_f;
                 break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_GAMING_TOY:
             case BluetoothClass.Device.TOY_DOLL_ACTION_FIGURE:
-                resource = drawable.av_toy;
-                break;
             case BluetoothClass.Device.TOY_GAME:
+            case BluetoothClass.Device.TOY_UNCATEGORIZED:
                 resource = drawable.av_toy;
                 break;
             case BluetoothClass.Device.TOY_ROBOT:
                 resource = drawable.toy_robot;
-                break;
-            case BluetoothClass.Device.TOY_UNCATEGORIZED:
-                resource = drawable.av_toy;
                 break;
             case BluetoothClass.Device.TOY_VEHICLE:
                 resource = drawable.toy_vehicle;
@@ -317,5 +326,32 @@ public class NetworkListUtil {
                 resource = null;
         }
         return resource;
+    }
+
+    public static Integer getBleAddrTypeImage(final Integer type) {
+        if (type != 0) {
+            Logging.error("BLEADDRTYPE: " + type);
+        }
+        switch (type) {
+            case ADDRESS_TYPE_ANONYMOUS:
+                return drawable.balaclava;
+            //case ADDRESS_TYPE_ PRIVATE_RESOLVABLE / PRIVATE_NONRESOLVABLE: - not yet in Android API
+                //return drawable.groucho
+            case ADDRESS_TYPE_RANDOM:
+                return drawable.d6;
+            default:
+                return null;
+        }
+    }
+
+    public static void sort(final SharedPreferences prefs, final SetNetworkListAdapter listAdapter) {
+        if (listAdapter != null) {
+            try {
+                listAdapter.sort(NetworkListSorter.getSort(prefs));
+                listAdapter.notifyDataSetChanged();
+            } catch (IllegalArgumentException ex) {
+                Logging.error("netlist sort failed: ",ex);
+            }
+        }
     }
 }

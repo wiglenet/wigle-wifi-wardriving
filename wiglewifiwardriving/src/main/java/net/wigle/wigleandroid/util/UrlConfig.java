@@ -26,6 +26,7 @@ public class UrlConfig {
     public static final String KML_TRANSID_URL_STEM = API_HOST+"/api/v2/file/kml/";
     public static final String SEARCH_WIFI_URL = API_HOST+"/api/v2/network/search";
     public static final String SEARCH_CELL_URL = API_HOST+"/api/v2/cell/search";
+    public static final String SEARCH_BT_URL = API_HOST+"/api/v2/bluetooth/search";
 
     public static final String WIGLE_BASE_URL = "https://wigle.net";
 

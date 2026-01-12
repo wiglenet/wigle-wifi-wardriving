@@ -12,16 +12,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -44,18 +46,16 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
+import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
-
-import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
 
 import org.json.JSONObject;
 
@@ -98,6 +98,27 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            final Insets navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, navBars.bottom);
+            return insets;
+        });
+        //hack manual padding
+        view.post(() -> {
+            final Context context = getContext();
+            int navBarHeight = context == null ? 0 : LayoutUtil.getNavigationBarHeight(getActivity(), context.getResources());
+            if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
+                view.setPadding(0, 0, 0, navBarHeight);
+            }
+            if (view.isAttachedToWindow()) {
+                ViewCompat.requestApplyInsets(view);
+            }
+        });
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -109,10 +130,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
 
-        // don't let the textbox have focus to start with, so we don't see a keyboard right away
-        final LinearLayout linearLayout = view.findViewById(R.id.linearlayout);
-        linearLayout.setFocusableInTouchMode(true);
-        linearLayout.requestFocus();
+        final LinearLayout linearLayout = view.findViewById(R.id.settingslayout);
+        if (null != linearLayout) {
+            linearLayout.setFocusableInTouchMode(true);
+            linearLayout.requestFocus();
+            // don't let the textbox have focus to start with, so we don't see a keyboard right away
+        }
+
         updateView(view);
         return view;
     }
@@ -411,12 +435,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final TextView register = view.findViewById(R.id.register);
         try {
             register.setText(Html.fromHtml(getString(R.string.registration_html_prompt),
-                    Html.FROM_HTML_MODE_LEGACY));
+            Html.FROM_HTML_MODE_LEGACY));
+            register.setMovementMethod(LinkMovementMethod.getInstance());
+            updateRegister(view);
         } catch (Exception ex) {
             Logging.error("unable to create registration prompt from HTML");
         }
-        register.setMovementMethod(LinkMovementMethod.getInstance());
-        updateRegister(view);
 
         user.setText( prefs.getString( PreferenceKeys.PREF_USERNAME, "" ) );
         user.addTextChangedListener( new SetWatcher() {
@@ -478,14 +502,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         // period spinners
         final Context c = getContext();
-        SettingsUtil.doScanSpinner( R.id.periodstill_spinner, PreferenceKeys.PREF_SCAN_PERIOD_STILL,
-                MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view, c );
-        SettingsUtil.doScanSpinner( R.id.period_spinner, PreferenceKeys.PREF_SCAN_PERIOD,
-                MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view, c );
-        SettingsUtil.doScanSpinner( R.id.periodfast_spinner, PreferenceKeys.PREF_SCAN_PERIOD_FAST,
-                MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, c );
-        SettingsUtil.doScanSpinner( R.id.gps_spinner, PreferenceKeys.GPS_SCAN_PERIOD,
-                MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, c );
+        if (null != c) {
+            SettingsUtil.doScanSpinner(R.id.periodstill_spinner, PreferenceKeys.PREF_SCAN_PERIOD_STILL,
+                    MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view, c);
+            SettingsUtil.doScanSpinner(R.id.period_spinner, PreferenceKeys.PREF_SCAN_PERIOD,
+                    MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view, c);
+            SettingsUtil.doScanSpinner(R.id.periodfast_spinner, PreferenceKeys.PREF_SCAN_PERIOD_FAST,
+                    MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, c);
+            SettingsUtil.doScanSpinner(R.id.gps_spinner, PreferenceKeys.GPS_SCAN_PERIOD,
+                    MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, c);
+        }
 
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
@@ -599,13 +625,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
 
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_kalman, PreferenceKeys.PREF_GPS_KALMAN_FILTER ,true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.gnss_full, PreferenceKeys.PREF_GPS_GNSS_FULL, false);
+        }
 
         TextView appVersion = view.findViewById(R.id.app_version);
         final String appName = getString(R.string.app_name);
         if (null != appVersion) {
             try {
                 String versionName = activity.getApplicationContext().getPackageManager().getPackageInfo(activity.getApplicationContext().getPackageName(), 0).versionName;
-                appVersion.setText(appName+" v."+versionName);
+                appVersion.setText(String.format("%s - %s", appName, versionName));
             } catch (PackageManager.NameNotFoundException e) {
                 Logging.error("Unable to get version number: ",e);
             }
@@ -714,43 +743,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 return true;
         }
         return false;
-    }
-
-    /**
-     * used for authentication - this seems really heavy
-     */
-    private final static class UserDownloadHandler extends DownloadHandler {
-        private final SettingsFragment fragment;
-        private UserDownloadHandler(final View view, final String packageName,
-                                    final Resources resources, SettingsFragment settingsFragment) {
-            super(view, null, packageName, resources);
-            fragment = settingsFragment;
-        }
-
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            if (msg.what == MSG_USER_DONE) {
-                if ((null != bundle) && (bundle.containsKey("error"))) {
-                    //ALIBI: not doing anything more here, since the toast will alert.
-                    Logging.info("Settings auth unsuccessful");
-                } else {
-                    Logging.info("Settings auth successful");
-                    final MainActivity m = MainActivity.getMainActivity();
-                    if (null != m) {
-                        final SharedPreferences prefs = m
-                                .getApplicationContext()
-                                .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                        final Editor editor = prefs.edit();
-                        editor.remove(PreferenceKeys.PREF_PASSWORD);
-                        editor.apply();
-                        //TODO: order dependent -verify no risk of race condition here.
-                        fragment.updateView(view);
-                    }
-                }
-            }
-        }
     }
 
     private static void addDevModeMesgIfApplicable(StringBuilder builder, final Context c, final String message) {

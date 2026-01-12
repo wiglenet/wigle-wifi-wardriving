@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi — Настройки</string>
     <string name="mapping_app_name">WiGLE WiFi — Карта</string>
     <string name="dashboard_app_name">WiGLE WiFi — Обзор</string>
-    <string name="error_report_name">WiGLE WiFi — Новые ошибки</string>
+    <string name="error_report_name">Новые ошибки</string>
     <string name="speech_name">WiGLE WiFi — звуковые параметры</string>
     <string name="network_activity_name">WiGLE WiFi — Сети</string>
     <string name="data_activity_name">WiGLE WiFi — База данных</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Канал:</string>
     <string name="network_observations">Наблюдения:</string>
     <string name="network_querying">(осуществляется запрос&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Показывать пароль</string>
     <string name="setting_db_marker">Настройки ID маркера в БД (там, где начинаются добавления):</string>
     <string name="setting_high_up">Текущий ID в БД:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Зарегистрируйте&lt;/a&gt; @WiGLE.net или &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;активируйте сейчас с помощью QR-кода&lt;/a&gt;</string>
     <string name="ble_services">UUID BLE:</string>
     <string name="ble_vendor">Идентификатор поставщика BLE:</string>
+    <string name="speech_new_bt">Новый Bluetooth для БД</string>
+    <string name="tts_new_bt">Новый блютуз</string>
+    <string name="gnss_full">Используйте полное отслеживание GNSS (большой расход заряда батареи)</string>
+    <string name="search_area">Область поиска:</string>
+    <string name="queued_jobs">(%1$d задач в очереди)</string>
+    <string name="duplicate_job">Задание этого типа уже запущено или ожидает запуска.</string>
+    <string name="start_survey">Опрос на сайте</string>
+    <string name="end_survey">Завершить опрос</string>
+    <string name="confirm_survey">Вы ДОЛЖНЫ нажать «%1$s», чтобы завершить опрос и сохранить результаты, прежде чем выйти из занятия!\n\n Мы рекомендуем установить «%2$s» сканирование в настройках скорости вашего движения для достижения наилучших результатов. (Это БУДЕТ иметь последствия для батареи)</string>
+    <string name="interrogate_ble">спросить подробности</string>
+    <string name="ble_mfgr_title">Производитель</string>
+    <string name="ble_model_title">Модель</string>
+    <string name="ble_serial_title">Серийный номер</string>
+    <string name="ble_firmware_title">Прошивка</string>
+    <string name="ble_hw_title">Аппаратное обеспечение</string>
+    <string name="ble_sw_title">Программное обеспечение</string>
+    <string name="ble_name_title">Имя</string>
+    <string name="ble_pnp_title">Подключи и играй</string>
+    <string name="ble_appearance_title">внешний вид</string>
+    <string name="alert_filter_button">Оповещение о MAC/OUI…</string>
+    <string name="status_too_many">Слишком много в течение определенного периода времени</string>
+    <string name="filter_show_wifi">Показать WiFi</string>
+    <string name="filter_show_bt_classic">Показать Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Скрыть</string>
+    <string name="alert">Оповещение</string>
 </resources>

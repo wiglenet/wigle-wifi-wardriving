@@ -1,8 +1,11 @@
 package net.wigle.wigleandroid.listener;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.lang.String;
 
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -20,11 +24,11 @@ import net.wigle.wigleandroid.model.GsmOperator;
 import net.wigle.wigleandroid.model.GsmOperatorException;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.CellNetworkLegend;
 import net.wigle.wigleandroid.ui.WiGLEToast;
@@ -92,6 +96,10 @@ public class WifiReceiver extends BroadcastReceiver {
     private long prevScanPeriod;
     private boolean scanInFlight = false;
 
+    private Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
+
+    private WiFiScanUpdater updateOnSeen = null;
+
     public static final int CELL_MIN_STRENGTH = -113;
 
     public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper, final Context context ) {
@@ -153,7 +161,7 @@ public class WifiReceiver extends BroadcastReceiver {
             // ignore, happens on some vm's
             Logging.info("exception getting scan results: " + ex, ex);
         }
-        Logging.info("wifi receive, results: " + (results == null ? null : results.size()));
+        Logging.debug("wifi receive, results: " + (results == null ? null : results.size()));
 
         long nonstopScanRequestTime = Long.MIN_VALUE;
         final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
@@ -218,14 +226,29 @@ public class WifiReceiver extends BroadcastReceiver {
         final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, PreferenceKeys.FILTER_PREF_PREFIX );
         final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS );
         final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS );
+        final Matcher bssidAlertMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_ALERT_ADDRS );
 
         // can be null on shutdown
         if ( results != null ) {
             resultSize = results.size();
             for ( ScanResult result : results ) {
+                if (result == null) continue; // have seen in the wild
+
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
                     network = new Network( result );
+
+                    // Roaming Consortium Organizational Identifiers
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        String rcois = null;
+                        for ( ScanResult.InformationElement info : result.getInformationElements()) {
+                            if (info.getId() == net.wigle.wigleandroid.listener.WifiReceiver.EID_ROAMING_CONSORTIUM) {
+                                rcois = net.wigle.wigleandroid.listener.WifiReceiver.getConcatenatedRcois(info);
+                            }
+                        }
+                        network.setRcois(rcois);
+                    }
+
                     networkCache.put( network.getBssid(), network );
                 }
                 else {
@@ -308,6 +331,21 @@ public class WifiReceiver extends BroadcastReceiver {
                         dbHelper.pendingObservation( network, added, false, false );
                     }
                 }
+
+                if (bssidAlertMatcher != null) {
+                    bssidAlertMatcher.reset(network.getBssid());
+                    if (bssidAlertMatcher.find()) {
+                        if (null != mainActivity) {
+                            mainActivity.updateLastHighSignal(network.getLevel());
+                        }
+                    }
+                }
+
+                if (null != updateOnSeen && null != safeWatchSsids && null != location) {
+                    if (safeWatchSsids.contains(network.getBssid())) {
+                        updateOnSeen.handleWiFiSeen(network.getBssid(), result.level, location);
+                    }
+                }
             }
         }
 
@@ -356,10 +394,7 @@ public class WifiReceiver extends BroadcastReceiver {
         // check for "New" cell towers
         final long newCellCount = dbHelper.getNewCellCount();
 
-
-        if (listAdapter != null) {
-            listAdapter.sort(NetworkListSorter.getSort(prefs) );
-        }
+        NetworkListUtil.sort(prefs, listAdapter);
 
         final long dbNets = dbHelper.getNetworkCount();
         final long dbLocs = dbHelper.getLocationCount();
@@ -410,11 +445,6 @@ public class WifiReceiver extends BroadcastReceiver {
 
         // info( savedStats );
 
-        // notify
-        if (listAdapter != null) {
-            listAdapter.notifyDataSetChanged();
-        }
-
         mainActivity.setScanStatusUI( resultSize, ListFragment.lameStatic.currWifiScanDurMs);
 
         mainActivity.setDBQueue(preQueueSize);
@@ -427,9 +457,84 @@ public class WifiReceiver extends BroadcastReceiver {
 
         final long speechPeriod = prefs.getLong( PreferenceKeys.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD );
         if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-            doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
+            doAnnouncement( preQueueSize, newWifiCount, newCellCount, ListFragment.lameStatic.newBt, now );
         }
     }
+
+    public static final int NIBBLE_MASK = 0x0f;
+    public static final int BYTE_MASK = 0xff;
+
+    public static final int EID_ROAMING_CONSORTIUM = 111;
+
+    // get any Roaming Consortium Organizational identifiers from beacon and concatenate
+    // @param ScanResult.InformationElement
+    // @return a string of concatenated RCOIS with " " delimiter
+    //
+
+    public static String getConcatenatedRcois (ScanResult.InformationElement ie) {
+        String concatenatedRcois = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (ie.getId() != EID_ROAMING_CONSORTIUM) {
+                throw new IllegalArgumentException("Element id is not ROAMING_CONSORTIUM, : "
+                        + ie.getId());
+            }
+            // RCOI length handling from https://android.googlesource.com/platform/frameworks/opt/net/wifi/+/6f5af9b7f69b15369238bd2642c46638ba1f0255/service/java/com/android/server/wifi/util/InformationElementUtil.java#206
+
+            // Roaming Consortium (OI) element format defined in IEEE 802.11 clause 9.4.2.95
+            // ElementID (1 Octet), Length (1 Octet), Number of OIs (1 Octet), OI #1 and #2 Lengths (1 Octet), OI#1 (variable), OI#2 (variable), OI#3 (variable)
+            // where 1 octet "OI #1 and #2 Length" comprises: OI#1 Length [B0-B3], OI#2 Length [B4-B7]
+            ByteBuffer data = ie.getBytes().order(ByteOrder.LITTLE_ENDIAN);
+            data.get(); // anqpOICount
+            int oi12Length = data.get() & BYTE_MASK;
+            int oi1Length = oi12Length & NIBBLE_MASK;
+            int oi2Length = (oi12Length >>> 4) & NIBBLE_MASK;
+            int oi3Length = ie.getBytes().limit() - 2 - oi1Length - oi2Length;
+
+            if (oi1Length > 0) {
+                final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
+                concatenatedRcois = formatRcoi(rcoiInteger);
+            }
+            if (oi2Length > 0) {
+                final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
+                concatenatedRcois += " " + formatRcoi(rcoiInteger);
+            }
+            if (oi3Length > 0) {
+                final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
+                concatenatedRcois += " " + formatRcoi(rcoiInteger);
+            }
+        }
+        // OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
+        return concatenatedRcois;
+    }
+
+    private static String formatRcoi(final long rcoi) {
+        if (rcoi < 16777216) {
+            return String.format("%1$06X", rcoi);
+        }
+        return String.format("%1$010X", rcoi);
+    }
+
+    public static long getInteger(ByteBuffer payload, ByteOrder bo, int size, int position) {
+        payload.position(position + 2);
+        long value = 0;
+        if (bo == ByteOrder.LITTLE_ENDIAN) {
+            final byte[] octets = new byte[size];
+            payload.get(octets);
+
+            for (int n = octets.length - 1; n >= 0; n--) {
+                value = (value << Byte.SIZE) | (octets[n] & BYTE_MASK);
+            }
+        }
+        else {
+            for (int i = 0; i < size; i++) {
+                final byte octet = payload.get();
+                value = (value << Byte.SIZE) | (octet & BYTE_MASK);
+            }
+        }
+        return value;
+    }
+
 
     /**
      * trigger for cell collection and logging
@@ -442,20 +547,12 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( tele != null ) {
             try {
                 //DEBUG: MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
-                CellLocation currentCell = tele.getCellLocation();
-                if (currentCell != null) {
-                    Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                    if (currentNetwork != null) {
-                        networks.put(currentNetwork.getBssid(), currentNetwork);
-                        ListFragment.lameStatic.currCells = 1;
-                    }
-                }
 
-                // we can survey cells
                 List<CellInfo> infos = tele.getAllCellInfo();
                 if (null != infos) {
                     for (final CellInfo cell : infos) {
                         Network network = handleSingleCellInfo(cell, tele, location);
+                        //DEBUG: Logging.info("list cell: "+cell.toString());
                         if (null != network) {
                             if (networks.containsKey(network.getBssid())) {
                                 //DEBUG: MainActivity.info("matching network already in map: " + network.getBssid());
@@ -468,19 +565,28 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                     }
                     ListFragment.lameStatic.currCells = infos.size();
-                }
-                //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
-                //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
-
-
-                /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
-                if (null != list) {
-                    for (final NeighboringCellInfo cell : list) {
-                        //networks.put(
-                        handleSingleNeighboringCellInfo(cell, tele, location);
-                        //);
+                } else if (Build.VERSION.SDK_INT < 26) {
+                    //NB: common source of ANRs
+                    CellLocation currentCell = tele.getCellLocation();
+                    if (currentCell != null) {
+                        Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
+                        //DEBUG: Logging.info("single cell: "+currentCell.toString());
+                        if (currentNetwork != null) {
+                            networks.put(currentNetwork.getBssid(), currentNetwork);
+                            ListFragment.lameStatic.currCells = 1;
+                        }
                     }
-                }*/
+                    //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
+                    //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
+                    /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
+                    if (null != list) {
+                        for (final NeighboringCellInfo cell : list) {
+                            //networks.put(
+                            handleSingleNeighboringCellInfo(cell, tele, location);
+                            //);
+                        }
+                    }*/
+                }
             } catch (SecurityException sex) {
                 Logging.warn("unable to scan cells due to permission issue: ", sex);
             } catch (NullPointerException ex) {
@@ -528,7 +634,7 @@ public class WifiReceiver extends BroadcastReceiver {
                             g = new GsmOperator((CellIdentityNr) ((CellInfoNr) (cellInfo)).getCellIdentity());
                             CellSignalStrength cellStrengthW = ((CellInfoNr) (cellInfo)).getCellSignalStrength();
                             return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "NR",
-                                    cellStrengthW.getDbm(), NetworkType.typeForCode("D"), location);
+                                    cellStrengthW.getDbm(), NetworkType.typeForCode("N"), location);
                         }
                         break;
                     default:
@@ -713,7 +819,7 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * Voice announcement method for scan
      */
-    private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
+    private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long newBtCount, long now ) {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
         StringBuilder builder = new StringBuilder();
 
@@ -733,6 +839,10 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_CELL, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_new_cell)).append(" ")
                     .append(newCellCount).append( ", " );
+        }
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_BT, true ) ) {
+            builder.append(mainActivity.getString(R.string.tts_new_bt)).append(" ")
+                    .append(newBtCount).append( ", " );
         }
         if ( preQueueSize > 0 && prefs.getBoolean( PreferenceKeys.PREF_SPEAK_QUEUE, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_queue)).append(" ")
@@ -843,6 +953,16 @@ public class WifiReceiver extends BroadcastReceiver {
         wifiTimer.post(this::doWifiScan);
     }
 
+    public synchronized void registerWiFiScanUpdater(final WiFiScanUpdater updater, final Set<String> watchBssids) {
+        safeWatchSsids.addAll(watchBssids);
+        updateOnSeen = updater;
+    }
+
+    public synchronized void unregisterWiFiScanUpdater() {
+        updateOnSeen = null;
+        safeWatchSsids.clear();
+    }
+
     /**
      * only call this from a Handler
      * @return true if startScan success
@@ -871,7 +991,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 lastScanResponseTime = now;
             } else {
                 final long sinceLastScan = now - lastScanResponseTime;
-                Logging.info("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
+                Logging.debug("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(
                         PreferenceKeys.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
@@ -970,8 +1090,8 @@ public class WifiReceiver extends BroadcastReceiver {
                     "\n\tSystem ID:" + systemIdInt +
                     "\n\tNetwork Key: " + networkKey;
 
-            res += "\n\tLat: " + new Double(cellIdentC.getLatitude()) / 4.0d / 60.0d / 60.0d;
-            res += "\n\tLon: " + new Double(cellIdentC.getLongitude()) / 4.0d / 60.0d / 60.0d;
+            res += "\n\tLat: " + (double) cellIdentC.getLatitude() / 4.0d / 60.0d / 60.0d;
+            res += "\n\tLon: " + (double) cellIdentC.getLongitude() / 4.0d / 60.0d / 60.0d;
             res += "\n\tSignal: " + cellStrengthC.getCdmaLevel();
 
             int rssi = cellStrengthC.getEvdoDbm() != 0 ? cellStrengthC.getEvdoDbm() : cellStrengthC.getCdmaDbm();
@@ -1036,5 +1156,4 @@ public class WifiReceiver extends BroadcastReceiver {
         //ALIBI: allows us to run in conjunction with current-carrier detection
         return network;
     }
-
 }

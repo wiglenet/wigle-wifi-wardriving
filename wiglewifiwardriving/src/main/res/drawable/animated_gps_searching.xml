@@ -1,0 +1,12 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/gps_searching" >
+    <target
+        android:name="outerRotationGroup"
+        android:animation="@animator/rotation" />
+    <target
+        android:name="innerRotationGroup"
+        android:animation="@animator/rotation_fast" />
+    <target
+        android:name="signal"
+        android:animation="@animator/fade_in_and_out" />
+</animated-vector>

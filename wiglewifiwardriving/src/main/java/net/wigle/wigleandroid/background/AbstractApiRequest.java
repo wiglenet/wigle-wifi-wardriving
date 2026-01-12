@@ -11,6 +11,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -93,27 +94,12 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         return createConnection(connectURL, setBoundary, preConnectConfigurator, connectionMethod);
     }
 
-    public static String getUserAgentString() {
-        String javaVersion = "unknown";
-        try {
-            javaVersion =  System.getProperty("java.vendor") + " " +
-                    System.getProperty("java.version") + ", jvm: " +
-                    System.getProperty("java.vm.vendor") + " " +
-                    System.getProperty("java.vm.name") + " " +
-                    System.getProperty("java.vm.version") + " on " +
-                    System.getProperty("os.name") + " " +
-                    System.getProperty("os.version") +
-                    " [" + System.getProperty("os.arch") + "]";
-        } catch (RuntimeException ignored) { }
-        return "WigleWifi ("+javaVersion+")";
-    }
-
     private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
                                                       final PreConnectConfigurator preConnectConfigurator,
                                                       final String connectionMethod)
             throws IOException {
 
-        final String userAgent = AbstractApiRequest.getUserAgentString();
+        final String userAgent = WiGLEApiManager.USER_AGENT;
 
         // Open a HTTP connection to the URL
         HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
@@ -244,7 +230,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         // if we have cached data, and are meant to use it, call the handler with that
         if (useCacheIfPresent) {
             final JSONObject cache = getCached();
-            if (cache != null) listener.requestComplete(cache, true);
+            if (cache != null && listener != null) listener.requestComplete(cache, true);
             if (cacheOnly) return;
         }
 
@@ -296,14 +282,14 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         PreConnectConfigurator preConnectConfigurator = null;
         if (doBasicLogin) {
             final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-            final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
+            // get authname second as getting the token may clear it
+            final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String encoded = Base64.encodeToString((authname + ":" + token).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
             // Cannot set request property after connection is made
             preConnectConfigurator = new PreConnectConfigurator() {
                 @Override
                 public void configure(HttpURLConnection connection) {
-                    //TODO: for non-upload tasks, how to handle anonymity
                     connection.setRequestProperty("Authorization", "Basic " + encoded);
                 }
             };

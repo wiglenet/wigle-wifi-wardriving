@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - Asetukset</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-    <string name="error_report_name">WiGLE Wifi - Viimeisin virheraportti</string>
+    <string name="error_report_name">Viimeisin virheraportti</string>
     <string name="speech_name">WiGLE Wifi - Puhe-asetukset</string>
     <string name="network_activity_name">WiGLE Wifi - Network</string>
     <string name="data_activity_name">WiGLE Wifi - tietokanta</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Kanava:</string>
     <string name="network_observations">Havainnot:</string>
     <string name="network_querying">(Querying&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Näytä salasana</string>
     <string name="setting_db_marker">DB Marker (jossa kuvat alkavat):</string>
     <string name="setting_high_up">Korkein ladataan id:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Rekisteröidy&lt;/a&gt; @WiGLE.net tai &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivoi nyt QR-koodilla&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID:</string>
     <string name="ble_vendor">BLE-toimittajan tunnus:</string>
+    <string name="speech_new_bt">Uusi bluetooth DB:lle</string>
+    <string name="tts_new_bt">Uusi bluetooth</string>
+    <string name="gnss_full">Käytä täydellistä GNSS-seurantaa (suuri akun tyhjennys)</string>
+    <string name="search_area">Hakualue:</string>
+    <string name="queued_jobs">(%1$d jonossa olevaa tehtävää)</string>
+    <string name="duplicate_job">Tämäntyyppinen työ on jo käynnissä tai odottaa suorittamistaan.</string>
+    <string name="start_survey">Sivustotutkimus</string>
+    <string name="end_survey">Lopeta kysely</string>
+    <string name="confirm_survey">Sinun PITÄÄ napsauttaa \"%1$s\" suorittaaksesi kyselyn ja tallentaaksesi tulokset ennen kuin lopetat aktiviteetin!\n\n Suosittelemme, että asetat \"%2$s\"-skannauksen matkustusnopeuden asetuksiin saadaksesi parhaat tulokset. (Tällä on akun seurauksia)</string>
+    <string name="interrogate_ble">kysy lisätietoja</string>
+    <string name="ble_mfgr_title">Valmistaja</string>
+    <string name="ble_model_title">Malli</string>
+    <string name="ble_serial_title">Sarjanumero</string>
+    <string name="ble_firmware_title">Laiteohjelmisto</string>
+    <string name="ble_hw_title">Laitteisto</string>
+    <string name="ble_sw_title">Ohjelmisto</string>
+    <string name="ble_name_title">Nimi</string>
+    <string name="ble_pnp_title">PnP-tunnus</string>
+    <string name="ble_appearance_title">Ulkonäkö</string>
+    <string name="alert_filter_button">Varoitus MAC-/OUI-osoitteista…</string>
+    <string name="status_too_many">Liian monta aikataulussa</string>
+    <string name="filter_show_wifi">Näytä WiFi</string>
+    <string name="filter_show_bt_classic">Näytä Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Piilota</string>
+    <string name="alert">Varoitus</string>
 </resources>

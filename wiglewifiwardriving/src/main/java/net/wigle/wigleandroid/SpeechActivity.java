@@ -4,20 +4,29 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import java.util.Objects;
 
-public class SpeechActivity extends AppCompatActivity {
+public class SpeechActivity extends ScreenChildActivity {
     private static final int MENU_RETURN = 12;
 
     // used for shutting extraneous activities down on an error
@@ -37,6 +46,23 @@ public class SpeechActivity extends AppCompatActivity {
         MainActivity.setLocale( this );
         setContentView( R.layout.speech );
         speechActivity = this;
+        EdgeToEdge.enable(this);
+        View wrapperLayout = findViewById(R.id.speech_content_wrapper);
+        if (null != wrapperLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(wrapperLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
 
         // force media volume controls
         this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
@@ -46,6 +72,7 @@ public class SpeechActivity extends AppCompatActivity {
         doTtsCheckbox( prefs, R.id.speech_run, PreferenceKeys.PREF_SPEAK_RUN );
         doTtsCheckbox( prefs, R.id.speech_new_wifi, PreferenceKeys.PREF_SPEAK_NEW_WIFI );
         doTtsCheckbox( prefs, R.id.speech_new_cell, PreferenceKeys.PREF_SPEAK_NEW_CELL );
+        doTtsCheckbox( prefs, R.id.speech_new_bt, PreferenceKeys.PREF_SPEAK_NEW_BT );
         doTtsCheckbox( prefs, R.id.speech_queue, PreferenceKeys.PREF_SPEAK_QUEUE );
         doTtsCheckbox( prefs, R.id.speech_miles, PreferenceKeys.PREF_SPEAK_MILES );
         doTtsCheckbox( prefs, R.id.speech_time, PreferenceKeys.PREF_SPEAK_TIME );
@@ -63,7 +90,6 @@ public class SpeechActivity extends AppCompatActivity {
             speakText.setText(getString(R.string.no_tts));
         }
 
-
         final String off = getString(R.string.off);
         final String sec = " " + getString(R.string.sec);
         final String min = " " + getString(R.string.min);
@@ -72,6 +98,11 @@ public class SpeechActivity extends AppCompatActivity {
                 "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
         SettingsUtil.doSpinner(findViewById(R.id.speak_spinner), PreferenceKeys.PREF_SPEECH_PERIOD,
                 MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, this);
+
+        Button speechSettingsFinished = findViewById(R.id.finish_speech_settings);
+        if (null != speechSettingsFinished) {
+            speechSettingsFinished.setOnClickListener(v-> finish());
+       }
     }
 
     @Override

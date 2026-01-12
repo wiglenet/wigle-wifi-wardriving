@@ -1,6 +1,15 @@
 package net.wigle.wigleandroid.model;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * upload. not thread-safe.
@@ -193,5 +202,7 @@ public final class Upload {
         Status(final String status) {
             this.stringStatus = status;
         }
+
+        public static final Set<Status> IN_PROGRESS = new HashSet<>(Arrays.asList( QUEUED, PARSING, TRILATERATING, STATS, GEOINDEX, ARCHIVE, CATALOG));
     }
 }

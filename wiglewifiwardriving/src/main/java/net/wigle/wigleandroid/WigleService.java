@@ -37,7 +37,10 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
-    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_1";
+
+    // NOTIFICATION_CHANNEL_ID must be updated for any channel change to take effect on an
+    // existing device.
+    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_9";
 
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
@@ -47,6 +50,12 @@ public final class WigleService extends Service {
     // Binder given to clients
     private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
     private final NumberFormat countFormat = NumberFormat.getIntegerInstance();
+
+    public static final String UPLOAD_COMPLETE_INTENT = "net.wigle.wigleandroid.UPLOAD_COMPLETE";
+    public static final String UPLOAD_FAILED_INTENT = "net.wigle.wigleandroid.UPLOAD_FAILED";
+    public static final String UPLOAD_INTENT = "net.wigle.wigleandroid.UPLOAD";
+    public static final String PAUSE_INTENT = "net.wigle.wigleandroid.PAUSE";
+    public static final String SCAN_INTENT = "net.wigle.wigleandroid.SCAN";
 
     private class GuardThread extends Thread {
         GuardThread() {
@@ -234,21 +243,23 @@ public final class WigleService extends Service {
                 }
 
                 final Intent pauseSharedIntent = new Intent();
-                pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
+                pauseSharedIntent.setAction(PAUSE_INTENT);
                 pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
 
                 final MainActivity ma = MainActivity.getMainActivity();
                 Notification notification = null;
 
-                if (null != ma) {
+                if (null == ma) {
+                    Logging.info("MainActivity is null");
+                } else {
                     final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     final Intent scanSharedIntent = new Intent();
-                    scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
+                    scanSharedIntent.setAction(SCAN_INTENT);
                     scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
                     final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
                     final Intent uploadSharedIntent = new Intent();
-                    uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
+                    uploadSharedIntent.setAction(UPLOAD_INTENT);
                     uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
                     final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     if (SDK_INT >= 31) {
@@ -297,8 +308,9 @@ public final class WigleService extends Service {
             // no such thing as foreground back then
             return false;
         }
-        final boolean isForeground = getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
-        Logging.info("Service is foreground: " + isForeground);
+        final int foregroundServiceType = getForegroundServiceType();
+        final boolean isForeground = foregroundServiceType != FOREGROUND_SERVICE_TYPE_NONE;
+        Logging.info("Service is foreground: " + isForeground + " ("+foregroundServiceType+")");
         return isForeground;
     }
 
@@ -316,7 +328,7 @@ public final class WigleService extends Service {
         builder.setContentText(text);
         builder.setWhen(when);
         builder.setLargeIcon(largeIcon);
-        builder.setSmallIcon(R.drawable.wiglewifi_small);
+        builder.setSmallIcon(R.drawable.wiglewifi_small_white);
         builder.setOngoing(true);
         builder.setCategory("SERVICE");
         builder.setPriority(NotificationCompat.PRIORITY_LOW);
@@ -348,9 +360,9 @@ public final class WigleService extends Service {
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager == null) return null;
-
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     title, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setSound(null, null); // turns off notification sound
             channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
 
@@ -369,7 +381,7 @@ public final class WigleService extends Service {
             builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
-            builder.setSmallIcon(R.drawable.ic_w_logo_simple);
+            builder.setSmallIcon(R.drawable.ic_w_logo_simple_mono);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(VISIBILITY_PUBLIC);
@@ -415,10 +427,14 @@ public final class WigleService extends Service {
                                            final PendingIntent uploadIntent) {
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager == null) return null;
+        if (notificationManager == null) {
+            Logging.info( "notificationManager is null" );
+            return null;
+        }
 
         final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                title, NotificationManager.IMPORTANCE_HIGH);
+                title, NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setSound(null, null); // turns off notification sound
         channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(channel);
 

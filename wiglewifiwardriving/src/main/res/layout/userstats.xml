@@ -4,16 +4,13 @@
     android:id="@+id/stats_scrolllayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:keepScreenOn="true">
-
+    android:layout_height="fill_parent">
     <LinearLayout
         android:id="@+id/linearlayout"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="4dp"
-        >
+        android:padding="4dp">
         <ImageView
             android:id="@+id/badgeImage"
             android:layout_width="match_parent"
@@ -23,7 +20,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:paddingRight="60dp"
-            android:paddingLeft="60dp"/>
+            android:paddingLeft="60dp"
+            android:contentDescription="@string/rank_stats_app_name" />
         <LinearLayout
             android:id="@+id/linearlayout2"
             android:orientation="horizontal"

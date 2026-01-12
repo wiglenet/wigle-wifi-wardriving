@@ -26,6 +26,7 @@ import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.StatsUtil;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -60,7 +61,7 @@ public class DashboardFragment extends Fragment {
     finishing = new AtomicBoolean( false );
     final Configuration conf = getResources().getConfiguration();
     Locale locale = null;
-    if (null != conf && null != conf.getLocales()) {
+    if (null != conf) {
         locale = conf.getLocales().get(0);
     }
     if (null == locale) {
@@ -81,9 +82,7 @@ public class DashboardFragment extends Fragment {
     scrollView = (ScrollView) inflater.inflate(R.layout.dash, container, false);
     landscape = inflater.inflate(R.layout.dashlandscape, container, false);
     portrait = inflater.inflate(R.layout.dashportrait, container, false);
-
     switchView();
-
     return scrollView;
   }
 
@@ -160,7 +159,7 @@ public class DashboardFragment extends Fragment {
         if (null != currentActivity) {
             final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             tv = view.findViewById( R.id.newNetsSinceUpload );
-            tv.setText( getString(R.string.dash_new_upload, newNetsSinceUpload(prefs)) );
+            tv.setText( getString(R.string.dash_new_upload, StatsUtil.newNetsSinceUpload(prefs)) );
 
             updateDist(view, prefs, R.id.rundist, PreferenceKeys.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
             updateTime(view, prefs, R.id.run_dur, PreferenceKeys.PREF_STARTTIME_RUN);
@@ -264,20 +263,6 @@ public class DashboardFragment extends Fragment {
                     iv.setColorFilter(colorUnknown);
             }
         }
-  }
-
-  private long newNetsSinceUpload(final SharedPreferences prefs) {
-      long newSinceUpload = 0;
-      final long marker = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
-      final long uploaded = prefs.getLong( PreferenceKeys.PREF_NETS_UPLOADED, 0L );
-      // marker is set but no uploaded, a migration situation, so return zero
-      if (marker == 0 || uploaded != 0) {
-          newSinceUpload = ListFragment.lameStatic.dbNets - uploaded;
-          if ( newSinceUpload < 0 ) {
-              newSinceUpload = 0;
-          }
-      }
-    return newSinceUpload;
   }
 
   private void updateDist(final View view, final SharedPreferences prefs, final int id, final String pref, final String title ) {

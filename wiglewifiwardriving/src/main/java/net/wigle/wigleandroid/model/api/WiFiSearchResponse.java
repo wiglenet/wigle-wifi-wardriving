@@ -6,6 +6,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * WiGLE v2 API WiFi Search Response model object
@@ -110,7 +111,7 @@ public class WiFiSearchResponse {
     public static Network asNetwork(WiFiNetwork wNet) {
         final LatLng l = new LatLng(wNet.getTrilat(),wNet.getTrilong());
         return new Network(wNet.getNetid(), wNet.getSsid(),
-                wNet.getChannel(), "["+wNet.getEncryption().toUpperCase()+" SEARCH]",
+                wNet.getChannel(), "["+wNet.getEncryption().toUpperCase(Locale.ROOT)+" SEARCH]",
                 0, NetworkType.WIFI, l);
     }
 

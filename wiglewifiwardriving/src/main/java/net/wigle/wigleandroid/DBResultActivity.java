@@ -1,28 +1,46 @@
 package net.wigle.wigleandroid;
 
+import static net.wigle.wigleandroid.db.DatabaseHelper.SEARCH_NETWORKS;
+import static net.wigle.wigleandroid.model.Network.RSN_CAP;
+import static net.wigle.wigleandroid.model.Network.SAE_CAP;
+import static net.wigle.wigleandroid.model.Network.SUITE_B_192_CAP;
+import static net.wigle.wigleandroid.model.Network.WEP_CAP;
+import static net.wigle.wigleandroid.model.Network.WPA2_CAP;
+import static net.wigle.wigleandroid.model.Network.WPA3_CAP;
+import static net.wigle.wigleandroid.model.Network.WPA_CAP;
+import static net.wigle.wigleandroid.model.NetworkFilterType.BT;
+import static net.wigle.wigleandroid.model.NetworkFilterType.CELL;
+import static net.wigle.wigleandroid.model.NetworkFilterType.WIFI;
+
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.location.Address;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 //import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,21 +51,28 @@ import android.widget.Toast;
 //import com.google.android.gms.maps.model.LatLngBounds;
 
 import net.wigle.wigleandroid.background.PooledQueryExecutor;
-import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.NetworkFilterType;
+import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.model.WiFiSecurityType;
+import net.wigle.wigleandroid.model.api.BtSearchResponse;
+import net.wigle.wigleandroid.model.api.CellSearchResponse;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
+import net.wigle.wigleandroid.ui.ProgressThrobberActivity;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import org.json.JSONObject;
 
-public class DBResultActivity extends AppCompatActivity {
+public class DBResultActivity extends ProgressThrobberActivity {
     private static final int MENU_RETURN = 12;
     private static final int LIMIT = 50;
 
@@ -58,18 +83,25 @@ public class DBResultActivity extends AppCompatActivity {
     private static final String API_LON1_PARAM = "longrange1";
     private static final String API_LON2_PARAM = "longrange2";
     private static final String API_BSSID_PARAM = "netid";
+    private static final String API_CELL_OP_PARAM = "cell_op";
+    private static final String API_CELL_NET_PARAM = "cell_net";
+    private static final String API_CELL_ID_PARAM = "cell_id";
+    private static final String API_BT_NAME_PARAM = "name";
+    private static final String API_BT_NAMELIKE_PARAM = "namelike";
     private static final String API_SSIDLIKE_PARAM = "ssidlike";
     private static final String API_SSID_PARAM = "ssid";
-
-    private static final Double LOCAL_RANGE = 0.1d;
-    private static final Double ONLINE_RANGE = 0.001d; //ALIBI: online DB coverage mandates tighter bounds.
+    private static final String API_ENCRYPTION_PARAM = "encryption";
 
     private SetNetworkListAdapter listAdapter;
-//    private MapView mapView;
+    private Object mapView;
 //    private MapRender mapRender;
     private final List<Network> resultList = new ArrayList<>();
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>();
     private WiFiSearchResponse searchResponse;
+    private BtSearchResponse btSearchResponse;
+    private CellSearchResponse cellSearchResponse;
+
+    private boolean queryFailed;
 
     @Override
     public void onCreate( final Bundle savedInstanceState) {
@@ -79,95 +111,187 @@ public class DBResultActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         // set language
         MainActivity.setLocale( this );
         setContentView( R.layout.dbresult );
-
+        EdgeToEdge.enable(this);
         // force media volume controls
         setVolumeControlStream( AudioManager.STREAM_MUSIC );
         setupList();
 
+        View wrapperLayout = findViewById(R.id.db_result_wrapper);
+        if (null != wrapperLayout) {
+            ViewCompat.setOnApplyWindowInsetsListener(wrapperLayout, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+
+        ImageButton back = findViewById(R.id.result_back_button);
+        if (null != back) {
+            back.setOnClickListener( v -> { finish(); });
+        }
+
         QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
-        final TextView tv = findViewById( R.id.dbstatus );
+        loadingImage = findViewById(R.id.search_throbber);
+        errorImage = findViewById(R.id.search_error);
 
         if ( queryArgs != null ) {
-            tv.setText( getString(R.string.status_working)); //TODO: throbber/overlay?
-            Address address = queryArgs.getAddress();
-//            LatLng center = MappingFragment.DEFAULT_POINT;
-//            if ( address != null ) {
-//                center = new LatLng(address.getLatitude(), address.getLongitude());
-//            }
-//            setupMap( center, savedInstanceState );
+            startAnimation();
+
+            LatLng center = MappingFragment.DEFAULT_POINT;
+            /*LatLngBounds bounds = queryArgs.getLocationBounds();
+            if ( bounds != null ) {
+                center = new LatLng(bounds.getCenter().latitude, bounds.getCenter().longitude);
+            }*/
+            final SharedPreferences prefs = this.getApplicationContext().
+                    getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            setupMap( center, savedInstanceState, prefs );
             if (queryArgs.searchWiGLE()) {
                 setupWiGLEQuery(queryArgs);
             } else {
                 setupQuery(queryArgs);
             }
         }
-        else {
-            tv.setText(getString(R.string.status_fail) + "...");
-        }
     }
 
     private void setupList() {
         // not set by nonconfig retain
-        listAdapter = new SetNetworkListAdapter( this, R.layout.row );
+        listAdapter = new SetNetworkListAdapter( this, true, R.layout.row );
         final ListView listView = findViewById( R.id.dblist );
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }
 
-//    private void setupMap( final LatLng center, final Bundle savedInstanceState ) {
-//        mapView = new MapView( this );
-//        mapView.onCreate(savedInstanceState);
-//        MapsInitializer.initialize(this);
-//
-//        mapView.getMapAsync(googleMap -> {
-//            mapRender = new MapRender(DBResultActivity.this, googleMap, true);
-//
-//            if (center != null) {
-//                final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                        .target(center).zoom(DEFAULT_ZOOM).build(); //TODO: zoom all the way out instead?
-//                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//            }
-//        });
-//
-//        final RelativeLayout rlView = findViewById( R.id.db_map_rl );
-//        rlView.addView( mapView );
-//    }
+    private void setupMap(final LatLng center, final Bundle savedInstanceState, final SharedPreferences prefs) {
+        /*mapView = new MapView( this );
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
+        MapsInitializer.initialize(this);
+
+        mapView.getMapAsync(googleMap -> {
+            mapRender = new MapRender(DBResultActivity.this, googleMap, true);
+
+            if (center != null) {
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(center).zoom(DEFAULT_ZOOM).build(); //TODO: zoom all the way out instead?
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+        });*/
+        final RelativeLayout rlView = findViewById( R.id.db_map_rl );
+        //rlView.addView( mapView );
+    }
 
     private void setupQuery( final QueryArgs queryArgs ) {
-        final Address address = queryArgs.getAddress();
 
-        String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
+        //final LatLngBounds bounds = queryArgs.getLocationBounds();
+        String sql = SEARCH_NETWORKS;
         final String ssid = queryArgs.getSSID();
-        final String bssid = queryArgs.getBSSID();
+        String bssid = queryArgs.getBSSID();
         boolean limit = false;
         List<String> params = new ArrayList<>();
+        if ((queryArgs.getType() != null) && CELL.equals(queryArgs.getType())) {
+            boolean hasCellParams = false;
+            String cellId = "";
+            if (queryArgs.getCellOp() != null && !queryArgs.getCellOp().isEmpty()) {
+                cellId += queryArgs.getCellOp()+"_";
+                hasCellParams = true;
+            } else {
+                cellId += "%";
+            }
+            if (queryArgs.getCellNet() != null && !queryArgs.getCellNet().isEmpty()) {
+                cellId += queryArgs.getCellNet()+"_";
+                hasCellParams = true;
+            } else {
+                cellId += "%";
+            }
+            if (queryArgs.getCellId() != null && !queryArgs.getCellId().isEmpty()) {
+                cellId += queryArgs.getCellId();
+                hasCellParams = true;
+            } else {
+                cellId += "%";
+            }
+            if (hasCellParams) {
+                bssid = cellId;
+            }
+        }
+
         if ( ssid != null && ! "".equals(ssid) ) {
             sql += " AND ssid like ?"; // + DatabaseUtils.sqlEscapeString(ssid);
             params.add(ssid);
             limit = true;
         }
         if ( bssid != null && ! "".equals(bssid) ) {
-            sql += " AND bssid like ?"; // + DatabaseUtils.sqlEscapeString(bssid);
+            sql += " AND bssid LIKE ?"; // + DatabaseUtils.sqlEscapeString(bssid);
             params.add(bssid);
             limit = true;
         }
-        if ( address != null ) {
-            sql += " AND lastlat > ? AND lastlat < ? AND lastlon > ? AND lastlon < ?";
-            final double lat = address.getLatitude();
-            final double lon = address.getLongitude();
-            params.add((lat - LOCAL_RANGE)+"");
-            params.add((lat + LOCAL_RANGE)+"");
-            params.add((lon - LOCAL_RANGE)+"");
-            params.add((lon + LOCAL_RANGE)+"");
+        if ( queryArgs.getType() != null && !NetworkFilterType.ALL.equals(queryArgs.getType())) {
+            switch (queryArgs.getType()) {
+                case BT:
+                    sql += " AND type IN ('B','E')";
+                    break;
+                case CELL:
+                    sql += " AND type IN ('G','C','L','D','N')";
+                    break;
+                case WIFI:
+                    sql += " AND type = ?";
+                    params.add(NetworkType.WIFI.getCode());
+                    break;
+                default:
+                    break;
+            }
         }
+        if ( queryArgs.getType() != null && (NetworkFilterType.ALL.equals(queryArgs.getType())|| WIFI.equals(queryArgs.getType()))) {
+            if (queryArgs.getCrypto() != null && !WiFiSecurityType.ALL.equals(queryArgs.getCrypto())) {
+                switch (queryArgs.getCrypto()) {
+                    case WPA3:
+                        sql += " AND (capabilities LIKE ? OR capabilities LIKE ? OR capabilities LIKE ?)";
+                        params.add("%"+WPA3_CAP+"%");
+                        params.add("%"+SUITE_B_192_CAP+"%");
+                        params.add("%"+SAE_CAP+"%");
+                        break;
+                    case WPA2:
+                        sql += " AND (capabilities LIKE ? OR capabilities LIKE ?)";
+                        params.add("%"+WPA2_CAP+"%");
+                        params.add("%"+RSN_CAP+"%");
+                        break;
+                    case WPA:
+                        sql += " AND capabilities LIKE ?";
+                        params.add("%"+WPA_CAP+"-%");
+                        break;
+                    case WEP:
+                        sql += " AND capabilities LIKE ?";
+                        params.add(WEP_CAP+"%");
+                        break;
+                    case NONE:
+                        sql += " AND capabilities IN ('[]','[ESS]', '')"; //TODO: verify that these cases are complete
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        /*if (bounds  != null ) {
+            sql += " AND lastlat > ? AND lastlat < ? AND lastlon > ? AND lastlon < ?";
+            params.add((bounds.southwest.latitude)+"");
+            params.add((bounds.northeast.latitude)+"");
+            params.add((bounds.southwest.longitude)+"");
+            params.add((bounds.northeast.longitude)+"");
+        }*/
         if ( limit ) {
             sql += " LIMIT ?"; // + LIMIT;
             params.add(LIMIT+"");
         }
-
+        //DEBUG: Logging.error(sql);
         final TreeMap<Float,String> top = new TreeMap<>();
         final float[] results = new float[1];
         final long[] count = new long[1];
@@ -181,10 +305,10 @@ public class DBResultActivity extends AppCompatActivity {
                 final float lon = cursor.getFloat(2);
                 count[0]++;
 
-                if ( address == null ) {
+                /*if ( bounds == null ) {
                     top.put( (float) count[0], bssid );
-                } else {
-                    Location.distanceBetween( lat, lon, address.getLatitude(), address.getLongitude(), results );
+                } else {*/
+                    //Location.distanceBetween( lat, lon, bounds.getCenter().latitude, bounds.getCenter().longitude, results );
                     final float meters = results[0];
 
                     if ( top.size() <= LIMIT ) {
@@ -196,7 +320,7 @@ public class DBResultActivity extends AppCompatActivity {
                             putWithBackoff( top, bssid, meters );
                         }
                     }
-                }
+                //}
                 return true;
             }
 
@@ -213,21 +337,32 @@ public class DBResultActivity extends AppCompatActivity {
                         }
                     }
                     if (resultList.size() > 0) {
-//                        handler.post(() -> {
-//                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//                            for (Network n : resultList) {
-//                                listAdapter.add(n);
-//                                mapRender.addItem(n);
-//                                final LatLng ll = n.getPosition();
-//                                //noinspection ConstantConditions
-//                                if (ll != null) builder.include(ll);
-//                            }
-//                            mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
-//                            resultList.clear();
-//                        });
+                        handler.post(() -> {
+                            stopAnimation();
+                            /*LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            boolean hasValidPoints = false;
+                            if (null != mapRender) {
+                                for (Network n : resultList) {
+                                    listAdapter.add(n);
+                                    mapRender.addItem(n);
+                                    final LatLng ll = n.getPosition();
+                                    //noinspection ConstantConditions
+                                    if (ll != null) {
+                                        builder.include(ll);
+                                        hasValidPoints = true;
+                                    }
+                                }
+                            }
+                            if (hasValidPoints) {
+                                mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+                            } else {
+                                handler.post(() -> handleEmptyResult());
+                            }*/
+                            resultList.clear();
+                        });
                     }
                 } else {
-                    handler.post(() -> handleFailedRequest());
+                    handler.post(() -> handleEmptyResult());
                 }
             }
         }, ListFragment.lameStatic.dbHelper);
@@ -236,49 +371,93 @@ public class DBResultActivity extends AppCompatActivity {
     }
 
     private void handleResults() {
-        final TextView tv = findViewById(R.id.dbstatus);
-        tv.setText(getString(R.string.status_success));
+        stopAnimation();
         listAdapter.clear();
-//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//
-//        for (WiFiSearchResponse.WiFiNetwork net : searchResponse.getResults()) {
-//            if (null != net) {
-//                final Network n = WiFiSearchResponse.asNetwork(net);
-//                listAdapter.add(n);
-//                builder.include(n.getPosition());
-//
-//                if (n.getLatLng() != null && mapRender != null) {
-//                    mapRender.addItem(n);
-//                }
-//            }
-//        }
-//        if (!listAdapter.isEmpty()) {
-//            try {
-//                mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
-//            } catch (IllegalStateException ise) {
-//                Logging.error("Illegal state exception on map move: ", ise);
-//            }
-//        }
+        //LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        if (null != searchResponse && null != searchResponse.getResults()) {
+            for (WiFiSearchResponse.WiFiNetwork net :searchResponse.getResults()) {
+                if (null != net) {
+                    final Network n = WiFiSearchResponse.asNetwork(net);
+                    listAdapter.add(n);
+                    /*builder.include(n.getPosition());
+
+                    if (n.getLatLng() != null && mapRender != null) {
+                        mapRender.addItem(n);
+                    }*/
+                }
+            }
+        } else if (null != btSearchResponse && null != btSearchResponse.getResults()) {
+            for (BtSearchResponse.BtNetwork net :btSearchResponse.getResults()) {
+                if (null != net) {
+                    final Network n = BtSearchResponse.asNetwork(net);
+                    listAdapter.add(n);
+                    /*builder.include(n.getPosition());
+
+                    if (n.getLatLng() != null && mapRender != null) {
+                        mapRender.addItem(n);
+                    }*/
+                }
+            }
+        } else if (null != cellSearchResponse && null != cellSearchResponse.getResults()) {
+            for (CellSearchResponse.CellNetwork net :cellSearchResponse.getResults()) {
+                if (null != net) {
+                    final Network n = CellSearchResponse.asNetwork(net);
+                    listAdapter.add(n);
+                    /*builder.include(n.getPosition());
+
+                    if (n.getLatLng() != null && mapRender != null) {
+                        mapRender.addItem(n);
+                    }*/
+                }
+            }
+        }
+        if (!listAdapter.isEmpty()) {
+            try {
+                //mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+            } catch (IllegalStateException ise) {
+                Logging.error("Illegal state exception on map move: ", ise);
+            }
+        }
         resultList.clear();
     }
 
-    private void handleFailedRequest() {
-        final TextView tv = findViewById( R.id.dbstatus );
-        tv.setText( getString(R.string.search_empty)  );
+    private void handleEmptyResult() {
         listAdapter.clear();
         WiGLEToast.showOverActivity(this, R.string.app_name,
                 getString(R.string.search_empty), Toast.LENGTH_LONG);
+        stopAnimation();
+    }
+
+    private void handleFailedRequest() {
+        listAdapter.clear();
+        WiGLEToast.showOverActivity(this, R.string.app_name,
+                getString(R.string.search_empty), Toast.LENGTH_LONG);
+        stopAnimation();
+        showError();
     }
 
     private void setupWiGLEQuery(final QueryArgs queryArgs) {
         final FragmentActivity fa = this;
         String queryParams = "";
         if (queryArgs.getSSID() != null && !queryArgs.getSSID().isEmpty()) {
-
-            if (queryArgs.getSSID().contains("%") || queryArgs.getSSID().contains("_")) {
-                queryParams+=API_SSIDLIKE_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
-            } else {
-                queryParams+=API_SSID_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
+            try {
+                boolean likeMatch = queryArgs.getSSID().contains("%") || queryArgs.getSSID().contains("_");
+                String nameParam = API_SSID_PARAM;
+                if (null != queryArgs.getType() && BT.equals(queryArgs.getType())) {
+                    if (likeMatch) {
+                        nameParam = API_BT_NAMELIKE_PARAM;
+                    } else {
+                        nameParam = API_BT_NAME_PARAM;
+                    }
+                } else {
+                    if (likeMatch) {
+                        nameParam = API_SSIDLIKE_PARAM;
+                    }
+                }
+                queryParams+=nameParam+"="+URLEncoder.encode((queryArgs.getSSID()), java.nio.charset.StandardCharsets.UTF_8.toString() );
+            } catch (UnsupportedEncodingException e) {
+                Logging.error("parameter encoding error for SSID: ", e);
             }
         }
 
@@ -287,56 +466,179 @@ public class DBResultActivity extends AppCompatActivity {
                 queryParams+="&";
             }
 
-            queryParams+=API_BSSID_PARAM+"="+(queryArgs.getBSSID());
+            if (null != queryArgs.getType()) {
+                switch (queryArgs.getType()) {
+                    case WIFI:
+                    case BT:
+                        queryParams += API_BSSID_PARAM + "=" + (queryArgs.getBSSID());
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                queryParams += API_BSSID_PARAM + "=" + (queryArgs.getBSSID());
+            }
         }
 
-        final Address address = queryArgs.getAddress();
-        if (address != null) {
+        if (CELL.equals(queryArgs.getType())) {
             if (!queryParams.isEmpty()) {
                 queryParams+="&";
             }
-
-            final double lat = address.getLatitude();
-            final double lon = address.getLongitude();
-
-            queryParams+=API_LAT1_PARAM+"="+(lat - ONLINE_RANGE)+"&";
-            queryParams+=API_LAT2_PARAM+"="+(lat + ONLINE_RANGE)+"&";
-            queryParams+=API_LON1_PARAM+"="+(lon - ONLINE_RANGE)+"&";
-            queryParams+=API_LON2_PARAM+"="+(lon + ONLINE_RANGE);
+            boolean needSep = false;
+            if ((queryArgs.getCellOp() != null) && !queryArgs.getCellOp().isEmpty()) {
+                queryParams += API_CELL_OP_PARAM + "=" + queryArgs.getCellOp();
+                needSep = true;
+            }
+            if ((queryArgs.getCellNet() != null) && !queryArgs.getCellNet().isEmpty()) {
+                if (needSep) {
+                    queryParams += "&";
+                }
+                queryParams += API_CELL_NET_PARAM + "=" + queryArgs.getCellNet();
+                needSep = true;
+            }
+            if ((queryArgs.getCellId() != null) && !queryArgs.getCellId().isEmpty()) {
+                if (needSep) {
+                    queryParams += "&";
+                }
+                queryParams += API_CELL_ID_PARAM + "=" + queryArgs.getCellId();
+            }
         }
 
+        final WiFiSecurityType securityType = queryArgs.getCrypto();
+        if (null !=  securityType) {
+            if (!queryParams.isEmpty()) {
+                queryParams+="&";
+            }
+            final String param = WiFiSecurityType.webParameterValue(securityType);
+            if (null != param) {
+                queryParams += API_ENCRYPTION_PARAM + "=" +param;
+            }
+        }
+
+        /*final LatLngBounds bounds = queryArgs.getLocationBounds();
+        if (bounds != null) {
+            if (!queryParams.isEmpty()) {
+                queryParams+="&";
+            }
+            queryParams+=API_LAT1_PARAM+"="+bounds.southwest.latitude+"&";
+            queryParams+=API_LAT2_PARAM+"="+bounds.northeast.latitude+"&";
+            queryParams+=API_LON1_PARAM+"="+bounds.southwest.longitude+"&";
+            queryParams+=API_LON2_PARAM+"="+bounds.northeast.longitude;
+        }*/
+
         final MainActivity.State s = MainActivity.getStaticState();
+        //DEBUG: Logging.error(queryParams);
+
         if (null != s) {
-
-            s.apiManager.searchWiFi(queryParams, new AuthenticatedRequestCompletedListener<WiFiSearchResponse, JSONObject>() {
-                @Override
-                public void onAuthenticationRequired() {
-                    if (null != fa) {
-                        WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
-                                getString(R.string.login_required), getString(R.string.login),
-                                getString(R.string.cancel));
+            queryFailed = false;
+            if (null == queryArgs.getType() /*ALIBI: default to WiFi, but shouldn't happen*/ || WIFI.equals(queryArgs.getType())) {
+                s.apiManager.searchWiFi(queryParams, new AuthenticatedRequestCompletedListener<WiFiSearchResponse, JSONObject>() {
+                    @Override
+                    public void onAuthenticationRequired() {
+                        if (null != fa) {
+                            WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                    getString(R.string.login_required), getString(R.string.login),
+                                    getString(R.string.cancel));
+                        }
                     }
-                }
 
-                @Override
-                public void onTaskCompleted() {
-                    if (null != searchResponse) {
-                        handleResults();
-                    } else {
-                        handleFailedRequest();
+                    @Override
+                    public void onTaskCompleted() {
+                        if (null != searchResponse) {
+                            handleResults();
+                        } else {
+                            if (queryFailed) {
+                                handleFailedRequest();
+                            } else {
+                                handleEmptyResult();
+                            }
+                        }
                     }
-                }
 
-                @Override
-                public void onTaskSucceeded(WiFiSearchResponse response) {
-                    searchResponse = response;
-                }
+                    @Override
+                    public void onTaskSucceeded(WiFiSearchResponse response) {
+                        searchResponse = response;
+                    }
 
-                @Override
-                public void onTaskFailed(int status, JSONObject error) {
-                    searchResponse = null;
-                }
-            });
+                    @Override
+                    public void onTaskFailed(int status, JSONObject error) {
+                        searchResponse = null;
+                        queryFailed = true;
+                    }
+                });
+            } else if (BT.equals(queryArgs.getType())) {
+                s.apiManager.searchBt(queryParams, new AuthenticatedRequestCompletedListener<BtSearchResponse, JSONObject>() {
+                    @Override
+                    public void onAuthenticationRequired() {
+                        if (null != fa) {
+                            WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                    getString(R.string.login_required), getString(R.string.login),
+                                    getString(R.string.cancel));
+                        }
+                    }
+
+                    @Override
+                    public void onTaskCompleted() {
+                        if (null != btSearchResponse) {
+                            handleResults();
+                        } else {
+                            if (queryFailed) {
+                                handleFailedRequest();
+                            } else {
+                                handleEmptyResult();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onTaskSucceeded(BtSearchResponse response) {
+                        btSearchResponse = response;
+                    }
+
+                    @Override
+                    public void onTaskFailed(int status, JSONObject error) {
+                        btSearchResponse = null;
+                        queryFailed = true;
+                    }
+                });
+            } else if (CELL.equals(queryArgs.getType())) { //TODO: failing
+                s.apiManager.searchCell(queryParams, new AuthenticatedRequestCompletedListener<CellSearchResponse, JSONObject>() {
+                    @Override
+                    public void onAuthenticationRequired() {
+                        if (null != fa) {
+                            WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                    getString(R.string.login_required), getString(R.string.login),
+                                    getString(R.string.cancel));
+                        }
+                    }
+
+                    @Override
+                    public void onTaskCompleted() {
+                        if (null != cellSearchResponse) {
+                            handleResults();
+                        } else {
+                            if (queryFailed) {
+                                handleFailedRequest();
+                            } else {
+                                handleEmptyResult();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onTaskSucceeded(CellSearchResponse response) {
+                        cellSearchResponse = response;
+                    }
+
+                    @Override
+                    public void onTaskFailed(int status, JSONObject error) {
+                        cellSearchResponse = null;
+                        queryFailed = true;
+                    }
+                });
+            } else {
+                Logging.error("Unsupported network type for search: "+queryArgs.getType());
+            }
         }
     }
 
@@ -375,45 +677,45 @@ public class DBResultActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-//        if (mapView != null) {
-//            mapView.onDestroy();
-//        }
+        /*if (mapView != null) {
+            mapView.onDestroy();
+        }*/
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-//        if (null != mapView) {
-//            mapView.onResume();
-//        }
+        /*if (null != mapView) {
+            mapView.onResume();
+        }*/
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        if (mapView != null) {
-//            mapView.onPause();
-//        }
-//        if (mapRender != null) {
-//            // save memory
-//            mapRender.clear();
-//        }
+        /*if (mapView != null) {
+            mapView.onPause();
+        }
+        if (mapRender != null) {
+            // save memory
+            mapRender.clear();
+        }*/
     }
 
     @Override
     public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
-//        if (mapView != null) {
-//            mapView.onSaveInstanceState(outState);
-//        }
+        /*if (mapView != null) {
+            mapView.onSaveInstanceState(outState);
+        }*/
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-//        if (mapView != null) {
-//            mapView.onLowMemory();
-//        }
+        /*if (mapView != null) {
+            mapView.onLowMemory();
+        }*/
     }
 }

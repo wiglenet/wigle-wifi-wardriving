@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -44,6 +45,7 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.background.UniqueTaskExecutorService;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -55,10 +57,12 @@ import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.StatsUtil;
 
 import org.json.JSONObject;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,6 +89,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private static final long QUEUE_WARN_DEPTH = 500L;
     private int dbQueueTextColor;
+
+    private NumberFormat distanceNumberFormat;
 
     // rank stats data
     public static final String PREF_RANK = "rank";
@@ -125,8 +131,23 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public Set<String> runNetworks;
         public Set<String> runBtNetworks;
         public QueryArgs queryArgs;
-        public ConcurrentLinkedHashMap<String,Network> networkCache;
+        public final ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;
+        public final UniqueTaskExecutorService executorService;
+
+        LameStatic() {
+            final long maxMemory = Runtime.getRuntime().maxMemory();
+            int cacheSize = 128;
+            if (maxMemory > 400_000_000L) {
+                cacheSize = 4000; // cap at 4,000
+            }
+            else if (maxMemory > 50_000_000L) {
+                cacheSize = (int)(maxMemory / 100_000); // 100MiB == 1000 cache
+            }
+            Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
+            networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
+            executorService = new UniqueTaskExecutorService(1);
+        }
     }
     public static final LameStatic lameStatic = new LameStatic();
 
@@ -135,18 +156,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private boolean animating = false;
     private AnimatedVectorDrawableCompat scanningAnimation = null;
 
-    static {
-        final long maxMemory = Runtime.getRuntime().maxMemory();
-        int cacheSize = 128;
-        if (maxMemory > 400_000_000L) {
-            cacheSize = 4000; // cap at 4,000
-        }
-        else if (maxMemory > 50_000_000L) {
-            cacheSize = (int)(maxMemory / 100_000); // 100MiB == 1000 cache
-        }
-        Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
-        lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
-    }
+    private SharedPreferences prefs;
 
     /**
      * for the doing of things
@@ -154,13 +164,17 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public ExecutorService executor;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final Activity a = getActivity();
+        if (null != a) {
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        }
         final View view = inflater.inflate(R.layout.list, container, false);
         final State state = MainActivity.getStaticState();
         final TextView tv = view.findViewById( R.id.db_status );
         dbQueueTextColor = tv.getCurrentTextColor();
         Logging.info("setupUploadButton");
-        setupUploadButton(view);
+        setupUploadButton(view, prefs);
         Logging.info("setupList");
         setupList(view);
         Logging.info("setNetCountUI");
@@ -170,6 +184,17 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         Logging.info("setupLocation");
         setupLocation(view);
         dbFormat.setGroupingUsed(false);
+
+        final Configuration conf = getResources().getConfiguration();
+        Locale locale = null;
+        if (null != conf && null != conf.getLocales()) {
+            locale = conf.getLocales().get(0);
+        }
+        if (null == locale) {
+            locale = Locale.US;
+        }
+        distanceNumberFormat = NumberFormat.getNumberInstance(locale);
+        distanceNumberFormat.setMaximumFractionDigits(2);
 
         return view;
     }
@@ -215,12 +240,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         //ALIBI: the number of async requests to perform.
         final Handler handler = new Handler(Looper.getMainLooper());
-        TextView tv = view.findViewById( R.id.stats_run );
-        long netCount = state.wifiReceiver.getRunNetworkCount();
-        if (null != state.bluetoothReceiver){
-            netCount += state.bluetoothReceiver.getRunNetworkCount();
-        }
-        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount));
         executor.execute(() -> {
             final long count = state.dbHelper.getNewWifiCount();
             handler.post(() -> {
@@ -228,7 +247,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 text.setText( UINumberFormat.counterFormat(count) );
             });
         });
-        tv = view.findViewById( R.id.stats_cell );
+        TextView tv = view.findViewById( R.id.stats_cell );
         tv.setText( UINumberFormat.counterFormat(lameStatic.newCells));
         executor.execute(() -> {
             final long count = state.dbHelper.getNewBtCount();
@@ -237,6 +256,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 text.setText( UINumberFormat.counterFormat(count) );
             });
         });
+        final long unUploaded = StatsUtil.newNetsSinceUpload(prefs);
+        tv = view.findViewById( R.id.stats_unuploaded );
+        tv.setText( UINumberFormat.counterFormat(unUploaded));
         executor.execute(() -> {
             final long count = state.dbHelper.getNetworkCount();
             handler.post(() -> {
@@ -292,7 +314,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 Logging.error("Null activity context - can't set animation");
             }
 
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             String quickPausePref = prefs.getString(PreferenceKeys.PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
             if (!QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) {
                 scanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.off));
@@ -329,7 +350,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
     }
 
-    public void setScanningStatusIndicator(boolean scanning) {
+    public void setScanningStatusIndicator(final boolean scanning) {
         View view = getView();
         if (view != null) {
             final ImageButton scanningImageButton = view.findViewById(R.id.scanning);
@@ -345,6 +366,33 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     }
 
+    public void setGpsFixIndicator(final boolean locked) {
+        View view = getView();
+        if (view != null) {
+            final View gpsFixContainer = view.findViewById(R.id.gps_area);
+            final View gpsSearchingContainer = view.findViewById(R.id.gps_searching);
+            final ImageView searchingGps = view.findViewById(R.id.gps_searching_anim);
+            if (locked) {
+                if (null != searchingGps) {
+                    AnimatedVectorDrawable animatedVectorDrawable =  (AnimatedVectorDrawable) searchingGps.getDrawable();
+                    if (null != animatedVectorDrawable) {
+                        animatedVectorDrawable.stop();
+                    }
+                }
+                gpsSearchingContainer.setVisibility(GONE);
+                gpsFixContainer.setVisibility(VISIBLE);
+            } else {
+                if (null != searchingGps) {
+                    AnimatedVectorDrawable animatedVectorDrawable =  (AnimatedVectorDrawable) searchingGps.getDrawable();
+                    if (null != animatedVectorDrawable) {
+                        animatedVectorDrawable.start();
+                    }
+                }
+                gpsFixContainer.setVisibility(GONE);
+                gpsSearchingContainer.setVisibility(VISIBLE);
+            }
+        }
+    }
     @Override
     public void onPause() {
         Logging.info("LIST: paused.");
@@ -363,6 +411,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         super.onResume();
         final Activity a = getActivity();
         if (null != a) {
+            if (null == prefs) {
+                prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            }
             a.setTitle(R.string.list_app_name);
         }
         State state = MainActivity.getStaticState();
@@ -413,15 +464,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_MAP, 0, getString(R.string.tab_map));
-        item.setIcon( android.R.drawable.ic_menu_mapmode );
+        item.setIcon(R.drawable.map );
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-        item.setIcon(android.R.drawable.ic_menu_manage);
+        item.setIcon(R.drawable.filter);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
-        item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
+        item.setIcon(R.drawable.sort);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         final MainActivity main = MainActivity.getMainActivity(this);
@@ -436,7 +487,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
             item = menu.add(0, MENU_MUTE, 0,
                     muted ? getString(R.string.play) : getString(R.string.mute));
@@ -493,7 +543,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             case MENU_MUTE:
                 if (null != a) {
-                    final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                     boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
                     muted = !muted;
                     Editor editor = prefs.edit();
@@ -623,7 +673,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         // have to redo linkages/listeners
         final View v = getView();
         if (null != v) {
-            setupUploadButton(v);
+            setupUploadButton(v, prefs);
             setNetCountUI(state, v);
             if (null != main) {
                 setLocationUI(main, v);
@@ -637,7 +687,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupList(final View view ) {
         State state = MainActivity.getStaticState();
         if (null != state && state.listAdapter == null) {
-            state.listAdapter = new SetNetworkListAdapter(requireActivity().getBaseContext(), R.layout.row );
+            state.listAdapter = new SetNetworkListAdapter(requireActivity().getBaseContext(), false, R.layout.row );
         }
         // always set our current list adapter
         if (null != state) {
@@ -700,25 +750,25 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             String latText;
             if ( location == null ) {
                 if ( main.isScanning() ) {
-                    latText = getString(R.string.list_waiting_gps);
-                }
-                else {
-                    latText = getString(R.string.list_scanning_off);
+                    latText = "";
+                    setGpsFixIndicator(false);
+                } else {
+                    latText = getString(R.string.list_scanning_off); //TODO: perhaps a parallel GPS-disabled replacement display?
                     setScanningStatusIndicator(false);
                 }
-            }
-            else {
+            } else {
+                setGpsFixIndicator(true);
                 latText = state.numberFormat8.format( location.getLatitude() );
             }
             tv.setText( getString(R.string.list_short_lat, latText ));
-
             tv = view.findViewById( R.id.lon_text);
             tv.setText( getString(R.string.list_short_lon, (location == null) ? "" : state.numberFormat8.format( location.getLongitude() )) );
 
             tv = view.findViewById( R.id.speed_text);
             final Activity a = getActivity();
             if (null != a) {
-                tv.setText(getString(R.string.list_speed, (location == null) ? "" : metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed())));
+                tv.setText(getString(R.string.list_speed, (location == null) ? "" :
+                        metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed(), prefs)));
             }
 
             TextView tv4 = view.findViewById( R.id.accuracy_text);
@@ -727,25 +777,22 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 tv4.setText( "" );
                 tv5.setText( "" );
             } else {
-                final SharedPreferences prefs = main.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 final String distString = UINumberFormat.metersToString(prefs,
                         state.numberFormat0, main, location.getAccuracy(), true);
                 tv4.setText("+/- " + distString);
                 final String accString = UINumberFormat.metersToString(prefs,
                         state.numberFormat0, main, (float) location.getAltitude(), true);
                 tv5.setText(getString(R.string.list_short_alt, accString));
+                setRunDistUI(view, prefs);
             }
-        }
-        catch ( IncompatibleClassChangeError ex ) {
+        } catch ( IncompatibleClassChangeError ex ) {
             // yeah, saw this in the wild, who knows.
             Logging.error( "wierd ex: " + ex, ex);
         }
     }
 
     public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,
-                                                       final float metersPerSecond ) {
-
-        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
+                                                       final float metersPerSecond, final SharedPreferences prefs ) {
         final boolean metric = prefs.getBoolean( PreferenceKeys.PREF_METRIC, false );
 
         String retval;
@@ -758,7 +805,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         return retval;
     }
 
-    private void setupUploadButton( final View view ) {
+    private void setupUploadButton( final View view, final SharedPreferences prefs) {
         final Button button = view.findViewById( R.id.upload_button );
         if (null != button) {
             MainActivity m = MainActivity.getMainActivity();
@@ -773,7 +820,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 }
                 final FragmentActivity a = getActivity();
                 if (null != a) {
-                    final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                     final boolean userConfirmed = prefs.getBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, false);
                     final State state = MainActivity.getStaticState();
 
@@ -787,11 +833,21 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
     }
 
+    private void setRunDistUI(final View view, final SharedPreferences prefs) {
+        if (prefs != null && distanceNumberFormat != null) {
+            float dist = prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f);
+            final String distString = UINumberFormat.metersToString(prefs,
+                    distanceNumberFormat, getActivity(), dist, true);
+            TextView tv = view.findViewById(R.id.list_run_distance);
+            tv.setText(distString);
+        }
+    }
+
     public void makeUploadDialog(final MainActivity main) {
         final SharedPreferences prefs = main.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
         final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
-        final String username = beAnonymous? "anonymous":
-                prefs.getString( PreferenceKeys.PREF_USERNAME, "anonymous" );
+        final String username = beAnonymous? ANONYMOUS:
+                prefs.getString( PreferenceKeys.PREF_USERNAME, ANONYMOUS );
 
         final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
         final FragmentActivity a = getActivity();

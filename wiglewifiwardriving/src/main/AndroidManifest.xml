@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    android:versionCode="280"
-    android:versionName="2.80">
+    android:versionCode="303"
+    android:versionName="2.103">
 
+    <attribution android:tag="@string/empty"
+        android:label="@string/app_name" />
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -30,6 +33,7 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- permission for start-on-boot -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -72,10 +76,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:resizeableActivity="true"
-        android:theme="@style/Theme.AppCompat.DayNight">
+        android:theme="@style/Theme.AppCompat.DayNight"
+        android:enableOnBackInvokedCallback="true"
+        android:supportsRtl="true"
+        tools:targetApi="tiramisu">
         <activity
             android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|uiMode"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:label="@string/list_app_name"
             android:exported="true"
             android:launchMode="singleTask">
@@ -89,8 +96,8 @@
             android:label="@string/title_activity_activate"
             android:exported="true"
             android:parentActivityName=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
-            <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.wigle.wigleandroid.MainActivity" />
@@ -105,21 +112,24 @@
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/error_report_name"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask"
+            android:theme="@style/ChildActivityTheme"/>
         <activity
             android:name=".DebugActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/menu_debug"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme"/>
         <activity
             android:name=".SpeechActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/speech_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -132,7 +142,8 @@
             android:exported="false"
             android:label="@string/network_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -143,7 +154,8 @@
             android:name=".RegistrationActivity"
             android:parentActivityName=".MainActivity"
             android:exported="true"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -156,12 +168,12 @@
             android:exported="false"
             android:label="@string/filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
-
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".MainActivity"/>
         </activity>
         <activity
             android:name=".MacFilterActivity"
@@ -169,7 +181,8 @@
             android:exported="false"
             android:label="@string/mac_filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".FilterActivity">
+            android:parentActivityName=".FilterActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -177,12 +190,29 @@
                 android:value=".FilterActivity" />
         </activity>
         <activity
+            android:name=".MacFinderActivity"
+            android:label="@string/title_activity_activate"
+            android:exported="true"
+            android:parentActivityName=".MacFilterActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:theme="@style/ChildActivityTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.wigle.wigleandroid.MacFilterActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="net.wigle.wigleandroid" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MapFilterActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/mapfilter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -195,7 +225,8 @@
             android:exported="false"
             android:label="@string/dbresult_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -208,7 +239,8 @@
             android:exported="false"
             android:label="@string/manage_gpx"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -260,19 +292,22 @@
                 android:resource="@xml/csvgz_paths" />
         </provider>
         <receiver android:name=".listener.TerminationReceiver"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />
             </intent-filter>
         </receiver>
         <receiver android:name=".listener.UploadReceiver"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.UPLOAD" />
             </intent-filter>
         </receiver>
         <receiver android:name=".listener.ScanControlReceiver"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.SCAN" />
             </intent-filter>

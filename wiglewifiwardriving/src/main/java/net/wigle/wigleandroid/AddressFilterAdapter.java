@@ -5,23 +5,27 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * It seems obvious that you'd want to implement all this junk in every mobile phone app that has a list.
  * Created by rksh on 20170901
  */
 
-public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
+public class AddressFilterAdapter extends ArrayAdapter<String> implements ListAdapter {
 
     //enough to make a list and update prefs from it.
     private final List<String> list;
@@ -30,8 +34,9 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
     private final String filterKey;
 
 
-
-    public AddressFilterAdapter(List<String> list, Context context, final SharedPreferences prefs, final String filterKey) {
+    public AddressFilterAdapter(List<String> list, final int resource, Context context,
+                                final SharedPreferences prefs, final String filterKey) {
+        super(context, resource ,list);
         this.list = list;
         this.context = context;
         this.prefs = prefs;
@@ -44,7 +49,7 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
     }
 
     @Override
-    public Object getItem(int pos) {
+    public String getItem(int pos) {
         return list.get(pos);
     }
 
@@ -59,17 +64,39 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
         return 0L;
     }
 
+    @NonNull
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.address_filter_list_item, null);
+            if (PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS.equals(filterKey)) {
+                view = inflater.inflate(R.layout.ble_mfgr_id_filter_list_item, parent, false);
+            } else {
+                view = inflater.inflate(R.layout.address_filter_list_item, parent, false);
+            }
         }
 
         TextView listItemText = view.findViewById(R.id.list_item_string);
-        listItemText.setText(list.get(position));
+        final String address = list.get(position);
+        listItemText.setText(address);
 
+        TextView listItemOui = view.findViewById(R.id.address_oui);
+        if (null != listItemOui) {
+
+            final String lookup = address.replace(":", "").toUpperCase(Locale.ROOT);
+            if (ListFragment.lameStatic.oui != null && lookup.length() >= 6) {
+                String result = ListFragment.lameStatic.oui.getOui(lookup.substring(0, 6));
+                listItemOui.setText(result);
+            } else if (lookup.length() == 4) {
+                try {
+                    String result = MainActivity.getMainActivity().getBleMfgr(Integer.parseInt(address, 16));
+                    listItemOui.setText(result);
+                } catch (Exception e) {
+                    Logging.error("unable to lookup BLE manufacturer: ",e);
+                }
+            }
+        }
         ImageButton deleteBtn = view.findViewById(R.id.delete_btn);
 
         deleteBtn.setOnClickListener(v -> {

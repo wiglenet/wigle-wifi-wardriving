@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE WiFi – Beállítások</string>
     <string name="mapping_app_name">WiGLE WiFi – Térkép</string>
     <string name="dashboard_app_name">WiGLE WiFi – Áttekintés</string>
-    <string name="error_report_name">WiGLE WiFi – Legfrissebb hibajelentés</string>
+    <string name="error_report_name">Legfrissebb hibajelentés</string>
     <string name="speech_name">WiGLE Wifi – Beszédbeállítások</string>
     <string name="network_activity_name">WiGLE WiFi – Hálózat</string>
     <string name="data_activity_name">WiGLE WiFi – Adatbázis</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Csatorna:</string>
     <string name="network_observations">Megfigyelések:</string>
     <string name="network_querying">(lekérés&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Jelszó megjelenítése</string>
     <string name="setting_db_marker">Adatbázis-jelölő (ahol a feltöltés kezdődik):</string>
     <string name="setting_high_up">Legmagasabb feltöltésazonosító:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Regisztráció&lt;/a&gt; @WiGLE.net vagy &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktiválás most QR-kóddal&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID-ok:</string>
     <string name="ble_vendor">BLE szállítói azonosító:</string>
+    <string name="speech_new_bt">Új bluetooth a DB-hez</string>
+    <string name="tts_new_bt">Új bluetooth</string>
+    <string name="gnss_full">Használja a GNSS teljes követést (nagy akkumulátorlemerülés)</string>
+    <string name="search_area">Keresési terület:</string>
+    <string name="queued_jobs">(%1$d sorban álló feladat)</string>
+    <string name="duplicate_job">Egy ilyen típusú feladat már fut, vagy futásra vár.</string>
+    <string name="start_survey">Helyszíni felmérés</string>
+    <string name="end_survey">A felmérés befejezése</string>
+    <string name="confirm_survey">A „%1$s” gombra KELL kattintania a felmérés kitöltéséhez és az eredmények mentéséhez, mielőtt kilép a tevékenységből!\n\n Javasoljuk, hogy a legjobb eredmény érdekében állítsa be a „%2$s” szkennelést az utazási sebesség beállításainál. (Ennek az akkumulátor következményei lesznek)</string>
+    <string name="interrogate_ble">kérjen részleteket</string>
+    <string name="ble_mfgr_title">Gyártó</string>
+    <string name="ble_model_title">Modell</string>
+    <string name="ble_serial_title">Sorozatszám</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardver</string>
+    <string name="ble_sw_title">Szoftver</string>
+    <string name="ble_name_title">Név</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Megjelenés</string>
+    <string name="alert_filter_button">Figyelmeztetés MAC/OUI címekkel kapcsolatban…</string>
+    <string name="status_too_many">Túl sok az időkereten belül</string>
+    <string name="filter_show_wifi">WiFi megjelenítése</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic megjelenítése</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Elrejtés</string>
+    <string name="alert">Figyelmeztetés</string>
 </resources>

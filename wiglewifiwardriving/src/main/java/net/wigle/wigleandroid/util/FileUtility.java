@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid.util;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 
@@ -22,7 +21,6 @@ public class FileUtility {
     private final static String APP_SUB_DIR = "/"+APP_DIR+"/";
     private static final String GPX_DIR = APP_SUB_DIR+"gpx/";
     private final static String KML_DIR = "app_kml";
-    private final static String KML_DIR_BASE = "kml";
     private static final String M8B_DIR = APP_SUB_DIR+"m8b/";
     private final static String SQLITE_BACKUPS_DIR = "sqlite";
 
@@ -49,11 +47,7 @@ public class FileUtility {
     public static long getFreeBytes(File path) {
         try {
             StatFs stats = new StatFs(path.getAbsolutePath());
-            if (Build.VERSION.SDK_INT >= 18) {
-                return stats.getAvailableBlocksLong() * stats.getBlockSizeLong();
-            } else {
-                return (long) (stats.getAvailableBlocks() * stats.getBlockSize());
-            }
+            return stats.getAvailableBlocksLong() * stats.getBlockSizeLong();
         } catch (Exception ex) {
             // if we can't determine free space, be optimistic. Possibly because of missing permission?
             Logging.error("Unable to determine free space: ",ex);
@@ -162,8 +156,10 @@ public class FileUtility {
                                                        final String dir) throws IOException {
         File path = new File(context.getFilesDir(), dir);
         if (!path.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            path.mkdir();
+            final boolean createdDirs = path.mkdir();
+            if (! createdDirs) {
+                Logging.error("Failed to create directories for: "+dir+" - "+filename);
+            }
         }
         if (path.exists() && path.isDirectory()) {
             //DEBUG: MainActivity.info("... file output directory found");
@@ -188,11 +184,17 @@ public class FileUtility {
     /**
      * return the m8b dir if we're using external storage
      * @return external file location if we're using external/otherwise null
-     * //TODO: useful to return the true path if !hasSD?
      */
-    public static String getM8bPath() {
+    public static String getM8bPath(final Context context) {
         if ( hasSD() ) {
-            return safeFilePath(Environment.getExternalStorageDirectory()) + M8B_DIR;
+            final String externalPath = safeFilePath(Environment.getExternalStorageDirectory()) + M8B_DIR;
+            Logging.debug("Using m8b (external) "+ externalPath);
+            return externalPath;
+        } else if (context != null) {
+            final String internalPath = safeFilePath(context.getCacheDir())+"/";
+            //= safeFilePath(context.getFilesDir()) + M8B_DIR; // if we need to return to files-path for future sharing perms (1/2)
+            Logging.debug("Using m8b (internal)"+ internalPath);
+            return internalPath;
         }
         return null;
     }
@@ -200,11 +202,17 @@ public class FileUtility {
     /**
      * return the GPX dir if we're using external storage
      * @return external file location if we're using external/otherwise null
-     * //TODO: useful to return the true path if !hasSD?
      */
-    public static String getGpxPath() {
+    public static String getGpxPath(final Context context) {
         if ( hasSD() ) {
-            return safeFilePath(Environment.getExternalStorageDirectory()) + GPX_DIR;
+            final String externalPath = safeFilePath(Environment.getExternalStorageDirectory()) + GPX_DIR;
+            Logging.debug("Using gpx (external) "+ externalPath);
+            return externalPath;
+        } else if (context != null) {
+            final String internalPath = safeFilePath(context.getCacheDir())+"/";
+            //= safeFilePath(context.getFilesDir()) + GPX_DIR; // if we need to return to files-path for future sharing perms (2/2)
+            Logging.debug("Using gpx (internal)"+ internalPath);
+            return internalPath;
         }
         return null;
     }
@@ -212,6 +220,7 @@ public class FileUtility {
     /**
      * just get the KML location for internal purposes; should be compatible with the results of
      * getKmlDownloadFile
+     * TODO: switch to use cache dir in case of no-external
      * @param context the context of the application
      * @return the string path suitable for intent construction
      */

@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -26,9 +27,8 @@ import net.wigle.wigleandroid.util.RouteExportSelector;
 
 import java.text.DateFormat;
 
-import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
-
 public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.ViewHolder>  {
+    public static final int EXPORT_GPX_DIALOG = 130;
 
     private final Context context;
     private final FragmentActivity fragmentActivity;
@@ -140,7 +140,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GpxRecyclerAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull GpxRecyclerAdapter.ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         if (!dataValid) {
             throw new IllegalStateException("Invalid cursor / dataValid flag onBindViewHolder");
         }
@@ -156,25 +156,26 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
             selectedPos = position; //.getLayoutPosition();
             notifyItemChanged(selectedPos);
             //DEBUG: MainActivity.info("get route "+clickedId);
-//            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId)) {
-//                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-//                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
-//                if (null == routeCursor) {
-//                    Logging.info("null route cursor; not mapping");
-//                } else {
-//                    PolylineRoute newRoute = new PolylineRoute();
-//                    for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-//                        final float lat = routeCursor.getFloat(0);
-//                        final float lon = routeCursor.getFloat(1);
-//                        //final long time = routeCursor.getLong(2);
-//                        newRoute.addLatLng(lat, lon, mapMode, nightMode);
-//                    }
-//                    Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
-//                    configurable.configureMapForRoute(newRoute);
-//                }
-//            } catch (Exception e) {
-//                Logging.error("Unable to add route: ",e);
-//            }
+            /*try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId)) {
+                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
+                if (null == routeCursor) {
+                    Logging.info("null route cursor; not mapping");
+                } else {
+                    PolylineRoute newRoute = new PolylineRoute();
+                    for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                        final float lat = routeCursor.getFloat(0);
+                        final float lon = routeCursor.getFloat(1);
+                        //final float ele = routeCursor.getFloat(2);
+                        //final long time = routeCursor.getLong(3);
+                        newRoute.addLatLng(lat, lon, mapMode, nightMode);
+                    }
+                    Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
+                    configurable.configureMapForRoute(newRoute);
+                }
+            } catch (Exception e) {
+                Logging.error("Unable to add route: ",e);
+            }*/
         });
         holder.shareButton.setOnClickListener(v -> {
             Logging.info("share route "+clickedId);

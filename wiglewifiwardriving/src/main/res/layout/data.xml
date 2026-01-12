@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:clipToPadding="false">
 <LinearLayout
     android:id="@+id/data_tools_layout"
     android:orientation="vertical"
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="6dip">
 
-        <Button android:id="@+id/search_button"
+        <Button android:id="@+id/perform_search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_button"

@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - إعدادات</string>
     <string name="mapping_app_name">WiGLE Wifi - خريطة الشارع المفتوح</string>
     <string name="dashboard_app_name">WiGLE Wifi - لوحة القيادة</string>
-    <string name="error_report_name">WiGLE Wifi - Most Recent Error Report</string>
+    <string name="error_report_name">أحدث تقرير عن الخطأ</string>
     <string name="speech_name">WiGLE Wifi - Speech Settings</string>
     <string name="network_activity_name">WiGLE Wifi - شبكة</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Channel:</string>
     <string name="network_observations">Observations:</string>
     <string name="network_querying">(querying&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Show password</string>
     <string name="setting_db_marker">DB Marker (where uploads start from):</string>
     <string name="setting_high_up">Highest uploaded id:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>سجل في&lt;/a&gt; @WiGLE.net أو &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;تفعيل الآن مع رمز الاستجابة السريعة&lt;/a&gt;</string>
     <string name="ble_services">:UUIDs بليه</string>
     <string name="ble_vendor">معرف البائع بليه:</string>
+    <string name="speech_new_bt">بلوتوث جديد لقاعدة البيانات</string>
+    <string name="tts_new_bt">بلوتوث جديد</string>
+    <string name="gnss_full">استخدم التتبع الكامل GNSS (استنزاف كبير للبطارية)</string>
+    <string name="search_area">منطقة البحث:</string>
+    <string name="queued_jobs">(%1$d مهمة في قائمة الانتظار)</string>
+    <string name="duplicate_job">هناك مهمة من هذا النوع قيد التشغيل بالفعل أو في انتظار التشغيل.</string>
+    <string name="start_survey">استبيان عن الموقع</string>
+    <string name="end_survey">نهاية المسح</string>
+    <string name="confirm_survey">يجب عليك النقر فوق \"%1$s\" لإكمال الاستبيان وحفظ النتائج قبل الخروج من النشاط!\n\n نوصي بتعيين المسح \"%2$s\" ضمن الإعدادات الخاصة بسرعة سفرك للحصول على أفضل النتائج. (سيكون لهذا عواقب على البطارية)</string>
+    <string name="interrogate_ble">الاستعلام عن التفاصيل</string>
+    <string name="ble_mfgr_title">الشركة المصنعة</string>
+    <string name="ble_model_title">نموذج</string>
+    <string name="ble_serial_title">الرقم التسلسلي</string>
+    <string name="ble_firmware_title">البرامج الثابتة</string>
+    <string name="ble_hw_title">الأجهزة</string>
+    <string name="ble_sw_title">برمجة</string>
+    <string name="ble_name_title">اسم</string>
+    <string name="ble_pnp_title">معرف بي إن بي</string>
+    <string name="ble_appearance_title">مظهر</string>
+    <string name="alert_filter_button">تنبيه بشأن أجهزة MAC/OUIs…</string>
+    <string name="status_too_many">كثير جدًا في الإطار الزمني</string>
+    <string name="filter_show_wifi">إظهار WiFi</string>
+    <string name="filter_show_bt_classic">إظهار Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">إخفاء</string>
+    <string name="alert">تنبيه</string>
 </resources>

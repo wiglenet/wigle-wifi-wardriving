@@ -13,8 +13,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import net.wigle.wigleandroid.model.NewsItem;
 import net.wigle.wigleandroid.model.api.WiGLENews;
@@ -50,7 +50,7 @@ public class NewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
         Logging.info("NEWS: onCreateView. orientation: " + orientation);
-        final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.news, container, false);
+        final RelativeLayout rootView = (RelativeLayout) inflater.inflate(R.layout.news, container, false);
         setupListView(rootView);
 
         MainActivity.State s = MainActivity.getStaticState();

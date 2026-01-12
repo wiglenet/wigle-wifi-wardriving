@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi – Nastavení</string>
     <string name="mapping_app_name">WiGLE Wifi – Mapa</string>
     <string name="dashboard_app_name">WiGLE Wifi – Přehled</string>
-    <string name="error_report_name">WiGLE Wifi – Poslední chybové hlášení</string>
+    <string name="error_report_name">Poslední chybové hlášení</string>
     <string name="speech_name">WiGLE Wifi – Nastavení TTS</string>
     <string name="network_activity_name">WiGLE Wifi – Síť</string>
     <string name="data_activity_name">WiGLE Wifi – Databáze</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Kanál:</string>
     <string name="network_observations">Počet spatření:</string>
     <string name="network_querying">(dotazování&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Ukázat heslo</string>
     <string name="setting_db_marker">Značka DB (odkud začínají záznamy):</string>
     <string name="setting_high_up">Nejvyšší nahrané id:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Zaregistrujte se na&lt;/a&gt; @WiGLE.net nebo &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivujte nyní pomocí QR kódu&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID:</string>
     <string name="ble_vendor">ID dodavatele BLE:</string>
+    <string name="speech_new_bt">Nové bluetooth do DB</string>
+    <string name="tts_new_bt">Nové bluetooth</string>
+    <string name="gnss_full">Použít úplné sledování GNSS (velká spotřeba baterie)</string>
+    <string name="search_area">Oblast hledání:</string>
+    <string name="queued_jobs">(%1$d úkolů ve frontě)</string>
+    <string name="duplicate_job">Úloha tohoto typu již běží nebo čeká na spuštění.</string>
+    <string name="start_survey">Průzkum lokality</string>
+    <string name="end_survey">Ukončit průzkum</string>
+    <string name="confirm_survey">Před ukončením aktivity MUSÍTE kliknout na „%1$s“, abyste dokončili průzkum a uložili své výsledky!\n\n Pro dosažení nejlepších výsledků doporučujeme nastavit skenování „%2$s“ v nastavení rychlosti vašeho cestování. (Bude to mít důsledky pro baterii)</string>
+    <string name="interrogate_ble">dotaz na detail</string>
+    <string name="ble_mfgr_title">Výrobce</string>
+    <string name="ble_model_title">Model</string>
+    <string name="ble_serial_title">Sériové číslo</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Železářské zboží</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Jméno</string>
+    <string name="ble_pnp_title">ID PnP</string>
+    <string name="ble_appearance_title">Vzhled</string>
+    <string name="alert_filter_button">Upozornění na MAC/OUI…</string>
+    <string name="status_too_many">Příliš mnoho v daném časovém rámci</string>
+    <string name="filter_show_wifi">Zobrazit WiFi</string>
+    <string name="filter_show_bt_classic">Zobrazit Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Skrýt</string>
+    <string name="alert">Upozornění</string>
 </resources>

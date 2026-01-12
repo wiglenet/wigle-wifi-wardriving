@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
-import android.os.ParcelUuid;
 
 import androidx.annotation.NonNull;
 
@@ -50,6 +49,7 @@ public final class Network {
 
     private int frequency;
     private int level;
+    private Long lastTime;
     private Integer channel;
     private LatLng geoPoint;
     private boolean isNew;
@@ -58,19 +58,23 @@ public final class Network {
     private Integer bleMfgrId;
     private String bleMfgr;
 
+    private Integer bleAddressType = null;
+
+    private boolean passpoint;
+
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
 
     private static final String BAR_STRING = " | ";
-    private static final String WPA3_CAP = "[WPA3";
-    private static final String SAE_CAP = "SAE";
-    private static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
+    public static final String WPA3_CAP = "[WPA3";
+    public static final String SAE_CAP = "SAE";
+    public static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
     //private static final String OWE_CAP = "OWE";    //handles both OWE and OWE_TRANSITION
     //TODO: how we do distinguish between RSN-EAP-CCMP WPA2 and WPA3 implementations?
-    private static final String WPA2_CAP = "[WPA2";
-    private static final String RSN_CAP = "[RSN";
-    private static final String WPA_CAP = "[WPA";
-    private static final String WEP_CAP = "[WEP";
+    public static final String WPA2_CAP = "[WPA2";
+    public static final String RSN_CAP = "[RSN";
+    public static final String WPA_CAP = "[WPA-";
+    public static final String WEP_CAP = "[WEP";
 
     // faster than enums
     public static final int CRYPTO_NONE = 0;
@@ -79,41 +83,90 @@ public final class Network {
     public static final int CRYPTO_WPA2 = 3;
     public static final int CRYPTO_WPA3 = 4;
 
+    public enum CryptoType {
+        None(CRYPTO_NONE), WEP(CRYPTO_WEP), WPA(CRYPTO_WPA), WPA2(CRYPTO_WPA2), WPA3(CRYPTO_WPA3);
+        private final int value;
+
+        CryptoType(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        @NonNull
+        public String toString() {
+            switch (value) {
+                case CRYPTO_NONE:
+                    return "None";
+                case CRYPTO_WEP:
+                    return "WEP";
+                case CRYPTO_WPA:
+                    return "WPA";
+                case CRYPTO_WPA2:
+                    return "WPA2";
+                case CRYPTO_WPA3:
+                    return "WPA3";
+                default:
+                    return "Unknown";
+            }
+        }
+    }
     public enum NetworkBand {
         WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED
     }
+
+    private String concatenatedRcois;
+
     /**
-     * convenience constructor
+     * convenience constructor, WiFi-specific
      * @param scanResult a result from a wifi scan
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null, null);
+                scanResult.level,  NetworkType.WIFI, null, null, null, null, null, scanResult.isPasspointNetwork());
     }
+
+    // load from CSV/observation list
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null, null, null);
     }
 
+    // new Network, no location
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId,  null);
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime, final Integer bleAddressType) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, bleAddressType, null);
     }
 
+    // for WiFiSearchResponse
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-        final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng);
+                    final int level, final NetworkType type, final LatLng latLng ) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null, null, null);
     }
 
-    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-        final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng ) {
+    private Network(final String bssid, final String ssid, final int frequency, final String capabilities,
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId,
+                    final LatLng latLng, final Long lastTime, final Integer bleAddressType, final Boolean passpoint ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        this.bleMfgrId = bleMfgrId;
+        if (null != passpoint && passpoint) {
+            this.passpoint = true;
+        } else {
+            this.passpoint = false;
+        }
+        if (bleAddressType != null) {
+            this.bleAddressType = bleAddressType;
+        }
+        if (null != lastTime && lastTime > 0L) {
+            this.lastTime = lastTime;
+        }
+        if (bleMfgrId != null) this.bleMfgrId = bleMfgrId;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
         } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
@@ -221,6 +274,27 @@ public final class Network {
         this.capabilities = capabilities;
     }
 
+    public String getRcois() {
+        return concatenatedRcois;
+    }
+
+    public String getRcoisOrBlank() {
+        final String result = concatenatedRcois;
+        return result == null ? "" : result;
+    }
+
+    public Long getLastTime() {
+        return lastTime;
+    }
+
+    public void setRcois(final String concatenatedRcois) {
+        this.concatenatedRcois = concatenatedRcois;
+    }
+
+    public boolean isPasspoint() {
+        return this.passpoint;
+    }
+
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
     public void setFrequency( final int frequency) {
         this.frequency = frequency;
@@ -259,6 +333,17 @@ public final class Network {
             bleMfgr = lookupMfgrByMfgrId(id);
         }
     }
+
+    public Integer getBleAddressType() {
+        return bleAddressType;
+    }
+
+    public void setBleAddressType(final Integer bleAddressType) {
+        if (null != bleAddressType && (null == this.bleAddressType || bleAddressType > this.bleAddressType)) {
+            this.bleAddressType = bleAddressType;
+        }
+    }
+
     public void setIsNew() {
         this.isNew = true;
     }
@@ -344,7 +429,7 @@ public final class Network {
                 return bleMfgr;
             }
         }
-        final String lookup = getBssid().replace(":", "").toUpperCase();
+        final String lookup = getBssid().replace(":", "").toUpperCase(Locale.ROOT);
         if (oui != null && lookup.length() >= 9) {
             retval = oui.getOui(lookup.substring(0, 9));
             if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
@@ -357,8 +442,18 @@ public final class Network {
         return bleServiceUuids;
     }
 
+    public String getBleServiceUuidsAsString() {
+        final List<String> current = bleServiceUuids;
+        return current == null ? "" : String.join(" ",current);
+    }
+
     public Integer getBleMfgrId() {
         return bleMfgrId;
+    }
+
+    public int getBleMfgrIdAsInt() {
+        final Integer current = bleMfgrId;
+        return current == null ? 0 : current;
     }
 
     public String getBleMfgr() {
@@ -399,7 +494,7 @@ public final class Network {
     public static Integer frequencyMHzForWiFiChannel(final int channel, final NetworkBand band) {
         NetworkBand bandGuess = band;
         //This isn't sustainable - in SDK 31 and up, android handles this for us, but we need to figure out how to get back to bands from previously incomplete records.
-        if (band == NetworkBand.UNDEFINED.UNDEFINED) {
+        if (band == NetworkBand.UNDEFINED) {
             if (channel <= 14) {
                 bandGuess = NetworkBand.WIFI_2_4_GHZ;
             } else if (channel >= 237 && channel <= 255 ) {

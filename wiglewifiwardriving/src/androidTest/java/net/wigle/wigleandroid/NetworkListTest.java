@@ -12,7 +12,6 @@ import androidx.test.runner.AndroidJUnit4;
 
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
-import net.wigle.wigleandroid.ui.NetworkListAdapter;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.util.Logging;
@@ -101,8 +100,8 @@ public class NetworkListTest {
 
     @Test
     public void testSetBackedList() {
-        Assert.assertTrue(null != context);
-        SetNetworkListAdapter setAdapter = new SetNetworkListAdapter( context, R.layout.row );
+        Assert.assertNotNull(context);
+        SetNetworkListAdapter setAdapter = new SetNetworkListAdapter( context, true, R.layout.row );
         long start = System.currentTimeMillis();
         for (Network net: btleLarge) {
             setAdapter.addBluetoothLe(net);
@@ -138,47 +137,6 @@ public class NetworkListTest {
         setAdapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
         Logging.info(" Re-sorted set-backed in ("+(end-start)+"ms)");
-    }
-
-    @Test
-    public void testOldList() {
-        Assert.assertTrue(null != context);
-        NetworkListAdapter adapter = new NetworkListAdapter( context, R.layout.row );
-        long start = System.currentTimeMillis();
-        for (Network net: btleLarge) {
-            adapter.addBluetoothLe(net);
-        }
-        long end = System.currentTimeMillis();
-        Logging.info(" Added to old in ("+(end-start)+"ms)");
-        start = System.currentTimeMillis();
-        adapter.sort(NetworkListSorter.signalCompare);
-        end = System.currentTimeMillis();
-        Logging.info(" Sorted old in ("+(end-start)+"ms)");
-        start = System.currentTimeMillis();
-        for (Network net: btcLarge) {
-            adapter.enqueueBluetooth(net);
-        }
-        adapter.batchUpdateBt(false, false, true);
-        end = System.currentTimeMillis();
-        Logging.info(" Batch-added BTC to old in ("+(end-start)+"ms)");
-
-        start = System.currentTimeMillis();
-        adapter.sort(NetworkListSorter.signalCompare);
-        end = System.currentTimeMillis();
-        Logging.info(" Re-sorted old in ("+(end-start)+"ms)");
-
-        start = System.currentTimeMillis();
-        for (Network net: btleSmall) {
-            adapter.addBluetoothLe(net);
-        }
-        adapter.batchUpdateBt(true, true, false);
-        end = System.currentTimeMillis();
-        Logging.info(" Destructively batch-added BTLE small to old in ("+(end-start)+"ms)");
-
-        start = System.currentTimeMillis();
-        adapter.sort(NetworkListSorter.signalCompare);
-        end = System.currentTimeMillis();
-        Logging.info(" Re-sorted old in ("+(end-start)+"ms)");
     }
 
     //ALIBI: dup from unit tests because of no-sharing in tests

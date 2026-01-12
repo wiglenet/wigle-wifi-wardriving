@@ -4,39 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+    android:layout_height="fill_parent">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:weightSum="21">
-        <TextView
-            android:id="@+id/stats_run"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:layout_weight="4"
-            android:text="@string/run"
-            tools:text="Run 88.8K"
-            />
+        android:weightSum="21"
+        android:baselineAligned="false">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 app:srcCompat="@drawable/ic_wifi_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run wifi"
+                android:contentDescription="@string/dash_new_wifi"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="wifi new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/stats_wifi"
                 android:textSize="15sp"
                 style="@style/WiFiColor"
@@ -47,23 +39,22 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 app:srcCompat="@drawable/ic_cell_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run cell"
+                android:contentDescription="@string/dash_new_cells"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="cell new vs. run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_cell"
                 android:textSize="15sp"
-                android:layout_weight="1"
                 android:text="@string/stats"
                 style="@style/CellColor"
                 tools:text="888.8 K"
@@ -74,23 +65,22 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 app:srcCompat="@drawable/ic_bt_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run bluetooth"
+                android:contentDescription="@string/dash_new_bt"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="bt new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_bt"
                 android:textSize="15sp"
-                android:layout_weight="1"
                 style="@style/BtColor"
                 tools:text="888.8 K"
                 />
@@ -99,19 +89,46 @@
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="5">
+            android:layout_weight="9"
+            android:gravity="end"
+            tools:ignore="UseCompoundDrawables">
+            <ImageView
+                android:src="@drawable/new_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/new_word"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="@string/new_word"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_unuploaded"
+                android:textSize="15sp"
+                style="@style/UploadColor"
+                tools:text="888.8 K"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="/"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                />
             <ImageView
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run DB"
                 android:paddingTop="3dp"
                 android:paddingStart="1dp"
                 android:paddingEnd="2dp"
-                android:text="database"
+                android:contentDescription="@string/total_seen"
                 app:tint="?attr/colorControlNormal" />
             <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_dbnets"
                 android:textSize="15sp"
@@ -119,13 +136,11 @@
                 />
         </LinearLayout>
     </LinearLayout>
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         >
-
         <Button
             android:id="@+id/upload_button"
             android:layout_width="wrap_content"
@@ -137,60 +152,94 @@
             android:background="@drawable/upload_button"
             android:text="@string/upload_button" />
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="6"
-            >
-            <TextView
+            android:layout_height="match_parent"
+            android:layout_weight="11"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:id="@+id/gps_searching">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/lat_text"
-                android:scrollHorizontally="true"
-                android:ellipsize="end"
-                android:maxLines="1"
+                android:contentDescription="@string/list_waiting_gps"
+                android:src="@drawable/animated_gps_searching"
+                android:scaleType="fitCenter"
+                android:layout_margin="5dp"
+                android:paddingTop="2dp"
+                android:id="@+id/gps_searching_anim"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/gps_searching_text"
                 android:text="@string/list_waiting_gps"
-            />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/lon_text"
-                tools:text="Lon: -108.44456771"
-            />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/speed_text"
-                tools:text="Speed: 88 mph" />
+                android:layout_gravity="center"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                />
         </LinearLayout>
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="5"
-            >
-            <TextView
+            android:layout_height="wrap_content"
+            android:layout_weight="11"
+            android:orientation="horizontal"
+            android:id="@+id/gps_area"
+            android:baselineAligned="false">
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/accuracy_text"
-                tools:text="+/- 160 ft"
+                android:layout_height="fill_parent"
+                android:layout_weight="6"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lat_text"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="Lon: 32.72387801"
+                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lon_text"
+                    tools:text="Lon: -108.44456771"
+                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/speed_text"
+                    tools:text="Speed: 88 mph" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="5"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accuracy_text"
+                    tools:text="+/- 160 ft"
 
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/alt_text"
-                tools:text="Alt: 888 ft"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sats_text"
-                tools:text="Sats: 22"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/alt_text"
+                    tools:text="Alt: 888 ft"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sats_text"
+                    tools:text="Sats: 22"
 
-                />
+                    />
+            </LinearLayout>
         </LinearLayout>
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
@@ -207,8 +256,9 @@
             android:layout_margin="5dip"
             android:layout_width="44dip"
             android:layout_height="44dip"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:visibility="gone"/>
+            android:src="@drawable/no_scan"
+            android:visibility="gone"
+            android:contentDescription="@string/dash_scan_off"/>
         <ImageButton
             android:id="@+id/scanning"
             android:background="#00000000"
@@ -217,12 +267,14 @@
             android:paddingBottom="1dip"
             android:paddingStart="3dip"
             android:layout_margin="5dip"
-            android:layout_width="44dip"
-            android:layout_height="44dip"
+            android:layout_width="46dip"
+            android:layout_height="46dip"
             app:srcCompat="@drawable/ic_wifi_simplified"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:tint="?attr/colorControlNormal"/>
+            app:tint="?attr/colorControlNormal"
+            tools:visibility="visible"
+            android:contentDescription="@string/list_scanning_on"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -230,11 +282,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 		<TextView
+            android:id="@+id/list_run_distance"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:text=""
 			android:layout_weight="4"
             android:layout_gravity="start"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            tools:text="8,888,888 km"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -249,7 +305,6 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/db_status"
-			android:text="-"
 			android:layout_weight="0"
             android:layout_gravity="end"
             android:paddingEnd="5dp"
@@ -264,8 +319,9 @@
         style="@style/DividerColor"
         />
     <ListView android:id="@+id/ListView01"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/list_background"
         android:layout_weight="6"
         tools:listitem="@layout/row"
         />

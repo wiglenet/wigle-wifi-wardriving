@@ -1,7 +1,12 @@
 package net.wigle.wigleandroid.ui;
 
+import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+import static net.wigle.wigleandroid.R.color.list_item_match_background;
+import static net.wigle.wigleandroid.model.NetworkType.BLE;
+
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
@@ -9,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
@@ -20,27 +26,34 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.regex.Matcher;
 
 /**
  * the array adapter for a list of networks.
  * note: separators aren't drawn if areAllItemsEnabled or isEnabled are false
  */
 public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
-    private final SimpleDateFormat format;
 
     private final SetBackedNetworkList networks = new SetBackedNetworkList();
 
-    public SetNetworkListAdapter(final Context context, final int rowLayout) {
+    private final boolean historical;
+    private final MainActivity mainActivity;
+
+    public SetNetworkListAdapter(final Context context, final boolean historical, final int rowLayout) {
         super(context, rowLayout);
-        format = NetworkListUtil.getConstructionTimeFormater(context);
+        this.historical = historical;
         if (ListFragment.lameStatic.oui == null) {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
+        mainActivity = MainActivity.getMainActivity();
     }
 
+    public void updateBssidFilterMatcher() {
+        MainActivity mainActivity = MainActivity.getMainActivity();
+    }
     public void clearWifiAndCell() {
         networks.clearWifiAndCell();
         notifyDataSetChanged();
@@ -128,11 +141,9 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         networks.enqueueBluetoothLe(n);
     }
 
-    //TODO: almost certainly the source of our duplicate BT nets in non show-current
     public void batchUpdateBt(final boolean showCurrent, final boolean updateLe, final boolean updateClassic) {
-
         networks.batchUpdateBt(showCurrent,updateLe,updateClassic);
-        notifyDataSetChanged();
+        //TODO: could simply move list sort here, since they're always paired
     }
 
     @Override
@@ -169,10 +180,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     }
 
     @Override
-    public void sort(Comparator comparator) {
+    public void sort(@NonNull Comparator comparator) {
         networks.sort(comparator);
     }
 
+    @NonNull
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         // long start = System.currentTimeMillis();
@@ -198,11 +210,32 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         }
         // info( "listing net: " + network.getBssid() );
 
+        boolean matches = false;
+        Matcher bssidAlertMatcher = null != mainActivity ?
+                mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_ALERT_ADDRS) : null;
+        if (null != bssidAlertMatcher) {
+            bssidAlertMatcher.reset(network.getBssid());
+            matches = bssidAlertMatcher.find();
+        }
+        if (BLE.equals(network.getType())) {
+            Matcher mfgrAlertMatcher = null != mainActivity ?
+                    mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS) : null;
+            if (null != mfgrAlertMatcher) {
+                mfgrAlertMatcher.reset(String.format("%04X", network.getBleMfgrId()));
+                matches |= mfgrAlertMatcher.find();
+            }
+        }
+        if (matches) {
+            row.setBackgroundColor(row.getResources().getColor(list_item_match_background));
+        } else {
+            row.setBackgroundColor(0);
+        }
+
         final ImageView ico = row.findViewById(R.id.wepicon);
         ico.setImageResource(NetworkListUtil.getImage(network));
 
         final ImageView btico = row.findViewById(R.id.bticon);
-        if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
+        if (NetworkType.BT.equals(network.getType()) || BLE.equals(network.getType())) {
             btico.setVisibility(View.VISIBLE);
             Integer btImageId = NetworkListUtil.getBtImage(network);
             if (null == btImageId) {
@@ -216,21 +249,57 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             btico.setVisibility(View.GONE);
         }
 
+        final ImageView passpointIcon = row.findViewById(R.id.passpoint_logo_view);
+        if (NetworkType.WIFI.equals(network.getType())) {
+            if (network.isPasspoint()) {
+                passpointIcon.setVisibility(VISIBLE);
+            } else {
+                passpointIcon.setVisibility(GONE);
+            }
+        } else {
+            passpointIcon.setVisibility(GONE);
+        }
+
+        final ImageView btRandom = row.findViewById(R.id.btrandom);
+        if (BLE.equals(network.getType())) {
+            final Integer bleAddressType = network.getBleAddressType();
+            if (null != bleAddressType /*&& (bleAddressType == ADDRESS_TYPE_RANDOM || bleAddressType == ADDRESS_TYPE_ANONYMOUS)*/) {
+                final Integer img = NetworkListUtil.getBleAddrTypeImage(bleAddressType);
+                if (null != img) {
+                    btRandom.setImageResource(img);
+                    btRandom.setVisibility(View.VISIBLE);
+                } else {
+                    if (bleAddressType != 0) {
+                        Logging.error("null image for BLE addr type: "+bleAddressType);
+                        btRandom.setImageResource(R.drawable.groucho);
+                        btRandom.setVisibility(View.VISIBLE);
+                    } else {
+                        btRandom.setVisibility(View.GONE);
+                    }
+                }
+            } else {
+                //DEBUG: Logging.error("null/random address type: "+bleAddressType);
+                btRandom.setVisibility(View.GONE);
+            }
+        } else {
+            btRandom.setVisibility(View.GONE);
+        }
+
         TextView tv = row.findViewById(R.id.ssid);
-        tv.setText(network.getSsid() + " ");
+        tv.setText(network.getSsid());
 
         tv = row.findViewById(R.id.oui);
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
-        if (NetworkType.BLE.equals(network.getType())) {
+        if (BLE.equals(network.getType())) {
             tv.setTextAppearance(R.style.ListBt);
         } else {
             tv.setTextAppearance(R.style.ListOui);
         }
 
         tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getConstructionTime(format, network));
+        tv.setText(NetworkListUtil.getTime(network, historical, getContext()));
 
         tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();
@@ -247,7 +316,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         tv = row.findViewById(R.id.chan_freq_string);
         if (NetworkType.WIFI.equals(network.getType())) {
             tv.setText(network.getFrequency()+"MHz");
-        } else if (NetworkType.BLE.equals(network.getType())) {
+        } else if (BLE.equals(network.getType())) {
             tv.setText(network.getType().toString());
         } else {
             tv.setText("");

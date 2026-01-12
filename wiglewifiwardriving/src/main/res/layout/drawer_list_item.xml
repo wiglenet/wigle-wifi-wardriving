@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:ignore="UseCompoundDrawables">
     <ImageView
         android:id="@+id/drawer_list_icon"
         android:layout_width="wrap_content"
@@ -16,12 +15,11 @@
         android:id="@+id/drawer_list_text"
         android:layout_height="50dp"
         android:padding="4dp"
-        android:layout_width="fill_parent"
+        android:layout_width="0dp"
         android:textSize="22sp"
         android:gravity="center_vertical"
         android:layout_weight="1"
-        android:textColor="#ffffffff"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:textColor="#ffffffff">
     </TextView>
 </LinearLayout>
 

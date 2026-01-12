@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - הגדרות</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-    <string name="error_report_name">WiGLE Wifi - דוח שגיאות אחרונות</string>
+    <string name="error_report_name">דוח שגיאות אחרונות</string>
     <string name="speech_name">WiGLE Wifi - הגדרות דיבור</string>
     <string name="network_activity_name">WiGLE Wifi - רשת</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">ערוץ:</string>
     <string name="network_observations">תוכן:</string>
     <string name="network_querying">(Querying&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">הצג סיסמה</string>
     <string name="setting_db_marker">DB מרקר (שם שנוספו להתחיל):</string>
     <string name="setting_high_up">Id נטען גבוהה ביותר:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>הרשמה ל-&lt;/a&gt; @WiGLE.net או &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;הפעל עכשיו עם קוד QR&lt;/a&gt;</string>
     <string name="ble_services">BLE UUIDs:</string>
     <string name="ble_vendor">מזהה ספק BLE:</string>
+    <string name="speech_new_bt">Bluetooth חדש ל-DB</string>
+    <string name="tts_new_bt">בלוטוס חדש</string>
+    <string name="gnss_full">השתמש במעקב מלא GNSS (ריקון סוללה גדול)</string>
+    <string name="search_area">אזור חיפוש:</string>
+    <string name="queued_jobs">(%1$d משימות בתור)</string>
+    <string name="duplicate_job">עבודה מסוג זה כבר פועלת או ממתינה להפעלה.</string>
+    <string name="start_survey">סקר שטח</string>
+    <string name="end_survey">סיום הסקר</string>
+    <string name="confirm_survey">עליך ללחוץ על \"%1$s\" כדי להשלים את הסקר ולשמור את התוצאות שלך לפני היציאה מהפעילות!\n\n אנו ממליצים להגדיר \"%2$s\" סריקה תחת הגדרות עבור מהירות הנסיעה שלך לקבלת התוצאות הטובות ביותר. (לזה יהיו השלכות סוללה)</string>
+    <string name="interrogate_ble">לבקש פירוט</string>
+    <string name="ble_mfgr_title">יַצרָן</string>
+    <string name="ble_model_title">דֶגֶם</string>
+    <string name="ble_serial_title">מספר סידורי</string>
+    <string name="ble_firmware_title">קושחה</string>
+    <string name="ble_hw_title">חוּמרָה</string>
+    <string name="ble_sw_title">תוֹכנָה</string>
+    <string name="ble_name_title">שֵׁם</string>
+    <string name="ble_pnp_title">מזהה הכנס והפעל</string>
+    <string name="ble_appearance_title">הוֹפָעָה</string>
+    <string name="alert_filter_button">התראה על חשבונות MAC/OUI…</string>
+    <string name="status_too_many">יותר מדי בתוך מסגרת הזמן</string>
+    <string name="filter_show_wifi">הצג WiFi</string>
+    <string name="filter_show_bt_classic">הצג Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">הסתר</string>
+    <string name="alert">התראה</string>
 </resources>

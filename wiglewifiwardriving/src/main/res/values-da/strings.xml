@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - Indstillinger</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-    <string name="error_report_name">WiGLE Wifi - seneste Fejlrapport</string>
+    <string name="error_report_name">seneste Fejlrapport</string>
     <string name="speech_name">WiGLE Wifi - taleindstillingerne</string>
     <string name="network_activity_name">WiGLE Wifi - Netværk</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
@@ -26,7 +26,7 @@
     <string name="maxout_maxid_text">Sæt max kør til:</string>
     <string name="csv_run_export_button">Start CSV Eksport</string>
     <string name="csv_run_export_text">Eksport aktuelle forløb til CSV-fil</string>
-    <string name="csv_export_button">CSV Eksport til DB</string>
+    <string name="csv_export_button">CSV Eksport fra DB</string>
     <string name="csv_export_text">Eksportere hele DB til CSV fil</string>
     <string name="kml_run_export_button">Start KML Eksport</string>
     <string name="kml_run_export_text">Eksport aktuelle forløb til KML-fil</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Kanal:</string>
     <string name="network_observations">Observationer:</string>
     <string name="network_querying">(Forspøger)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Vis adgangskode</string>
     <string name="setting_db_marker">DB Marker (hvor uploads starter fra):</string>
     <string name="setting_high_up">Højeste uploadet id:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Tilmeld&lt;/a&gt; @WiGLE.net eller &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktiver nu med QR-kode&lt;/a&gt;</string>
     <string name="ble_services">BLE UUIDs:</string>
     <string name="ble_vendor">BLE Leverandør ID:</string>
+    <string name="speech_new_bt">Ny bluetooth til DB</string>
+    <string name="tts_new_bt">Ny bluetooth</string>
+    <string name="gnss_full">Brug GNSS fuld sporing (stort batteriforbrug)</string>
+    <string name="search_area">Søgeområde:</string>
+    <string name="queued_jobs">(%1$d opgaver i kø)</string>
+    <string name="duplicate_job">Et job af denne type kører allerede eller venter på at køre.</string>
+    <string name="start_survey">Områdeundersøgelse</string>
+    <string name="end_survey">Slutundersøgelse</string>
+    <string name="confirm_survey">Du SKAL klikke på \"%1$s\" for at fuldføre undersøgelsen og gemme dine resultater, før du afslutter aktiviteten!\n\n Vi anbefaler at indstille \"%2$s\" scanning under indstillinger for din rejsehastighed for at få de bedste resultater. (Dette VIL have batterikonsekvenser)</string>
+    <string name="interrogate_ble">Spørg efter detaljer</string>
+    <string name="ble_mfgr_title">Fabrikant</string>
+    <string name="ble_model_title">Model</string>
+    <string name="ble_serial_title">Serienummer</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Navn</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Udseende</string>
+    <string name="alert_filter_button">Advarsel om MAC\'er/OUI\'er…</string>
+    <string name="status_too_many">For mange inden for tidsrammen</string>
+    <string name="filter_show_wifi">Vis WiFi</string>
+    <string name="filter_show_bt_classic">Vis Bluetooth Classic</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Skjul</string>
+    <string name="alert">Advarsel</string>
 </resources>

@@ -3,6 +3,7 @@ package net.wigle.wigleandroid;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 
@@ -125,7 +126,8 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                     public void onTaskCompleted() {
                         stopAnimation();
                         if (userDownloadFailed) {
-                            WiGLEToast.showOverFragment(a, R.string.upload_failed, getString(R.string.dl_failed));
+                            WiGLEToast.showOverFragment(a, R.string.upload_failed,
+                                    a.getResources().getString(R.string.dl_failed));
                         }
                     }
 
@@ -336,21 +338,20 @@ public class RankStatsFragment extends ProgressThrobberFragment {
     @Override
     public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
-        item.setIcon( android.R.drawable.ic_menu_myplaces );
+        item.setIcon( R.drawable.user_star );
         MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
-        item.setIcon(android.R.drawable.ic_menu_myplaces);
+        item.setIcon(R.drawable.user_star);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon( R.drawable.wiglewifi_small_black_white );
+        item.setIcon(R.drawable.w_logo);
         MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
-        item.setIcon(R.drawable.wiglewifi_small_black_white);
-
+        item.setIcon(R.drawable.w_logo);
         item = menu.add(0, MENU_RANK_SWAP, 0, getRankSwapString());
-        item.setIcon(android.R.drawable.ic_menu_sort_alphabetically);
+        item.setIcon(R.drawable.sort);
 
         item = menu.add(0, MENU_USER_CENTRIC_SWAP, 0, getUserCentricSwapString());
         item.setIcon(android.R.drawable.picture_frame);

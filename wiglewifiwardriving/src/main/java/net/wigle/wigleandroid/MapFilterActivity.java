@@ -1,15 +1,27 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.BT_SUB_BOX_IDS;
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
+import net.wigle.wigleandroid.ui.ScreenChildActivity;
+import net.wigle.wigleandroid.util.FilterUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
@@ -23,13 +35,39 @@ import java.util.List;
  * Created by arkasha on 8/1/17.
  */
 
-public class MapFilterActivity extends AppCompatActivity {
+public class MapFilterActivity extends ScreenChildActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.mapfilter);
+        EdgeToEdge.enable(this);
+        final View filterWrapper = findViewById(R.id.map_filter_wrapper);
+        if (null != filterWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(filterWrapper, new OnApplyWindowInsetsListener() {
+                        @Override
+                        public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                            final Insets innerPadding = insets.getInsets(
+                                    WindowInsetsCompat.Type.statusBars() |
+                                            WindowInsetsCompat.Type.displayCutout());
+                            v.setPadding(
+                                    innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
+                            );
+                            return insets;
+                        }
+                    }
+            );
+        }
+        //ALIBI: the map view tools reuses the filter options, need to exclude alerts.
+        Button alerts = findViewById(R.id.alert_filter_button);
+        if (alerts != null) {
+            alerts.setVisibility(GONE);
+        }
+        Button alertMfgrss = findViewById(R.id.alert_ble_mfgr_filter_button);
+        if (alertMfgrss != null) {
+            alertMfgrss.setVisibility(GONE);
+        }
 
         final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -92,18 +130,25 @@ public class MapFilterActivity extends AppCompatActivity {
         PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true );
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true );
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true );
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
-        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbt,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BT, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbtc,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BT, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbtle,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true );
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
+
+        FilterUtil.updateWifiGroupCheckbox(view);
+        FilterUtil.updateBluetoothGroupCheckbox(view);
+        final Button finishButton = view.findViewById(R.id.finish_map_filter);
+        if (null != finishButton) {
+            finishButton.setOnClickListener(v -> finish());
+        }
     }
 }

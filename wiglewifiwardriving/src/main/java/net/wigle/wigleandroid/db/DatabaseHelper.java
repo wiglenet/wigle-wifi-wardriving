@@ -17,7 +17,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +30,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.wigle.wigleandroid.DataFragment.BackupTask;
 import net.wigle.wigleandroid.ErrorReportActivity;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.background.BackupRunnable;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
@@ -70,7 +72,6 @@ public final class DatabaseHelper extends Thread {
     private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
-    private static final String INTERNAL_DB_PATH = "databases/";
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
@@ -100,7 +101,10 @@ public final class DatabaseHelper extends Thread {
                     + "type text not null default '" + NetworkType.WIFI.getCode() + "',"
                     + "bestlevel integer not null default 0,"
                     + "bestlat double not null default 0,"
-                    + "bestlon double not null default 0"
+                    + "bestlon double not null default 0,"
+                    + "rcois text not null default '',"
+                    + "mfgrid integer not null default 0,"
+                    + "service text not null default ''"
                     + ")";
 
     public static final String LOCATION_TABLE = "location";
@@ -114,7 +118,8 @@ public final class DatabaseHelper extends Thread {
                     + "altitude double not null,"
                     + "accuracy float not null,"
                     + "time long not null,"
-                    + "external integer not null default 0"
+                    + "external integer not null default 0,"
+                    + "mfgrid integer not null default 0"
                     + ")";
 
     public static final String ROUTE_TABLE = "route";
@@ -139,10 +144,17 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
         + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
+    public static final String SEARCH_NETWORKS = "SELECT bssid,lastlat,lastlon FROM " + NETWORK_TABLE + " WHERE 1=1 ";
+    //TODO: should search use best[lat|lon] instead of last?
+
+    private static final String LOCATED_WIFI_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
+            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND " + NetworkFilter.WIFI.getFilter()
+            + " AND instr(bssid, '_') <= 0";
     //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
 
-    private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;
-    public static final String LOCATED_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_NETS_QUERY_STEM;
+    public static final String LOCATED_WIFI_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_WIFI_QUERY_STEM;
+
+    private static final String LOCATED_WIFI_COUNT_QUERY = "SELECT count(*)" +LOCATED_WIFI_QUERY_STEM;
 
     private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
@@ -197,6 +209,7 @@ public final class DatabaseHelper extends Thread {
         public int bestlevel;
         public double bestlat;
         public double bestlon;
+        public int mfgrid;
     }
 
     /** class for queueing updates to the database */
@@ -278,9 +291,11 @@ public final class DatabaseHelper extends Thread {
             }
 
             final MainActivity mainActivity = MainActivity.getMainActivity();
-            final Intent errorReportIntent = new Intent( mainActivity, ErrorReportActivity.class );
-            errorReportIntent.putExtra( ERROR_REPORT_DIALOG, error );
-            mainActivity.startActivity( errorReportIntent );
+            if (null != mainActivity) {
+                final Intent errorReportIntent = new Intent(mainActivity, ErrorReportActivity.class);
+                errorReportIntent.putExtra(ERROR_REPORT_DIALOG, error);
+                mainActivity.startActivity(errorReportIntent);
+            }
         }
     }
 
@@ -567,6 +582,20 @@ public final class DatabaseHelper extends Thread {
                     db.setVersion(3);
                 }
             }
+        } else if ( db.getVersion() == 3) {
+            Logging.info("upgrading db from 3 to 4");
+            try {
+                db.execSQL( "ALTER TABLE "+NETWORK_TABLE+" ADD COLUMN rcois text not null default ''" );
+                db.execSQL( "ALTER TABLE "+NETWORK_TABLE+" ADD COLUMN mfgrid integer not null default 0" );
+                db.execSQL( "ALTER TABLE "+NETWORK_TABLE+" ADD COLUMN service text not null default ''" );
+                db.execSQL( "ALTER TABLE "+LOCATION_TABLE+" ADD COLUMN mfgrid integer not null default 0" );
+                db.setVersion(4);
+            } catch ( SQLiteException ex ) {
+                Logging.info("ex: " + ex, ex);
+                if ( "duplicate column name".equals( ex.toString() ) ) {
+                    db.setVersion(4);
+                }
+            }
         }
 
         // drop index, was never publicly released
@@ -574,16 +603,16 @@ public final class DatabaseHelper extends Thread {
 
         // compile statements
         insertNetwork = db.compileStatement( "INSERT INTO "+NETWORK_TABLE
-                + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon) VALUES (?,?,?,?,?,?,?,?,?,?,?)" );
+                + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon,rcois,mfgrid,service) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)" );
 
         insertLocationExternal = db.compileStatement( "INSERT INTO " + LOCATION_TABLE
-                + " (bssid,level,lat,lon,altitude,accuracy,time,external) VALUES (?,?,?,?,?,?,?,?)" );
+                + " (bssid,level,lat,lon,altitude,accuracy,time,external,mfgrid) VALUES (?,?,?,?,?,?,?,?,?)" );
 
         updateNetwork = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
                 + " lasttime = ?, lastlat = ?, lastlon = ? WHERE bssid = ?" );
 
         updateNetworkMetadata = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
-                + " bestlevel = ?, bestlat = ?, bestlon = ?, ssid = ?, frequency = ?, capabilities = ? WHERE bssid = ?" );
+                + " bestlevel = ?, bestlat = ?, bestlon = ?, ssid = ?, frequency = ?, capabilities = ?, rcois = ?, mfgrid = ?, service = ? WHERE bssid = ?" );
 
         updateNetworkType = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
                 + " type = ? WHERE bssid = ?" );
@@ -735,6 +764,7 @@ public final class DatabaseHelper extends Thread {
         int bestlevel = 0;
         double bestlat = 0;
         double bestlon = 0;
+        int prevMfgrId = 0;
         boolean isNew = false;
 
         // STEP 1: verify location
@@ -748,13 +778,14 @@ public final class DatabaseHelper extends Thread {
             bestlevel = prevWrittenLocation.bestlevel;
             bestlat = prevWrittenLocation.bestlat;
             bestlon = prevWrittenLocation.bestlon;
+            prevMfgrId = prevWrittenLocation.mfgrid;
             // MainActivity.info( "db cache hit. bssid: " + network.getBssid() );
         }
         else {
             // cache miss, get the last values from the db, if any
             long start = System.currentTimeMillis();
             // SELECT: can't precompile, as it has more than 1 result value
-            final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon FROM network WHERE bssid = ?", bssidArgs );
+            final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon,mfgrid FROM network WHERE bssid = ?", bssidArgs );
             logTime( start, "db network queried " + bssid );
             if ( cursor.getCount() == 0 ) {
                 insertNetwork.bindString( 1, bssid );
@@ -768,6 +799,9 @@ public final class DatabaseHelper extends Thread {
                 insertNetwork.bindLong( 9, network.getLevel() );
                 insertNetwork.bindDouble( 10, location.getLatitude() );
                 insertNetwork.bindDouble( 11, location.getLongitude() );
+                insertNetwork.bindString( 12, network.getRcoisOrBlank() );
+                insertNetwork.bindLong( 13, network.getBleMfgrIdAsInt() );
+                insertNetwork.bindString( 14, network.getBleServiceUuidsAsString() );
 
                 start = System.currentTimeMillis();
                 // INSERT
@@ -796,6 +830,7 @@ public final class DatabaseHelper extends Thread {
                 bestlevel = cursor.getInt(3);
                 bestlat = cursor.getDouble(4);
                 bestlon = cursor.getDouble(5);
+                prevMfgrId = cursor.getInt(6);
             }
             try {
                 cursor.close();
@@ -833,7 +868,8 @@ public final class DatabaseHelper extends Thread {
         //    + " lastlat: " + lastlat + " lat: " + location.getLatitude()
         //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
         final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
-        final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange) || levelChange;
+        final boolean diffMfgrId = network.getBleMfgrIdAsInt() != prevMfgrId;
+        final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange) || levelChange || diffMfgrId;
 
         final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
@@ -869,6 +905,7 @@ public final class DatabaseHelper extends Thread {
             insertLocationExternal.bindDouble(6, location.getAccuracy());
             insertLocationExternal.bindLong(7, location.getTime());
             insertLocationExternal.bindLong( 8, update.external);
+            insertLocationExternal.bindLong( 9, network.getBleMfgrIdAsInt());
             if (db.isDbLockedByOtherThreads()) {
                 // this is kinda lame, make this better
                 Logging.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
@@ -887,6 +924,7 @@ public final class DatabaseHelper extends Thread {
             cached.bestlevel = update.level;
             cached.bestlat = location.getLatitude();
             cached.bestlon = location.getLongitude();
+            cached.mfgrid = network.getBleMfgrIdAsInt();
             previousWrittenLocationsCache.put( bssid, cached );
 
             if ( ! isNew ) {
@@ -928,7 +966,7 @@ public final class DatabaseHelper extends Thread {
                     logTime( start, "db network type updated" );
                 }
 
-                if (smallLocDelay || newBest || update.frequencyChanged) {
+                if (smallLocDelay || newBest || update.frequencyChanged || diffMfgrId) {
                     // MainActivity.info("META updating network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
                     updateNetworkMetadata.bindLong( 1, bestlevel );
                     updateNetworkMetadata.bindDouble( 2, bestlat );
@@ -936,7 +974,10 @@ public final class DatabaseHelper extends Thread {
                     updateNetworkMetadata.bindString( 4, network.getSsid() );
                     updateNetworkMetadata.bindLong( 5, network.getFrequency() );
                     updateNetworkMetadata.bindString( 6, network.getCapabilities() );
-                    updateNetworkMetadata.bindString( 7, bssid );
+                    updateNetworkMetadata.bindString( 7, network.getRcoisOrBlank() );
+                    updateNetworkMetadata.bindLong( 8, network.getBleMfgrIdAsInt() );
+                    updateNetworkMetadata.bindString( 9, network.getBleServiceUuidsAsString() );
+                    updateNetworkMetadata.bindString( 10, bssid );
 
                     start = System.currentTimeMillis();
                     updateNetworkMetadata.execute();
@@ -1292,10 +1333,9 @@ public final class DatabaseHelper extends Thread {
             return count;
         }
     }
-
-    public long getNetsWithLocCountFromDB() throws DBException {
+    public long getWiFiNetsWthLocCountFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null)) {
+        try (Cursor cursor = db.rawQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
         }
@@ -1310,7 +1350,7 @@ public final class DatabaseHelper extends Thread {
             try {
                 checkDB();
                 final String[] args = new String[]{ bssid };
-                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon FROM "
+                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service,bestlevel,lasttime FROM "
                         + NETWORK_TABLE
                         + " WHERE bssid = ?", args);
                 if ( cursor.getCount() > 0 ) {
@@ -1322,15 +1362,29 @@ public final class DatabaseHelper extends Thread {
                     final float lastlon = cursor.getFloat(5);
                     final float bestlat = cursor.getFloat(6);
                     final float bestlon = cursor.getFloat(7);
+                    final String rcois = cursor.getString(8);
+                    final int mfgridInt = cursor.getInt(9);
+                    final String service = cursor.getString(10);
+                    final int level = cursor.getInt(11);
+                    final long lastTime = cursor.getLong(12);
+
+                    Integer mfgrid = null;
+                    if (mfgridInt != 0) mfgrid = mfgridInt;
+                    List<String> serviceUUIDs = service.isEmpty() ? null :
+                            new ArrayList<>(Arrays.asList(service.split(" ")));
 
                     final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
-                    retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
+                    retval = new Network( bssid, ssid, frequency, capabilities, level, type, serviceUUIDs, mfgrid, lastTime, null /*TODO: BLE address type*/ );
                     if (bestlat != 0 && bestlon != 0) {
                         retval.setLatLng( new LatLng(bestlat, bestlon) );
-                    }
-                    else {
+                    } else {
                         retval.setLatLng( new LatLng(lastlat, lastlon) );
                     }
+                    if (!rcois.isEmpty()) {
+                        retval.setRcois(rcois);
+                    }
+
+
                     MainActivity.getNetworkCache().put( bssid, retval );
                 }
             } catch (DBException ex ) {
@@ -1348,28 +1402,21 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         Logging.info( "locationIterator fromId: " + fromId );
         final String[] args = new String[]{ Long.toString( fromId ) };
-        return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ? AND external = 0", args );
-    }
-
-    public Cursor networkIterator() throws DBException {
-        checkDB();
-        Logging.info( "networkIterator" );
-        final String[] args = new String[]{};
-        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network", args );
+        return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time,mfgrid FROM location WHERE _id > ? AND external = 0", args );
     }
 
     public Cursor networkIterator(final NetworkFilter filter) throws DBException {
         checkDB();
         Logging.info( "networkIterator (filtered)" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE "+filter.getFilter(), args );
+        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE "+filter.getFilter(), args );
     }
 
     public Cursor routeIterator(final long routeId) throws DBException {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{String.valueOf(routeId)};
-        return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = ?", args );
+        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = ?", args );
     }
 
     public Cursor routeMetaIterator() throws DBException {
@@ -1384,7 +1431,7 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
+        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
     }
 
     public void clearDefaultRoute() throws DBException {
@@ -1406,22 +1453,15 @@ public final class DatabaseHelper extends Thread {
             return db.rawQuery("SELECT lat,lon FROM route WHERE run_id = ?", args);
     }
 
-    public Cursor getSingleNetwork( final String bssid ) throws DBException {
-        checkDB();
-        final String[] args = new String[]{bssid};
-        return db.rawQuery(
-                "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE bssid = ?", args );
-    }
-
     public Cursor getSingleNetwork( final String bssid, final NetworkFilter filter ) throws DBException {
         checkDB();
         final String[] args = new String[]{bssid};
         return db.rawQuery(
-                "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE bssid = ? AND "+ filter.getFilter(), args );
+                "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE bssid = ? AND "+ filter.getFilter(), args );
     }
 
 
-    public Pair<Boolean,String> copyDatabase(final BackupTask task) {
+    public Pair<Boolean,String> copyDatabase(final BackupRunnable task) {
         File file = context.getDatabasePath(DATABASE_NAME);
         String outputFilename = "backup-" + System.currentTimeMillis() + SQL_EXT;
 
@@ -1429,8 +1469,7 @@ public final class DatabaseHelper extends Thread {
             file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
         }
         Pair<Boolean,String> result;
-        try {
-            InputStream input = new FileInputStream(file);
+        try (InputStream input = new FileInputStream(file)){
             FileOutputStream output = FileUtility.createFile(context, outputFilename, false);
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -1441,14 +1480,12 @@ public final class DatabaseHelper extends Thread {
                 read += bytesRead;
                 int percent = (int)( (read*100)/total );
                 // MainActivity.info("percent: " + percent + " read: " + read + " total: " + total );
-                task.progress( percent );
+                task.setProgress( percent );
             }
             output.close();
-            input.close();
             final File outputFile = new File(FileUtility.getBackupPath(context), outputFilename);
             result = new Pair<>(Boolean.TRUE, outputFile.getAbsolutePath());
-        }
-        catch ( IOException ex ) {
+        } catch ( IOException ex ) {
             Logging.error("backup failure: " + ex, ex);
             result = new Pair<>(Boolean.FALSE, "ERROR: " + ex);
         }

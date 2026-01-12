@@ -7,6 +7,10 @@
         <item name="colorControlNormal">#AAAAAA</item>
         <item name="colorNavigationItemSelected">#B0B0B0</item>
         <item name="colorNavigationItem">#353535</item>
+        <item name="scrimBackground">#88000000</item>
+    </style>
+    <style name="ChildActivityTheme" parent="AppTheme">
+        <item name="android:colorBackground">#1A1A1A</item>
     </style>
     <style name="NavigationDrawerStyle">
         <item name="android:textSize">24sp</item>
@@ -104,6 +108,7 @@
     </style>
     <style name="NewsPostStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:gravity">start</item>
     </style>
     <style name="ToastStyle">
@@ -113,10 +118,10 @@
         <item name="android:background">#AA000000</item>
     </style>
     <style name="NetworkViewOverlay">
-        <item name="android:background">#AA000000</item>
+        <item name="android:background">#AA353535</item>
     </style>
     <style name="NetDetailSsid">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">26sp</item>
         <item name="android:textColor">#AAEE50</item>
     </style>
     <style name="NetDetailBssid">

@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import androidx.fragment.app.FragmentActivity;
+
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -86,16 +88,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         } catch ( InterruptedException ex ) {
             Logging.info( name + " interrupted: " + ex );
         } catch ( final WiGLEAuthException waex) {
-            //DEBUG: MainActivity.error("auth error", waex);
+            //DEBUG:  Logging.error("auth error", waex);
             Bundle errorBundle = new Bundle();
             errorBundle.putCharSequence("AUTH_ERROR", waex.getMessage());
-            sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
+            sendBundledMessage(Status.BAD_LOGIN.ordinal(), errorBundle);
         } catch ( final IOException ioex) {
             Logging.error("connection error", ioex);
             Bundle errorBundle = new Bundle();
             errorBundle.putString(BackgroundGuiHandler.ERROR, "IOException");
             errorBundle.putCharSequence("CONN_ERROR", ioex.getMessage());
-            sendBundledMessage(BackgroundGuiHandler.CONNECTION_ERROR, errorBundle);
+            sendBundledMessage(Status.CONNECTION_ERROR.ordinal(), errorBundle);
         } catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
         } finally {
@@ -150,14 +152,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     private void activateProgressPanel(final FragmentActivity context) {
         final LinearLayout progressLayout = context.findViewById(R.id.inline_status_bar);
         final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
+        final TextView queueLabel = context.findViewById(R.id.inline_progress_queue_status);
         final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
         final Button importObservedButton = context.findViewById(R.id.import_observed_button);
         final Button uploadButton = context.findViewById(R.id.upload_button);
 
         if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
-            pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
+            pp = new ProgressPanel(progressLayout, progressLabel, progressBar, queueLabel);
             pp.show();
             final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
+            taskCancelButton.setVisibility(View.VISIBLE);
             taskCancelButton.setOnClickListener(v -> {
                 if (null != latestTask) {
                     latestTask.setInterrupted();
@@ -183,13 +187,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.setContext(context);
     }
 
+    /**
+     * make sure that we have an auth name and API token
+     * @return true if both are present, otherwise false.
+     */
     protected final boolean validAuth() {
         final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
         if ( (!prefs.getString(PreferenceKeys.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
             return true;
         }
         return false;
-
     }
 
 
@@ -212,16 +219,6 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return password;
     }
 
-    protected final String getToken() {
-        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
-        String token = TokenAccess.getApiToken(prefs);
-
-        if ( prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false) ) {
-            token = "";
-        }
-        return token;
-    }
-
     /**
      * @return null if ok, else an error status
      */
@@ -231,11 +228,10 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             Logging.error( "username not defined" );
             status = Status.BAD_USERNAME;
         }
-        else if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase(Locale.US) ) ) {
+        if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase(Locale.US) ) ) {
             Logging.error( "password not defined and username isn't 'anonymous'" );
             status = Status.BAD_PASSWORD;
         }
-
         return status;
     }
 

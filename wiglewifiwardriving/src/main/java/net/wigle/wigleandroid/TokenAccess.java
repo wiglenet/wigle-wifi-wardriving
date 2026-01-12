@@ -60,8 +60,10 @@ public class TokenAccess {
 
                 if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)
                         || keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    //TODO: it would be best to test decrypt here, but makes this heavier
-                    return true;
+
+                    // do a full decryption
+                    final String apiToken = getApiToken(prefs);
+                    return apiToken != null && !apiToken.isEmpty();
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
                 Logging.error("[TOKEN] Error trying to test token existence: ", e);
@@ -162,13 +164,8 @@ public class TokenAccess {
     public static boolean setApiToken(SharedPreferences prefs, String apiToken) {
         try {
             return setApiTokenVersion2(prefs, apiToken);
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
-                IOException | UnrecoverableEntryException | NoSuchPaddingException |
-                InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-            Logging.error("[TOKEN] Failed to set token: ",ex);
-            ex.printStackTrace();
         } catch (Exception e) {
-            Logging.error("[TOKEN] Other error - failed to set token: ",e);
+            Logging.error("[TOKEN] failed to set token: ",e);
             e.printStackTrace();
         }
         return false;
@@ -180,29 +177,41 @@ public class TokenAccess {
      * @return the String token or null if unavailable
      */
     public static String getApiToken(SharedPreferences prefs) {
+        final String apiToken = internalGetApiToken(prefs);
+        if (apiToken == null || apiToken.isEmpty()) {
+            // We should not carry around an API authname without a token.
+            // This can happen during device migrations.
+            final SharedPreferences.Editor editor = prefs.edit();
+            editor.putString( PreferenceKeys.PREF_AUTHNAME, "" );
+            editor.apply();
+        }
+        return apiToken;
+    }
+
+    private static String internalGetApiToken(SharedPreferences prefs) {
         try {
             final KeyStore keyStore = getKeyStore();
 
-            KeyStore.PrivateKeyEntry privateKeyEntry;
-
+            KeyStore.PrivateKeyEntry privateKeyEntry = null;
             // prefer v2 key -> v1 key -> v0 key, nada as applicable
             int versionThreshold = android.os.Build.VERSION_CODES.M;
-            if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
-                return getApiTokenVersion2(prefs);
-            } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
-                privateKeyEntry = (KeyStore.PrivateKeyEntry)
-                        keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
-            } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                privateKeyEntry = (KeyStore.PrivateKeyEntry)
-                        keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V0, null);
-                versionThreshold = Build.VERSION_CODES.JELLY_BEAN_MR2;
-            } else {
-                Logging.warn("[TOKEN] Compatible build, but no key set: " +
-                        android.os.Build.VERSION.SDK_INT + " - returning plaintext.");
-                return prefs.getString(PreferenceKeys.PREF_TOKEN, "");
+            if (null != keyStore) {
+                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
+                    return getApiTokenVersion2(prefs);
+                } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
+                    privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                            keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
+                } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
+                    privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                            keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V0, null);
+                    versionThreshold = Build.VERSION_CODES.JELLY_BEAN_MR2;
+                } else {
+                    Logging.warn("[TOKEN] Compatible build, but no key set: " +
+                            android.os.Build.VERSION.SDK_INT + " - returning plaintext.");
+                    return prefs.getString(PreferenceKeys.PREF_TOKEN, "");
+                }
             }
-
 
             if (null != privateKeyEntry) {
                 String encodedCypherText = prefs.getString(PreferenceKeys.PREF_TOKEN, "");
@@ -219,11 +228,13 @@ public class TokenAccess {
                     c.init(Cipher.DECRYPT_MODE, privateKey);
                     return new String(c.doFinal(cypherText), StandardCharsets.UTF_8);
                 } else {
-                    Logging.error("[TOKEN] NULL encoded cyphertext on token decrypt.");
+                    Logging.error("[TOKEN] NULL. encoded cyphertext on token decrypt.");
+                    clearApiToken(prefs);
                     return null;
                 }
             } else {
-                Logging.error("[TOKEN] NULL Private Key on token decrypt.");
+                Logging.error("[TOKEN] NULL. Private Key on token decrypt.");
+                clearApiToken(prefs);
                 return null;
             }
         } catch (CertificateException | NoSuchAlgorithmException | IOException |
@@ -231,6 +242,7 @@ public class TokenAccess {
                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException |
                 InvalidAlgorithmParameterException ex) {
             Logging.error("[TOKEN] Failed to get API Token: ", ex);
+            clearApiToken(prefs);
             return null;
         }
     }

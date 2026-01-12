@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - 설정</string>
     <string name="mapping_app_name">WiGLE Wifi - 오픈스트리트맵</string>
     <string name="dashboard_app_name">WiGLE Wifi - 대시보드</string>
-    <string name="error_report_name">WiGLE Wifi - 대부분의 최근 오류 보고서</string>
+    <string name="error_report_name">대부분의 최근 오류 보고서</string>
     <string name="speech_name">WiGLE Wifi - 음성 설정</string>
     <string name="network_activity_name">WiGLE Wifi - 네트워크</string>
     <string name="data_activity_name">WiGLE Wifi - 데이터베이스</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">채널 :</string>
     <string name="network_observations">관찰 :</string>
     <string name="network_querying">(querying&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">비밀 번호를 표시</string>
     <string name="setting_db_marker">DB 마커 (여기서 업로드부터 시작) :</string>
     <string name="setting_high_up">최고 업로드 ID :</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net 등록&lt;/a&gt; 또는 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;지금 QR 코드로 활성화&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID:</string>
     <string name="ble_vendor">BLE 공급업체 ID:</string>
+    <string name="speech_new_bt">DB에 새로운 블루투스</string>
+    <string name="tts_new_bt">새로운 블루투스</string>
+    <string name="gnss_full">GNSS 전체 추적 사용(배터리 소모가 많음)</string>
+    <string name="search_area">검색 영역:</string>
+    <string name="queued_jobs">(%1$d개의 대기 중인 작업)</string>
+    <string name="duplicate_job">이 유형의 작업이 이미 실행 중이거나 실행 대기 중입니다.</string>
+    <string name="start_survey">현장 조사</string>
+    <string name="end_survey">설문조사 종료</string>
+    <string name="confirm_survey">설문조사를 완료하고 활동을 종료하기 전에 결과를 저장하려면 \"%1$s\"를 클릭해야 합니다!\n\n 최상의 결과를 얻으려면 이동 속도 설정에서 \"%2$s\" 스캔을 설정하는 것이 좋습니다. (이것은 배터리에 영향을 미칠 것입니다)</string>
+    <string name="interrogate_ble">자세히 물어보세요</string>
+    <string name="ble_mfgr_title">제조업체</string>
+    <string name="ble_model_title">모델</string>
+    <string name="ble_serial_title">일련번호 #</string>
+    <string name="ble_firmware_title">펌웨어</string>
+    <string name="ble_hw_title">하드웨어</string>
+    <string name="ble_sw_title">소프트웨어</string>
+    <string name="ble_name_title">이름</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">허울</string>
+    <string name="alert_filter_button">MAC/OUI에 대한 경고…</string>
+    <string name="status_too_many">시간 내에 너무 많은</string>
+    <string name="filter_show_wifi">WiFi 표시</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic 표시</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">숨기기</string>
+    <string name="alert">경고</string>
 </resources>

@@ -3,12 +3,15 @@
             xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#00FFFFFF">
+    android:background="#00FFFFFF"
+    android:clipToPadding="false">
+    <!-- ALIBI:  background in to prevent arrow/scroll regressions on oldroid -->
 <LinearLayout
-	android:id="@+id/linearlayout"
+	android:id="@+id/settingslayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:paddingBottom="12dp"
     >
     <TextView
         android:id="@+id/scan_throttle_help"
@@ -479,6 +482,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/enable_kalman" />
+    <CheckBox android:id="@+id/gnss_full"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/gnss_full" />
 
     <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"

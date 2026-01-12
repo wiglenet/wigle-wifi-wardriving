@@ -24,7 +24,7 @@
             android:layout_height="wrap_content">
             <ImageButton
                 android:id="@+id/view_upload"
-                android:background="@android:drawable/ic_menu_view"
+                android:background="@drawable/view"
                 android:layout_gravity="end"
                 android:layout_height="28dp"
                 android:layout_width="28dp"
@@ -35,7 +35,7 @@
                 />
             <ImageButton
                 android:id="@+id/share_upload"
-                android:background="@android:drawable/ic_menu_share"
+                android:background="@drawable/share"
                 android:layout_gravity="end"
                 android:layout_height="28dp"
                 android:layout_width="28dp"

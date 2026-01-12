@@ -40,7 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -83,13 +83,17 @@ import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.FilterUtil;
 import net.wigle.wigleandroid.util.HeadingManager;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.StatsUtil;
 
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
 import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.BT_SUB_BOX_IDS;
+import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
 
 /**
  * show a map depicting current position and configurable stumbling progress information.
@@ -194,10 +198,7 @@ public final class MappingFragment extends Fragment {
         }
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(2);
-        // media volume
-        //TODO: almost certainly not like this.
         final SharedPreferences prefs = (null != a)?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
-
         if (prefs != null && BuildConfig.DEBUG && HeadingManager.DEBUG && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
             headingManager = new HeadingManager(a);
         }
@@ -206,6 +207,7 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+<<<<<<< HEAD
 //        final Activity a = getActivity();
 //        if (null != a) {
 //            mapView = new MapView(a);
@@ -519,6 +521,322 @@ public final class MappingFragment extends Fragment {
 //        }
 //        return null;
 //    }
+=======
+        final Activity a = getActivity();
+        if (null != a) {
+            mapView = new MapView(a);
+            final int serviceAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(a);
+            if (serviceAvailable == ConnectionResult.SUCCESS) {
+                try {
+                    mapView.onCreate(savedInstanceState);
+                    final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
+                }
+                catch (final SecurityException ex) {
+                    Logging.error("security exception onCreateView map: " + ex, ex);
+                }
+            } else {
+                final FragmentActivity fa = getActivity();
+                if (null != fa) {
+                    WiGLEToast.showOverFragment(fa, R.string.fatal_pre_message,
+                            fa.getResources().getString(R.string.map_needs_playservice));
+                }
+            }
+            MapsInitializer.initialize(a);
+        }
+        final View view = inflater.inflate(R.layout.map, container, false);
+
+        final LatLng oldCenter = state.oldCenter != null ? state.oldCenter : null;
+        int oldZoom = Integer.MIN_VALUE;
+        setupMapView(view, oldCenter, oldZoom);
+        return view;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
+        // view
+        final RelativeLayout rlView = view.findViewById(R.id.map_rl);
+        if (mapView != null) {
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            mapView.setLayoutParams(params);
+        }
+
+        // conditionally replace the tile source
+        final Activity a = getActivity();
+        final SharedPreferences prefs = (null != a)?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+        final boolean visualizeRoute = prefs != null && prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false);
+        rlView.addView(mapView);
+        // guard against not having google play services
+        mapView.getMapAsync(googleMap -> {
+            final Context c = MappingFragment.this.getContext();
+            if (null != c) {
+                if (ActivityCompat.checkSelfPermission(c,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        || ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    googleMap.setMyLocationEnabled(true);
+                    googleMap.setOnCameraIdleListener(() -> {
+                        if (null != prefs && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
+                            Float cameraBearing = getBearing(getActivity());
+                            Logging.info("Camera Bearing: "+cameraBearing);
+                            if (null != cameraBearing) {
+                                CameraPosition camPos = CameraPosition
+                                        .builder(googleMap.getCameraPosition())
+                                        .bearing(cameraBearing)
+                                        .build();
+                                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+                            }
+                        }
+                    });
+                }
+            }
+            googleMap.setBuildingsEnabled(true);
+            if (null != prefs) {
+                final boolean showTraffic = prefs.getBoolean(PreferenceKeys.PREF_MAP_TRAFFIC, true);
+                googleMap.setTrafficEnabled(showTraffic);
+                final int mapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
+                googleMap.setMapType(mapType);
+            } else {
+                googleMap.setMapType(MAP_TYPE_NORMAL);
+            }
+            final Activity a1 = getActivity();
+            if (null != a1) {
+                mapRender = new MapRender(a1, googleMap, false);
+            }
+
+            // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
+            googleMap.setIndoorEnabled(false);
+
+            googleMap.setOnMyLocationButtonClickListener(() -> {
+                if (!state.locked) {
+
+                    state.locked = true;
+                    if (menu != null) {
+                        MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                        String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                        item.setTitle(name);
+                        Logging.info("on-my-location received - activating lock");
+                    }
+                }
+                return false;
+            });
+
+            googleMap.setOnCameraMoveStartedListener(reason -> {
+                if (reason == OnCameraMoveStartedListener.REASON_GESTURE) {
+                    if (state.locked) {
+                        state.locked = false;
+                        if (menu != null) {
+                            MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                            String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                            item.setTitle(name);
+                        }
+                    }
+                } else if (reason == OnCameraMoveStartedListener.REASON_API_ANIMATION) {
+                    //DEBUG: MainActivity.info("Camera moved due to user tap");
+                    //TODO: should we combine this case with REASON_GESTURE?
+                } else if (reason == OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION) {
+                    //MainActivity.info("Camera moved due to app directive");
+                }
+            });
+
+            // controller
+            final LatLng centerPoint = getCenter(getActivity(), oldCenter, previousLocation);
+            float zoom = DEFAULT_ZOOM;
+            if (oldZoom >= 0) {
+                zoom = oldZoom;
+            } else {
+                if (null != prefs) {
+                    zoom = prefs.getFloat(PreferenceKeys.PREF_PREV_ZOOM, zoom);
+                }
+            }
+
+            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(centerPoint).zoom(zoom).build();
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+            if (null != prefs && !PreferenceKeys.PREF_MAP_NO_TILE.equals(
+                    prefs.getString(PreferenceKeys.PREF_SHOW_DISCOVERED,
+                            PreferenceKeys.PREF_MAP_NO_TILE))) {
+                final int providerTileRes = MainActivity.isHighDefinition()?512:256;
+
+                //TODO: DRY up token composition vs AbstractApiRequest?
+                String ifAuthToken = null;
+                try {
+                    final String token = TokenAccess.getApiToken(prefs);
+                    // get authname second, as the token may clear it
+                    final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
+                    if ((null != authname) && (null != token)) {
+                        final String encoded = Base64.encodeToString((authname + ":" + token).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
+                        ifAuthToken = "Basic " + encoded;
+                    }
+                } catch (Exception uoex) {
+                    Logging.error("map tiles: unable to access credentials for mine/others", uoex);
+                }
+                final String authToken = ifAuthToken;
+
+                final String userAgent = WiGLEApiManager.USER_AGENT;
+
+
+                TileProvider tileProvider = new TileProvider() {
+                    @SuppressLint("DefaultLocale")
+                    @Override
+                    public Tile getTile(int x, int y, int zoom) {
+                        if (!checkTileExists(x, y, zoom)) {
+                            return NO_TILE;
+                        }
+
+                        final Long since = prefs.getLong(PreferenceKeys.PREF_SHOW_DISCOVERED_SINCE, 2001);
+                        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+                        String tileContents = prefs.getString(PreferenceKeys.PREF_SHOW_DISCOVERED,
+                                PreferenceKeys.PREF_MAP_NO_TILE);
+
+                        String sinceString = String.format("%d0000-00000", since);
+                        String toString = String.format("%d0000-00000", thisYear+1);
+                        String s = String.format(MAP_TILE_URL_FORMAT,
+                                zoom, x, y, sinceString, toString);
+
+                        if (MainActivity.isHighDefinition()) {
+                                s += HIGH_RES_TILE_TRAILER;
+                        }
+
+                        // ALIBI: defaults to "ALL"
+                        if (PreferenceKeys.PREF_MAP_ONLYMINE_TILE.equals(tileContents)) {
+                            s += ONLY_MINE_TILE_TRAILER;
+                        } else if (PreferenceKeys.PREF_MAP_NOTMINE_TILE.equals(tileContents)) {
+                            s += NOT_MINE_TILE_TRAILER;
+                        }
+
+                        //DEBUG: MainActivity.info("map URL: " + s);
+
+                        try {
+                            final byte[] data = downloadData(new URL(s), userAgent, authToken);
+                            if (data.length > 0) {
+                                return new Tile(providerTileRes, providerTileRes, data);
+                            } else {
+                                return null;
+                            }
+                        } catch (MalformedURLException e) {
+                            throw new AssertionError(e);
+                        }
+                    }
+
+                    /*
+                     * depends on supported levels on the server
+                     */
+                    private boolean checkTileExists(int x, int y, int zoom) {
+                        int minZoom = 0;
+                        int maxZoom = 24;
+
+                        if ((zoom < minZoom || zoom > maxZoom)) {
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    private byte[] downloadData(final URL url, final String userAgent, final String authToken) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        InputStream is = null;
+                        try {
+                            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                            if (null != authToken) {
+                                conn.setRequestProperty("Authorization", authToken);
+                            }
+                            conn.setRequestProperty("User-Agent", userAgent);
+                            is = conn.getInputStream();
+                            byte[] byteChunk = new byte[4096];
+                            int n;
+
+                            while ((n = is.read(byteChunk)) > 0) {
+                                baos.write(byteChunk, 0, n);
+                            }
+                        } catch (IOException e) {
+                            Logging.error("Failed while reading bytes from " +
+                                    url.toExternalForm() + ": "+ e.getMessage());
+                        } finally {
+                            if (is != null) {
+                                try {
+                                    is.close();
+                                } catch (IOException ioex) {
+                                    Logging.error("Failed while closing InputStream " +
+                                            url.toExternalForm() + ": "+ ioex.getMessage());
+                                }
+                            }
+                        }
+                        return baos.toByteArray();
+                    }
+                };
+
+                tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
+                        .tileProvider(tileProvider).transparency(0.35f));
+            }
+
+            //ALIBI: still checking prefs because we pass them to the dbHelper
+            if (null != prefs  && visualizeRoute) {
+
+                PolylineOptions pOptions = new PolylineOptions()
+                                .clickable(false);
+                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
+                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
+                try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
+                        .getCurrentVisibleRouteIterator(prefs)) {
+                    if (null == routeCursor) {
+                        Logging.info("null route cursor; not mapping");
+                    } else {
+                        long segmentCount = 0;
+
+                        for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                            final double lat = routeCursor.getDouble(0);
+                            final double lon = routeCursor.getDouble(1);
+                            //final long time = routeCursor.getLong(2);
+                            pOptions.add(
+                                    new LatLng(lat, lon));
+
+                            pOptions.color(getRouteColorForMapType(mapMode, nightMode));
+                            pOptions.width(ROUTE_WIDTH); //DEFAULT: 10.0
+                            pOptions.zIndex(10000); //to overlay on traffic data
+                            segmentCount++;
+                        }
+                        Logging.info("Loaded route with " + segmentCount + " segments");
+                        routePolyline = googleMap.addPolyline(pOptions);
+
+                        routePolyline.setTag(ROUTE_LINE_TAG);
+                    }
+                } catch (Exception e) {
+                    Logging.error("Unable to add route: ",e);
+                }
+            }
+        });
+        Logging.info("done setupMapView.");
+    }
+
+    public Float getBearing( final Context context) {
+        final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
+        if (gpsLocation != null) {
+            //DEBUG: Logging.info("acc: "+headingManager.getAccuracy());
+            final Float bearing = (gpsLocation.hasBearing() && gpsLocation.getBearing() != 0.0f)?gpsLocation.getBearing():null;
+
+            if (null != bearing) {
+                //ALIBI: prefer bearing if it's not garbage, because heading almost certainly is.
+                if (gpsLocation.hasAccuracy() && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
+                    if (gpsLocation.getBearingAccuracyDegrees() < MIN_BEARING_UPDATE_ACCURACY) {
+                        return gpsLocation.getBearing();
+                    }
+                } else {
+                    Logging.warn("have GPS location but no headingManager or accuracy");
+                    return bearing;
+                }
+            }
+            //ALIBI: heading is too often completely wrong. This is here for debugging only unless things improve.
+            if (null != headingManager && BuildConfig.DEBUG && HeadingManager.DEBUG  && headingManager.getAccuracy() >= 3.0) {
+                // if the fusion of accelerometer and magnetic compass claims it doesn't suck (although it probably still does)
+                return headingManager.getHeading(gpsLocation);
+            }
+        }
+        return null;
+    }
+>>>>>>> origin/main
 
     public static LatLng getCenter( final Context context, final LatLng priorityCenter,
                                     final Location previousLocation ) {
@@ -665,29 +983,35 @@ public final class MappingFragment extends Fragment {
                 previousRunNets = ListFragment.lameStatic.runNets;
 
                 if (view != null) {
-                    TextView tv = view.findViewById(R.id.stats_run);
-                    tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(
-                            ListFragment.lameStatic.runNets+ListFragment.lameStatic.runBt));
-                    tv = view.findViewById(R.id.stats_wifi);
+                    TextView tv = view.findViewById(R.id.stats_wifi);
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
                     tv = view.findViewById( R.id.stats_cell );
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
                     tv = view.findViewById( R.id.stats_bt );
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
+                    if (null != prefs) {
+                        final long unUploaded = StatsUtil.newNetsSinceUpload(prefs);
+                        tv = view.findViewById(R.id.stats_unuploaded);
+                        tv.setText(UINumberFormat.counterFormat(unUploaded));
+                    }
                     tv = view.findViewById(R.id.heading);
                     final Location gpsLocation = safelyGetLast(getContext(), LocationManager.GPS_PROVIDER);
                     if (BuildConfig.DEBUG && HeadingManager.DEBUG) {
-                        tv.setText(String.format("heading: %3.2f", ((headingManager != null) ? headingManager.getHeading(gpsLocation) : -1f)));
+                        tv.setText(String.format(Locale.ROOT, "heading: %3.2f", ((headingManager != null) ? headingManager.getHeading(gpsLocation) : -1f)));
                         if (null != ListFragment.lameStatic.location) {
                             tv = view.findViewById(R.id.bearing);
                             if (gpsLocation.hasAccuracy() && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
-                                tv.setText(String.format("bearing: %3.2f +/- %3.2f", ListFragment.lameStatic.location.getBearing(), ListFragment.lameStatic.location.getBearingAccuracyDegrees()));
+                                tv.setText(String.format(Locale.ROOT,"bearing: %3.2f +/- %3.2f", ListFragment.lameStatic.location.getBearing(), ListFragment.lameStatic.location.getBearingAccuracyDegrees()));
                             } else {
-                                tv.setText(String.format("bearing: %3.2f", ListFragment.lameStatic.location.getBearing()));
+                                tv.setText(String.format(Locale.ROOT,"bearing: %3.2f", ListFragment.lameStatic.location.getBearing()));
                             }
                         }
                         tv = view.findViewById(R.id.selectedbh);
+<<<<<<< HEAD
 //                        tv.setText(String.format("chose: %3.2f", getBearing(getContext())));
+=======
+                        tv.setText(String.format(Locale.ROOT,"chose: %3.2f", getBearing(getContext())));
+>>>>>>> origin/main
                     } else {
                         final View v =view.findViewById(R.id.debug);
                         if (null != v) {
@@ -860,12 +1184,12 @@ public final class MappingFragment extends Fragment {
             item.setIcon(android.R.drawable.ic_menu_directions);
 
             item = menu.add(0, MENU_MAP_TYPE, 0, getString(R.string.menu_map_type));
-            item.setIcon(android.R.drawable.ic_menu_mapmode);
-            MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            item.setIcon(R.drawable.map_layer);
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             item = menu.add(0, MENU_FILTER, 0, getString(R.string.settings_map_head));
-            item.setIcon(android.R.drawable.ic_menu_search);
-            MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            item.setIcon(R.drawable.filter);
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
             String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
             item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
@@ -879,18 +1203,6 @@ public final class MappingFragment extends Fragment {
                 getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
         item = menu.add(0, MENU_WAKELOCK, 0, wake);
         item.setIcon( android.R.drawable.ic_menu_gallery );
-
-        // item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
-        // item.setIcon( android.R.drawable.ic_menu_add );
-
-        // item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
-        // item.setIcon( android.R.drawable.ic_menu_revert );
-
-        // item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-        // item.setIcon( android.R.drawable.ic_menu_preferences );
-
-        // item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-        // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
 
         super.onCreateOptionsMenu(menu, inflater);
         this.menu = menu;
@@ -985,6 +1297,7 @@ public final class MappingFragment extends Fragment {
                     return true;
                 }
                 case MENU_MAP_TYPE: {
+<<<<<<< HEAD
 //                    mapView.getMapAsync(googleMap -> {
 //                        int newMapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
 //                        final Activity a1 = getActivity();
@@ -1013,6 +1326,37 @@ public final class MappingFragment extends Fragment {
 //                        edit.apply();
 //                        googleMap.setMapType(newMapType);
 //                    });
+=======
+                    mapView.getMapAsync(googleMap -> {
+                        int newMapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
+                        final Activity a1 = getActivity();
+                        switch (newMapType) {
+                            case MAP_TYPE_NORMAL:
+                                newMapType = MAP_TYPE_SATELLITE;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
+                                break;
+                            case MAP_TYPE_SATELLITE:
+                                newMapType = MAP_TYPE_HYBRID;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
+                                break;
+                            case MAP_TYPE_HYBRID:
+                                newMapType = MAP_TYPE_TERRAIN;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
+                                break;
+                            case MAP_TYPE_TERRAIN:
+                                newMapType = MAP_TYPE_NORMAL;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
+                                break;
+                            default:
+                                Logging.error("unhandled mapType: " + newMapType);
+                        }
+                        Editor edit = prefs.edit();
+                        edit.putInt(PreferenceKeys.PREF_MAP_TYPE, newMapType);
+                        edit.apply();
+                        googleMap.setMapType(newMapType);
+                    });
+                    return true;
+>>>>>>> origin/main
                 }
                 case MENU_WAKELOCK: {
                     boolean screenLocked = !MainActivity.isScreenLocked(this);
@@ -1049,15 +1393,22 @@ public final class MappingFragment extends Fragment {
                 final CheckBox invert = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showinvert,
                         prefix + PreferenceKeys.PREF_MAPF_INVERT, false, prefs);
                 final CheckBox open = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showopen,
-                        prefix + PreferenceKeys.PREF_MAPF_OPEN, true, prefs);
+                        prefix + PreferenceKeys.PREF_MAPF_OPEN, true, prefs, value -> FilterUtil.updateWifiGroupCheckbox(view));
                 final CheckBox wep = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showwep,
-                        prefix + PreferenceKeys.PREF_MAPF_WEP, true, prefs);
+                        prefix + PreferenceKeys.PREF_MAPF_WEP, true, prefs, value -> FilterUtil.updateWifiGroupCheckbox(view));
                 final CheckBox wpa = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showwpa,
-                        prefix + PreferenceKeys.PREF_MAPF_WPA, true, prefs);
+                        prefix + PreferenceKeys.PREF_MAPF_WPA, true, prefs, value -> FilterUtil.updateWifiGroupCheckbox(view));
                 final CheckBox cell = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showcell,
                         prefix + PreferenceKeys.PREF_MAPF_CELL, true, prefs);
                 final CheckBox enabled = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.enabled,
                         prefix + PreferenceKeys.PREF_MAPF_ENABLED, true, prefs);
+                final CheckBox btc = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showbtc,
+                        prefix + PreferenceKeys.PREF_MAPF_BT, true, prefs, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
+                final CheckBox btle = PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.showbtle,
+                        prefix + PreferenceKeys.PREF_MAPF_BTLE, true, prefs, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
+
+                FilterUtil.updateWifiGroupCheckbox(view);
+                FilterUtil.updateBluetoothGroupCheckbox(view);
 
                 Button ok = view.findViewById(R.id.ok_button);
                 ok.setOnClickListener(buttonView -> {

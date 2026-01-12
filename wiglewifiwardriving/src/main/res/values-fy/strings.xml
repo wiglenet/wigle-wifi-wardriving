@@ -6,7 +6,7 @@
     <string name="settings_app_name">WiGLE Wifi - Ynstellingen</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-    <string name="error_report_name">WiGLE Wifi - Meast koartlyn foutrapport</string>
+    <string name="error_report_name">Meast koartlyn foutrapport</string>
     <string name="speech_name">WiGLE Wifi - Spraakinstellingen</string>
     <string name="network_activity_name">WiGLE Wifi - Netwurk</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
@@ -95,6 +95,7 @@
     <string name="network_channel">Kanaal:</string>
     <string name="network_observations">Oantal kearen sjoen:</string>
     <string name="network_querying">(query uitvoeren&#8230;)</string>
+    <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Wachtwurd weergeven</string>
     <string name="setting_db_marker">DB Marker (de upload start by):</string>
     <string name="setting_high_up">Heechste upload ID:</string>
@@ -446,4 +447,31 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registreer&lt;/a&gt; @WiGLE.net of &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activeer nu met QR-code&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID\'s:</string>
     <string name="ble_vendor">BLE-leveranciers-ID:</string>
+    <string name="speech_new_bt">Nije bluetooth nei DB</string>
+    <string name="tts_new_bt">Nije bluetooth</string>
+    <string name="gnss_full">Brûk GNSS folsleine tracking (grutte batterij drain)</string>
+    <string name="search_area">Zoekgebied:</string>
+    <string name="queued_jobs">(%1$d taken in de wachtrij)</string>
+    <string name="duplicate_job">Een taak van dit type is al actief of wacht op uitvoering.</string>
+    <string name="start_survey">Site-onderzoek</string>
+    <string name="end_survey">Enquête beëindigen</string>
+    <string name="confirm_survey">U MOET op \"%1$s\" klikken om de enquête in te vullen en uw resultaten op te slaan voordat u de activiteit afsluit!\n\n Voor de beste resultaten raden wij aan om \"%2$s\" te scannen onder de instellingen voor uw reissnelheid. (Dit ZAL gevolgen hebben voor de batterij)</string>
+    <string name="interrogate_ble">vraag om details</string>
+    <string name="ble_mfgr_title">Fabrikant</string>
+    <string name="ble_model_title">Model</string>
+    <string name="ble_serial_title">Serienummer</string>
+    <string name="ble_firmware_title">Firmware</string>
+    <string name="ble_hw_title">Hardware</string>
+    <string name="ble_sw_title">Software</string>
+    <string name="ble_name_title">Naam</string>
+    <string name="ble_pnp_title">PnP ID</string>
+    <string name="ble_appearance_title">Verschijning</string>
+    <string name="alert_filter_button">Waarschuwing voor MAC\'s/OUI\'s…</string>
+    <string name="status_too_many">Tefolle binnen de tiidsperioade</string>
+    <string name="filter_show_wifi">WiFi toane</string>
+    <string name="filter_show_bt_classic">Bluetooth Classic toane</string>
+    <string name="oui">OUI</string>
+    <string name="mac">MAC</string>
+    <string name="hide">Ferbergje</string>
+    <string name="alert">Warskôging</string>
 </resources>

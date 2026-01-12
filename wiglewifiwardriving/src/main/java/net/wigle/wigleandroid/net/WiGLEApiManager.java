@@ -1,11 +1,13 @@
 package net.wigle.wigleandroid.net;
 
 import static net.wigle.wigleandroid.util.UrlConfig.API_DOMAIN;
+import static net.wigle.wigleandroid.util.UrlConfig.FILE_POST_URL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,14 +15,21 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.babylon.certificatetransparency.CTInterceptorBuilder;
+import com.appmattus.certificatetransparency.CTInterceptorBuilder;
+import com.appmattus.certificatetransparency.CTLogger;
+import com.appmattus.certificatetransparency.VerificationResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import net.wigle.wigleandroid.TokenAccess;
+import net.wigle.wigleandroid.background.BackgroundGuiHandler;
+import net.wigle.wigleandroid.background.CountingRequestBody;
 import net.wigle.wigleandroid.background.Status;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
+import net.wigle.wigleandroid.model.api.BtSearchResponse;
+import net.wigle.wigleandroid.model.api.CellSearchResponse;
 import net.wigle.wigleandroid.model.api.RankResponse;
+import net.wigle.wigleandroid.model.api.UploadReseponse;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
@@ -32,6 +41,7 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -46,6 +56,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -79,6 +91,7 @@ public class WiGLEApiManager {
                     System.getProperty("os.name") + " " +
                     System.getProperty("os.version") +
                     " [" + System.getProperty("os.arch") + "]";
+            javaVersion = javaVersion.replaceAll("[^\\x00-\\x7F]", "");
         } catch (RuntimeException e) {
             Logging.error("Unable to get Java version for user agent string: ",e);
         }
@@ -89,11 +102,18 @@ public class WiGLEApiManager {
     private final OkHttpClient unauthedClient;
     private final Context context;
 
-    private static final CTInterceptorBuilder ctIB = new com.babylon.certificatetransparency.CTInterceptorBuilder();
+    private static final CTInterceptorBuilder ctIB = new CTInterceptorBuilder();
+
+    private static final CTLogger ctLogger = new CTLogger() {
+        @Override
+        public void log(@NonNull String host, @NonNull VerificationResult result) {
+            Logging.info("[CERTTRANS] "+result);
+        }
+    };
 
     // certificate transparency interceptor
-    private final static Interceptor certTransparencyInterceptor = ctIB.includeHost(API_DOMAIN).setLogger(
-            (s, verificationResult) -> Logging.info("[CERTTRANS] "+verificationResult)).build();
+    private final static Interceptor certTransparencyInterceptor = ctIB.includeHost(API_DOMAIN)
+            .setLogger(ctLogger).build();
 
     /**
      * Build a WiGLEApiManager
@@ -460,7 +480,7 @@ public class WiGLEApiManager {
             final Handler mainHandler = new Handler(Looper.getMainLooper());
 
             @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                onCallFailure("Unsuccessful WiGLE Search request: ", e,
+                onCallFailure("Unsuccessful WiGLE WiFi Search request: ", e,
                         completedListener, mainHandler, null);
             }
             @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
@@ -490,6 +510,193 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Search the WiGLE Cell database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
+    public void searchCell(@NotNull final String urlEncodedQueryParams,
+                           @NotNull final AuthenticatedRequestCompletedListener<CellSearchResponse,
+                                   JSONObject> completedListener) {
+        if (null == authedClient) {
+            completedListener.onAuthenticationRequired();
+        }
+        final String httpUrl = UrlConfig.SEARCH_CELL_URL + "?" + urlEncodedQueryParams;
+
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .build();
+        if (authedClient == null) {
+            Logging.warn("searchCell authedClient is null, returning");
+            return;
+        }
+        authedClient.newCall(request).enqueue(new Callback() {
+            final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+            @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                onCallFailure("Unsuccessful WiGLE Cell Search request: ", e,
+                        completedListener, mainHandler, null);
+            }
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
+                    } else {
+                        //TODO- consider caching implications here
+                        if (null != responseBody) {
+                            try {
+                                CellSearchResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        CellSearchResponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+                mainHandler.post(completedListener::onTaskCompleted);
+            }
+        });
+    }
+
+    /**
+     * Search the WiGLE BT database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
+    public void searchBt(@NotNull final String urlEncodedQueryParams,
+                           @NotNull final AuthenticatedRequestCompletedListener<BtSearchResponse,
+                                   JSONObject> completedListener) {
+        if (null == authedClient) {
+            completedListener.onAuthenticationRequired();
+        }
+        final String httpUrl = UrlConfig.SEARCH_BT_URL + "?" + urlEncodedQueryParams;
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .build();
+        if (authedClient == null) {
+            Logging.warn("searchBt authedClient is null, returning");
+            return;
+        }
+        authedClient.newCall(request).enqueue(new Callback() {
+            final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+            @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                onCallFailure("Unsuccessful WiGLE BT Search request: ", e,
+                        completedListener, mainHandler, null);
+            }
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
+                    } else {
+                        //TODO- consider caching implications here
+                        if (null != responseBody) {
+                            try {
+                                BtSearchResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        BtSearchResponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+                mainHandler.post(completedListener::onTaskCompleted);
+            }
+        });
+    }
+
+    /**
+     * Upload a (CSV) file
+     * @param filename the file name on-device to upload
+     * @param fileParamName parameter name for the file
+     * @param params additional parameters ("donate" at time of implementation)
+     * @param handler the callback for progress or completion
+     * @param completedListener the RequestCompletedListener implementation to call on completion
+     */
+    public void upload(@NotNull final String filename,
+                       @NotNull final String fileParamName,
+                       @NotNull final Map<String, String> params,
+                       final Handler handler,
+                       @NotNull final RequestCompletedListener<UploadReseponse,
+            JSONObject> completedListener) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart(fileParamName, filename,
+                        RequestBody.create(new File(filename), MediaType.parse("application/octet-stream")));
+        // add params if present
+        if (!params.isEmpty()) {
+            for ( Map.Entry<String, String> entry : params.entrySet() ) {
+                builder.addFormDataPart(entry.getKey(), entry.getValue());
+            }
+        }
+        MultipartBody requestBody = builder.build();
+        // progress-aware requestBody
+        CountingRequestBody countingBody
+                = new CountingRequestBody(requestBody, (bytesWritten, contentLength) -> {
+            int progress = (int)((bytesWritten*1000) / contentLength );
+            Logging.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
+            if ( handler != null && progress >= 0 ) {
+                //TODO: we can improve this, but minimal risk dictates reuse of old technique to start
+                handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
+            }
+        });
+        OkHttpClient client = unauthedClient;
+        if (authedClient != null) {
+            client = authedClient;
+        }
+        Request request = new Request.Builder()
+                .url(FILE_POST_URL)
+                .post(countingBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    if (!response.isSuccessful()) {
+                        Logging.error("Failed to upload file: " + response.code() + " " + response.message());
+                        completedListener.onTaskFailed(response.code(), null);
+                    } else {
+                        if (null != response.body()) {
+                            try (ResponseBody responseBody = response.body()) {
+                                final String responseBodyString = responseBody.string();
+                                UploadReseponse r =  new Gson().fromJson(responseBodyString,
+                                        UploadReseponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                //TODO: deserialize failed response to get error and send to onTaskFailed?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    if (null != e) {
+                        Logging.error("Failed to upload - client exception: "+ e.getClass() + " - " + e.getMessage());
+                    } else {
+                        Logging.error("Failed to upload - client call failed. (data: "+hasDataConnection(context.getApplicationContext())+")");
+                    }
+                    completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                }
+            }
+        );
+    }
 
     /**
      * Check to see if we have a working data connection
@@ -503,8 +710,13 @@ public class WiGLEApiManager {
             Logging.error("null ConnectivityManager trying to determine connection info");
             return false;
         }
-        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        final Network n = connectivityManager.getActiveNetwork();
+        if (null != n) {
+            final NetworkCapabilities cap = connectivityManager.getNetworkCapabilities(n);
+            return cap != null && cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                    cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        }
+        return false;
     }
 
     /**
@@ -524,15 +736,16 @@ public class WiGLEApiManager {
     }
 
     private static boolean hasAuthed(final SharedPreferences prefs) {
-        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         final String token = TokenAccess.getApiToken(prefs);
+        // get authname second as getApiToken may clear it
+        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         return (null != authname && !authname.isEmpty() && null != token);
     }
 
 
     //TODO: should this be implemented as an interceptor? we'd have to parametereize based on queries...
     private static void cacheResult(final String result, final String outputFileName, final Context context) {
-        if (outputFileName == null || result == null || result.length() < 1) return;
+        if (outputFileName == null || result == null || result.isEmpty()) return;
 
         try (FileOutputStream fos = FileUtility.createFile(context, outputFileName, true)) {
             //DEBUG: Logging.info("writing cache file "+outputFileName);

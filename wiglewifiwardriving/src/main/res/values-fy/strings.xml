@@ -474,4 +474,5 @@
     <string name="mac">MAC</string>
     <string name="hide">Ferbergje</string>
     <string name="alert">Warskôging</string>
+    <string name="guess_le_address_type">BLE-adrestype ôfliede</string>
 </resources>

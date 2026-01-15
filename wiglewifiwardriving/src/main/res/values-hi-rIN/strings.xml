@@ -473,4 +473,5 @@
     <string name="mac">MAC</string>
     <string name="hide">छिपाएँ</string>
     <string name="alert">चेतावनी</string>
+    <string name="guess_le_address_type">BLE पता प्रकार का अनुमान लगाएं</string>
 </resources>

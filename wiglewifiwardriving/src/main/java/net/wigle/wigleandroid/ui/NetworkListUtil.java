@@ -329,9 +329,6 @@ public class NetworkListUtil {
     }
 
     public static Integer getBleAddrTypeImage(final Integer type) {
-        if (type != 0) {
-            Logging.error("BLEADDRTYPE: " + type);
-        }
         switch (type) {
             case ADDRESS_TYPE_ANONYMOUS:
                 return drawable.balaclava;

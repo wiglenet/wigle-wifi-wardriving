@@ -512,76 +512,78 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             SettingsUtil.doScanSpinner(R.id.gps_spinner, PreferenceKeys.GPS_SCAN_PERIOD,
                     MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, c);
         }
-
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.found_sound, PreferenceKeys.PREF_FOUND_SOUND, true);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.found_new_sound, PreferenceKeys.PREF_FOUND_NEW_SOUND, true);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, PreferenceKeys.PREF_CIRCLE_SIZE_MAP, false);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.no_individual_nets_map, PreferenceKeys.PREF_MAP_HIDE_NETS, false);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_bearing, PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, PreferenceKeys.PREF_USE_NETWORK_LOC, false);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, PreferenceKeys.PREF_DISABLE_TOAST, false);
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, PreferenceKeys.PREF_START_AT_BOOT, false, value -> {
-            if (Build.VERSION.SDK_INT >= 29) {
-                if (value) {
-                    if (!Settings.canDrawOverlays(getContext())) {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:net.wigle.wigleandroid"));
-                        startActivityForResult(intent, 0);
+        final Activity thisActivity = this.getActivity();
+        if (null != thisActivity) {
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.found_sound, PreferenceKeys.PREF_FOUND_SOUND, true);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.found_new_sound, PreferenceKeys.PREF_FOUND_NEW_SOUND, true);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.circle_size_map, PreferenceKeys.PREF_CIRCLE_SIZE_MAP, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.no_individual_nets_map, PreferenceKeys.PREF_MAP_HIDE_NETS, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_map_bearing, PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.use_network_location, PreferenceKeys.PREF_USE_NETWORK_LOC, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.disable_toast, PreferenceKeys.PREF_DISABLE_TOAST, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.bluetooth_le_guess, PreferenceKeys.PREF_GUESS_BLE_ADDRESS_TYPE, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.boot_start, PreferenceKeys.PREF_START_AT_BOOT, false, value -> {
+                if (Build.VERSION.SDK_INT >= 29) {
+                    if (value) {
+                        if (!Settings.canDrawOverlays(getContext())) {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:net.wigle.wigleandroid"));
+                            startActivityForResult(intent, 0);
+                        }
                     }
                 }
-            }
-        });
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, PreferenceKeys.PREF_SCAN_BT, true, value -> {
-            Logging.info("Signaling bluetooth change: "+value);
-            final MainActivity ma = MainActivity.getMainActivity();
-            if (null != ma) {
-                if (value) {
-                    ma.setupBluetooth(prefs);
-                } else {
-                    ma.endBluetooth(prefs);
+            });
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.bluetooth_ena, PreferenceKeys.PREF_SCAN_BT, true, value -> {
+                Logging.info("Signaling bluetooth change: " + value);
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    if (value) {
+                        ma.setupBluetooth(prefs);
+                    } else {
+                        ma.endBluetooth(prefs);
+                    }
                 }
-            }
-        });
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , PreferenceKeys.PREF_VISUALIZE_ROUTE, false, value -> {
-            Logging.info("Signaling route mapping change: "+value);
-            final MainActivity ma = MainActivity.getMainActivity();
-            if (null != ma) {
-                if (value) {
-                    ma.startRouteMapping(prefs);
-                } else {
-                    ma.endRouteMapping(prefs);
+            });
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_route_map_display, PreferenceKeys.PREF_VISUALIZE_ROUTE, false, value -> {
+                Logging.info("Signaling route mapping change: " + value);
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    if (value) {
+                        ma.startRouteMapping(prefs);
+                    } else {
+                        ma.endRouteMapping(prefs);
+                    }
                 }
-            }
-        });
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, PreferenceKeys.PREF_LOG_ROUTES, false, value -> {
-            Logging.info("Signaling route logging change: "+value);
-            final MainActivity ma = MainActivity.getMainActivity();
-            if (null != ma) {
-                if (value) {
-                    ma.startRouteLogging(prefs);
-                } else {
-                    ma.endRouteLogging();
+            });
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_route_logging, PreferenceKeys.PREF_LOG_ROUTES, false, value -> {
+                Logging.info("Signaling route logging change: " + value);
+                final MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    if (value) {
+                        ma.startRouteLogging(prefs);
+                    } else {
+                        ma.endRouteLogging();
+                    }
                 }
-            }
-        });
-        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_theme , PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);
-        final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
-                "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
-                "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
-        final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
-                getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
-                getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
-                getString(R.string.language_fr), getString(R.string.language_fy), getString(R.string.language_he),
-                getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
-                getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
-                getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
-                getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO), getString(R.string.language_ru),
-                getString(R.string.language_sv), getString(R.string.language_sw), getString(R.string.language_tr),
-                getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
-        };
-        SettingsUtil.doSpinner( R.id.language_spinner, view, PreferenceKeys.PREF_LANGUAGE, "", languages, languageName, getContext() );
-
+            });
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_map_theme, PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);
+            final String[] languages = new String[]{"", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
+                    "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
+                    "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK"};
+            final String[] languageName = new String[]{getString(R.string.auto), getString(R.string.language_en),
+                    getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
+                    getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
+                    getString(R.string.language_fr), getString(R.string.language_fy), getString(R.string.language_he),
+                    getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
+                    getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
+                    getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
+                    getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO), getString(R.string.language_ru),
+                    getString(R.string.language_sv), getString(R.string.language_sw), getString(R.string.language_tr),
+                    getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
+            };
+            SettingsUtil.doSpinner(R.id.language_spinner, view, PreferenceKeys.PREF_LANGUAGE, "", languages, languageName, getContext());
+        }
         if (Build.VERSION.SDK_INT > 28) {
             View theme = view.findViewById(R.id.theme_section);
             theme.setVisibility(View.VISIBLE);

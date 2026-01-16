@@ -254,19 +254,20 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                             bleAddressType = 0;
                         }
                     }
-                } else if (bleAddressType == ADDRESS_TYPE_PUBLIC && patternAddressType != null && patternAddressType == ADDRESS_TYPE_RANDOM) {
-                    // API says PUBLIC but pattern suggests RANDOM - trust pattern (with OUI verification)
-                    if (DEBUG_BLUETOOTH_DATA) {
-                        Logging.warn("API + OUI check indicates RANDOM for " + address);
-                    }
-                    bleAddressType = ADDRESS_TYPE_RANDOM;
-                } else if (bleAddressType == ADDRESS_TYPE_RANDOM && patternAddressType != null && patternAddressType == ADDRESS_TYPE_PUBLIC) {
-                    // API says RANDOM but pattern indicates PUBLIC
-                    if (DEBUG_BLUETOOTH_DATA) {
-                        Logging.warn("API returned RANDOM but pattern indicates PUBLIC for " + address + " (trusting API)");
+                } else if (null != bleAddressType) {
+                    if (bleAddressType == ADDRESS_TYPE_PUBLIC && patternAddressType != null && patternAddressType == ADDRESS_TYPE_RANDOM) {
+                        // API says PUBLIC but pattern suggests RANDOM - trust pattern (with OUI verification)
+                        if (DEBUG_BLUETOOTH_DATA) {
+                            Logging.warn("API + OUI check indicates RANDOM for " + address);
+                        }
+                        bleAddressType = 1; //ADDRESS_TYPE_RANDOM;
+                    } else if (bleAddressType == ADDRESS_TYPE_RANDOM && patternAddressType != null && patternAddressType == ADDRESS_TYPE_PUBLIC) {
+                        // API says RANDOM but pattern indicates PUBLIC
+                        if (DEBUG_BLUETOOTH_DATA) {
+                            Logging.warn("API returned RANDOM but pattern indicates PUBLIC for " + address + " (trusting API)");
+                        }
                     }
                 }
-
                 final String bssid = device.getAddress();
                 latestBtle.add(bssid);
                 prevBt.remove(bssid);   // ALIBI: upgrade to BLE -> remove BC
@@ -306,7 +307,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                                     + "\n\tUUIDs:\t" + Arrays.toString(device.getUuids())
                                     + "\n\tService UUIDs:\t" + scanRecord.getServiceUuids()
                                     );
-                    if (bleAddressType != 0) {
+                    if (bleAddressType != null && bleAddressType != 0) {
                         Logging.info("\tinteresting addressType: "+bleAddressType);
                     }
                 }

@@ -224,13 +224,14 @@ public class FossMapRender {
             Icon icon = null;
             try {
                 icon = getIcon(network);
+                if (null != icon) {
+                    options.icon(icon);
+                } else {
+                    Logging.error("Failed to get icon for "+network.getBssid()+" ("+network.getType()+")");
+                }
             } catch (Exception ex) {
                 Logging.info("FossMapRender: getIcon failed, using default: " + ex);
             }
-            if (icon == null) {
-                icon = mapIconFactory.fromResource(R.drawable.ic_wifi_sm);
-            }
-            options.icon(icon);
 
             marker = map.addMarker(options);
             if (marker != null) {

@@ -26,13 +26,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.WindowInsets;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -429,9 +426,11 @@ public final class DataFragment extends Fragment implements DialogListener {
                         Logging.error("unable to get fragment activity");
                     }
                 });
+                final boolean useFossMaps = prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false);
                 final Button manageGpxButton = view.findViewById(R.id.manage_gpx_button);
                 manageGpxButton.setOnClickListener(v -> {
-                    final Intent gpxIntent = new Intent(a.getApplicationContext(), GpxManagementActivity.class);
+                    final Intent gpxIntent = new Intent(a.getApplicationContext(),
+                            useFossMaps ? FossGpxManagementActivity.class : GpxManagementActivity.class);
                     a.startActivityForResult(gpxIntent, ACTION_GPX_MGMT);
                 });
             }

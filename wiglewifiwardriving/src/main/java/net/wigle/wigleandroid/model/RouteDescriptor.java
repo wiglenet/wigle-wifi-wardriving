@@ -1,22 +1,20 @@
 package net.wigle.wigleandroid.model;
 
-import android.graphics.Color;
 import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
 
-import net.wigle.wigleandroid.MainActivity;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.wigle.wigleandroid.MappingFragment.getRouteColorForMapType;
 
 /**
  * A utility class to manage routes for internal representation and map rendering
  */
-public class PolylineRoute {
-    public static final float DEFAULT_ROUTE_WIDTH = 15.0f; //TODO: dedup with MappingFragment
+public class RouteDescriptor {
+    public static final float DEFAULT_ROUTE_WIDTH = 7.0f; //TODO: dedup with MappingFragment
 
-    private PolylineOptions polyline;
+    private final SegmentRoute polyline;
     private float westExtent;
     private float eastExtent;
     private float northExtent;
@@ -25,10 +23,10 @@ public class PolylineRoute {
     private float distanceMeters;
     private LatLng lastAdded;
 
-    public PolylineRoute() {
+    public RouteDescriptor() {
         distanceMeters = 0;
-        polyline = new PolylineOptions()
-                .clickable(false);
+        polyline = new SegmentRoute();
+        polyline.setClickable(false);
         //init to sure - opposites
         westExtent = 180f;
         eastExtent = -180f;
@@ -49,9 +47,9 @@ public class PolylineRoute {
     public void addLatLng(final float latitude, final float longitude, final int mapMode, final boolean nightMode) {
         final LatLng newPoint = new LatLng(latitude, longitude);
         polyline.add(newPoint);
-        polyline.color(getRouteColorForMapType(mapMode, nightMode));
-        polyline.width(DEFAULT_ROUTE_WIDTH);
-        polyline.zIndex(10000); //to overlay above traffic data
+        polyline.setColor(getRouteColorForMapType(mapMode, nightMode));
+        polyline.setWidth(DEFAULT_ROUTE_WIDTH);
+        polyline.setZIndex(10000); //to overlay above traffic data
         if (latitude > northExtent) {
             northExtent = latitude;
         }
@@ -75,7 +73,7 @@ public class PolylineRoute {
      * Get the google maps polyline for the route
      * @return the corresponding polyline to render
      */
-    public PolylineOptions getPolyline() {
+    public SegmentRoute getSegmentRoute() {
         return polyline;
     }
 
@@ -88,11 +86,71 @@ public class PolylineRoute {
     }
 
     /**
+     * Get the north-eastern-most point latitude
+     * @return the latitude value
+     */
+    public float getNELatitude() {
+        return northExtent;
+    }
+
+    /**
+     * Get the north-eastern-most point longitude
+     * @return the longitude value
+     */
+    public float getNELongitude() {
+        return eastExtent;
+    }
+
+    /**
      * Get the south-western-most point of the route
      * @return the value at the corner
      */
     public LatLng getSWExtent() {
         return new LatLng(southExtent, westExtent);
+    }
+
+    /**
+     * Get the south-western-most point latitude
+     * @return the latitude value
+     */
+    public float getSWLatitude() {
+        return southExtent;
+    }
+
+    /**
+     * Get the south-western-most point longitude
+     * @return the longitude value
+     */
+    public float getSWLongitude() {
+        return westExtent;
+    }
+
+    /**
+     * Get the route color
+     * @return the color value
+     */
+    public int getRouteColor() {
+        return polyline.getColor();
+    }
+
+    /**
+     * Get the route width
+     * @return the width value
+     */
+    public float getRouteWidth() {
+        return polyline.getWidth();
+    }
+
+    /**
+     * Get all route points as a list of latitude/longitude pairs
+     * @return list of points where each point is represented as a double array [latitude, longitude]
+     */
+    public List<double[]> getRoutePoints() {
+        List<double[]> points = new ArrayList<>();
+        for (LatLng point : polyline.getPoints()) {
+            points.add(new double[]{point.latitude, point.longitude});
+        }
+        return points;
     }
 
     /**

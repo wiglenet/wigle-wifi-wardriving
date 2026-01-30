@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -34,6 +33,7 @@ import net.wigle.wigleandroid.ErrorReportActivity;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.background.BackupRunnable;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.Pair;
@@ -56,8 +56,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * our database helper, makes a great data meal.

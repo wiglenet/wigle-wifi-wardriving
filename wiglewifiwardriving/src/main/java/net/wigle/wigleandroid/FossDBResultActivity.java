@@ -1,6 +1,9 @@
 package net.wigle.wigleandroid;
 
 
+import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_KEY;
+import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -8,32 +11,31 @@ import androidx.annotation.NonNull;
 import android.os.Handler;
 import android.widget.RelativeLayout;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.api.BtSearchResponse;
 import net.wigle.wigleandroid.model.api.CellSearchResponse;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
-import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.util.Logging;
 
+import org.maplibre.android.annotations.MarkerOptions;
+import org.maplibre.android.camera.CameraPosition;
+import org.maplibre.android.camera.CameraUpdateFactory;
+import org.maplibre.android.geometry.LatLng;
+import org.maplibre.android.geometry.LatLngBounds;
+import org.maplibre.android.maps.MapView;
+
 /**
- * Display search results - Google Maps-specific implementation
- * [delete this file for FOSS build]
+ * DB/Network query result activity for FOSS Maps
  */
-public class DBResultActivity extends AbstractDBResultActivity {
+public class FossDBResultActivity extends AbstractDBResultActivity {
 
     private MapView mapView;
-    private MapRender mapRender;
+
+    private FossMapRender mapRender;
 
     @Override
     protected int getLayoutResourceId() {
-        return R.layout.dbresult;
+        return R.layout.foss_dbresult;
     }
 
     @Override
@@ -45,17 +47,26 @@ public class DBResultActivity extends AbstractDBResultActivity {
     protected void setupMap(final net.wigle.wigleandroid.model.LatLng center, final Bundle savedInstanceState, final SharedPreferences prefs) {
         mapView = new MapView( this );
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
-        MapsInitializer.initialize(this);
 
-        mapView.getMapAsync(googleMap -> {
-            mapRender = new MapRender(DBResultActivity.this, googleMap, true);
+        mapView.getMapAsync(mapLibreMap -> {
+            final String mapServerKey = prefs != null ?
+                    prefs.getString(PREF_FOSS_MAPS_VECTOR_TILE_KEY, null) : null;
+            final String mapServerUrl = prefs != null ?
+                    prefs.getString(PREF_FOSS_MAPS_VECTOR_TILE_STYLE, null) : null;
 
+            //TODO: day/night style?
+            String styleUrl;
+            if (mapServerKey != null && !mapServerKey.isEmpty()) {
+                styleUrl = mapServerUrl + mapServerKey;
+            } else {
+                styleUrl = "https://demotiles.maplibre.org/style.json";
+            }
+            mapLibreMap.setStyle(styleUrl);
             if (center != null) {
                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(center.latitude, center.longitude))
                         .zoom(DEFAULT_ZOOM).build();
-                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                mapLibreMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
         final RelativeLayout rlView = findViewById( R.id.db_map_rl );
@@ -65,20 +76,42 @@ public class DBResultActivity extends AbstractDBResultActivity {
     @Override
     public void updateMap(boolean hasValidPoints, Handler handler) {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        if (null != mapRender && listAdapter != null) {
+        if (listAdapter != null) {
             for (Network n : resultList) {
                 listAdapter.add(n);
-                mapRender.addItem(n);
-                final LatLng ll = n.getPosition();
-                //noinspection ConstantConditions
-                if (ll != null) {
-                    builder.include(ll);
-                    hasValidPoints = true;
+                final net.wigle.wigleandroid.model.LatLng pos = n.getLatLng();
+                if (null != pos) {
+                    final LatLng ll = new LatLng(pos.latitude, pos.longitude);
+                    //noinspection ConstantConditions
+                    if (ll != null) {
+                        builder.include(ll);
+                        hasValidPoints = true;
+                    }
                 }
             }
         }
         if (hasValidPoints) {
-            mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+            mapView.getMapAsync(mapLibre -> {
+                for (Network n: resultList) {
+                    final net.wigle.wigleandroid.model.LatLng pos = n.getLatLng();
+                    if (null != pos) {
+                        mapLibre.addMarker(
+                                new MarkerOptions()
+                                        .position(new LatLng(pos.latitude, pos.longitude))
+                                        .title(n.getSsid())
+                                        .snippet(n.getType() + " " + n.getBssid())
+                        );
+                    }
+                }
+                if (resultList.size() > 1) {
+                    mapLibre.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0));
+                } else if (resultList.size() == 1) {
+                    mapLibre.moveCamera(CameraUpdateFactory.newLatLng(
+                            new LatLng(
+                                    resultList.get(0).getLatLng().latitude,
+                                    resultList.get(0).getLatLng().longitude)));
+                }
+            });
         } else {
             handler.post(this::handleEmptyResult);
         }
@@ -99,11 +132,9 @@ public class DBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = WiFiSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(n.getPosition());
+                    builder.include(new LatLng(n.getPosition().latitude, n.getPosition().longitude));
+//1/3: TODO: not working
 
-                    if (n.getLatLng() != null && mapRender != null) {
-                        mapRender.addItem(n);
-                    }
                 }
             }
         } else if (null != btSearchResponse && null != btSearchResponse.getResults()) {
@@ -111,11 +142,9 @@ public class DBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = BtSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(n.getPosition());
+                    builder.include(new LatLng(n.getPosition().latitude, n.getPosition().longitude));
 
-                    if (n.getLatLng() != null && mapRender != null) {
-                        mapRender.addItem(n);
-                    }
+//2/3: TODO: not working
                 }
             }
         } else if (null != cellSearchResponse && null != cellSearchResponse.getResults()) {
@@ -123,17 +152,15 @@ public class DBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = CellSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(n.getPosition());
+                    builder.include(new LatLng(n.getPosition().latitude, n.getPosition().longitude));
 
-                    if (n.getLatLng() != null && mapRender != null) {
-                        mapRender.addItem(n);
-                    }
+//3/3: TODO: not working
                 }
             }
         }
         if (!listAdapter.isEmpty()) {
             try {
-                mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+                mapView.getMapAsync(mapLibre -> mapLibre.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
             } catch (IllegalStateException ise) {
                 Logging.error("Illegal state exception on map move: ", ise);
             }

@@ -10,7 +10,6 @@ import android.net.wifi.ScanResult;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
 import net.wigle.wigleandroid.MainActivity;
@@ -223,10 +222,20 @@ public final class Network implements ClusterItem {
         this.geoPoint = latLng;
     }
 
+    /**
+     * ClusterItem title
+     * [delete this method for FOSS build]
+     * @return the SSID of the network as title
+     */
     public String getTitle() {
         return ssid;
     }
 
+    /**
+     * ClusterItem snippet
+     * [delete this method for FOSS build]
+     * @return the BSSID of the network as "snippet"
+     */
     public String getSnippet() {
         return bssid;
     }
@@ -459,10 +468,18 @@ public final class Network implements ClusterItem {
         return bleMfgr;
     }
 
+    /**
+     * ClusterItem contract position
+     * [delete this method for FOSS build]
+     */
     @NonNull
     @Override
-    public LatLng getPosition() {
-        return geoPoint;
+    public com.google.android.gms.maps.model.LatLng getPosition() {
+        if (null != geoPoint) {
+            return new com.google.android.gms.maps.model.LatLng(geoPoint.latitude, geoPoint.longitude);
+        } else {
+            return new com.google.android.gms.maps.model.LatLng(0d, 0d);
+        }
     }
 
     @Override

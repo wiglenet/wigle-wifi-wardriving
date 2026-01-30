@@ -43,6 +43,7 @@ import org.maplibre.android.location.modes.CameraMode;
 import org.maplibre.android.maps.MapLibreMap;
 import org.maplibre.android.maps.MapView;
 import org.maplibre.android.maps.Style;
+import org.maplibre.android.style.layers.Layer;
 import org.maplibre.android.style.layers.RasterLayer;
 import org.maplibre.android.style.layers.Property;
 import org.maplibre.android.style.layers.PropertyFactory;
@@ -298,8 +299,9 @@ public class FossMappingFragment extends AbstractMappingFragment {
             style.addSource(rasterSource);
 
             if (!style.getLayers().isEmpty()) {
-                // Add above the first base layer - should be terrain/bg
-                String topLayerId = style.getLayers().getLast().getId();
+                // add over the top layer
+                final List<Layer> layers = style.getLayers();
+                String topLayerId = layers.get(layers.size()-1).getId();
                 style.addLayerAbove(rasterLayer, topLayerId);
                 Logging.info("RasterLayer added above layer: " + topLayerId);
             } else {

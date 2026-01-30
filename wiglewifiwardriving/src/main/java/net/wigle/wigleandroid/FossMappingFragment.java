@@ -413,7 +413,7 @@ public class FossMappingFragment extends AbstractMappingFragment {
     @Override
     public void addNetwork(Network network) {
         if (mapRender != null && mapRender.okForMapTab(network)) {
-            Logging.info("Adding network to map: " + network.getBssid());
+            //DEBUG: Logging.info("Adding network to map: " + network.getBssid());
             mapRender.addItem(network);
         }
     }

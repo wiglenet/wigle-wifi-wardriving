@@ -37,6 +37,7 @@ import java.util.regex.Matcher;
 
 /**
  * Custom map rendering: clustering, label decisions, MapUtils functionality
+ * [delete this file for FOSS build]
  */
 public class MapRender {
 
@@ -139,7 +140,7 @@ public class MapRender {
                 final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
                 if (bounds == null || network.getLatLng() == null) return false;
                 // if on screen, and room in labeled networks, we can show the label
-                return !bounds.contains(network.getLatLng()) || MapRender.this.labeledNetworks.size() > MAX_LABELS;
+                return !bounds.contains(network.getPosition()) || MapRender.this.labeledNetworks.size() > MAX_LABELS;
             }
             return true;
         }
@@ -209,7 +210,7 @@ public class MapRender {
                 for (final Network network : nets) {
                     final Marker marker = NetworkRenderer.this.getMarker(network);
                     if (marker != null && network.getLatLng() != null) {
-                        final boolean inBounds = bounds.contains(network.getLatLng());
+                        final boolean inBounds = bounds.contains(network.getPosition());
                         if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
                             // MainActivity.info("sendupdate: " + network.getBssid());
                             ssids.add(network.getBssid());

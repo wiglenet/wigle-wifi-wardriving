@@ -151,6 +151,20 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".FossNetworkActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:exported="false"
+            android:label="@string/network_activity_name"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
+
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
             android:name=".RegistrationActivity"
             android:parentActivityName=".MainActivity"
             android:exported="true"
@@ -234,7 +248,33 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".FossDBResultActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:exported="false"
+            android:label="@string/dbresult_activity_name"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
+
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
             android:name=".GpxManagementActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:exported="false"
+            android:label="@string/manage_gpx"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChildActivityTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".FossGpxManagementActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/manage_gpx"

@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,7 +24,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -280,13 +282,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final TextView scanThrottleHelp = view.findViewById(R.id.scan_throttle_help);
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
             scanThrottleHelp.setText(R.string.pie_bad);
-            scanThrottleHelp.setVisibility(View.VISIBLE);
+            scanThrottleHelp.setVisibility(VISIBLE);
         }  else if (Build.VERSION.SDK_INT == 29) {
             final StringBuilder builder = new StringBuilder(getString(R.string.q_bad));
             addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
             builder.append(getString(R.string.disable_throttle));
             scanThrottleHelp.setText(builder.toString());
-            scanThrottleHelp.setVisibility(View.VISIBLE);
+            scanThrottleHelp.setVisibility(VISIBLE);
         } else if (Build.VERSION.SDK_INT > 29) {
             //ALIBI: starting in SDK 30, we can check the throttle via WiFiManager.isScanThrottleEnabled
             final Context mainActivity = MainActivity.getMainActivity();
@@ -296,7 +298,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
                     addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
                     scanThrottleHelp.setText(builder.toString());
-                    scanThrottleHelp.setVisibility(View.VISIBLE);
+                    scanThrottleHelp.setVisibility(VISIBLE);
                 }
             }
         }
@@ -314,30 +316,30 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         if (!authUser.isEmpty()) {
             authUserDisplay.setText(authUser);
-            authUserDisplay.setVisibility(View.VISIBLE);
-            authUserLayout.setVisibility(View.VISIBLE);
+            authUserDisplay.setVisibility(VISIBLE);
+            authUserLayout.setVisibility(VISIBLE);
             if (!authToken.isEmpty()) {
-                deauthButton.setVisibility(View.VISIBLE);
+                deauthButton.setVisibility(VISIBLE);
                 deauthButton.setOnClickListener(view13 -> WiGLEConfirmationDialog.createConfirmation( getActivity(),
                         getString(R.string.deauthorize_confirm),
                         R.id.nav_settings, DEAUTHORIZE_DIALOG ));
-                authButton.setVisibility(View.GONE);
-                passEdit.setVisibility(View.GONE);
-                passEditLayout.setVisibility(View.GONE);
-                showPassword.setVisibility(View.GONE);
+                authButton.setVisibility(GONE);
+                passEdit.setVisibility(GONE);
+                passEditLayout.setVisibility(GONE);
+                showPassword.setVisibility(GONE);
                 user.setEnabled(false);
             } else {
                 user.setEnabled(true);
             }
         } else {
             user.setEnabled(true);
-            authUserDisplay.setVisibility(View.GONE);
-            authUserLayout.setVisibility(View.GONE);
-            deauthButton.setVisibility(View.GONE);
-            passEdit.setVisibility(View.VISIBLE);
-            passEditLayout.setVisibility(View.VISIBLE);
-            showPassword.setVisibility(View.VISIBLE);
-            authButton.setVisibility(View.VISIBLE);
+            authUserDisplay.setVisibility(GONE);
+            authUserLayout.setVisibility(GONE);
+            deauthButton.setVisibility(GONE);
+            passEdit.setVisibility(VISIBLE);
+            passEditLayout.setVisibility(VISIBLE);
+            showPassword.setVisibility(VISIBLE);
+            authButton.setVisibility(VISIBLE);
             authButton.setOnClickListener(view12 -> {
                 MainActivity.State s = MainActivity.getStaticState();
                 final SettingsFragment frag = this;
@@ -469,7 +471,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         if (!PreferenceKeys.PREF_MAP_NO_TILE.equals(showDiscovered)) {
             LinearLayout mainLayout = view.findViewById(R.id.show_map_discovered_since);
-            mainLayout.setVisibility(View.VISIBLE);
+            mainLayout.setVisibility(VISIBLE);
         }
 
         SettingsUtil.doMapSpinner( R.id.show_discovered, PreferenceKeys.PREF_SHOW_DISCOVERED,
@@ -583,10 +585,20 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
             };
             SettingsUtil.doSpinner(R.id.language_spinner, view, PreferenceKeys.PREF_LANGUAGE, "", languages, languageName, getContext());
+            final CheckBox fossMapOn = PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.foss_maps, PreferenceKeys.PREF_USE_FOSS_MAPS, false, value -> {
+                setFossMapVisible(value, view);
+                if (value) {
+                    setupFossMapEditFields(view, prefs, editor);
+                }
+            });
+            setFossMapVisible(fossMapOn.isChecked(), view);
+            if (fossMapOn.isChecked()) {
+                setupFossMapEditFields(view, prefs, editor);
+            }
         }
         if (Build.VERSION.SDK_INT > 28) {
             View theme = view.findViewById(R.id.theme_section);
-            theme.setVisibility(View.VISIBLE);
+            theme.setVisibility(VISIBLE);
             final Integer[] themes = new Integer[] {AppCompatDelegate.MODE_NIGHT_YES, AppCompatDelegate.MODE_NIGHT_NO, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM};
             final String[] themeName = new String[]{getString(R.string.theme_dark_label), getString(R.string.theme_light_label), getString(R.string.theme_follow_label)};
             SettingsUtil.doSpinner(R.id.theme_spinner, view, PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES, themes, themeName, getContext());
@@ -655,11 +667,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 //ALIBI: ActivateAcitivity.receiveDetections sets isAnonymous = false
                 if ("".equals(username) || isAnonymous) {
                     register.setEnabled(true);
-                    register.setVisibility(View.VISIBLE);
+                    register.setVisibility(VISIBLE);
                 } else {
                     // poof
                     register.setEnabled(false);
-                    register.setVisibility(View.GONE);
+                    register.setVisibility(GONE);
                 }
             }
         }
@@ -715,7 +727,56 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (view != null) {
             final CheckBox donate = view.findViewById(R.id.donate);
             donate.setEnabled(false);
-            donate.setVisibility(View.GONE);
+            donate.setVisibility(GONE);
+        }
+    }
+
+    private static void setFossMapVisible(final boolean value, final View view) {
+        if (view != null) {
+            final View fossMapUrlInput = view.findViewById(R.id.foss_map_url_input_layout);
+            if (fossMapUrlInput != null) {
+                if (value) {
+                    fossMapUrlInput.setVisibility(VISIBLE);
+                } else {
+                    fossMapUrlInput.setVisibility(GONE);
+                }
+            }
+        }
+    }
+
+    private void setupFossMapEditFields(final View view, final SharedPreferences prefs, final Editor editor) {
+        final com.google.android.material.textfield.TextInputEditText fossMapStyleUrlEdit = view.findViewById(R.id.edit_foss_map_style_url);
+        final com.google.android.material.textfield.TextInputEditText fossMapKeyEdit = view.findViewById(R.id.edit_foss_map_key);
+        if (fossMapStyleUrlEdit != null) {
+            final String currentStyleUrl = prefs.getString(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE, "");
+            fossMapStyleUrlEdit.setText(currentStyleUrl);// Add listener to save changes
+            fossMapStyleUrlEdit.addTextChangedListener(new SetWatcher() {
+                @Override
+                public void onTextChanged(final String s) {
+                    if (s != null && !s.trim().isEmpty()) {
+                        editor.putString(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE, s.trim());
+                    } else {
+                        editor.remove(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE);
+                    }
+                    editor.apply();
+                }
+            });
+        }
+
+        if (fossMapKeyEdit != null) {
+            final String currentKey = prefs.getString(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_KEY, "");
+            fossMapKeyEdit.setText(currentKey);
+            fossMapKeyEdit.addTextChangedListener(new SetWatcher() {
+                @Override
+                public void onTextChanged(final String s) {
+                    if (s != null && !s.trim().isEmpty()) {
+                        editor.putString(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_KEY, s.trim());
+                    } else {
+                        editor.remove(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_KEY);
+                    }
+                    editor.apply();
+                }
+            });
         }
     }
 

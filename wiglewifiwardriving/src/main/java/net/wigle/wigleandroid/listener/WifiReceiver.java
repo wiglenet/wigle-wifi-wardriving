@@ -22,6 +22,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.GsmOperator;
 import net.wigle.wigleandroid.model.GsmOperatorException;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
@@ -64,8 +65,6 @@ import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
-
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Primary receiver logic for WiFi and Cell nets.

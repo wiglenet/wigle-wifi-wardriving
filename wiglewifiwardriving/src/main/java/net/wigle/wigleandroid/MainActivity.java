@@ -873,8 +873,28 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         } else if (navId == R.id.nav_data) {
             return DataFragment.class;
         } else if (navId == R.id.nav_search) {
+            if (null != mainActivity) {
+                SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+                if (null != prefs) {
+                    if (prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false)) {
+                        return FossSearchFragment.class;
+                    } else {
+                        return SearchFragment.class;
+                    }
+                }
+            }
             return SearchFragment.class;
         } else if (navId == R.id.nav_map) {
+            if (null != mainActivity) {
+                SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+                if (null != prefs) {
+                    if (prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false)) {
+                        return FossMappingFragment.class;
+                    } else {
+                        return MappingFragment.class;
+                    }
+                }
+            }
             return MappingFragment.class;
         } else if (navId == R.id.nav_user_stats) {
             return UserStatsFragment.class;
@@ -1290,7 +1310,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final FragmentManager fragmentManager = a.getSupportFragmentManager();
             if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
                 // Map is visible, give it the new network
-                final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+                final AbstractMappingFragment f = (AbstractMappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
                 if (f != null) {
                     f.addNetwork(network);
                 }
@@ -1304,7 +1324,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final FragmentManager fragmentManager = a.getSupportFragmentManager();
             if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
                 // Map is visible, give it the new network
-                final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+                final AbstractMappingFragment f = (AbstractMappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
                 if (f != null) {
                     f.updateNetwork(network);
                 }
@@ -1313,10 +1333,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static void reclusterMap() {
-        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        final MainActivity a = MainActivity.mainActivity;
+        if (a == null) {
+            return;
+        }
+        final FragmentManager fragmentManager = a.getSupportFragmentManager();
         if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
-            // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+            final AbstractMappingFragment f = (AbstractMappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
                 f.reCluster();
             }

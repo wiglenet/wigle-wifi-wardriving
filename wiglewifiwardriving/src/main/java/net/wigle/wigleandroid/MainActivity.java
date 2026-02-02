@@ -1622,7 +1622,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     @Override
     public boolean isFinishing() {
-        return state.finishing.get();
+        //ALIBI: seeing ostensibly impossible crashes without null checks exclusively on HONOR devices
+        return null != state && null != state.finishing && state.finishing.get();
     }
 
     public boolean isTransferring() {

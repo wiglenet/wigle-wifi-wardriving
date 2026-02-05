@@ -7,11 +7,9 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.lang.String;
@@ -20,25 +18,21 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.model.GsmOperator;
-import net.wigle.wigleandroid.model.GsmOperatorException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
-import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ui.UINumberFormat;
-import net.wigle.wigleandroid.util.CellNetworkLegend;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.ScanUtil;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.SQLException;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -46,31 +40,11 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.telephony.CellIdentityCdma;
-import android.telephony.CellIdentityNr;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoCdma;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
-import android.telephony.CellInfoNr;
-import android.telephony.CellInfoWcdma;
-import android.telephony.CellLocation;
-import android.telephony.CellSignalStrength;
-import android.telephony.CellSignalStrengthCdma;
-import android.telephony.CellSignalStrengthGsm;
-import android.telephony.CellSignalStrengthLte;
-import android.telephony.CellSignalStrengthWcdma;
-import android.telephony.NeighboringCellInfo;
-import android.telephony.TelephonyManager;
-import android.telephony.cdma.CdmaCellLocation;
-import android.telephony.gsm.GsmCellLocation;
 
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Primary receiver logic for WiFi and Cell nets.
- * Monolithic - candidate for refactor.
- * TODO: split Cell into own class
+ * Primary receiver logic for WiFi scan results.
  * @author bobzilla, arkasha
  */
 public class WifiReceiver extends BroadcastReceiver {
@@ -88,11 +62,9 @@ public class WifiReceiver extends BroadcastReceiver {
     private long lastSaveLocationTime = 0;
     private long lastHaveLocationTime = 0;
     private int pendingWifiCount = 0;
-    private int pendingCellCount = 0;
     private final long constructionTime = System.currentTimeMillis();
     private long previousTalkTime = System.currentTimeMillis();
     private final Set<String> runNetworks = new HashSet<>();
-    private final Set<String> runCells = new HashSet<>();
     private long prevNewNetCount;
     private long prevScanPeriod;
     private boolean scanInFlight = false;
@@ -372,93 +344,47 @@ public class WifiReceiver extends BroadcastReceiver {
             mainActivity.interruptSpeak();
         }
 
-        // TODO: this ties cell collection to WiFi collection - refactor cells onto their own timer
-        // check cell tower info
-        final int preCellForRun = runNetworks.size();
-        int newCellForRun = 0;
-        final Map<String,Network>cellNetworks = recordCellInfo(location);
-        if ( cellNetworks != null ) {
-            for (String key: cellNetworks.keySet()) {
-                final Network cellNetwork = cellNetworks.get(key);
-                if (cellNetwork != null) {
-                    resultSize++;
-                    if (showCurrent && listAdapter != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, PreferenceKeys.FILTER_PREF_PREFIX, cellNetwork)) {
-                        listAdapter.addCell(cellNetwork);
-                    }
-                    if (runNetworks.size() > preCellForRun) {
-                        newCellForRun++;
-                    }
-                }
-            }
-        }
-
-        // check for "New" cell towers
-        final long newCellCount = dbHelper.getNewCellCount();
-
-        NetworkListUtil.sort(prefs, listAdapter);
-
-        final long dbNets = dbHelper.getNetworkCount();
-        final long dbLocs = dbHelper.getLocationCount();
-
-        // update stat
-        mainActivity.setNetCountUI();
-
-        if ( scanRequestTime <= 0 ) {
-            // wasn't set, set to now
-            scanRequestTime = now;
-        }
-
-        // set the statics for the map
+        final long effectiveScanRequestTime = scanRequestTime <= 0 ? now : scanRequestTime;
+        // setting statics for shared access
+        ListFragment.lameStatic.currWifi = resultSize;
+        ListFragment.lameStatic.currNets = resultSize + ListFragment.lameStatic.currCells; //TODO: outdated? (1/2)
         ListFragment.lameStatic.runNets = runNetworks.size();
-        ListFragment.lameStatic.runCells = runCells.size();
         ListFragment.lameStatic.newNets = newNetCount;
         ListFragment.lameStatic.newWifi = newWifiCount;
-        ListFragment.lameStatic.newCells = newCellCount;
-        ListFragment.lameStatic.currNets = resultSize;
-        ListFragment.lameStatic.currWifiScanDurMs = (now - scanRequestTime);
+        ListFragment.lameStatic.currWifiScanDurMs = (now - effectiveScanRequestTime);
         ListFragment.lameStatic.preQueueSize = preQueueSize;
-        ListFragment.lameStatic.dbNets = dbNets;
-        ListFragment.lameStatic.dbLocs = dbLocs;
+        ListFragment.lameStatic.dbNets = dbHelper.getNetworkCount();
+        ListFragment.lameStatic.dbLocs = dbHelper.getLocationCount();
 
-        // do this if trail is empty, so as soon as we get first gps location it gets triggered
-        // and will show up on map
-        if ( newWifiForRun > 0 || newCellForRun > 0 || ListFragment.lameStatic.networkCache.isEmpty() ) {
-            if ( location == null ) {
-                // save for later
+        if (newWifiForRun > 0 || ListFragment.lameStatic.networkCache.isEmpty()) {
+            if (location == null) {
                 pendingWifiCount += newWifiForRun;
-                pendingCellCount += newCellForRun;
-                // MainActivity.info("pendingCellCount: " + pendingCellCount);
-            }
-            else {
-                // add any pendings
-                // don't go crazy
-                if ( pendingWifiCount > 25 ) {
+            } else {
+                if (pendingWifiCount > 25) {
                     pendingWifiCount = 25;
                 }
                 pendingWifiCount = 0;
-
-                if ( pendingCellCount > 25 ) {
-                    pendingCellCount = 25;
-                }
-                pendingCellCount = 0;
             }
         }
 
-        // info( savedStats );
+        NetworkListUtil.sort(prefs, listAdapter);
+        mainActivity.setNetCountUI();
 
-        mainActivity.setScanStatusUI( resultSize, ListFragment.lameStatic.currWifiScanDurMs);
+        if (scanRequestTime <= 0) {
+            scanRequestTime = now;
+        }
 
+        mainActivity.setScanStatusUI(ListFragment.lameStatic.currNets, ListFragment.lameStatic.currWifiScanDurMs);
         mainActivity.setDBQueue(preQueueSize);
-        // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
         scanRequestTime = nonstopScanRequestTime;
 
-        if ( somethingAdded && ssidSpeak ) {
+        if (somethingAdded && ssidSpeak) {
             ssidSpeaker.speak();
         }
 
-        final long speechPeriod = prefs.getLong( PreferenceKeys.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD );
-        if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-            doAnnouncement( preQueueSize, newWifiCount, newCellCount, ListFragment.lameStatic.newBt, now );
+        final long speechPeriod = prefs.getLong(PreferenceKeys.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD);
+        if (speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L) {
+            doAnnouncement(preQueueSize, newWifiCount, ListFragment.lameStatic.newCells, ListFragment.lameStatic.newBt, now);
         }
     }
 
@@ -538,286 +464,6 @@ public class WifiReceiver extends BroadcastReceiver {
 
 
     /**
-     * trigger for cell collection and logging
-     * @param location the current Location
-     * @return a map of IDs::Network records
-     */
-    private Map<String,Network> recordCellInfo(final Location location) {
-        TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
-        Map<String,Network> networks = new HashMap<>();
-        if ( tele != null ) {
-            try {
-                //DEBUG: MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
-
-                List<CellInfo> infos = tele.getAllCellInfo();
-                if (null != infos) {
-                    for (final CellInfo cell : infos) {
-                        Network network = handleSingleCellInfo(cell, tele, location);
-                        //DEBUG: Logging.info("list cell: "+cell.toString());
-                        if (null != network) {
-                            if (networks.containsKey(network.getBssid())) {
-                                //DEBUG: MainActivity.info("matching network already in map: " + network.getBssid());
-                                Network n = networks.get(network.getBssid());
-                                //TODO merge to improve data instead of replace?
-                                networks.put(network.getBssid(), network);
-                            } else {
-                                networks.put(network.getBssid(), network);
-                            }
-                        }
-                    }
-                    ListFragment.lameStatic.currCells = infos.size();
-                } else if (Build.VERSION.SDK_INT < 26) {
-                    //NB: common source of ANRs
-                    CellLocation currentCell = tele.getCellLocation();
-                    if (currentCell != null) {
-                        Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                        //DEBUG: Logging.info("single cell: "+currentCell.toString());
-                        if (currentNetwork != null) {
-                            networks.put(currentNetwork.getBssid(), currentNetwork);
-                            ListFragment.lameStatic.currCells = 1;
-                        }
-                    }
-                    //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
-                    //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
-                    /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
-                    if (null != list) {
-                        for (final NeighboringCellInfo cell : list) {
-                            //networks.put(
-                            handleSingleNeighboringCellInfo(cell, tele, location);
-                            //);
-                        }
-                    }*/
-                }
-            } catch (SecurityException sex) {
-                Logging.warn("unable to scan cells due to permission issue: ", sex);
-            } catch (NullPointerException ex) {
-                Logging.warn("NPE on cell scan: ", ex);
-            }
-        }
-        return networks;
-    }
-
-    /**
-     * Translate a CellInfo record to Network record / sorts by type and capabilities to correct update methods
-     * (new implementation)
-     */
-    private Network handleSingleCellInfo(final CellInfo cellInfo, final TelephonyManager tele, final Location location) {
-        if (cellInfo == null) {
-            Logging.info("null cellInfo");
-            // ignore
-        } else {
-            if (MainActivity.DEBUG_CELL_DATA) {
-                Logging.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
-            }
-            GsmOperator g;
-            try {
-                switch (cellInfo.getClass().getSimpleName()) {
-                    case "CellInfoCdma":
-                        return handleSingleCdmaInfo(((CellInfoCdma) (cellInfo)), tele, location);
-                    case "CellInfoGsm":
-                        g = new GsmOperator(((CellInfoGsm) (cellInfo)).getCellIdentity());
-                        CellSignalStrengthGsm cellStrengthG = ((CellInfoGsm) (cellInfo)).getCellSignalStrength();
-                        return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "GSM",
-                                cellStrengthG.getDbm(), NetworkType.typeForCode("G"), location);
-                    case "CellInfoLte":
-                        g = new GsmOperator(((CellInfoLte) (cellInfo)).getCellIdentity());
-                        CellSignalStrengthLte cellStrengthL = ((CellInfoLte) (cellInfo)).getCellSignalStrength();
-                        return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "LTE",
-                                cellStrengthL.getDbm(), NetworkType.typeForCode("L"), location);
-                    case "CellInfoWcdma": {
-                        g = new GsmOperator(((CellInfoWcdma) (cellInfo)).getCellIdentity());
-                        CellSignalStrengthWcdma cellStrengthW = ((CellInfoWcdma) (cellInfo)).getCellSignalStrength();
-                        return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "WCDMA",
-                                cellStrengthW.getDbm(), NetworkType.typeForCode("D"), location);
-                    }
-                    case "CellInfoNr":
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                            g = new GsmOperator((CellIdentityNr) ((CellInfoNr) (cellInfo)).getCellIdentity());
-                            CellSignalStrength cellStrengthW = ((CellInfoNr) (cellInfo)).getCellSignalStrength();
-                            return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "NR",
-                                    cellStrengthW.getDbm(), NetworkType.typeForCode("N"), location);
-                        }
-                        break;
-                    default:
-                        Logging.warn("Unknown cell case: " + cellInfo.getClass().getSimpleName());
-                        break;
-                }
-            } catch (GsmOperatorException gsex) {
-                //MainActivity.info("skipping invalid cell data: "+gsex);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * no test environment to implement this, but the handleCellInfo methods should work to complete it.
-     * NeighboringCellInfos never appear in practical testing
-     */
-    @Deprecated
-    private Network handleSingleNeighboringCellInfo(final NeighboringCellInfo cellInfo, final TelephonyManager tele, final Location location) {
-        //noinspection StatementWithEmptyBody
-        if (null == cellInfo) {
-            // ignore
-        } else {
-            if (MainActivity.DEBUG_CELL_DATA) {
-                Logging.info("NeighboringCellInfo:" +
-                        "\n\tCID: " + cellInfo.getCid() +
-                        "\n\tLAC: " + cellInfo.getLac() +
-                        "\n\tType: " + cellInfo.getNetworkType() +
-                        "\n\tPsc: " + cellInfo.getPsc() +
-                        "\n\tRSSI: " + cellInfo.getRssi());
-            }
-            switch (cellInfo.getNetworkType()) {
-                case TelephonyManager.NETWORK_TYPE_GPRS:
-                    //TODO!!!
-                    break;
-                case TelephonyManager.NETWORK_TYPE_EDGE:
-                    //TODO!!!
-                    break;
-                case TelephonyManager.NETWORK_TYPE_UMTS:
-                    //TODO!!!
-                    break;
-                case TelephonyManager.NETWORK_TYPE_HSDPA:
-                    //TODO!!!
-                    break;
-                case TelephonyManager.NETWORK_TYPE_HSUPA:
-                    //TODO!!!
-                    break;
-                case TelephonyManager.NETWORK_TYPE_HSPA:
-                    //TODO!!!
-                    break;
-                default:
-                    //TODO!!!
-                    break;
-            }
-        }
-        return null; //TODO:
-    }
-
-    /**
-     * Translate and categorize a CellLocation record for update and logging
-     * (old/compat implementation)
-     */
-    private Network handleSingleCellLocation(final CellLocation cellLocation,
-                                             final TelephonyManager tele, final Location location) {
-        String bssid = null;
-        NetworkType type = null;
-        Network network = null;
-        String ssid = null;
-
-        //noinspection StatementWithEmptyBody
-        if ( cellLocation == null ) {
-            // ignore
-        } else if ( cellLocation.getClass().getSimpleName().equals("CdmaCellLocation") ) {
-            try {
-                final int systemId = ((CdmaCellLocation) cellLocation).getSystemId();
-                final int networkId = ((CdmaCellLocation) cellLocation).getNetworkId();
-                final int baseStationId = ((CdmaCellLocation) cellLocation).getBaseStationId();
-                if ( systemId > 0 && networkId >= 0 && baseStationId >= 0 ) {
-                    bssid = systemId + "_" + networkId + "_" + baseStationId;
-                    type = NetworkType.CDMA;
-                }
-                //TODO: not sure if there's anything else we can do here
-                ssid = tele.getNetworkOperatorName();
-            } catch ( Exception ex ) {
-                Logging.error("CDMA reflection exception: " + ex);
-            }
-        } else if ( cellLocation instanceof GsmCellLocation ) {
-            GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
-            final String operatorCode = tele.getNetworkOperator();
-            if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
-                bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
-                try {
-                    //TODO: 1/2: when cell gets its own listener, make this async (Strict)
-                    ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
-                } catch (SQLException sex) {
-                    Logging.error("failed to get op for "+tele.getNetworkOperator());
-                }
-                //DEBUG: MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
-                type = NetworkType.GSM;
-            }
-            if (operatorCode == null || operatorCode.isEmpty()) {
-                return null;
-            }
-        } else {
-            Logging.warn("Unhandled CellLocation type: "+cellLocation.getClass().getSimpleName());
-        }
-
-        if ( bssid != null ) {
-            final String networkType = CellNetworkLegend.getNetworkTypeName(tele);
-            final String capabilities = networkType + ";" + tele.getNetworkCountryIso();
-
-            int strength = 0;
-            PhoneState phoneState = mainActivity.getPhoneState();
-            if (phoneState != null) {
-                strength = phoneState.getStrength();
-            }
-
-            if ( NetworkType.GSM.equals(type) ) {
-                // never seems to work well in practice
-                strength = gsmDBmMagicDecoderRing( strength );
-            }
-
-            if (MainActivity.DEBUG_CELL_DATA) {
-                Logging.info("bssid: " + bssid);
-                Logging.info("strength: " + strength);
-                Logging.info("ssid: " + ssid);
-                Logging.info("capabilities: " + capabilities);
-                Logging.info("networkType: " + networkType);
-                Logging.info("location: " + location);
-            }
-
-            final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
-
-            final boolean newForRun = runNetworks.add( bssid );
-            runCells.add( bssid );
-
-            network = networkCache.get( bssid );
-            if ( network == null ) {
-                network = new Network( bssid, ssid, 0, capabilities, strength, type );
-                networkCache.put( network.getBssid(), network );
-            } else {
-                network.setLevel(strength);
-            }
-
-            if ( location != null && (newForRun || network.getLatLng() == null) ) {
-                // set the LatLng for mapping
-                final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-                network.setLatLng( LatLng );
-            }
-
-            if ( location != null ) {
-                dbHelper.addObservation(network, location, newForRun);
-            }
-        }
-        return network;
-    }
-
-    /**
-     * This was named RSSI - but I think it's more accurately dBm. Also worth noting that ALL the
-     * SignalStrength changes we've received in PhoneState for GSM networks have been resulting in
-     * "99" -> -113 in every measurable case on all hardware in testing.
-     */
-    @Deprecated
-    private int gsmDBmMagicDecoderRing( int strength ) {
-        int retval;
-        if ( strength == 99 ) {
-            // unknown
-            retval = CELL_MIN_STRENGTH;
-        }
-        else {
-            //  0        -113 dBm or less
-            //  1        -111 dBm
-            //  2...30   -109... -53 dBm
-            //  31        -51 dBm or greater
-            //  99 not known or not detectable
-            retval = strength * 2 + CELL_MIN_STRENGTH;
-        }
-        //DEBUG: MainActivity.info("strength: " + strength + " dBm: " + retval);
-        return retval;
-    }
-
-    /**
      * Voice announcement method for scan
      */
     private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long newBtCount, long now ) {
@@ -831,7 +477,7 @@ public class WifiReceiver extends BroadcastReceiver {
         // run, new, queue, miles, time, battery
         if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_RUN, true ) ) {
             builder.append(mainActivity.getString(R.string.run)).append(" ")
-                    .append(runNetworks.size()).append( ", " );
+                    .append(runNetworks.size() + ListFragment.lameStatic.runCells).append( ", " ); //TODO: also outdated? (2/2)
         }
         if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_WIFI, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_new_wifi)).append(" ")
@@ -926,25 +572,16 @@ public class WifiReceiver extends BroadcastReceiver {
      * get the scan period based on preferences and current speed
      */
     public long getScanPeriod() {
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
-
-        String scanPref = PreferenceKeys.PREF_SCAN_PERIOD;
-        long defaultRate = MainActivity.SCAN_DEFAULT;
-        // if over 5 mph
+        if (mainActivity == null) {
+            return MainActivity.SCAN_DEFAULT;
+        }
+        final SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         Location location = null;
         final GNSSListener gpsListener = mainActivity.getGPSListener();
         if (gpsListener != null) {
             location = gpsListener.getCurrentLocation();
         }
-        if ( location != null && location.getSpeed() >= 2.2352f ) {
-            scanPref = PreferenceKeys.PREF_SCAN_PERIOD_FAST;
-            defaultRate = MainActivity.SCAN_FAST_DEFAULT;
-        }
-        else if ( location == null || location.getSpeed() < 0.1f ) {
-            scanPref = PreferenceKeys.PREF_SCAN_PERIOD_STILL;
-            defaultRate = MainActivity.SCAN_STILL_DEFAULT;
-        }
-        return prefs.getLong( scanPref, defaultRate );
+        return ScanUtil.getWifiScanPeriod(prefs, location);
     }
 
     /**
@@ -1065,96 +702,4 @@ public class WifiReceiver extends BroadcastReceiver {
         return success;
     }
 
-    /**
-     * CDMA entrypoint to update and logging
-     */
-    private Network handleSingleCdmaInfo(final CellInfoCdma cellInfo, final TelephonyManager tele, final Location location) {
-        CellIdentityCdma cellIdentC = cellInfo.getCellIdentity();
-        CellSignalStrengthCdma cellStrengthC = cellInfo.getCellSignalStrength();
-
-        final int bssIdInt = cellIdentC.getBasestationId();
-        final int netIdInt = cellIdentC.getNetworkId();
-        final int systemIdInt = cellIdentC.getSystemId();
-
-        if ((Integer.MAX_VALUE == bssIdInt) || (Integer.MAX_VALUE == netIdInt) || (Integer.MAX_VALUE == systemIdInt)) {
-            Logging.info("Discarding CDMA cell with invalid ID");
-            return null;
-        }
-
-        final String networkKey = systemIdInt + "_" + netIdInt + "_" + bssIdInt;
-        final int dBmLevel = cellStrengthC.getDbm();
-        if (MainActivity.DEBUG_CELL_DATA) {
-
-            String res = "CDMA Cell:" +
-                    "\n\tBSSID:" + bssIdInt +
-                    "\n\tNet ID:" + netIdInt +
-                    "\n\tSystem ID:" + systemIdInt +
-                    "\n\tNetwork Key: " + networkKey;
-
-            res += "\n\tLat: " + (double) cellIdentC.getLatitude() / 4.0d / 60.0d / 60.0d;
-            res += "\n\tLon: " + (double) cellIdentC.getLongitude() / 4.0d / 60.0d / 60.0d;
-            res += "\n\tSignal: " + cellStrengthC.getCdmaLevel();
-
-            int rssi = cellStrengthC.getEvdoDbm() != 0 ? cellStrengthC.getEvdoDbm() : cellStrengthC.getCdmaDbm();
-            res += "\n\tRSSI: " + rssi;
-
-            final int asuLevel = cellStrengthC.getAsuLevel();
-
-            res += "\n\tSSdBm: " + dBmLevel;
-            res += "\n\tSSasu: " + asuLevel;
-            res += "\n\tEVDOdBm: " + cellStrengthC.getEvdoDbm();
-            res += "\n\tCDMAdBm: " + cellStrengthC.getCdmaDbm();
-            Logging.info(res);
-        }
-        //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
-        //  references http://niviuk.free.fr/cdma_band.php
-        return addOrUpdateCell(networkKey,
-                /*TODO: can we improve on this?*/ tele.getNetworkOperator(),
-                0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
-
-    }
-
-    /**
-     * Cell update and logging
-     */
-    private Network addOrUpdateCell(final String bssid, final String operator,
-                                    final int frequency, final String networkTypeName,
-                                    final int strength, final NetworkType type,
-                                    final Location location) {
-
-        final String capabilities = networkTypeName + ";" + operator;
-
-        final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
-        final boolean newForRun = runNetworks.add( bssid );
-        runCells.add( bssid );
-
-        Network network = networkCache.get( bssid );
-
-        try {
-            //TODO: 2/2: when cell gets its own listener, make this async (Strict)
-            final String operatorName = GsmOperator.getOperatorName(operator);
-
-            if ( network == null ) {
-                network = new Network( bssid, operatorName, frequency, capabilities, (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength, type );
-                networkCache.put( network.getBssid(), network );
-            } else {
-                network.setLevel( (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength);
-                network.setFrequency(frequency);
-            }
-
-            if ( location != null && (newForRun || network.getLatLng() == null) ) {
-                // set the LatLng for mapping
-                final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-                network.setLatLng( LatLng );
-            }
-
-            if ( location != null ) {
-                dbHelper.addObservation(network, location, newForRun);
-            }
-        } catch (SQLException sex) {
-            Logging.error("Error in add/update:", sex);
-        }
-        //ALIBI: allows us to run in conjunction with current-carrier detection
-        return network;
-    }
 }

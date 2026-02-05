@@ -46,6 +46,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.ScanUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -697,25 +698,15 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
     public long getScanPeriod() {
         final MainActivity m = MainActivity.getMainActivity();
-        if (null != m) {
-            String scanPref = PreferenceKeys.PREF_OG_BT_SCAN_PERIOD;
-            long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
-            // if over 5 mph
-            Location location = null;
-            final GNSSListener gpsListener = m.getGPSListener();
-            if (gpsListener != null) {
-                location = gpsListener.getCurrentLocation();
-            }
-            if (location != null && location.getSpeed() >= 2.2352f) {
-                scanPref = PreferenceKeys.PREF_OG_BT_SCAN_PERIOD_FAST;
-                defaultRate = MainActivity.OG_BT_SCAN_FAST_DEFAULT;
-            } else if (location == null || location.getSpeed() < 0.1f) {
-                scanPref = PreferenceKeys.PREF_OG_BT_SCAN_PERIOD_STILL;
-                defaultRate = MainActivity.OG_BT_SCAN_STILL_DEFAULT;
-            }
-            return prefs.getLong(scanPref, defaultRate);
+        if (m == null) {
+            return 0L;
         }
-        return 0L;
+        Location location = null;
+        final GNSSListener gpsListener = m.getGPSListener();
+        if (gpsListener != null) {
+            location = gpsListener.getCurrentLocation();
+        }
+        return ScanUtil.getBtScanPeriod(prefs, location);
     }
 
     /**

@@ -228,7 +228,7 @@ public final class WigleService extends Service {
                     wrappedDistString = " ("+ distString + ")";
                 }
                 if (dbNets > 0) {
-                    long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
+                    long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runCells + ListFragment.lameStatic.runBt;
                     long newNets = ListFragment.lameStatic.newNets;
                     text = context.getString(R.string.run) + ": " + runNets
                             + "  " + context.getString(R.string.new_word) + ": " + newNets
@@ -264,7 +264,7 @@ public final class WigleService extends Service {
                     final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     if (SDK_INT >= 31) {
                         notification = getNotification31(title, context, text,
-                                ListFragment.lameStatic.newWifi, (ListFragment.lameStatic.runNets-ListFragment.lameStatic.runCells),
+                                ListFragment.lameStatic.newWifi, ListFragment.lameStatic.runNets,
                                 ListFragment.lameStatic.newCells, ListFragment.lameStatic.runCells,
                                 ListFragment.lameStatic.newBt, ListFragment.lameStatic.runBt,
                                 distString, distStringShort, dbNets,

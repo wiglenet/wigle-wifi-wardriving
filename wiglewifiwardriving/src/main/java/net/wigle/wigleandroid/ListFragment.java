@@ -121,8 +121,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public long newCells;
         public long newBt;
         public int currNets;
+        public int currWifi;
         public int currCells;
         public int currBt;
+        public int pendingCellCount;
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
@@ -694,6 +696,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             state.wifiReceiver.setListAdapter(state.listAdapter);
             if (null != state.bluetoothReceiver) {
                 state.bluetoothReceiver.setListAdapter(state.listAdapter);
+            }
+            if (null != state.cellReceiver) {
+                state.cellReceiver.setListAdapter(state.listAdapter);
             }
             final ListView listView = view.findViewById( R.id.ListView01 );
             setupListAdapter(listView, getActivity(), state.listAdapter, false);

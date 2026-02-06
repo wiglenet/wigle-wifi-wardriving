@@ -86,6 +86,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.BluetoothReceiver;
+import net.wigle.wigleandroid.listener.CellReceiver;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.WifiReceiver;
@@ -157,6 +158,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         GNSSListener GNSSListener;
         WifiReceiver wifiReceiver;
         BluetoothReceiver bluetoothReceiver;
+        CellReceiver cellReceiver;
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
@@ -1748,8 +1750,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.info("\tnew wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
-            state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
+            state.wifiReceiver = new WifiReceiver(this, state.dbHelper);
             state.wifiReceiver.setupWifiTimer(turnedWifiOn);
+        }
+        if (state.cellReceiver == null) {
+            Logging.info("\tnew cellReceiver");
+            state.cellReceiver = new CellReceiver(this, state.dbHelper, getApplicationContext());
+            state.cellReceiver.setupCellTimer(turnedWifiOn);
+        } else {
+            state.cellReceiver.setupCellTimer(false);
         }
 
         // register wifi receiver
@@ -2157,6 +2166,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.wifiReceiver != null) {
                 state.wifiReceiver.updateLastScanResponseTime();
             }
+            if (state.cellReceiver != null) {
+                state.cellReceiver.setupCellTimer(false);
+            }
             // turn on location updates
             this.setLocationUpdates(getLocationSetPeriod(), 0f);
 
@@ -2167,6 +2179,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (listFragment != null) {
                 listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
                 listFragment.setScanningStatusIndicator(false);
+            }
+            if (state.cellReceiver != null) {
+                state.cellReceiver.stopCellTimer();
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);

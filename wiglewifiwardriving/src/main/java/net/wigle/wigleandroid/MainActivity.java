@@ -1749,7 +1749,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.info("\tnew wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
-            state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
+            state.wifiReceiver = new WifiReceiver(this, state.dbHelper);
             state.wifiReceiver.setupWifiTimer(turnedWifiOn);
         }
         if (state.cellReceiver == null) {

@@ -40,9 +40,8 @@ public class CellNetworkLegend {
         NETWORK_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
     }
 
-    @SuppressLint("MissingPermission")
-    public static String getNetworkTypeName(TelephonyManager tele) {
-        return NETWORK_TYPE_LEGEND.get(tele.getNetworkType());
+    public static String getNetworkTypeName(final int networkType) {
+        return NETWORK_TYPE_LEGEND.get(networkType);
     }
 
 }

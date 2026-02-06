@@ -61,7 +61,6 @@ public class WifiReceiver extends BroadcastReceiver {
     private long lastWifiUnjamTime = 0;
     private long lastSaveLocationTime = 0;
     private long lastHaveLocationTime = 0;
-    private int pendingWifiCount = 0;
     private final long constructionTime = System.currentTimeMillis();
     private long previousTalkTime = System.currentTimeMillis();
     private final Set<String> runNetworks = new HashSet<>();
@@ -73,9 +72,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
     private WiFiScanUpdater updateOnSeen = null;
 
-    public static final int CELL_MIN_STRENGTH = -113;
-
-    public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper, final Context context ) {
+    public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
         prevScanPeriod = mainActivity.getLocationSetPeriod();
@@ -190,7 +187,6 @@ public class WifiReceiver extends BroadcastReceiver {
         final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
         boolean somethingAdded = false;
         int resultSize = 0;
-        int newWifiForRun = 0;
 
         final boolean ssidSpeak = prefs.getBoolean( PreferenceKeys.PREF_SPEAK_SSID, false )
                 && ! mainActivity.isMuted();
@@ -231,7 +227,6 @@ public class WifiReceiver extends BroadcastReceiver {
 
                 final boolean added = runNetworks.add( result.BSSID );
                 if ( added ) {
-                    newWifiForRun++;
                     if ( ssidSpeak ) {
                         ssidSpeaker.add( network.getSsid() );
                     }
@@ -355,17 +350,6 @@ public class WifiReceiver extends BroadcastReceiver {
         ListFragment.lameStatic.preQueueSize = preQueueSize;
         ListFragment.lameStatic.dbNets = dbHelper.getNetworkCount();
         ListFragment.lameStatic.dbLocs = dbHelper.getLocationCount();
-
-        if (newWifiForRun > 0 || ListFragment.lameStatic.networkCache.isEmpty()) {
-            if (location == null) {
-                pendingWifiCount += newWifiForRun;
-            } else {
-                if (pendingWifiCount > 25) {
-                    pendingWifiCount = 25;
-                }
-                pendingWifiCount = 0;
-            }
-        }
 
         NetworkListUtil.sort(prefs, listAdapter);
         mainActivity.setNetCountUI();
@@ -515,7 +499,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
         final String speak = builder.toString();
         Logging.info( "speak: " + speak );
-        if (! "".equals(speak)) {
+        if (!speak.isEmpty()) {
             mainActivity.speak( builder.toString() );
         }
         previousTalkTime = now;
@@ -701,5 +685,4 @@ public class WifiReceiver extends BroadcastReceiver {
 
         return success;
     }
-
 }

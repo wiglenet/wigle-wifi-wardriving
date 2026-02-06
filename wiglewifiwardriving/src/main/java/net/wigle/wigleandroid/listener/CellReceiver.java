@@ -53,17 +53,33 @@ import java.util.concurrent.Executors;
 /**
  * Handles cellular network scanning and logging on its own timer, using the same period settings
  * as WifiReceiver. Refactored out of WiFiReceiver.
+ * @author bobzilla, arkasha
  */
 public class CellReceiver {
     public static final int CELL_MIN_STRENGTH = -113;
 
+    /**
+     * data transfer object from binder-call laden background processing
+     */
     private static class RawCellData {
-        final List<CellInfo> cellInfos;
+        final List<CellInfo> cellInfo;
         final CellLocation cellLocation;
 
-        RawCellData(final List<CellInfo> cellInfos, final CellLocation cellLocation) {
-            this.cellInfos = cellInfos;
+        final String networkOperator;
+
+        final String networkOperatorName;
+
+        final int networkTypeId;
+
+        final String networkCountryIso;
+
+        RawCellData(final List<CellInfo> cellInfo, final CellLocation cellLocation, final String networkOperator, final String networkOperatorName, final int networkTypeId, final String networkCountryIso) {
+            this.cellInfo = cellInfo;
             this.cellLocation = cellLocation;
+            this.networkOperator = networkOperator;
+            this.networkOperatorName = networkOperatorName;
+            this.networkTypeId = networkTypeId;
+            this.networkCountryIso = networkCountryIso;
         }
     }
 
@@ -80,20 +96,12 @@ public class CellReceiver {
         this.dbHelper = dbHelper;
     }
 
-    public void setMainActivity(final MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
-
     public void setListAdapter(final SetNetworkListAdapter listAdapter) {
         this.listAdapter = listAdapter;
     }
 
-    public int getRunCellCount() {
-        return runCells.size();
-    }
-
     /**
-     * Same period logic as WifiReceiver (via ScanUtil).
+     * scan period access
      */
     public long getScanPeriod() {
         if (mainActivity == null) {
@@ -154,13 +162,15 @@ public class CellReceiver {
         }
         final Location loc = location;
         final Context ctx = mainActivity;
+        //ALIBI: moving into executor due to ANRs caused by the TelephonyManager binder calls in
+        // getRawCellData then posting processCellData back onto main
         cellExecutor.execute(() -> {
-            final RawCellData raw = getRawCellDataOffMain(ctx);
+            final RawCellData raw = getRawCellData(ctx);
             mainHandler.post(() -> {
                 if (mainActivity == null || mainActivity.isFinishing()) {
                     return;
                 }
-                Map<String, Network> cellNetworks = processCellDataOnMain(raw, loc);
+                Map<String, Network> cellNetworks = processCellData(raw, loc);
                 if (cellNetworks == null) {
                     cellNetworks = Collections.emptyMap();
                 }
@@ -191,13 +201,18 @@ public class CellReceiver {
         });
     }
 
-    private static RawCellData getRawCellDataOffMain(final Context context) {
+    /**
+     * binder-call - do not perform on main thread
+     * @param context the context of the request
+     * @return a RawCellData object with the current scan's cell and operator information
+     */
+    private static RawCellData getRawCellData(final Context context) {
         if (context == null) {
-            return new RawCellData(null, null);
+            return new RawCellData(null, null, null, null, -1, null);
         }
         TelephonyManager tele = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (tele == null) {
-            return new RawCellData(null, null);
+            return new RawCellData(null, null, null, null, -1, null);
         }
         try {
             List<CellInfo> infos = tele.getAllCellInfo();
@@ -205,36 +220,39 @@ public class CellReceiver {
             if (infos == null && Build.VERSION.SDK_INT < 26) {
                 cellLocation = tele.getCellLocation();
             }
-            return new RawCellData(infos, cellLocation);
+            return new RawCellData(infos, cellLocation, tele.getNetworkOperator(), tele.getNetworkOperatorName(),
+                    tele.getNetworkType(), tele.getNetworkCountryIso());
         } catch (SecurityException sex) {
             Logging.warn("unable to scan cells due to permission issue: ", sex);
-            return new RawCellData(null, null);
+            return new RawCellData(null, null, null, null, -1, null);
         } catch (NullPointerException ex) {
             Logging.warn("NPE on cell scan: ", ex);
-            return new RawCellData(null, null);
+            return new RawCellData(null, null, null, null, -1, null);
         }
     }
 
-    private Map<String, Network> processCellDataOnMain(final RawCellData raw, final Location location) {
+    /**
+     * handle a RawCellData result - main thread safe.
+     * @param raw the raw data from the getRawCellData call
+     * @param location current location (from MainActivity)
+     * @return a Map of Network objects indexed by "BSSID" (cell op_lac_cid or system_net_bss for cdma)
+     */
+    private Map<String, Network> processCellData(final RawCellData raw, final Location location) {
         Map<String, Network> networks = new HashMap<>();
         if (mainActivity == null || raw == null) {
             return networks;
         }
-        TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService(Context.TELEPHONY_SERVICE);
-        if (tele == null) {
-            return networks;
-        }
         try {
-            List<CellInfo> infos = raw.cellInfos;
+            List<CellInfo> infos = raw.cellInfo;
             if (infos != null) {
                 for (final CellInfo cell : infos) {
-                    Network network = handleSingleCellInfo(cell, tele, location);
+                    Network network = handleSingleCellInfo(cell, raw.networkOperator, location);
                     if (network != null) {
                         networks.put(network.getBssid(), network);
                     }
                 }
             } else if (raw.cellLocation != null) {
-                Network currentNetwork = handleSingleCellLocation(raw.cellLocation, tele, location);
+                Network currentNetwork = handleSingleCellLocation(raw.cellLocation, raw.networkOperator, raw.networkOperatorName, raw.networkTypeId, raw.networkCountryIso, location);
                 if (currentNetwork != null) {
                     networks.put(currentNetwork.getBssid(), currentNetwork);
                 }
@@ -247,7 +265,7 @@ public class CellReceiver {
         return networks;
     }
 
-    private Network handleSingleCellInfo(final CellInfo cellInfo, final TelephonyManager tele, final Location location) {
+    private Network handleSingleCellInfo(final CellInfo cellInfo, final String networkOperator, final Location location) {
         if (cellInfo == null) {
             return null;
         }
@@ -257,7 +275,7 @@ public class CellReceiver {
         try {
             switch (cellInfo.getClass().getSimpleName()) {
                 case "CellInfoCdma":
-                    return handleSingleCdmaInfo((CellInfoCdma) cellInfo, tele, location);
+                    return handleSingleCdmaInfo((CellInfoCdma) cellInfo, networkOperator, location);
                 case "CellInfoGsm": {
                     GsmOperator g = new GsmOperator(((CellInfoGsm) cellInfo).getCellIdentity());
                     CellSignalStrengthGsm cellStrengthG = ((CellInfoGsm) cellInfo).getCellSignalStrength();
@@ -295,11 +313,15 @@ public class CellReceiver {
     }
 
     private Network handleSingleCellLocation(final CellLocation cellLocation,
-                                             final TelephonyManager tele, final Location location) {
+                                             final String networkOperator,
+                                             final String networkOperatorName,
+                                             final int networkTypeId,
+                                             final String networkCountryIso,
+                                             final Location location) {
         String bssid = null;
         NetworkType type = null;
-        Network network = null;
         String ssid = null;
+        Network network;
 
         if (cellLocation == null) {
             return null;
@@ -314,23 +336,22 @@ public class CellReceiver {
                     bssid = systemId + "_" + networkId + "_" + baseStationId;
                     type = NetworkType.CDMA;
                 }
-                ssid = tele.getNetworkOperatorName();
+                ssid = networkOperatorName;
             } catch (Exception ex) {
                 Logging.error("CDMA reflection exception: " + ex);
             }
         } else if (cellLocation instanceof GsmCellLocation) {
             GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
-            final String operatorCode = tele.getNetworkOperator();
             if (gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
-                bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
+                bssid = networkOperator + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
                 try {
-                    ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
+                    ssid = GsmOperator.getOperatorName(networkOperator);
                 } catch (android.database.SQLException sex) {
-                    Logging.error("failed to get op for " + tele.getNetworkOperator());
+                    Logging.error("failed to get op for " + networkOperator);
                 }
                 type = NetworkType.GSM;
             }
-            if (operatorCode == null || operatorCode.isEmpty()) {
+            if (networkOperator == null || networkOperator.isEmpty()) {
                 return null;
             }
         } else {
@@ -342,8 +363,8 @@ public class CellReceiver {
             return null;
         }
 
-        final String networkType = CellNetworkLegend.getNetworkTypeName(tele);
-        final String capabilities = networkType + ";" + tele.getNetworkCountryIso();
+        final String networkType = CellNetworkLegend.getNetworkTypeName(networkTypeId);
+        final String capabilities = networkType + ";" + networkCountryIso;
         int strength = 0;
         PhoneState phoneState = mainActivity.getPhoneState();
         if (phoneState != null) {
@@ -379,7 +400,7 @@ public class CellReceiver {
         return strength * 2 + CELL_MIN_STRENGTH;
     }
 
-    private Network handleSingleCdmaInfo(final CellInfoCdma cellInfo, final TelephonyManager tele, final Location location) {
+    private Network handleSingleCdmaInfo(final CellInfoCdma cellInfo, final String networkOperator, final Location location) {
         CellIdentityCdma cellIdentC = cellInfo.getCellIdentity();
         CellSignalStrengthCdma cellStrengthC = cellInfo.getCellSignalStrength();
         final int bssIdInt = cellIdentC.getBasestationId();
@@ -391,7 +412,7 @@ public class CellReceiver {
         }
         final String networkKey = systemIdInt + "_" + netIdInt + "_" + bssIdInt;
         final int dBmLevel = cellStrengthC.getDbm();
-        return addOrUpdateCell(networkKey, tele.getNetworkOperator(), 0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
+        return addOrUpdateCell(networkKey, networkOperator, 0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
     }
 
     private Network addOrUpdateCell(final String bssid, final String operator,

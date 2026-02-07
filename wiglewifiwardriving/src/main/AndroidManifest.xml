@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    android:versionCode="303"
-    android:versionName="2.103">
+    android:versionCode="304"
+    android:versionName="2.104">
 
     <attribution android:tag="@string/empty"
         android:label="@string/app_name" />

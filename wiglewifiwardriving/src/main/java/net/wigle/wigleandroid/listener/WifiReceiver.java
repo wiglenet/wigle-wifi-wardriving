@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.lang.String;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -71,6 +73,10 @@ public class WifiReceiver extends BroadcastReceiver {
     private Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
 
     private WiFiScanUpdater updateOnSeen = null;
+
+    /** Executor for running WifiManager.startScan() off the main thread to avoid ANR from Binder blocking. */
+    private final ExecutorService wifiScanExecutor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
@@ -587,24 +593,33 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * only call this from a Handler
-     * @return true if startScan success
+     * Runs WifiManager.startScan() on a background thread to avoid ANR from Binder blocking.
+     * @return true if a scan was submitted (optimistic; actual result is applied asynchronously)
      */
     private boolean doWifiScan() {
         // MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
         final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        boolean success = false;
+        boolean submitted = false;
 
         if (mainActivity.isScanning()) {
             if ( ! scanInFlight ) {
-                try {
-                    success = wifiManager.startScan();
-                }
-                catch (Exception ex) {
-                    Logging.warn("exception starting scan: " + ex, ex);
-                }
-                if ( success ) {
-                    scanInFlight = true;
-                }
+                scanInFlight = true;
+                submitted = true;
+                wifiScanExecutor.execute(() -> {
+                    boolean success = false;
+                    try {
+                        success = wifiManager.startScan();
+                    } catch (Exception ex) {
+                        Logging.warn("exception starting scan: " + ex, ex);
+                    }
+                    final boolean scanSuccess = success;
+                    mainHandler.post(() -> {
+                        if (!scanSuccess) {
+                            scanInFlight = false;
+                        }
+                        Logging.debug("startScan returned " + scanSuccess + ". last response seconds ago: " + (System.currentTimeMillis() - lastScanResponseTime) / 1000d);
+                    });
+                });
             }
 
             final long now = System.currentTimeMillis();
@@ -613,7 +628,6 @@ public class WifiReceiver extends BroadcastReceiver {
                 lastScanResponseTime = now;
             } else {
                 final long sinceLastScan = now - lastScanResponseTime;
-                Logging.debug("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(
                         PreferenceKeys.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
@@ -683,6 +697,6 @@ public class WifiReceiver extends BroadcastReceiver {
             }
         }
 
-        return success;
+        return submitted;
     }
 }

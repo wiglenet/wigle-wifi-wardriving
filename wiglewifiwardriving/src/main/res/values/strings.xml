@@ -482,5 +482,5 @@
     <string name="use_foss_maps">Use FOSS Maps (tile URL required)</string>
     <string name="foss_map_base_url">Map vector tile server style URL base</string>
     <string name="foss_map_key">Map vector base key</string>
-
+    <string name="check_credentials">Verify</string>
 </resources>

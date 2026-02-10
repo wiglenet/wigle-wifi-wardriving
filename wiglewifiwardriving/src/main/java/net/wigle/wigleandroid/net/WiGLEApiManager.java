@@ -70,9 +70,9 @@ import okhttp3.ResponseBody;
  */
 public class WiGLEApiManager {
 
-    private static final int CONN_TIMEOUT_S = 45;
-    private static final int WRITE_TIMEOUT_S = 210;
-    private static final int READ_TIMEOUT_S = 230;
+    public static final int CONN_TIMEOUT_S = 45;
+    public static final int WRITE_TIMEOUT_S = 210;
+    public static final int READ_TIMEOUT_S = 230;
 
     private static final int LOCAL_FAILURE_CODE = 999;
     private static final String NEWS_CACHE = "news-cache.json";

@@ -3,10 +3,16 @@ package net.wigle.wigleandroid;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static net.wigle.wigleandroid.net.WiGLEApiManager.CONN_TIMEOUT_S;
+import static net.wigle.wigleandroid.net.WiGLEApiManager.READ_TIMEOUT_S;
+import static net.wigle.wigleandroid.net.WiGLEApiManager.WRITE_TIMEOUT_S;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,6 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -29,6 +36,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.Html;
@@ -48,6 +57,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.razir.progressbutton.DrawableButton;
+import com.github.razir.progressbutton.DrawableButtonExtensionsKt;
+import com.github.razir.progressbutton.ProgressButtonHolderKt;
+import com.google.android.material.textfield.TextInputEditText;
+
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
@@ -59,7 +73,15 @@ import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+
+import kotlin.Unit;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * configure settings
@@ -745,8 +767,64 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     }
 
     private void setupFossMapEditFields(final View view, final SharedPreferences prefs, final Editor editor) {
-        final com.google.android.material.textfield.TextInputEditText fossMapStyleUrlEdit = view.findViewById(R.id.edit_foss_map_style_url);
-        final com.google.android.material.textfield.TextInputEditText fossMapKeyEdit = view.findViewById(R.id.edit_foss_map_key);
+        final TextInputEditText fossMapStyleUrlEdit = view.findViewById(R.id.edit_foss_map_style_url);
+        final TextInputEditText fossMapKeyEdit = view.findViewById(R.id.edit_foss_map_key);
+        final Button verify = view.findViewById(R.id.check_foss_map_creds);
+        if (null != verify) {
+            ProgressButtonHolderKt.bindProgressButton(this, verify);
+            verify.setOnClickListener(buttonView -> {
+                final Editable urlPart = fossMapStyleUrlEdit.getText();
+                final Editable keyPart = fossMapKeyEdit.getText();
+                if (null == urlPart || urlPart.toString().isEmpty()) {
+                    fossMapStyleUrlEdit.setError("required");
+                } else if (null == keyPart || keyPart.toString().isEmpty()) {
+                    fossMapKeyEdit.setError("required");
+                } else {
+                    showProgressCenter(verify);
+                    final String urlString = urlPart.toString() + keyPart.toString();
+                    OkHttpClient checkClient = new OkHttpClient.Builder()
+                            .connectTimeout(CONN_TIMEOUT_S, TimeUnit.SECONDS)
+                            .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
+                            .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS).build();
+                    Request request = new Request.Builder()
+                            .url(urlString)
+                            .build();
+                    checkClient.newCall(request).enqueue(new Callback() {
+                        final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+                        @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                            mainHandler.post(() -> {
+                                fossMapStyleUrlEdit.setError("required");
+                                hideProgressCenterFail(verify);
+                            });
+                        }
+
+                        @Override public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                            if (response.isSuccessful()) {
+                                mainHandler.post(() -> hideProgressCenterSuccess(verify));
+                            } else {
+                                if (response.code() == 404) {
+                                    mainHandler.post(() -> {
+                                        fossMapStyleUrlEdit.setError("required");
+                                        hideProgressCenterFail(verify);
+                                    });
+                                } else if (response.code() == 401 || response.code() == 403) {
+                                    mainHandler.post(() -> {
+                                        fossMapKeyEdit.setError("required");
+                                        hideProgressCenterFail(verify);
+                                    });
+                                } else {
+                                    mainHandler.post(() -> hideProgressCenterFail(verify));
+                                }
+                            }
+                        }
+                    });
+
+                }
+            });
+
+        }
+
         if (fossMapStyleUrlEdit != null) {
             final String currentStyleUrl = prefs.getString(PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE, "");
             fossMapStyleUrlEdit.setText(currentStyleUrl);// Add listener to save changes
@@ -814,4 +892,27 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             builder.append(message);
         }
     }
+
+    private void showProgressCenter(final Button button) {
+        DrawableButtonExtensionsKt.showProgress(button, progressParams -> {
+            //progressParams.setProgressColor(Color.WHITE);
+            progressParams.setGravity(DrawableButton.GRAVITY_CENTER);
+            return Unit.INSTANCE;
+        });
+        button.setEnabled(false);
+    }
+
+    private void hideProgressCenterFail(final Button button) {
+        button.setEnabled(true);
+        button.setBackgroundColor(Color.RED);
+        DrawableButtonExtensionsKt.hideProgress(button, R.string.check_credentials);
+    }
+
+    private void hideProgressCenterSuccess(final Button button) {
+        button.setEnabled(true);
+        button.setBackgroundColor(Color.GREEN);
+        //TODO: turn green and show a check
+        DrawableButtonExtensionsKt.hideProgress(button, R.string.check_credentials);
+    }
+
 }

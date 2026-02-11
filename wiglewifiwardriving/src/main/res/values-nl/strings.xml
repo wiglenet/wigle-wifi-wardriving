@@ -475,4 +475,8 @@
     <string name="hide">Verbergen</string>
     <string name="alert">Waarschuwing</string>
     <string name="guess_le_address_type">BLE-adrestype afleiden</string>
+    <string name="use_foss_maps">FOSS-kaarten gebruiken (tegel-URL vereist)</string>
+    <string name="foss_map_base_url">URL-basis voor mapvectortegelserver-stijl</string>
+    <string name="foss_map_key">Mapvector basissleutel</string>
+    <string name="check_credentials">Verifiëren</string>
 </resources>

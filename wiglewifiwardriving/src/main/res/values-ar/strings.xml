@@ -475,4 +475,8 @@
     <string name="hide">إخفاء</string>
     <string name="alert">تنبيه</string>
     <string name="guess_le_address_type">استنتاج نوع عنوان BLE</string>
+    <string name="use_foss_maps">استخدام خرائط FOSS (يتطلب عنوان URL للبلاط)</string>
+    <string name="foss_map_base_url">عنوان URL الأساسي لخادم بلاط خريطة المتجه</string>
+    <string name="foss_map_key">مفتاح قاعدة خريطة المتجه</string>
+    <string name="check_credentials">تحقق</string>
 </resources>

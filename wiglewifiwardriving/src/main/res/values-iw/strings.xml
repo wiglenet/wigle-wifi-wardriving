@@ -475,4 +475,8 @@
     <string name="hide">הסתר</string>
     <string name="alert">התראה</string>
     <string name="guess_le_address_type">הסקת סוג כתובת BLE</string>
+    <string name="use_foss_maps">השתמש במפות FOSS (נדרש URL אריח)</string>
+    <string name="foss_map_base_url">כתובת URL בסיסית של סגנון שרת אריחי מפה וקטורית</string>
+    <string name="foss_map_key">מפתח בסיס מפת וקטור</string>
+    <string name="check_credentials">אימות</string>
 </resources>

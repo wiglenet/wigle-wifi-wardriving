@@ -474,4 +474,8 @@
     <string name="hide">छिपाएँ</string>
     <string name="alert">चेतावनी</string>
     <string name="guess_le_address_type">BLE पता प्रकार का अनुमान लगाएं</string>
+    <string name="use_foss_maps">FOSS मानचित्र उपयोग करें (टाइल URL आवश्यक)</string>
+    <string name="foss_map_base_url">मानचित्र वेक्टर टाइल सर्वर शैली URL आधार</string>
+    <string name="foss_map_key">मानचित्र वेक्टर आधार कुंजी</string>
+    <string name="check_credentials">सत्यापित करें</string>
 </resources>

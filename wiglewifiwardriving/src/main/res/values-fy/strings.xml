@@ -475,4 +475,8 @@
     <string name="hide">Ferbergje</string>
     <string name="alert">Warskôging</string>
     <string name="guess_le_address_type">BLE-adrestype ôfliede</string>
+    <string name="use_foss_maps">FOSS-kaarten brûke (tegel-URL fereaske)</string>
+    <string name="foss_map_base_url">Basis-URL foar kaartvektor-tegelserverstyl</string>
+    <string name="foss_map_key">Kaartvektor basiskaai</string>
+    <string name="check_credentials">Kontrolearje</string>
 </resources>

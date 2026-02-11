@@ -475,4 +475,8 @@
     <string name="hide">Ascundeți</string>
     <string name="alert">Alertă</string>
     <string name="guess_le_address_type">Deduce tipul de adresă BLE</string>
+    <string name="use_foss_maps">Utilizați hărți FOSS (URL dală necesar)</string>
+    <string name="foss_map_base_url">URL de bază pentru stilul serverului de dale de hartă vectorială</string>
+    <string name="foss_map_key">Cheie de bază a hărții vectoriale</string>
+    <string name="check_credentials">Verificare</string>
 </resources>

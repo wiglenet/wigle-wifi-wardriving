@@ -475,4 +475,8 @@
     <string name="hide">Skjul</string>
     <string name="alert">Advarsel</string>
     <string name="guess_le_address_type">Udled BLE-adresstype</string>
+    <string name="use_foss_maps">Brug FOSS-kort (flis-URL påkrævet)</string>
+    <string name="foss_map_base_url">Kortvektortileserver-stil URL-basis</string>
+    <string name="foss_map_key">Kortvektor basisnøgle</string>
+    <string name="check_credentials">Verificer</string>
 </resources>

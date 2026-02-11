@@ -474,4 +474,8 @@
     <string name="hide">Ocultar</string>
     <string name="alert">Alerta</string>
     <string name="guess_le_address_type">Inferir tipo de dirección BLE</string>
+    <string name="use_foss_maps">Usar mapas FOSS (se requiere URL de mosaico)</string>
+    <string name="foss_map_base_url">URL base del estilo del servidor de mosaicos de mapa vectorial</string>
+    <string name="foss_map_key">Clave base del mapa vectorial</string>
+    <string name="check_credentials">Verificar</string>
 </resources>

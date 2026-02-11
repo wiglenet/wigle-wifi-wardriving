@@ -475,4 +475,8 @@
     <string name="hide">Elrejtés</string>
     <string name="alert">Figyelmeztetés</string>
     <string name="guess_le_address_type">BLE-címtípus következtetése</string>
+    <string name="use_foss_maps">FOSS térképek használata (csempe URL szükséges)</string>
+    <string name="foss_map_base_url">Térkép vektor csempe szerver stílus URL alapja</string>
+    <string name="foss_map_key">Térkép vektor alapkulcs</string>
+    <string name="check_credentials">Ellenőrzés</string>
 </resources>

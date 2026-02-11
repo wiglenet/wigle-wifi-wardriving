@@ -476,4 +476,8 @@
     <string name="hide">Skjul</string>
     <string name="alert">Varsel</string>
     <string name="guess_le_address_type">Utled BLE-adresstype</string>
+    <string name="use_foss_maps">Bruk FOSS-kart (flis-URL kreves)</string>
+    <string name="foss_map_base_url">Kartvektortileserver-stil URL-basiss</string>
+    <string name="foss_map_key">Kartvektor basisnøkkel</string>
+    <string name="check_credentials">Verifiser</string>
 </resources>

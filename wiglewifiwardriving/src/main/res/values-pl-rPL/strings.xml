@@ -475,4 +475,8 @@
     <string name="hide">Ukryj</string>
     <string name="alert">Alert</string>
     <string name="guess_le_address_type">Wnioskuj typ adresu BLE</string>
+    <string name="use_foss_maps">Użyj map FOSS (wymagany adres URL kafelka)</string>
+    <string name="foss_map_base_url">Bazowy adres URL stylu serwera kafelków mapy wektorowej</string>
+    <string name="foss_map_key">Klucz bazowy mapy wektorowej</string>
+    <string name="check_credentials">Weryfikuj</string>
 </resources>

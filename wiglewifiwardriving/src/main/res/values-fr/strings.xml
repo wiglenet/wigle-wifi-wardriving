@@ -475,4 +475,8 @@
     <string name="hide">Masquer</string>
     <string name="alert">Alerte</string>
     <string name="guess_le_address_type">Inférer le type d\'adresse BLE</string>
+    <string name="use_foss_maps">Utiliser les cartes FOSS (URL de tuile requise)</string>
+    <string name="foss_map_base_url">URL de base du style du serveur de tuiles vectorielles de carte</string>
+    <string name="foss_map_key">Clé de base de la carte vectorielle</string>
+    <string name="check_credentials">Vérifier</string>
 </resources>

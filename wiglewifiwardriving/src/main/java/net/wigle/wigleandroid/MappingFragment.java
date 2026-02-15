@@ -2,8 +2,11 @@ package net.wigle.wigleandroid;
 
 import static com.google.android.gms.maps.GoogleMap.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,6 +19,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -69,6 +73,7 @@ public final class MappingFragment extends AbstractMappingFragment {
     private Polyline routePolyline;
 
     final Runnable mUpdateTimeTask = new MappingFragment.MapRunnable();
+    private final ExecutorService routeLoadExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected int getLayoutResourceId() {
@@ -259,33 +264,45 @@ public final class MappingFragment extends AbstractMappingFragment {
             return;
         }
 
-        PolylineOptions pOptions = new PolylineOptions().clickable(false);
         final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
         final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
 
-        try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
-                .getCurrentVisibleRouteIterator(prefs)) {
-            if (routeCursor == null) {
-                Logging.info("null route cursor; not mapping");
+        routeLoadExecutor.execute(() -> {
+            List<net.wigle.wigleandroid.model.LatLng> routePoints = new ArrayList<>();
+            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
+                    .getCurrentVisibleRouteIterator(prefs)) {
+                if (routeCursor == null) {
+                    Logging.info("null route cursor; not mapping");
+                    return;
+                }
+
+                for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                    final double lat = routeCursor.getDouble(0);
+                    final double lon = routeCursor.getDouble(1);
+                    routePoints.add(new net.wigle.wigleandroid.model.LatLng(lat, lon));
+                }
+            } catch (Exception e) {
+                Logging.error("Unable to load route: ", e);
                 return;
             }
 
-            long segmentCount = 0;
-            for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-                final double lat = routeCursor.getDouble(0);
-                final double lon = routeCursor.getDouble(1);
-                pOptions.add(new com.google.android.gms.maps.model.LatLng(lat, lon));
+            final List<net.wigle.wigleandroid.model.LatLng> pointsToAdd = routePoints;
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (getActivity() == null) {
+                    return;
+                }
+                Logging.info("Loaded route with " + pointsToAdd.size() + " segments");
+                PolylineOptions pOptions = new PolylineOptions().clickable(false);
+                for (net.wigle.wigleandroid.model.LatLng pt : pointsToAdd) {
+                    pOptions.add(new com.google.android.gms.maps.model.LatLng(pt.latitude, pt.longitude));
+                }
                 pOptions.color(getRouteColorForMapType(mapMode, nightMode));
                 pOptions.width(ROUTE_WIDTH);
                 pOptions.zIndex(10000); // to overlay on traffic data
-                segmentCount++;
-            }
-            Logging.info("Loaded route with " + segmentCount + " segments");
-            routePolyline = googleMap.addPolyline(pOptions);
-            routePolyline.setTag(ROUTE_LINE_TAG);
-        } catch (Exception e) {
-            Logging.error("Unable to add route: ", e);
-        }
+                routePolyline = googleMap.addPolyline(pOptions);
+                routePolyline.setTag(ROUTE_LINE_TAG);
+            });
+        });
     }
 
     /**
@@ -494,6 +511,7 @@ public final class MappingFragment extends AbstractMappingFragment {
                     googleMap.getCameraPosition().target.longitude);
             }
         });
+        routeLoadExecutor.shutdown();
         try {
             mapView.onDestroy();
         } catch (NullPointerException ex) {

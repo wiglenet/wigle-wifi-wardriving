@@ -8,11 +8,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,11 +48,8 @@ import org.maplibre.android.style.layers.Property;
 import org.maplibre.android.style.layers.PropertyFactory;
 import org.maplibre.android.style.sources.RasterSource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FossMappingFragment extends AbstractMappingFragment {
 
@@ -68,7 +63,6 @@ public class FossMappingFragment extends AbstractMappingFragment {
     private final Handler timer = new Handler();
 
     final Runnable mUpdateMapTask = new MapUpdateRunnable();
-    private final ExecutorService routeLoadExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected int getLayoutResourceId() {
@@ -337,41 +331,17 @@ public class FossMappingFragment extends AbstractMappingFragment {
         // TODO: final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
         final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
 
-        routeLoadExecutor.execute(() -> {
-            List<net.wigle.wigleandroid.model.LatLng> routePoints = new ArrayList<>();
-            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
-                    .getCurrentVisibleRouteIterator(prefs)) {
-                if (routeCursor == null) {
-                    Logging.info("null route cursor; not mapping");
-                    return;
-                }
-
-                for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-                    final double lat = routeCursor.getDouble(0);
-                    final double lon = routeCursor.getDouble(1);
-                    routePoints.add(new net.wigle.wigleandroid.model.LatLng(lat, lon));
-                }
-            } catch (Exception e) {
-                Logging.error("Unable to load route: ", e);
-                return;
+        loadRoutePointsInBackground(prefs, routePoints -> {
+            Logging.info("Loaded route with " + routePoints.size() + " segments");
+            PolylineOptions polylineOptions = new PolylineOptions();
+            for (LatLng pt : routePoints) {
+                polylineOptions.add(new org.maplibre.android.geometry.LatLng(pt.latitude, pt.longitude));
             }
-
-            final List<net.wigle.wigleandroid.model.LatLng> pointsToAdd = routePoints;
-            new Handler(Looper.getMainLooper()).post(() -> {
-                if (getActivity() == null) {
-                    return;
-                }
-                Logging.info("Loaded route with " + pointsToAdd.size() + " segments");
-                PolylineOptions polylineOptions = new PolylineOptions();
-                for (net.wigle.wigleandroid.model.LatLng pt : pointsToAdd) {
-                    polylineOptions.add(new org.maplibre.android.geometry.LatLng(pt.latitude, pt.longitude));
-                }
-                polylineOptions.color(getRouteColorForMapType(
-                        1/*TODO: we don't have types yet*/,
-                        nightMode));
-                polylineOptions.width(ROUTE_WIDTH/2f);
-                routePolyline = map.addPolyline(polylineOptions);
-            });
+            polylineOptions.color(getRouteColorForMapType(
+                    1/*TODO: we don't have types yet*/,
+                    nightMode));
+            polylineOptions.width(ROUTE_WIDTH/2f);
+            routePolyline = map.addPolyline(polylineOptions);
         });
     }
 
@@ -612,7 +582,6 @@ public class FossMappingFragment extends AbstractMappingFragment {
         Logging.info( "MAP: destroy mapping." );
         finishing.set(true);
 
-        routeLoadExecutor.shutdown();
         // Cancel any pending timer callbacks to prevent new map access attempts
         timer.removeCallbacks(mUpdateMapTask);
 

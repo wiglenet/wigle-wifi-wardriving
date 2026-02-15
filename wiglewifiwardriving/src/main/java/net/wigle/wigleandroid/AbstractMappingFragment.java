@@ -17,8 +17,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,8 +48,13 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.StatsUtil;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * Superclass for mapping activity. Concrete child classes should contain map-tech specific elements
@@ -93,6 +101,7 @@ public abstract class AbstractMappingFragment extends Fragment {
     protected static LocationListener STATIC_LOCATION_LISTENER = null;
     protected final State state = new State();
     protected final String ROUTE_LINE_TAG = "routePolyline";
+    private final ExecutorService routeLoadExecutor = Executors.newSingleThreadExecutor();
     protected AtomicBoolean finishing;
     protected Location previousLocation;
     protected int previousRunNets;
@@ -141,6 +150,46 @@ public abstract class AbstractMappingFragment extends Fragment {
             }
         }
         return centerPoint;
+    }
+
+    /**
+     * Loads route points from the database on a background thread.
+     * Calls onLoaded on the main thread with the result. No-op if prefs is null
+     * or PREF_VISUALIZE_ROUTE is false.
+     *
+     * @param prefs SharedPreferences for route visibility and query params
+     * @param onLoaded Consumer invoked on main thread with loaded points (may be empty)
+     */
+    protected void loadRoutePointsInBackground(final SharedPreferences prefs,
+            final Consumer<List<LatLng>> onLoaded) {
+        if (prefs == null || !prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false)) {
+            return;
+        }
+        routeLoadExecutor.execute(() -> {
+            List<LatLng> routePoints = new ArrayList<>();
+            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
+                    .getCurrentVisibleRouteIterator(prefs)) {
+                if (routeCursor == null) {
+                    Logging.info("null route cursor; not mapping");
+                    return;
+                }
+                for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                    final double lat = routeCursor.getDouble(0);
+                    final double lon = routeCursor.getDouble(1);
+                    routePoints.add(new LatLng(lat, lon));
+                }
+            } catch (Exception e) {
+                Logging.error("Unable to load route: ", e);
+                return;
+            }
+            final List<LatLng> pointsToAdd = routePoints;
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (getActivity() == null) {
+                    return;
+                }
+                onLoaded.accept(pointsToAdd);
+            });
+        });
     }
 
     @SuppressLint("MissingPermission")
@@ -194,6 +243,12 @@ public abstract class AbstractMappingFragment extends Fragment {
             headingManager = new HeadingManager(a);
         }
         setupQuery();
+    }
+
+    @Override
+    public void onDestroy() {
+        routeLoadExecutor.shutdown();
+        super.onDestroy();
     }
 
     public Float getBearing(final Context context) {

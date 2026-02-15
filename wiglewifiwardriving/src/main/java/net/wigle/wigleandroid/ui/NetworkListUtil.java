@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
 import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
-import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_PUBLIC;
 import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
 
 import android.bluetooth.BluetoothClass;
@@ -127,14 +126,14 @@ public class NetworkListUtil {
         return color;
     }
 
-    public static BitmapDescriptor getSignalBitmap(@NonNull Context context, final int level) {
+    public static BitmapDescriptor getSignalBitmapDescriptor(@NonNull Context context, final int level) {
         int color = getSignalColor(level, true);
-        return getBitmapFromVector(context, drawable.observation, color);
+        return getBitmapDescriptorFromVector(context, drawable.observation, color);
     }
 
-    public static BitmapDescriptor getBitmapFromVector(@NonNull Context context,
-                                                       @DrawableRes int vectorResourceId,
-                                                       @ColorInt int tintColor) {
+    public static BitmapDescriptor getBitmapDescriptorFromVector(@NonNull Context context,
+                                                                 @DrawableRes int vectorResourceId,
+                                                                 @ColorInt int tintColor) {
 
         Drawable vectorDrawable;
         vectorDrawable = ResourcesCompat.getDrawable(
@@ -150,6 +149,26 @@ public class NetworkListUtil {
         DrawableCompat.setTint(vectorDrawable, tintColor);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public static Bitmap getSignalBitmap(@NonNull Context context, final int level) {
+        int color = getSignalColor(level, true);
+        return getBitmapFromVector(context, drawable.observation, color);
+    }
+
+    public static Bitmap getBitmapFromVector(@NonNull Context context,
+                                                                 @DrawableRes int vectorResourceId,
+                                                                 @ColorInt int tintColor) {
+        Drawable vectorDrawable;
+        vectorDrawable = ResourcesCompat.getDrawable(
+                context.getResources(), vectorResourceId, null);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        DrawableCompat.setTint(vectorDrawable, tintColor);
+        vectorDrawable.draw(canvas);
+        return bitmap;
     }
 
     public static int getImage(final Network network) {

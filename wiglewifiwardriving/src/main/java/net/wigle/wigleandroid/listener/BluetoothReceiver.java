@@ -31,11 +31,10 @@ import android.os.Looper;
 import android.os.ParcelUuid;
 import android.util.SparseArray;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.R;

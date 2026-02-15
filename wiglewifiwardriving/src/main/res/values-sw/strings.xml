@@ -474,4 +474,8 @@
     <string name="hide">Ficha</string>
     <string name="alert">Tahadhari</string>
     <string name="guess_le_address_type">Infer aina ya anwani BLE</string>
+    <string name="use_foss_maps">Tumia Ramani za FOSS (URL ya tile inahitajika)</string>
+    <string name="foss_map_base_url">URL ya msingi wa mtindo wa seva ya tile ya ramani vekta</string>
+    <string name="foss_map_key">Ufunguo wa msingi wa ramani vekta</string>
+    <string name="check_credentials">Thibitisha</string>
 </resources>

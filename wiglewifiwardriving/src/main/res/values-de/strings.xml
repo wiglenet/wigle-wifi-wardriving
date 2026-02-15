@@ -475,4 +475,8 @@
     <string name="hide">Verstecke</string>
     <string name="alert">Warnung</string>
     <string name="guess_le_address_type">BLE-Adresstyp ableiten</string>
+    <string name="use_foss_maps">FOSS-Karten verwenden (Kachel-URL erforderlich)</string>
+    <string name="foss_map_base_url">Basis-URL des Kartenvektor-Kachelserver-Stils</string>
+    <string name="foss_map_key">Kartenvektor-Basisschlüssel</string>
+    <string name="check_credentials">Überprüfen</string>
 </resources>

@@ -475,4 +475,8 @@
     <string name="hide">Dölj</string>
     <string name="alert">Varning</string>
     <string name="guess_le_address_type">Härled BLE-adresstyp</string>
+    <string name="use_foss_maps">Använd FOSS-kartor (rutnäts-URL krävs)</string>
+    <string name="foss_map_base_url">Kartvektorrutnätsserverstil-URL-bas</string>
+    <string name="foss_map_key">Kartvektorbasnyckel</string>
+    <string name="check_credentials">Verifiera</string>
 </resources>

@@ -479,4 +479,8 @@
     <string name="add_mfgr_filter_button">Add Mfgr Id</string>
     <string name="alert_ble_mfgrs_filter_button">Alert on BLE Manufacturers</string>
     <string name="guess_le_address_type">Infer BLE Address Type</string>
+    <string name="use_foss_maps">Use FOSS Maps (tile URL required)</string>
+    <string name="foss_map_base_url">Map vector tile server style URL base</string>
+    <string name="foss_map_key">Map vector base key</string>
+    <string name="check_credentials">Verify</string>
 </resources>

@@ -475,4 +475,8 @@
     <string name="hide">Ocultar</string>
     <string name="alert">Alerta</string>
     <string name="guess_le_address_type">Inferir tipo de endereço BLE</string>
+    <string name="use_foss_maps">Usar mapas FOSS (URL do tile necessária)</string>
+    <string name="foss_map_base_url">URL base do estilo do servidor de tiles do mapa vetorial</string>
+    <string name="foss_map_key">Chave base do mapa vetorial</string>
+    <string name="check_credentials">Verificar</string>
 </resources>

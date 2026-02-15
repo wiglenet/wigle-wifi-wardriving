@@ -92,6 +92,8 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
+    implementation 'org.maplibre.gl:android-sdk:12.3.1'
+    implementation 'org.maplibre.gl:android-plugin-annotation-v9:3.0.2'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'androidx.test:core:1.7.0'

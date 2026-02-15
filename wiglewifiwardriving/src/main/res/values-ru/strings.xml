@@ -475,4 +475,8 @@
     <string name="hide">Скрыть</string>
     <string name="alert">Оповещение</string>
     <string name="guess_le_address_type">Определить тип адреса BLE</string>
+    <string name="use_foss_maps">Использовать карты FOSS (требуется URL плиток)</string>
+    <string name="foss_map_base_url">Базовый URL стиля векторного сервера плиток карты</string>
+    <string name="foss_map_key">Базовый ключ векторной карты</string>
+    <string name="check_credentials">Проверить</string>
 </resources>

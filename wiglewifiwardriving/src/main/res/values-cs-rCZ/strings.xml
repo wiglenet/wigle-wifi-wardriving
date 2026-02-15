@@ -475,4 +475,8 @@
     <string name="hide">Skrýt</string>
     <string name="alert">Upozornění</string>
     <string name="guess_le_address_type">Odvodit typ adresy BLE</string>
+    <string name="use_foss_maps">Použít FOSS mapy (vyžadována URL dlaždic)</string>
+    <string name="foss_map_base_url">Základní URL stylu vektorového serveru mapových dlaždic</string>
+    <string name="foss_map_key">Klíč základny vektorové mapy</string>
+    <string name="check_credentials">Ověřit</string>
 </resources>

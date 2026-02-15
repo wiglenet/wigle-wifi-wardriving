@@ -19,9 +19,9 @@ import com.google.android.gms.maps.GoogleMap;
 
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.model.PolylineRoute;
+import net.wigle.wigleandroid.model.RouteDescriptor;
 import net.wigle.wigleandroid.util.Logging;
-import net.wigle.wigleandroid.util.PolyRouteConfigurable;
+import net.wigle.wigleandroid.util.RouteConfigurable;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
@@ -36,14 +36,14 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     private boolean dataValid;
     private int rowIdColumn;
     private final DataSetObserver dataSetObserver;
-    private final PolyRouteConfigurable configurable;
+    private final RouteConfigurable configurable;
     private final RouteExportSelector routeSelector;
     private final SharedPreferences prefs;
     private final DateFormat dateFormat;
     private final DateFormat timeFormat;
     private int selectedPos = RecyclerView.NO_POSITION;
 
-    public GpxRecyclerAdapter(Context context, FragmentActivity fragmentActivity, Cursor cursor, PolyRouteConfigurable configurable, RouteExportSelector routeSelector,
+    public GpxRecyclerAdapter(Context context, FragmentActivity fragmentActivity, Cursor cursor, RouteConfigurable configurable, RouteExportSelector routeSelector,
                               SharedPreferences prefs, DateFormat dateFormat, DateFormat timeFormat) {
         this.context = context;
         this.fragmentActivity = fragmentActivity;
@@ -162,7 +162,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
                 if (null == routeCursor) {
                     Logging.info("null route cursor; not mapping");
                 } else {
-                    PolylineRoute newRoute = new PolylineRoute();
+                    RouteDescriptor newRoute = new RouteDescriptor();
                     for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
                         final float lat = routeCursor.getFloat(0);
                         final float lon = routeCursor.getFloat(1);

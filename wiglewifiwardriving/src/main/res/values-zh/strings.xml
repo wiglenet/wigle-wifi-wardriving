@@ -475,4 +475,8 @@
     <string name="hide">隐藏</string>
     <string name="alert">警报</string>
     <string name="guess_le_address_type">推断BLE地址类型</string>
+    <string name="use_foss_maps">使用 FOSS 地图（需要瓦片 URL）</string>
+    <string name="foss_map_base_url">地图矢量瓦片服务器样式 URL 基础</string>
+    <string name="foss_map_key">地图矢量基础密钥</string>
+    <string name="check_credentials">验证</string>
 </resources>

@@ -478,4 +478,8 @@ KMLにエクスポート</string>
     <string name="hide">を非表示にする</string>
     <string name="alert">に関する警告</string>
     <string name="guess_le_address_type">BLEアドレスタイプを推測</string>
+    <string name="use_foss_maps">FOSSマップを使用（タイルURLが必要）</string>
+    <string name="foss_map_base_url">マップベクトルタイルサーバースタイルURLベース</string>
+    <string name="foss_map_key">マップベクトルベースキー</string>
+    <string name="check_credentials">検証</string>
 </resources>

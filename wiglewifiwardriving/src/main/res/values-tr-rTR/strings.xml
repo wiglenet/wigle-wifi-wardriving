@@ -475,5 +475,9 @@
     <string name="hide">Gizle</string>
     <string name="alert">Uyarı</string>
     <string name="guess_le_address_type">BLE Adres Türünü Çıkar</string>
+    <string name="use_foss_maps">FOSS Haritaları Kullan (döşeme URL\'si gerekli)</string>
+    <string name="foss_map_base_url">Harita vektör döşeme sunucusu stil URL temeli</string>
+    <string name="foss_map_key">Harita vektör temel anahtarı</string>
+    <string name="check_credentials">Doğrula</string>
 </resources>
 

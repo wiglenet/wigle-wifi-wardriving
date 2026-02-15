@@ -475,4 +475,8 @@
     <string name="hide">Nascondi</string>
     <string name="alert">Attenzione</string>
     <string name="guess_le_address_type">Dedurre tipo di indirizzo BLE</string>
+    <string name="use_foss_maps">Usa mappe FOSS (URL piastrella richiesto)</string>
+    <string name="foss_map_base_url">URL base dello stile del server di piastrelle vettoriali della mappa</string>
+    <string name="foss_map_key">Chiave base della mappa vettoriale</string>
+    <string name="check_credentials">Verifica</string>
 </resources>

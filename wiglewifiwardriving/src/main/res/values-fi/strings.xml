@@ -475,4 +475,8 @@
     <string name="hide">Piilota</string>
     <string name="alert">Varoitus</string>
     <string name="guess_le_address_type">Päättele BLE-osoitetyyppi</string>
+    <string name="use_foss_maps">Käytä FOSS-karttoja (laattaverkkosoite vaaditaan)</string>
+    <string name="foss_map_base_url">Kartan vektorilaattapalvelimen tyylin perus-URL</string>
+    <string name="foss_map_key">Kartan vektorin perusavain</string>
+    <string name="check_credentials">Tarkista</string>
 </resources>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#00FFFFFF"
     android:clipToPadding="false">
     <!-- ALIBI:  background in to prevent arrow/scroll regressions on oldroid -->
@@ -258,6 +259,58 @@
         android:layout_height="wrap_content"
         android:text="@string/enable_map_bearing" />
 
+    <CheckBox android:id="@+id/foss_maps"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_foss_maps" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:id="@+id/foss_map_url_input_layout">
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edit_foss_map_server_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:placeholderText="e.g. https://api.maptiler.com/maps/streets-v2/style.json?key="
+            android:hint="@string/foss_map_base_url">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_foss_map_style_url"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+            <!-- app:suffixText="{z}/{x}/{y}.pbf or .mvt" -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="6">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/foss_map_key_input_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:placeholderText="e.g. AABB01030402"
+                android:hint="@string/foss_map_key"
+                android:layout_weight="5">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_foss_map_key"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textVisiblePassword"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/check_foss_map_creds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/check_credentials"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </LinearLayout>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

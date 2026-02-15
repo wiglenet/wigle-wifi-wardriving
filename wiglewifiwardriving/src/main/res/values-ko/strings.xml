@@ -475,4 +475,8 @@
     <string name="hide">숨기기</string>
     <string name="alert">경고</string>
     <string name="guess_le_address_type">BLE 주소 유형 추론</string>
+    <string name="use_foss_maps">FOSS 지도 사용 (타일 URL 필요)</string>
+    <string name="foss_map_base_url">지도 벡터 타일 서버 스타일 URL 기본</string>
+    <string name="foss_map_key">지도 벡터 기본 키</string>
+    <string name="check_credentials">확인</string>
 </resources>

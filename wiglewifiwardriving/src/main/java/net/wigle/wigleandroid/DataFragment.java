@@ -215,9 +215,16 @@ public final class DataFragment extends Fragment implements DialogListener {
         if (fail != null) {
             WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
         } else {
-            // start db result activity
-            final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
-            startActivity(settingsIntent);
+            MainActivity m = MainActivity.getMainActivity();
+            if (null != m) {
+                final SharedPreferences prefs = m.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                final boolean useFossMaps = prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false);
+                // start db result activity
+                final Intent settingsIntent = new Intent(getActivity(), useFossMaps ?
+                        FossDBResultActivity.class : DBResultActivity.class);
+                startActivity(settingsIntent);
+
+            }
         }
     });
 

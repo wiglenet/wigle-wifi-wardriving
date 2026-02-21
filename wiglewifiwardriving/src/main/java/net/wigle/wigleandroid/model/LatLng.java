@@ -61,7 +61,3 @@ public final class LatLng  {
         return "lat/lng: (" + this.latitude + "," + this.longitude + ")";
     }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main

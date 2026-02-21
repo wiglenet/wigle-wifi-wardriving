@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
 import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
-import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_PUBLIC;
 import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
 
 import android.bluetooth.BluetoothClass;
@@ -19,9 +18,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-
-// import com.google.android.gms.maps.model.BitmapDescriptor;
-// import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
@@ -127,30 +123,25 @@ public class NetworkListUtil {
         return color;
     }
 
-    /*public static BitmapDescriptor getSignalBitmap(@NonNull Context context, final int level) {
+    public static Bitmap getSignalBitmap(@NonNull Context context, final int level) {
         int color = getSignalColor(level, true);
         return getBitmapFromVector(context, drawable.observation, color);
-    }*/
+    }
 
-    /*public static BitmapDescriptor getBitmapFromVector(@NonNull Context context,
-                                                       @DrawableRes int vectorResourceId,
-                                                       @ColorInt int tintColor) {
-
+    public static Bitmap getBitmapFromVector(@NonNull Context context,
+                                                                 @DrawableRes int vectorResourceId,
+                                                                 @ColorInt int tintColor) {
         Drawable vectorDrawable;
         vectorDrawable = ResourcesCompat.getDrawable(
                 context.getResources(), vectorResourceId, null);
-        if (vectorDrawable == null) {
-            Logging.error("Requested vector resource was not found");
-            return BitmapDescriptorFactory.defaultMarker();
-        }
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
                 vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         DrawableCompat.setTint(vectorDrawable, tintColor);
         vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }*/
+        return bitmap;
+    }
 
     public static int getImage(final Network network) {
         int resource;
@@ -329,9 +320,6 @@ public class NetworkListUtil {
     }
 
     public static Integer getBleAddrTypeImage(final Integer type) {
-        if (type != 0) {
-            Logging.error("BLEADDRTYPE: " + type);
-        }
         switch (type) {
             case ADDRESS_TYPE_ANONYMOUS:
                 return drawable.balaclava;

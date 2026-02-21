@@ -86,6 +86,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.BluetoothReceiver;
+import net.wigle.wigleandroid.listener.CellReceiver;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.WifiReceiver;
@@ -157,6 +158,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         GNSSListener GNSSListener;
         WifiReceiver wifiReceiver;
         BluetoothReceiver bluetoothReceiver;
+        CellReceiver cellReceiver;
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
@@ -873,9 +875,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         } else if (navId == R.id.nav_data) {
             return DataFragment.class;
         } else if (navId == R.id.nav_search) {
-            return SearchFragment.class;
+            return FossSearchFragment.class;
         } else if (navId == R.id.nav_map) {
-            return MappingFragment.class;
+            return FossMappingFragment.class;
         } else if (navId == R.id.nav_user_stats) {
             return UserStatsFragment.class;
         } else if (navId == R.id.nav_rank) {
@@ -1290,7 +1292,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final FragmentManager fragmentManager = a.getSupportFragmentManager();
             if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
                 // Map is visible, give it the new network
-                final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+                final AbstractMappingFragment f = (AbstractMappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
                 if (f != null) {
                     f.addNetwork(network);
                 }
@@ -1304,7 +1306,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final FragmentManager fragmentManager = a.getSupportFragmentManager();
             if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
                 // Map is visible, give it the new network
-                final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+                final AbstractMappingFragment f = (AbstractMappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
                 if (f != null) {
                     f.updateNetwork(network);
                 }
@@ -1313,10 +1315,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static void reclusterMap() {
-        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        final MainActivity a = MainActivity.mainActivity;
+        if (a == null) {
+            return;
+        }
+        final FragmentManager fragmentManager = a.getSupportFragmentManager();
         if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
-            // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+            final AbstractMappingFragment f = (AbstractMappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
                 f.reCluster();
             }
@@ -1622,7 +1627,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     @Override
     public boolean isFinishing() {
-        return state.finishing.get();
+        //ALIBI: seeing ostensibly impossible crashes without null checks exclusively on HONOR devices
+        return null != state && null != state.finishing && state.finishing.get();
     }
 
     public boolean isTransferring() {
@@ -1747,8 +1753,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.info("\tnew wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
-            state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
+            state.wifiReceiver = new WifiReceiver(this, state.dbHelper);
             state.wifiReceiver.setupWifiTimer(turnedWifiOn);
+        }
+        if (state.cellReceiver == null) {
+            Logging.info("\tnew cellReceiver");
+            state.cellReceiver = new CellReceiver(this, state.dbHelper, getApplicationContext());
+            state.cellReceiver.setupCellTimer(turnedWifiOn);
+        } else {
+            state.cellReceiver.setupCellTimer(false);
         }
 
         // register wifi receiver
@@ -2156,6 +2169,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.wifiReceiver != null) {
                 state.wifiReceiver.updateLastScanResponseTime();
             }
+            if (state.cellReceiver != null) {
+                state.cellReceiver.setupCellTimer(false);
+            }
             // turn on location updates
             this.setLocationUpdates(getLocationSetPeriod(), 0f);
 
@@ -2166,6 +2182,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (listFragment != null) {
                 listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
                 listFragment.setScanningStatusIndicator(false);
+            }
+            if (state.cellReceiver != null) {
+                state.cellReceiver.stopCellTimer();
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);
@@ -2213,7 +2232,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         // create a new listener to try and get around the gps stopping bug
         state.GNSSListener = new GNSSListener(this, state.dbHelper);
-        state.GNSSListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
+        state.GNSSListener.setMapListener(FossMappingFragment.STATIC_LOCATION_LISTENER);
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
 
         try {
@@ -2668,10 +2687,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         //ALIBI: we'll piggyback off the current route, if we're logging it
         if (!logRoutes) {
             if (state != null && state.dbHelper != null) {
-                try {
-                    state.dbHelper.clearDefaultRoute();
-                } catch (DBException dbe) {
-                    Logging.warn("unable to clear default route on start-viz: ", dbe);
+                final DatabaseHelper dbHelper = state.dbHelper;
+                try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+                    executor.execute(() -> {
+                        try {
+                            dbHelper.clearDefaultRoute();
+                        } catch (DBException dbe) {
+                            Logging.warn("unable to clear default route on startRouteMapping: ", dbe);
+                        }
+                    });
+                    executor.shutdown();
                 }
             }
         }

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <RelativeLayout
+        android:id="@+id/map_rl"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:background="@tools:sample/backgrounds/scenic">
+        <org.maplibre.android.maps.MapView
+            android:id="@+id/mapLibreMap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="3dp"
+        style="@style/MapOverlay"
+        android:weightSum="21"
+        android:baselineAligned="false">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
+            <ImageView
+                app:srcCompat="@drawable/ic_wifi_sm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run wifi"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="wifi new vs run"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_wifi"
+                android:textSize="15sp"
+                style="@style/WiFiColor"
+                tools:text="888.81k"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
+            <ImageView
+                app:srcCompat="@drawable/ic_cell_sm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run cell"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="cell new vs. run"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_cell"
+                android:textSize="15sp"
+                android:text="@string/stats"
+                android:scrollHorizontally="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                style="@style/CellColor" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/bt_list_total"
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            tools:ignore="UseCompoundDrawables">
+            <ImageView
+                app:srcCompat="@drawable/ic_bt_sm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run bluetooth"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="bt new vs run"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_bt"
+                android:textSize="15sp"
+                style="@style/BtColor"
+                tools:text="8,888k"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:gravity="end"
+            tools:ignore="UseCompoundDrawables">
+            <ImageView
+                android:src="@drawable/new_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/new_word"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="@string/new_word"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_unuploaded"
+                android:textSize="15sp"
+                style="@style/UploadColor"
+                tools:text="888.8 K"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="/"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"/>
+            <ImageView
+                android:src="@drawable/database"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run DB"
+                android:paddingTop="3dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
+                android:text="database"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_dbnets"
+                android:textSize="15sp"
+                tools:text="8888888"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/debug"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:background="#AA333333">
+        <TextView
+            android:id="@+id/heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#FFFF"
+            android:textSize="18sp" />
+        <TextView
+            android:id="@+id/bearing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#FFFF"
+            android:textSize="18sp" />
+        <TextView
+            android:id="@+id/selectedbh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#FFF4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/center_location_button"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/info"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#AA333333"
+        android:contentDescription="x"
+        android:src="@drawable/ic_gps"
+        android:padding="8dp"
+        app:tint="?attr/colorControlNormal"
+        style="@style/NetworkViewOverlay" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/info"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        tools:ignore="RelativeOverlap">
+        <TextView
+            android:id="@+id/rundistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="13dp"
+            android:paddingEnd="13dp"
+            android:textColor="#FFFF"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:background="#AA333333"
+            tools:text="8,888 km"/>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="0dp" />
+    </LinearLayout>
+</RelativeLayout>

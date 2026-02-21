@@ -2,9 +2,6 @@ package net.wigle.wigleandroid;
 
 import static android.view.View.GONE;
 
-import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.BT_SUB_BOX_IDS;
-import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -76,7 +73,7 @@ public class MapFilterActivity extends ScreenChildActivity {
         View view = findViewById(android.R.id.content);
         Logging.info("Filter Fragment Selected");
         final EditText regex = findViewById( R.id.edit_regex );
-        final String regexKey = MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_REGEX;
+        final String regexKey = FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_REGEX;
         regex.setText( prefs.getString(regexKey, "") );
 
         regex.addTextChangedListener( new SettingsFragment.SetWatcher() {
@@ -128,21 +125,21 @@ public class MapFilterActivity extends ScreenChildActivity {
                 yearLabelBase.toArray(new String[0]), MapFilterActivity.this );
 
         PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true, value -> FilterUtil.updateWifiGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbtc,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BT, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BT, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view));
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbtle,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view) );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true, value -> FilterUtil.updateBluetoothGroupCheckbox(view) );
         PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
-                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
+                FossMappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
 
         FilterUtil.updateWifiGroupCheckbox(view);
         FilterUtil.updateBluetoothGroupCheckbox(view);

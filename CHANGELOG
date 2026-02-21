@@ -1,3 +1,8 @@
+* 2.104 (02/07/2026)
+Heuristic for random/public BLE identification
+Backgrounding two tasks to lessen ANRs
+Bugfix for HONOR & old phones
+
 * 2.101 - 2.103 (01/10/2026)
 More manual layout to handle bottom nav bar after being forced to use Android's broken edge-to-edge
 Downgrade Google Material lib to 1.11.0 to solve menu crash

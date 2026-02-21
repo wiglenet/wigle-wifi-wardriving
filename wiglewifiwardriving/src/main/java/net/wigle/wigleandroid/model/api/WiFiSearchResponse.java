@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.model.api;
 
-//import com.google.android.gms.maps.model.LatLng;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;

@@ -6,7 +6,7 @@ Nethugging client for Android, from [wigle.net](https://wigle.net).
 
 This client provides geolocated detection and logging for WiFi, Bluetooth, and cellular signals using Android devices.
 
-As of December 2022, this application supports Android SDK versions 19 (KitKat) and up. For older versions, see the [2.67 release tag](https://github.com/wiglenet/wigle-wifi-wardriving/releases/tag/2.67) to build your own copy or side-load [the compiled artifact](https://github.com/wiglenet/wigle-wifi-wardriving/blob/2.67/dist/release/wiglewifiwardriving-release.apk). 
+As of January 2023, this application supports Android SDK versions 24 (Nougat) and up. For older versions, see the [2.67 release tag](https://github.com/wiglenet/wigle-wifi-wardriving/releases/tag/2.67) to build your own copy or side-load [the compiled artifact](https://github.com/wiglenet/wigle-wifi-wardriving/blob/2.67/dist/release/wiglewifiwardriving-release.apk).
 
 ## Features
 - View and map local RF signals including WiFi, Blueooth, and Cell
@@ -14,6 +14,8 @@ As of December 2022, this application supports Android SDK versions 19 (KitKat) 
 - Search and export observed data
 - Integrate with a [WiGLE.net account](https://wigle.net) for competition, statistics, and online aggregation and visualization
 - See your standings and accomplishments per the WiGLE.net server
+- Perform WiFi site surveys on a per-BSSID basis
+- Register for proximity notifications based on the basis MAC, OUI, or Bluetooth LE manufacturer IDs
 
 ## Data Export
 The client offers numerous data export formats including:
@@ -30,7 +32,7 @@ Please use [github issue tracking](https://github.com/wiglenet/wigle-wifi-wardri
 **Please note:** *this is primarly a data collection tool - as such we aim to support the widest range of devices possible, and so advanced visualization and data management feature requests that would limit low-end device support will probably not be prioritized.*
 
 ## Device Support
-Currently Android versions from KitKat (Android 4.4.3 / API 19) to Android 12 (API 31) are supported. Android 9 fundamentally throttled WiFi scanning support without a reliable remediation (see [our forums](https://wigle.net/phpbb/viewtopic.php?f=13&t=2841) for some possible fixes), but as of Android 10 and above, disabling WiFi scan throttling was added to the Developer Options settings menu. If you're using a modern Android OS, you should [disable WiFi Scan Throttling](https://www.netspotapp.com/help/how-to-disable-wi-fi-throttling-on-android-10/) to maximize the effectiveness of this application.
+Currently Android versions from Nougat (Android 7 / API 24) to Android 16 (API 36) are supported. Android 9 fundamentally throttled WiFi scanning support without a reliable remediation (see [our forums](https://wigle.net/phpbb/viewtopic.php?f=13&t=2841) for some possible fixes), but as of Android 10 and above, disabling WiFi scan throttling was added to the Developer Options settings menu. If you're using a modern Android OS, you should use the Android Developer options to [disable WiFi Scan Throttling](https://www.netspotapp.com/help/how-to-disable-wi-fi-throttling-on-android-10/) to maximize the effectiveness of this application.
 
 We receive various bug reports from forks/ports of Android to non-standard devices, but cannot address or test all possible variations. While we do our best to support the widest range of devices possible, the best way to get support for your device is to help us debug or to submit a pull request!
 

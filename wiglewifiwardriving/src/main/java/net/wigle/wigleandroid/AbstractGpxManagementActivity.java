@@ -1,10 +1,12 @@
 package net.wigle.wigleandroid;
+
+import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
+
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -17,24 +19,15 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-//import com.google.android.gms.maps.CameraUpdate;
-//import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.MapView;
-//import com.google.android.gms.maps.MapsInitializer;
-//import com.google.android.gms.maps.model.LatLngBounds;
-//import com.google.android.gms.maps.model.Polyline;
-
 import net.wigle.wigleandroid.background.GpxExportRunnable;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.model.PolylineRoute;
+import net.wigle.wigleandroid.model.RouteDescriptor;
 import net.wigle.wigleandroid.ui.GpxRecyclerAdapter;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
-import net.wigle.wigleandroid.ui.ThemeUtil;
-import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
-import net.wigle.wigleandroid.util.PolyRouteConfigurable;
+import net.wigle.wigleandroid.util.RouteConfigurable;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
@@ -44,22 +37,60 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 import static android.view.View.GONE;
-import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
 
-public class GpxManagementActivity extends ScreenChildActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
+public abstract class AbstractGpxManagementActivity extends ScreenChildActivity implements RouteConfigurable, RouteExportSelector, DialogListener {
+    protected DatabaseHelper dbHelper;
+    protected NumberFormat numberFormat;
+    protected final int DEFAULT_MAP_PADDING = 25;
+    protected final String CURRENT_ROUTE_LINE_TAG = "currentRoutePolyline";
+    protected View infoView;
+    protected TextView distanceText;
+    protected SharedPreferences prefs;
+    protected long exportRouteId = -1L;
+    protected Object mapView;
+    protected Object routePolyline;
 
-    private final NumberFormat numberFormat;
-    private final int DEFAULT_MAP_PADDING = 25;
-    private final DatabaseHelper dbHelper;
-//    private MapView mapView;
-    private View infoView;
-    private TextView distanceText;
-//    private Polyline routePolyline;
-    private final String CURRENT_ROUTE_LINE_TAG = "currentRoutePolyline";
-    private SharedPreferences prefs;
-    private long exportRouteId = -1L;
+    /**
+     * Initializes the subclass map library.
+     */
+    protected void initializeMapLibrary() {
+        // Default: M/A for Google Maps
+    }
 
-    public GpxManagementActivity() {
+    /**
+     * Returns the subclass layout resource ID
+     * @return the unique ID of the resource
+     */
+    protected abstract int getLayoutResourceId();
+
+    /**
+     * set up the map (subclass-specific)
+     * @param prefs the current SharedPreferences instance for the app
+     */
+    protected abstract void setupMap(SharedPreferences prefs);
+
+    /**
+     * Configures the map for the given route in subclass
+     * @param routeDescriptor The route descriptor to configure the map for
+     */
+    protected abstract void configureMapForRouteInternal(RouteDescriptor routeDescriptor);
+
+    /**
+     * Destroy the map view (subclass-specific)
+     */
+    protected abstract void destroyMapView();
+
+    /**
+     * Resumes the map view (subclass-specific)
+     */
+    protected abstract void resumeMapView();
+
+    /**
+     * Pauses the map view (subclass-specific)
+     */
+    protected abstract void pauseMapView();
+
+    public AbstractGpxManagementActivity() {
         final MainActivity.State s = MainActivity.getStaticState();
         if (null != s) {
             this.dbHelper = s.dbHelper;
@@ -72,9 +103,10 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     }
 
     @Override
-    public void onCreate( final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
+        initializeMapLibrary();
+        setContentView(getLayoutResourceId());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gpx_mgmt);
         EdgeToEdge.enable(this);
         View backButtonWrapper = findViewById(R.id.gpx_back_layout);
         if (null != backButtonWrapper) {
@@ -102,86 +134,43 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
             backButton.setOnClickListener(v -> finish());
         }
         prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        infoView = findViewById(R.id.gpx_info);
+        distanceText = findViewById(R.id.gpx_rundistance);
         setupMap(prefs);
         setupList();
     }
 
     @Override
-    public void onDestroy() {
-        Logging.info("NET: onDestroy");
-//        if (mapView != null) {
-//            mapView.onDestroy();
-//        }
-        super.onDestroy();
-        //setResult(Result.OK);
-        finish();
-    }
-
-    @Override
-    public void onResume() {
-        Logging.info("NET: onResume");
-        super.onResume();
-//        if (mapView != null) {
-//            mapView.onResume();
-//        } else {
-//            final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-//            setupMap(prefs);
-//        }
-    }
-
-    @Override
-    public void onPause() {
-        Logging.info("NET: onPause");
-        super.onPause();
-//        if (mapView != null) {
-//            mapView.onPause();
-//        }
-    }
-
-    private void setupMap(final SharedPreferences prefs) {
-//        mapView = new MapView( this );
-//        try {
-//            mapView.onCreate(null);
-//            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
-//        } catch (NullPointerException ex) {
-//            Logging.error("npe in mapView.onCreate: " + ex, ex);
-//        }
-//        MapsInitializer.initialize( this );
-//        final RelativeLayout rlView = findViewById( R.id.gpx_map_rl );
-//        rlView.addView( mapView );
-//        infoView = findViewById(R.id.gpx_info);
-//        distanceText = findViewById(R.id.gpx_rundistance);
-    }
-
-    @Override
-    public void configureMapForRoute(final PolylineRoute polyRoute) {
-        if ((polyRoute != null)) {
-//            mapView.getMapAsync(googleMap -> {
-//                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//                builder.include(polyRoute.getNEExtent());
-//                builder.include(polyRoute.getSWExtent());
-//                LatLngBounds bounds = builder.build();
-//                final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_MAP_PADDING);
-//                googleMap.animateCamera(cu);
-//                routePolyline = googleMap.addPolyline(polyRoute.getPolyline());
-//                routePolyline.setTag(CURRENT_ROUTE_LINE_TAG);
-//            });
-            infoView.setVisibility(View.VISIBLE);
-            final String distString = UINumberFormat.metersToString(prefs,
-                    numberFormat, this, polyRoute.getDistanceMeters(), true);
-            distanceText.setText(distString);
+    public void configureMapForRoute(final RouteDescriptor routeDescriptor) {
+        if (routeDescriptor != null) {
+            configureMapForRouteInternal(routeDescriptor);
+            updateRouteInfoView(routeDescriptor);
         } else {
-            infoView.setVisibility(GONE);
-            distanceText.setText("");
+            hideRouteInfoView();
         }
+    }
+
+    private void updateRouteInfoView(RouteDescriptor routeDescriptor) {
+        infoView.setVisibility(View.VISIBLE);
+        final String distString = net.wigle.wigleandroid.ui.UINumberFormat.metersToString(
+            prefs, numberFormat, this, routeDescriptor.getDistanceMeters(), true);
+        distanceText.setText(distString);
+    }
+
+    private void hideRouteInfoView() {
+        infoView.setVisibility(GONE);
+        distanceText.setText("");
     }
 
     @Override
     public void clearCurrentRoute() {
-//        if (routePolyline != null ) {
-//            routePolyline.remove();
-//        }
+        clearRoutePolyline();
     }
+
+    /**
+     * Subclass-specific the route polyline from the map.
+     */
+    protected abstract void clearRoutePolyline();
 
     private void setupList() {
         RecyclerView recyclerView = findViewById(R.id.gpx_list);
@@ -244,5 +233,27 @@ public class GpxManagementActivity extends ScreenChildActivity implements PolyRo
     @Override
     public void setRouteToExport(long routeId) {
         exportRouteId = routeId;
+    }
+
+    @Override
+    public void onDestroy() {
+        Logging.info("GPX MGMT: onDestroy");
+        destroyMapView();
+        super.onDestroy();
+        finish();
+    }
+
+    @Override
+    public void onResume() {
+        Logging.info("GPX MGMT: onResume");
+        super.onResume();
+        resumeMapView();
+    }
+
+    @Override
+    public void onPause() {
+        Logging.info("GPX MGMT: onPause");
+        pauseMapView();
+        super.onPause();
     }
 }

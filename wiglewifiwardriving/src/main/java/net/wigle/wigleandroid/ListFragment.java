@@ -69,6 +69,7 @@ import java.util.concurrent.Executors;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_USE_FOSS_MAPS;
 
 /**
  * Main Network List View Fragment Adapter. Manages dynamic update of view apart from list when showing.
@@ -121,8 +122,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public long newCells;
         public long newBt;
         public int currNets;
+        public int currWifi;
         public int currCells;
         public int currBt;
+        public int pendingCellCount;
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
@@ -695,6 +698,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             if (null != state.bluetoothReceiver) {
                 state.bluetoothReceiver.setListAdapter(state.listAdapter);
             }
+            if (null != state.cellReceiver) {
+                state.cellReceiver.setListAdapter(state.listAdapter);
+            }
             final ListView listView = view.findViewById( R.id.ListView01 );
             setupListAdapter(listView, getActivity(), state.listAdapter, false);
         }
@@ -708,7 +714,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final Network network = (Network) parent.getItemAtPosition(position);
             if (network != null && activity != null) {
                 MainActivity.getNetworkCache().put(network.getBssid(), network);
-                final Intent intent = new Intent(activity, NetworkActivity.class);
+                final Intent intent = new Intent(activity, FossNetworkActivity.class);
                 intent.putExtra(NETWORK_EXTRA_BSSID, network.getBssid());
                 intent.putExtra(NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
                 activity.startActivity(intent);

@@ -104,7 +104,6 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     protected static final int MSG_OBS_DONE = 2;
     protected static final int DEFAULT_ZOOM = 18;
     // used for shutting extraneous activities down on an error
-    protected static NetworkActivity networkActivity;
     protected final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
     protected final ConcurrentLinkedHashMap<LatLng, Observation> localObsMap = new ConcurrentLinkedHashMap<>(1024);
     protected Network network;
@@ -494,7 +493,6 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     public void onDestroy() {
         Logging.info("NET: onDestroy");
         destroyMapView();
-        networkActivity = null;
         super.onDestroy();
     }
 

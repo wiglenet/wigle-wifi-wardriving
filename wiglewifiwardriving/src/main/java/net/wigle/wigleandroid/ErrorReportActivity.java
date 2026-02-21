@@ -151,9 +151,6 @@ public class ErrorReportActivity extends AppCompatActivity {
         if ( mainActivity != null ) {
             mainActivity.finishSoon();
         }
-        if ( NetworkActivity.networkActivity != null ) {
-            NetworkActivity.networkActivity.finish();
-        }
         if ( SpeechActivity.speechActivity != null ) {
             SpeechActivity.speechActivity.finish();
         }

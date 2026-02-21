@@ -259,10 +259,6 @@
         android:layout_height="wrap_content"
         android:text="@string/enable_map_bearing" />
 
-    <CheckBox android:id="@+id/foss_maps"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/use_foss_maps" />
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

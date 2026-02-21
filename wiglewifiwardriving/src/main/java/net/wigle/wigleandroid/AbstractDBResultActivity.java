@@ -154,7 +154,7 @@ public abstract class AbstractDBResultActivity extends ProgressThrobberActivity 
         if (queryArgs != null) {
             startAnimation();
 
-            LatLng center = MappingFragment.DEFAULT_POINT;
+            LatLng center = FossMappingFragment.DEFAULT_POINT;
             MapBounds bounds = queryArgs.getLocationBounds();
             if (bounds != null) {
                 center = new LatLng(bounds.getCenter().latitude, bounds.getCenter().longitude);

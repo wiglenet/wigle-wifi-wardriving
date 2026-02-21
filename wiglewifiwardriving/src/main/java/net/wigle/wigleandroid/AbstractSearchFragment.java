@@ -209,7 +209,7 @@ public abstract class AbstractSearchFragment extends Fragment {
         } else if (null != ListFragment.lameStatic.location) {
             centerPoint = new LatLng(ListFragment.lameStatic.location.getLatitude(), ListFragment.lameStatic.location.getLongitude());
         } else {
-            centerPoint = MappingFragment.DEFAULT_POINT;
+            centerPoint = FossMappingFragment.DEFAULT_POINT;
         }
         setupMap(this.getActivity().getApplicationContext(), view, centerPoint, savedInstanceState, prefs);
         setupAddressSearch(this.getActivity().getApplicationContext(), view);
@@ -229,9 +229,7 @@ public abstract class AbstractSearchFragment extends Fragment {
                 WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
             } else {
                 ListFragment.lameStatic.queryArgs.setSearchWiGLE(!local);
-                final Intent settingsIntent = new Intent(getActivity(),
-                        prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false) ?
-                                FossDBResultActivity.class : DBResultActivity.class);
+                final Intent settingsIntent = new Intent(getActivity(), FossDBResultActivity.class );
                 startActivity(settingsIntent);
             }
 

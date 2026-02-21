@@ -216,7 +216,7 @@ public final class DataFragment extends Fragment implements DialogListener {
             WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
         } else {
             // start db result activity
-            final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
+            final Intent settingsIntent = new Intent(getActivity(), FossDBResultActivity.class);
             startActivity(settingsIntent);
         }
     });
@@ -426,11 +426,10 @@ public final class DataFragment extends Fragment implements DialogListener {
                         Logging.error("unable to get fragment activity");
                     }
                 });
-                final boolean useFossMaps = prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false);
                 final Button manageGpxButton = view.findViewById(R.id.manage_gpx_button);
                 manageGpxButton.setOnClickListener(v -> {
                     final Intent gpxIntent = new Intent(a.getApplicationContext(),
-                            useFossMaps ? FossGpxManagementActivity.class : GpxManagementActivity.class);
+                            FossGpxManagementActivity.class );
                     a.startActivityForResult(gpxIntent, ACTION_GPX_MGMT);
                 });
             }

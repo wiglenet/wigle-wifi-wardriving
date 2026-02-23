@@ -209,7 +209,7 @@ public abstract class AbstractSearchFragment extends Fragment {
         } else if (null != ListFragment.lameStatic.location) {
             centerPoint = new LatLng(ListFragment.lameStatic.location.getLatitude(), ListFragment.lameStatic.location.getLongitude());
         } else {
-            centerPoint = MappingFragment.DEFAULT_POINT;
+            centerPoint = AbstractMappingFragment.DEFAULT_POINT;
         }
         setupMap(this.getActivity().getApplicationContext(), view, centerPoint, savedInstanceState, prefs);
         setupAddressSearch(this.getActivity().getApplicationContext(), view);

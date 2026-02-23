@@ -128,7 +128,7 @@ public class FossMapRender {
         final boolean hideNets = prefs.getBoolean(PreferenceKeys.PREF_MAP_HIDE_NETS, false);
         final boolean showNewDBOnly = prefs.getBoolean(PreferenceKeys.PREF_MAP_ONLY_NEWDB, false)
                 && !isDbResult;
-        if (network.getPosition() != null && !hideNets) {
+        if (network.getLatLng() != null && !hideNets) {
             if (!showNewDBOnly || network.isNew()) {
                 return FilterMatcher.isOk(
                         ssidMatcher,
@@ -145,7 +145,7 @@ public class FossMapRender {
      * add a network.
      */
     public void addItem(@NonNull final Network network) {
-        if (network.getPosition() == null) {
+        if (network.getLatLng() == null) {
             return;
         }
         if (!okForMapTab(network)) {
@@ -470,11 +470,13 @@ public class FossMapRender {
             } catch (Exception ex) {
                 Logging.info("FossMapRender: getIcon failed, using default: " + ex);
             }
-            options.icon(icon);
+            if (null != icon && null != icon.getBitmap()) {
+                options.icon(icon);
 
-            marker = map.addMarker(options);
-            if (marker != null) {
-                markersByBssid.put(bssid, marker);
+                marker = map.addMarker(options);
+                if (marker != null) {
+                    markersByBssid.put(bssid, marker);
+                }
             }
         } else {
             try {

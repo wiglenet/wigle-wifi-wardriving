@@ -132,7 +132,7 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = WiFiSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(new LatLng(n.getPosition().latitude, n.getPosition().longitude));
+                    builder.include(new LatLng(n.getLatLng().latitude, n.getLatLng().longitude));
 //1/3: TODO: not working
 
                 }
@@ -142,7 +142,7 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = BtSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(new LatLng(n.getPosition().latitude, n.getPosition().longitude));
+                    builder.include(new LatLng(n.getLatLng().latitude, n.getLatLng().longitude));
 
 //2/3: TODO: not working
                 }
@@ -152,7 +152,7 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = CellSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(new LatLng(n.getPosition().latitude, n.getPosition().longitude));
+                    builder.include(new LatLng(n.getLatLng().latitude, n.getLatLng().longitude));
 
 //3/3: TODO: not working
                 }

@@ -15,6 +15,7 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
@@ -832,8 +833,11 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                             //DEBUG: Logging.info("** MATCHED DEVICE IN NetworkActivity: " + network.getBssid() + " **");
                             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                             if (bluetoothAdapter != null) {
-                                bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
-                                bluetoothAdapter.getBluetoothLeScanner().flushPendingScanResults(leScanCallback);
+                                BluetoothLeScanner scanner = bluetoothAdapter.getBluetoothLeScanner();
+                                if (null != scanner) {
+                                    scanner.stopScan(leScanCallback);
+                                    scanner.flushPendingScanResults(leScanCallback);
+                                }
                             }
                             final BluetoothGatt btGatt = bluetoothDevice.connectGatt(getApplicationContext(), false, gattCallback, BluetoothDevice.TRANSPORT_LE);
                             //Logging.info("class: " + bluetoothDevice.getBluetoothClass().getMajorDeviceClass() + " (all " + bluetoothDevice.getBluetoothClass().getDeviceClass() + ") vs "+network.getCapabilities());

@@ -157,6 +157,7 @@ public final class DatabaseHelper extends Thread {
     private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
     private static final String CLEAR_DEFAULT_ROUTE = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = 0";
+    private static final String DELETE_ROUTE_BY_ID = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
     private SQLiteDatabase db;
 
@@ -1436,6 +1437,19 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         if (null != db) {
             db.execSQL(CLEAR_DEFAULT_ROUTE);
+        }
+    }
+
+    /**
+     * Delete a route and all its points by run_id.
+     * @param runId the run_id of the route to delete
+     * @throws DBException if the database is unavailable
+     */
+    public void deleteRoute(long runId) throws DBException {
+        checkDB();
+        if (null != db) {
+            db.execSQL(DELETE_ROUTE_BY_ID, new Object[]{runId});
+            Logging.info("Deleted route run_id=" + runId);
         }
     }
 

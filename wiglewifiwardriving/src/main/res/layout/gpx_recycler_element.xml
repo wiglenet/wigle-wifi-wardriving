@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="6dp"
     android:paddingBottom="6dp"
     android:orientation="horizontal"
-    android:background="@drawable/gpx_selector"
-    >
+    android:background="@drawable/gpx_selector">
     <TextView
         android:id="@+id/gpxItemLabel"
         android:layout_width="wrap_content"
@@ -23,12 +23,25 @@
     <ImageButton
         android:id="@+id/share_route"
         android:background="@drawable/share"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/delete_route"
+        android:layout_gravity="end"
+        android:layout_height="32dp"
+        android:layout_width="32dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        />
+    <ImageButton
+        android:id="@+id/delete_route"
+        android:background="@null"
+        android:src="@drawable/remove"
+        app:tint="#FF0000"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="end"
-        android:layout_height="28dp"
-        android:layout_width="28dp"
-        android:layout_marginStart="10dp"
+        android:layout_height="32dp"
+        android:layout_width="32dp"
+        android:layout_marginStart="4dp"
         android:layout_marginEnd="5dp"
         />
 </RelativeLayout>

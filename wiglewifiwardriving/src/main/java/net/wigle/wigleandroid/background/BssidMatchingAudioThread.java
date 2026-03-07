@@ -1,11 +1,9 @@
 package net.wigle.wigleandroid.background;
 
-import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_MUTED;
-
-import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.util.Logging;
 
@@ -21,10 +19,8 @@ public class BssidMatchingAudioThread extends Thread {
     AtomicInteger lastHighestSignal;
     WifiReceiver wifiReceiver;
 
-    SharedPreferences prefs;
-    public BssidMatchingAudioThread(final SharedPreferences prefs, final MediaPlayer soundScanning, final MediaPlayer soundContact,
+    public BssidMatchingAudioThread(final MediaPlayer soundScanning, final MediaPlayer soundContact,
         final AtomicInteger lastHighestSignal, final WifiReceiver wifiReceiver) {
-        this.prefs = prefs;
         this.soundScanning = soundScanning;
         this.soundContact = soundContact;
         this.lastHighestSignal = lastHighestSignal;
@@ -35,18 +31,17 @@ public class BssidMatchingAudioThread extends Thread {
     public void run() {
         while (!isInterrupted()) {
             try {
-                boolean notify = true;
-                if (null != prefs) {
-                    notify = !prefs.getBoolean(PREF_MUTED, false);
-                }
-                if (notify) {
-                    soundScanning.start();
-                    final long last = lastHighestSignal.getAndSet(Integer.MIN_VALUE);
-                    if (last != Integer.MIN_VALUE) {
-                        PlaybackParams params = new PlaybackParams();
-                        params.setPitch(scaleLevel(last));
-                        soundContact.setPlaybackParams(params);
-                        soundContact.start();
+                MainActivity mainActivity = MainActivity.getMainActivity();
+                if (null != mainActivity) {
+                    if (!mainActivity.isMuted()) {
+                        soundScanning.start();
+                        final long last = lastHighestSignal.getAndSet(Integer.MIN_VALUE);
+                        if (last != Integer.MIN_VALUE) {
+                            PlaybackParams params = new PlaybackParams();
+                            params.setPitch(scaleLevel(last));
+                            soundContact.setPlaybackParams(params);
+                            soundContact.start();
+                        }
                     }
                 }
                 final long currentScanPeriod = wifiReceiver.getScanPeriod();

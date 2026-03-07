@@ -2874,7 +2874,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             return;
         }
         state.bssidMatchHeartbeat = new BssidMatchingAudioThread(
-                prefs,
                 state.soundScanning,
                 state.soundContact, state.lastHighestSignal, state.wifiReceiver);
         state.bssidMatchHeartbeat.start();

@@ -478,4 +478,8 @@
     <string name="foss_map_base_url">मानचित्र वेक्टर टाइल सर्वर शैली URL आधार</string>
     <string name="foss_map_key">मानचित्र वेक्टर आधार कुंजी</string>
     <string name="check_credentials">सत्यापित करें</string>
+    <string name="delete_gpx_detail">क्या आप वाकई चयनित मार्ग को हटाना चाहते हैं?</string>
+    <string name="delete_gpx">मार्ग हटाएं</string>
+    <string name="delete_gpx_success">मार्ग सफलतापूर्वक हटा दिया गया।</string>
+    <string name="delete_gpx_failed">मार्ग हटाने में विफल।</string>
 </resources>

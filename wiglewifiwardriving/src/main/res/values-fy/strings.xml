@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Basis-URL foar kaartvektor-tegelserverstyl</string>
     <string name="foss_map_key">Kaartvektor basiskaai</string>
     <string name="check_credentials">Kontrolearje</string>
+    <string name="delete_gpx_detail">Bist wis dat jo de selektearre rûte wolle fuortsmite?</string>
+    <string name="delete_gpx">Rûte fuortsmite</string>
+    <string name="delete_gpx_success">Rûte mei sukses fuortsmiten.</string>
+    <string name="delete_gpx_failed">Rûte fuortsmite mislearre.</string>
 </resources>

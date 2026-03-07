@@ -478,4 +478,8 @@
     <string name="foss_map_base_url">URL ya msingi wa mtindo wa seva ya tile ya ramani vekta</string>
     <string name="foss_map_key">Ufunguo wa msingi wa ramani vekta</string>
     <string name="check_credentials">Thibitisha</string>
+    <string name="delete_gpx_detail">Je, una uhakika unataka kufuta njia iliyochaguliwa?</string>
+    <string name="delete_gpx">Futa njia</string>
+    <string name="delete_gpx_success">Njia imefutwa kwa mafanikio.</string>
+    <string name="delete_gpx_failed">Imeshindwa kufuta njia.</string>
 </resources>

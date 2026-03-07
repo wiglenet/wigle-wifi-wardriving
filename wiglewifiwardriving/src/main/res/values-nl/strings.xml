@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">URL-basis voor mapvectortegelserver-stijl</string>
     <string name="foss_map_key">Mapvector basissleutel</string>
     <string name="check_credentials">Verifiëren</string>
+    <string name="delete_gpx_detail">Weet u zeker dat u de geselecteerde route wilt verwijderen?</string>
+    <string name="delete_gpx">Route verwijderen</string>
+    <string name="delete_gpx_success">Route succesvol verwijderd.</string>
+    <string name="delete_gpx_failed">Route verwijderen mislukt.</string>
 </resources>

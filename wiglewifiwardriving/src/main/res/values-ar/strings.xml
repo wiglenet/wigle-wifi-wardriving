@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">عنوان URL الأساسي لخادم بلاط خريطة المتجه</string>
     <string name="foss_map_key">مفتاح قاعدة خريطة المتجه</string>
     <string name="check_credentials">تحقق</string>
+    <string name="delete_gpx_detail">هل أنت متأكد أنك تريد حذف المسار المحدد؟</string>
+    <string name="delete_gpx">حذف المسار</string>
+    <string name="delete_gpx_success">تم حذف المسار بنجاح.</string>
+    <string name="delete_gpx_failed">فشل في حذف المسار.</string>
 </resources>

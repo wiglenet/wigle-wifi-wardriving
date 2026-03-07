@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Bazowy adres URL stylu serwera kafelków mapy wektorowej</string>
     <string name="foss_map_key">Klucz bazowy mapy wektorowej</string>
     <string name="check_credentials">Weryfikuj</string>
+    <string name="delete_gpx_detail">Czy na pewno chcesz usunąć wybraną trasę?</string>
+    <string name="delete_gpx">Usuń trasę</string>
+    <string name="delete_gpx_success">Trasa została pomyślnie usunięta.</string>
+    <string name="delete_gpx_failed">Nie udało się usunąć trasy.</string>
 </resources>

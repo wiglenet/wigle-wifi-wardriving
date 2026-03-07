@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">URL base do estilo do servidor de tiles do mapa vetorial</string>
     <string name="foss_map_key">Chave base do mapa vetorial</string>
     <string name="check_credentials">Verificar</string>
+    <string name="delete_gpx_detail">Tem certeza de que deseja excluir a rota selecionada?</string>
+    <string name="delete_gpx">Excluir rota</string>
+    <string name="delete_gpx_success">Rota excluída com sucesso.</string>
+    <string name="delete_gpx_failed">Falha ao excluir a rota.</string>
 </resources>

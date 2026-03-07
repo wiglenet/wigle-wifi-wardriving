@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Базовый URL стиля векторного сервера плиток карты</string>
     <string name="foss_map_key">Базовый ключ векторной карты</string>
     <string name="check_credentials">Проверить</string>
+    <string name="delete_gpx_detail">Вы уверены, что хотите удалить выбранный маршрут?</string>
+    <string name="delete_gpx">Удалить маршрут</string>
+    <string name="delete_gpx_success">Маршрут успешно удалён.</string>
+    <string name="delete_gpx_failed">Не удалось удалить маршрут.</string>
 </resources>

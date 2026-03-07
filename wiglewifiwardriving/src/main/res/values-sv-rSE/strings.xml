@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Kartvektorrutnätsserverstil-URL-bas</string>
     <string name="foss_map_key">Kartvektorbasnyckel</string>
     <string name="check_credentials">Verifiera</string>
+    <string name="delete_gpx_detail">Är du säker på att du vill ta bort den valda rutten?</string>
+    <string name="delete_gpx">Ta bort rutt</string>
+    <string name="delete_gpx_success">Rutten har tagits bort.</string>
+    <string name="delete_gpx_failed">Kunde inte ta bort rutten.</string>
 </resources>

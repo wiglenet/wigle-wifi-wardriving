@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">지도 벡터 타일 서버 스타일 URL 기본</string>
     <string name="foss_map_key">지도 벡터 기본 키</string>
     <string name="check_credentials">확인</string>
+    <string name="delete_gpx_detail">선택한 경로를 삭제하시겠습니까?</string>
+    <string name="delete_gpx">경로 삭제</string>
+    <string name="delete_gpx_success">경로가 성공적으로 삭제되었습니다.</string>
+    <string name="delete_gpx_failed">경로 삭제에 실패했습니다.</string>
 </resources>

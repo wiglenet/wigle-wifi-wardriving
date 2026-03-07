@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">地图矢量瓦片服务器样式 URL 基础</string>
     <string name="foss_map_key">地图矢量基础密钥</string>
     <string name="check_credentials">验证</string>
+    <string name="delete_gpx_detail">您确定要删除所选路线吗？</string>
+    <string name="delete_gpx">删除路线</string>
+    <string name="delete_gpx_success">路线已成功删除。</string>
+    <string name="delete_gpx_failed">删除路线失败。</string>
 </resources>

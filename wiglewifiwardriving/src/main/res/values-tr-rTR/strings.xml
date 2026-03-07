@@ -479,5 +479,9 @@
     <string name="foss_map_base_url">Harita vektör döşeme sunucusu stil URL temeli</string>
     <string name="foss_map_key">Harita vektör temel anahtarı</string>
     <string name="check_credentials">Doğrula</string>
+    <string name="delete_gpx_detail">Seçilen rotayı silmek istediğinizden emin misiniz?</string>
+    <string name="delete_gpx">Rotayı sil</string>
+    <string name="delete_gpx_success">Rota başarıyla silindi.</string>
+    <string name="delete_gpx_failed">Rota silinemedi.</string>
 </resources>
 

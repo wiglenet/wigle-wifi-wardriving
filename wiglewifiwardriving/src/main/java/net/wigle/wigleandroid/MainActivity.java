@@ -242,6 +242,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    private SharedPreferences.OnSharedPreferenceChangeListener mutedPreferenceListener;
+
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
@@ -1010,6 +1012,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onDestroy() {
         Logging.info("MAIN: destroy.");
+        if (mutedPreferenceListener != null) {
+            getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE)
+                    .unregisterOnSharedPreferenceChangeListener(mutedPreferenceListener);
+            mutedPreferenceListener = null;
+        }
         super.onDestroy();
         stopHeartbeat();
         if (!state.uiRestart.get()) {
@@ -1539,12 +1546,29 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
             state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
             //TODO: port SSID matcher over as well?
+            registerMutedPreferenceListener(prefs);
             if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
                 startHeartbeat(prefs);
             } else {
                 stopHeartbeat();
             }
         }
+    }
+
+    private void registerMutedPreferenceListener(final SharedPreferences prefs) {
+        if (mutedPreferenceListener != null) {
+            prefs.unregisterOnSharedPreferenceChangeListener(mutedPreferenceListener);
+        }
+        mutedPreferenceListener = (sharedPrefs, key) -> {
+            if (PreferenceKeys.PREF_MUTED.equals(key)) {
+                if (sharedPrefs.getBoolean(PreferenceKeys.PREF_MUTED, true)) {
+                    stopHeartbeat();
+                } else if (state.bssidAlertList != null || state.bleMfgrIdList != null) {
+                    startHeartbeat(sharedPrefs);
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(mutedPreferenceListener);
     }
 
     /**
@@ -2845,6 +2869,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null != state.bssidMatchHeartbeat) {
             state.bssidMatchHeartbeat.interrupt();
             state.bssidMatchHeartbeat = null;
+        }
+        if (prefs.getBoolean(PreferenceKeys.PREF_MUTED, true)) {
+            return;
         }
         state.bssidMatchHeartbeat = new BssidMatchingAudioThread(
                 prefs,

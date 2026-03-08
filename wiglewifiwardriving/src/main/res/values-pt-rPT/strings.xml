@@ -478,4 +478,8 @@
     <string name="foss_map_base_url">URL base do estilo do servidor de mosaicos do mapa vetorial</string>
     <string name="foss_map_key">Chave base do mapa vetorial</string>
     <string name="check_credentials">Verificar</string>
+    <string name="delete_gpx_detail">Tem a certeza de que deseja eliminar o percurso selecionado?</string>
+    <string name="delete_gpx">Eliminar percurso</string>
+    <string name="delete_gpx_success">Percurso eliminado com sucesso.</string>
+    <string name="delete_gpx_failed">Falha ao eliminar o percurso.</string>
 </resources>

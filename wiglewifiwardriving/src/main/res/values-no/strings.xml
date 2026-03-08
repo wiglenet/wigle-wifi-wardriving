@@ -480,4 +480,8 @@
     <string name="foss_map_base_url">Kartvektortileserver-stil URL-basiss</string>
     <string name="foss_map_key">Kartvektor basisnøkkel</string>
     <string name="check_credentials">Verifiser</string>
+    <string name="delete_gpx_detail">Er du sikker på at du vil slette den valgte ruten?</string>
+    <string name="delete_gpx">Slett rute</string>
+    <string name="delete_gpx_success">Ruten ble slettet.</string>
+    <string name="delete_gpx_failed">Kunne ikke slette ruten.</string>
 </resources>

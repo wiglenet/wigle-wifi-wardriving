@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">URL base dello stile del server di piastrelle vettoriali della mappa</string>
     <string name="foss_map_key">Chiave base della mappa vettoriale</string>
     <string name="check_credentials">Verifica</string>
+    <string name="delete_gpx_detail">Sei sicuro di voler eliminare il percorso selezionato?</string>
+    <string name="delete_gpx">Elimina percorso</string>
+    <string name="delete_gpx_success">Percorso eliminato con successo.</string>
+    <string name="delete_gpx_failed">Impossibile eliminare il percorso.</string>
 </resources>

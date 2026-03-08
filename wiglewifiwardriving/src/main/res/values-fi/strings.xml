@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Kartan vektorilaattapalvelimen tyylin perus-URL</string>
     <string name="foss_map_key">Kartan vektorin perusavain</string>
     <string name="check_credentials">Tarkista</string>
+    <string name="delete_gpx_detail">Haluatko varmasti poistaa valitun reitin?</string>
+    <string name="delete_gpx">Poista reitti</string>
+    <string name="delete_gpx_success">Reitti poistettu onnistuneesti.</string>
+    <string name="delete_gpx_failed">Reitin poistaminen epäonnistui.</string>
 </resources>

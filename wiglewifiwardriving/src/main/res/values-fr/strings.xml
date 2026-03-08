@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">URL de base du style du serveur de tuiles vectorielles de carte</string>
     <string name="foss_map_key">Clé de base de la carte vectorielle</string>
     <string name="check_credentials">Vérifier</string>
+    <string name="delete_gpx_detail">Êtes-vous sûr de vouloir supprimer l\'itinéraire sélectionné ?</string>
+    <string name="delete_gpx">Supprimer l\'itinéraire</string>
+    <string name="delete_gpx_success">Itinéraire supprimé avec succès.</string>
+    <string name="delete_gpx_failed">Échec de la suppression de l\'itinéraire.</string>
 </resources>

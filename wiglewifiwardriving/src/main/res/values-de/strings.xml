@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Basis-URL des Kartenvektor-Kachelserver-Stils</string>
     <string name="foss_map_key">Kartenvektor-Basisschlüssel</string>
     <string name="check_credentials">Überprüfen</string>
+    <string name="delete_gpx_detail">Möchten Sie die ausgewählte Route wirklich löschen?</string>
+    <string name="delete_gpx">Route löschen</string>
+    <string name="delete_gpx_success">Route wurde erfolgreich gelöscht.</string>
+    <string name="delete_gpx_failed">Route konnte nicht gelöscht werden.</string>
 </resources>

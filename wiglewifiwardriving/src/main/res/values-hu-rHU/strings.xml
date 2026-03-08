@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">Térkép vektor csempe szerver stílus URL alapja</string>
     <string name="foss_map_key">Térkép vektor alapkulcs</string>
     <string name="check_credentials">Ellenőrzés</string>
+    <string name="delete_gpx_detail">Biztosan törölni szeretné a kiválasztott útvonalat?</string>
+    <string name="delete_gpx">Útvonal törlése</string>
+    <string name="delete_gpx_success">Az útvonal sikeresen törölve.</string>
+    <string name="delete_gpx_failed">Az útvonal törlése sikertelen.</string>
 </resources>

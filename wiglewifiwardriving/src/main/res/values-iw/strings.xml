@@ -479,4 +479,8 @@
     <string name="foss_map_base_url">כתובת URL בסיסית של סגנון שרת אריחי מפה וקטורית</string>
     <string name="foss_map_key">מפתח בסיס מפת וקטור</string>
     <string name="check_credentials">אימות</string>
+    <string name="delete_gpx_detail">האם אתה בטוח שברצונך למחוק את המסלול הנבחר?</string>
+    <string name="delete_gpx">מחק מסלול</string>
+    <string name="delete_gpx_success">המסלול נמחק בהצלחה.</string>
+    <string name="delete_gpx_failed">מחיקת המסלול נכשלה.</string>
 </resources>

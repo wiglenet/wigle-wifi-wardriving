@@ -483,4 +483,8 @@
     <string name="foss_map_base_url">Map vector tile server style URL base</string>
     <string name="foss_map_key">Map vector base key</string>
     <string name="check_credentials">Verify</string>
+    <string name="delete_gpx_detail">Are you sure you want to delete the selected route?</string>
+    <string name="delete_gpx">Delete Route</string>
+    <string name="delete_gpx_success">Route deleted successfully.</string>
+    <string name="delete_gpx_failed">Failed to delete route.</string>
 </resources>

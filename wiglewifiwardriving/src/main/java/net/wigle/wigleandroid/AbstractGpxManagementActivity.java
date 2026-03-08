@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIALOG;
+import static net.wigle.wigleandroid.ui.GpxRecyclerAdapter.DELETE_GPX_DIALOG;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -23,12 +24,14 @@ import net.wigle.wigleandroid.background.GpxExportRunnable;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.RouteDescriptor;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.GpxRecyclerAdapter;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.RouteConfigurable;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.RouteDeleteSelector;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
 import java.text.DateFormat;
@@ -38,7 +41,7 @@ import java.util.concurrent.ExecutorService;
 
 import static android.view.View.GONE;
 
-public abstract class AbstractGpxManagementActivity extends ScreenChildActivity implements RouteConfigurable, RouteExportSelector, DialogListener {
+public abstract class AbstractGpxManagementActivity extends ScreenChildActivity implements RouteConfigurable, RouteExportSelector, RouteDeleteSelector, DialogListener {
     protected DatabaseHelper dbHelper;
     protected NumberFormat numberFormat;
     protected final int DEFAULT_MAP_PADDING = 25;
@@ -47,6 +50,7 @@ public abstract class AbstractGpxManagementActivity extends ScreenChildActivity 
     protected TextView distanceText;
     protected SharedPreferences prefs;
     protected long exportRouteId = -1L;
+    protected long deleteRouteId = -1L;
     protected Object mapView;
     protected Object routePolyline;
 
@@ -181,7 +185,7 @@ public abstract class AbstractGpxManagementActivity extends ScreenChildActivity 
                 Cursor cursor = dbHelper.routeMetaIterator();
                 final DateFormat itemDateFormat = android.text.format.DateFormat.getDateFormat(this.getApplicationContext());
                 final DateFormat itemTimeFormat = android.text.format.DateFormat.getTimeFormat(this.getApplicationContext());
-                GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
+                GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, this, prefs, itemDateFormat, itemTimeFormat);
                 recyclerView.setAdapter(adapter);
             } catch (DBException dbex) {
                 Logging.error("Failed to setup list for GPX management: ", dbex);
@@ -197,6 +201,23 @@ public abstract class AbstractGpxManagementActivity extends ScreenChildActivity 
                     Logging.warn("Failed to export gpx.");
                     //WiGLEToast.showOverFragment(this, R.string.error_general,
                     //        getString(R.string.gpx_failed));
+                }
+                break;
+            }
+            case DELETE_GPX_DIALOG: {
+                if (deleteRouteId >= 0 && dbHelper != null) {
+                    try {
+                        dbHelper.deleteRoute(deleteRouteId);
+                        clearCurrentRoute();
+                        refreshRouteList();
+                        displayFirstRouteIfAvailable();
+                        WiGLEToast.showOverFragment(this, R.string.delete_gpx, getString(R.string.delete_gpx_success));
+                    } catch (DBException e) {
+                        Logging.error("Failed to delete route: ", e);
+                        WiGLEToast.showOverFragment(this, R.string.error_general, getString(R.string.delete_gpx_failed));
+                    } finally {
+                        deleteRouteId = -1L;
+                    }
                 }
                 break;
             }
@@ -233,6 +254,56 @@ public abstract class AbstractGpxManagementActivity extends ScreenChildActivity 
     @Override
     public void setRouteToExport(long routeId) {
         exportRouteId = routeId;
+    }
+
+    @Override
+    public void setRouteToDelete(long routeId) {
+        deleteRouteId = routeId;
+    }
+
+    private void refreshRouteList() {
+        RecyclerView recyclerView = findViewById(R.id.gpx_list);
+        GpxRecyclerAdapter adapter = (GpxRecyclerAdapter) recyclerView.getAdapter();
+        if (adapter != null && dbHelper != null) {
+            try {
+                Cursor newCursor = dbHelper.routeMetaIterator();
+                adapter.updateCursor(newCursor);
+            } catch (DBException e) {
+                Logging.error("Failed to refresh route list: ", e);
+            }
+        }
+    }
+
+    /**
+     * After a route is deleted, display the first remaining route on the map and select it in the list.
+     */
+    private void displayFirstRouteIfAvailable() {
+        RecyclerView recyclerView = findViewById(R.id.gpx_list);
+        GpxRecyclerAdapter adapter = (GpxRecyclerAdapter) recyclerView.getAdapter();
+        if (adapter == null || adapter.getItemCount() == 0 || dbHelper == null) {
+            return;
+        }
+        Cursor cursor = adapter.getCursor();
+        if (cursor == null || !cursor.moveToPosition(0)) {
+            return;
+        }
+        int runIdCol = cursor.getColumnIndexOrThrow("run_id");
+        long runId = cursor.getLong(runIdCol);
+        try (Cursor routeCursor = dbHelper.routeIterator(runId)) {
+            if (routeCursor == null) return;
+            final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, 1);
+            final boolean nightMode = ThemeUtil.shouldUseMapNightMode(this, prefs);
+            RouteDescriptor newRoute = new RouteDescriptor();
+            for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                float lat = routeCursor.getFloat(0);
+                float lon = routeCursor.getFloat(1);
+                newRoute.addLatLng(lat, lon, mapMode, nightMode);
+            }
+            configureMapForRoute(newRoute);
+        } catch (Exception e) {
+            Logging.error("Unable to display route after delete: ", e);
+        }
+        adapter.setSelectedPosition(0);
     }
 
     @Override

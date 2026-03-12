@@ -1,7 +1,11 @@
 package net.wigle.wigleandroid.ui;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
+import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.Logging;
 
@@ -13,23 +17,95 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Because a SetList is for bands.
  */
 public class SetBackedNetworkList extends AbstractList<Network> implements List<Network> {
+    //NB: realistically, you can't let the displayed networks grow forever or you'll exhaust device memory.
+    public int MAX_BT_SET_SIZE = 10000; // estimated around 4MiB?
+    public int MAX_WIFI_SET_SIZE = 10000; // ""
+    public int MAX_CELL_SET_SIZE = 5000;
+
     private final List<Network> unsafeNetworks = new ArrayList<>();
     private final List<Network> networks = Collections.synchronizedList(unsafeNetworks);
 
-    private final Set<Network> btNets = new HashSet<>();
-    private final Set<Network> leNets = new HashSet<>();
+    private final AtomicInteger btTruncCount = new AtomicInteger(0);
+    private final AtomicInteger leTruncCount = new AtomicInteger(0);
+    private final AtomicInteger wifiTruncCount = new AtomicInteger(0);
+    private final AtomicInteger cellTruncCount = new AtomicInteger(0);
+
+    private void onTruncation(final String collectionType, final AtomicInteger counter) {
+        final int count = counter.incrementAndGet();
+        if (count == 1 || (count - 1) % 100 == 0) {
+            final MainActivity a = MainActivity.getMainActivity();
+            if (a != null && !a.isFinishing()) {
+                a.runOnUiThread(() -> WiGLEToast.showOverActivity(a, R.string.app_name,
+                        a.getString(R.string.warn_display_trunc, collectionType), Toast.LENGTH_SHORT));
+            }
+        }
+    }
+
+    private final Set<Network> btNets = Collections.newSetFromMap(
+            new LinkedHashMap<Network, Boolean>() {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<Network, Boolean> eldest) {
+                    if (size() > MAX_BT_SET_SIZE) {
+                        networks.remove(eldest.getKey());
+                        onTruncation("bluetooth", btTruncCount);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+    );
+    private final Set<Network> leNets = Collections.newSetFromMap(
+            new LinkedHashMap<Network, Boolean>() {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<Network, Boolean> eldest) {
+                    if (size() > MAX_BT_SET_SIZE) {
+                        networks.remove(eldest.getKey());
+                        onTruncation("BLE", leTruncCount);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+    );
     private final Set<Network> nextBtNets = new HashSet<>();
     private final Set<Network> nextLeNets = new HashSet<>();
-    private final Set<Network> cellNets = new HashSet<>();
-    private final Set<Network> wifiNets = new HashSet<>();
+    private final Set<Network> cellNets = Collections.newSetFromMap(
+            new LinkedHashMap<Network, Boolean>() {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<Network, Boolean> eldest) {
+                    if (size() > MAX_CELL_SET_SIZE) {
+                        networks.remove(eldest.getKey());
+                        onTruncation("cell", cellTruncCount);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+    );
+
+    private final Set<Network> wifiNets = Collections.newSetFromMap(
+            new LinkedHashMap<Network, Boolean>() {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<Network, Boolean> eldest) {
+                    if (size() > MAX_WIFI_SET_SIZE) {
+                        networks.remove(eldest.getKey());
+                        onTruncation("WiFi", wifiTruncCount);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+    );
 
     @Override
     public int size() {
@@ -84,8 +160,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         } else if (ts.length > networks.size()) {
             ts[networks.size()] = null;
         }
-        System.arraycopy(networks.toArray(), 0, ts, 0, networks.size());
-        return ts;
+        return networks.toArray(ts);
     }
 
     /**
@@ -164,7 +239,10 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public boolean containsAll(@NonNull Collection<?> collection) {
-        return networks.containsAll(collection);
+        for (Object o : collection) {
+            if (!contains(o)) return false;
+        }
+        return true;
     }
 
     private Set<Network> addAllToSets(@NonNull Collection<? extends Network> collection) {
@@ -240,13 +318,13 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         leNets.retainAll(collection);
         wifiNets.retainAll(collection);
         cellNets.retainAll(collection);
-        Set retainNets = new HashSet<Network>();
+        /*Set retainNets = new HashSet<Network>();
         //TODO: perftesting
         retainNets.addAll(btNets);
         retainNets.addAll(leNets);
         retainNets.addAll(cellNets);
-        retainNets.addAll(wifiNets);
-        return networks.retainAll(retainNets);
+        retainNets.addAll(wifiNets);*/
+        return networks.retainAll(collection);
     }
 
     @Override
@@ -347,16 +425,20 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
             switch (n.getType()) {
                 case BLE:
                     leNets.remove(n);
+                    break;
                 case BT:
                     btNets.remove(n);
+                    break;
                 case WIFI:
                     wifiNets.remove(n);
+                    break;
                 case CDMA:
                 case GSM:
                 case LTE:
                 case WCDMA:
                 case NR:
                     cellNets.remove(n);
+                    break;
                 default:
                     break;
             }
@@ -427,32 +509,32 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     public void addWiFi(Network n) {
         if (null != n) {
-            networks.add(n);
-            wifiNets.add(n);
+            if (wifiNets.add(n)) {
+                networks.add(n);
+            }
         }
     }
 
     public void addCell(Network n) {
         if (null != n) {
-            networks.add(n);
-            cellNets.add(n);
+            if (cellNets.add(n)) {
+                networks.add(n);
+            }
         }
     }
 
     public void addBluetooth(Network n) {
         if (null != n) {
-            if (!btNets.contains(n) && !networks.contains(n)) {
+            if (btNets.add(n)) {
                 networks.add(n);
-                btNets.add(n);
             }
         }
     }
 
     public void addBluetoothLe(Network n) {
         if (null != n) {
-            if (!leNets.contains(n) && !networks.contains(n)) {
+            if (leNets.add(n)) {
                 networks.add(n);
-                leNets.add(n);
             }
         }
     }

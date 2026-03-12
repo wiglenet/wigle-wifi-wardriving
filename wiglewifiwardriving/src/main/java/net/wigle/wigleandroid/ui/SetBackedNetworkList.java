@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SetBackedNetworkList extends AbstractList<Network> implements List<Network> {
     //NB: realistically, you can't let the displayed networks grow forever or you'll exhaust device memory.
-    public int MAX_BT_SET_SIZE = 10000; // estimated around 4MiB?
-    public int MAX_WIFI_SET_SIZE = 10000; // ""
+    public int MAX_BT_SET_SIZE = 20000; // estimated around 4MiB?
+    public int MAX_WIFI_SET_SIZE = 20000; // ""
     public int MAX_CELL_SET_SIZE = 5000;
 
     private final List<Network> unsafeNetworks = new ArrayList<>();

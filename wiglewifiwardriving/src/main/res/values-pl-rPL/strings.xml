@@ -483,4 +483,5 @@
     <string name="delete_gpx">Usuń trasę</string>
     <string name="delete_gpx_success">Trasa została pomyślnie usunięta.</string>
     <string name="delete_gpx_failed">Nie udało się usunąć trasy.</string>
+    <string name="warn_display_trunc">Lista wyświetlania przekroczyła limity - usuwanie najstarszych wpisów %s.</string>
 </resources>

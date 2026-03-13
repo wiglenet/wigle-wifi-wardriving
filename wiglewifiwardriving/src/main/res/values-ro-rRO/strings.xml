@@ -483,4 +483,5 @@
     <string name="delete_gpx">Șterge ruta</string>
     <string name="delete_gpx_success">Ruta a fost ștearsă cu succes.</string>
     <string name="delete_gpx_failed">Ștergerea rutei a eșuat.</string>
+    <string name="warn_display_trunc">Lista de afișare a depășit limitele - eliminare intrări %s cele mai vechi.</string>
 </resources>

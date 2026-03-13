@@ -483,4 +483,5 @@
     <string name="delete_gpx">Route löschen</string>
     <string name="delete_gpx_success">Route wurde erfolgreich gelöscht.</string>
     <string name="delete_gpx_failed">Route konnte nicht gelöscht werden.</string>
+    <string name="warn_display_trunc">Anzeigeliste hat Grenzen überschritten - älteste %s-Einträge werden entfernt.</string>
 </resources>

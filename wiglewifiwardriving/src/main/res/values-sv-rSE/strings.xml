@@ -483,4 +483,5 @@
     <string name="delete_gpx">Ta bort rutt</string>
     <string name="delete_gpx_success">Rutten har tagits bort.</string>
     <string name="delete_gpx_failed">Kunde inte ta bort rutten.</string>
+    <string name="warn_display_trunc">Visningslistan överskred gränserna - tar bort äldsta %s-poster.</string>
 </resources>

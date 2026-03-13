@@ -482,4 +482,5 @@
     <string name="delete_gpx">Eliminar ruta</string>
     <string name="delete_gpx_success">Ruta eliminada correctamente.</string>
     <string name="delete_gpx_failed">No se pudo eliminar la ruta.</string>
+    <string name="warn_display_trunc">La lista de visualización excedió los límites - eliminando las entradas %s más antiguas.</string>
 </resources>

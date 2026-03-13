@@ -483,4 +483,5 @@
     <string name="delete_gpx">Rûte fuortsmite</string>
     <string name="delete_gpx_success">Rûte mei sukses fuortsmiten.</string>
     <string name="delete_gpx_failed">Rûte fuortsmite mislearre.</string>
+    <string name="warn_display_trunc">Toanlist foarby de limieten - âldste %s-foarsjinnen fuortsmite.</string>
 </resources>

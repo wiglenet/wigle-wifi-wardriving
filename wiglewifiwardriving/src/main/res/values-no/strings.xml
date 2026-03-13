@@ -484,4 +484,5 @@
     <string name="delete_gpx">Slett rute</string>
     <string name="delete_gpx_success">Ruten ble slettet.</string>
     <string name="delete_gpx_failed">Kunne ikke slette ruten.</string>
+    <string name="warn_display_trunc">Visningslisten overskred grensen - fjerner eldste %s-poster.</string>
 </resources>

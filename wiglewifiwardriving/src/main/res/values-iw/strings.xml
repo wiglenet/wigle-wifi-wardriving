@@ -483,4 +483,5 @@
     <string name="delete_gpx">מחק מסלול</string>
     <string name="delete_gpx_success">המסלול נמחק בהצלחה.</string>
     <string name="delete_gpx_failed">מחיקת המסלול נכשלה.</string>
+    <string name="warn_display_trunc">רשימת התצוגה חרגה מהמגבלות - מוחקים את רשומות %s הישנות ביותר.</string>
 </resources>

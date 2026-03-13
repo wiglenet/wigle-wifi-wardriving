@@ -486,4 +486,5 @@ KMLにエクスポート</string>
     <string name="delete_gpx">ルートを削除</string>
     <string name="delete_gpx_success">ルートが正常に削除されました。</string>
     <string name="delete_gpx_failed">ルートの削除に失敗しました。</string>
+    <string name="warn_display_trunc">表示リストが制限を超えました - 最も古い%sエントリを削除しています。</string>
 </resources>

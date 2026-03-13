@@ -482,4 +482,5 @@
     <string name="delete_gpx">Eliminar percurso</string>
     <string name="delete_gpx_success">Percurso eliminado com sucesso.</string>
     <string name="delete_gpx_failed">Falha ao eliminar o percurso.</string>
+    <string name="warn_display_trunc">Lista de visualização excedeu os limites - a remover as entradas %s mais antigas.</string>
 </resources>

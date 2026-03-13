@@ -482,4 +482,5 @@
     <string name="delete_gpx">Futa njia</string>
     <string name="delete_gpx_success">Njia imefutwa kwa mafanikio.</string>
     <string name="delete_gpx_failed">Imeshindwa kufuta njia.</string>
+    <string name="warn_display_trunc">Orodha ya onyesho ilizidi kikomo - kuondoa maingizo %s ya zamani zaidi.</string>
 </resources>

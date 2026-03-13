@@ -483,4 +483,5 @@
     <string name="delete_gpx">Útvonal törlése</string>
     <string name="delete_gpx_success">Az útvonal sikeresen törölve.</string>
     <string name="delete_gpx_failed">Az útvonal törlése sikertelen.</string>
+    <string name="warn_display_trunc">A megjelenítési lista meghaladta a korlátokat - legrégebbi %s bejegyzések eltávolítása.</string>
 </resources>

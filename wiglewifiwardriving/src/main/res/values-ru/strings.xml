@@ -483,4 +483,5 @@
     <string name="delete_gpx">Удалить маршрут</string>
     <string name="delete_gpx_success">Маршрут успешно удалён.</string>
     <string name="delete_gpx_failed">Не удалось удалить маршрут.</string>
+    <string name="warn_display_trunc">Список отображения превысил лимиты - удаление самых старых записей %s.</string>
 </resources>

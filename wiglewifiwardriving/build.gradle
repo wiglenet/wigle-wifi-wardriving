@@ -84,7 +84,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    implementation (name:'MaskedEditText-1.0.5', ext:'aar')
+    implementation 'com.github.edwardstock:edittext-mask:1.0.7'
     implementation 'com.goebl:simplify:1.0.0'
     implementation "com.appmattus.certificatetransparency:certificatetransparency-android:2.8.20"
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'

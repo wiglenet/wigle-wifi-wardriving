@@ -483,5 +483,6 @@
     <string name="delete_gpx">Rotayı sil</string>
     <string name="delete_gpx_success">Rota başarıyla silindi.</string>
     <string name="delete_gpx_failed">Rota silinemedi.</string>
+    <string name="warn_display_trunc">Görüntüleme listesi sınırları aştı - en eski %s girdileri kaldırılıyor.</string>
 </resources>
 

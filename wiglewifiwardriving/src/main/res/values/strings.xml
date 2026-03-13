@@ -487,4 +487,5 @@
     <string name="delete_gpx">Delete Route</string>
     <string name="delete_gpx_success">Route deleted successfully.</string>
     <string name="delete_gpx_failed">Failed to delete route.</string>
+    <string name="warn_display_trunc">Display list exceeded limits - dropping oldest %s entries.</string>
 </resources>

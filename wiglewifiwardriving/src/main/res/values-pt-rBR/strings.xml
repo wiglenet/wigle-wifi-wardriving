@@ -483,4 +483,5 @@
     <string name="delete_gpx">Excluir rota</string>
     <string name="delete_gpx_success">Rota excluída com sucesso.</string>
     <string name="delete_gpx_failed">Falha ao excluir a rota.</string>
+    <string name="warn_display_trunc">Lista de exibição excedeu os limites - removendo as entradas %s mais antigas.</string>
 </resources>

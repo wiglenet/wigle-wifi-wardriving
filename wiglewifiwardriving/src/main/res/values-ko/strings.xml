@@ -483,4 +483,5 @@
     <string name="delete_gpx">경로 삭제</string>
     <string name="delete_gpx_success">경로가 성공적으로 삭제되었습니다.</string>
     <string name="delete_gpx_failed">경로 삭제에 실패했습니다.</string>
+    <string name="warn_display_trunc">표시 목록이 제한을 초과했습니다 - 가장 오래된 %s 항목을 삭제합니다.</string>
 </resources>

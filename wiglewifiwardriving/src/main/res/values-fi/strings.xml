@@ -483,4 +483,5 @@
     <string name="delete_gpx">Poista reitti</string>
     <string name="delete_gpx_success">Reitti poistettu onnistuneesti.</string>
     <string name="delete_gpx_failed">Reitin poistaminen epäonnistui.</string>
+    <string name="warn_display_trunc">Näyttölista ylitti rajat - vanhimpien %s-tietueiden poistaminen.</string>
 </resources>

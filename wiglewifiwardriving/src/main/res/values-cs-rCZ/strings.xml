@@ -483,4 +483,5 @@
     <string name="delete_gpx">Smazat trasu</string>
     <string name="delete_gpx_success">Trasa byla úspěšně smazána.</string>
     <string name="delete_gpx_failed">Nepodařilo se smazat trasu.</string>
+    <string name="warn_display_trunc">Seznam zobrazení překročil limity - odstraňování nejstarších položek %s.</string>
 </resources>

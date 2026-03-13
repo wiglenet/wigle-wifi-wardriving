@@ -483,4 +483,5 @@
     <string name="delete_gpx">Supprimer l\'itinéraire</string>
     <string name="delete_gpx_success">Itinéraire supprimé avec succès.</string>
     <string name="delete_gpx_failed">Échec de la suppression de l\'itinéraire.</string>
+    <string name="warn_display_trunc">La liste d\'affichage a dépassé les limites - suppression des entrées %s les plus anciennes.</string>
 </resources>

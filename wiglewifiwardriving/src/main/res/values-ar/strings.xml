@@ -483,4 +483,5 @@
     <string name="delete_gpx">حذف المسار</string>
     <string name="delete_gpx_success">تم حذف المسار بنجاح.</string>
     <string name="delete_gpx_failed">فشل في حذف المسار.</string>
+    <string name="warn_display_trunc">قائمة العرض تجاوزت الحدود - إسقاط أقدم إدخالات %s.</string>
 </resources>

@@ -483,4 +483,5 @@
     <string name="delete_gpx">Route verwijderen</string>
     <string name="delete_gpx_success">Route succesvol verwijderd.</string>
     <string name="delete_gpx_failed">Route verwijderen mislukt.</string>
+    <string name="warn_display_trunc">Weergavelijst heeft limieten overschreden - oudste %s-vermeldingen verwijderen.</string>
 </resources>

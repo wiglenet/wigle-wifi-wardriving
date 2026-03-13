@@ -482,4 +482,5 @@
     <string name="delete_gpx">刪除路線</string>
     <string name="delete_gpx_success">路線已成功刪除。</string>
     <string name="delete_gpx_failed">刪除路線失敗。</string>
+    <string name="warn_display_trunc">顯示列表超出限制 - 正在刪除最舊的 %s 條目。</string>
 </resources>

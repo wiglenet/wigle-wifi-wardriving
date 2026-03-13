@@ -483,4 +483,5 @@
     <string name="delete_gpx">Elimina percorso</string>
     <string name="delete_gpx_success">Percorso eliminato con successo.</string>
     <string name="delete_gpx_failed">Impossibile eliminare il percorso.</string>
+    <string name="warn_display_trunc">L\'elenco di visualizzazione ha superato i limiti - rimozione delle voci %s più vecchie.</string>
 </resources>

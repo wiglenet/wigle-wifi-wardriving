@@ -8,9 +8,6 @@ pluginManagement {
         }
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        flatDir {
-            dirs 'lib'
-        }
     }
 }
 dependencyResolutionManagement {
@@ -23,9 +20,6 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        flatDir {
-            dirs 'lib'
-        }
     }
 }
 include ':wiglewifiwardriving'

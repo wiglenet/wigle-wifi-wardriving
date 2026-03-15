@@ -488,4 +488,11 @@
     <string name="delete_gpx_success">Route deleted successfully.</string>
     <string name="delete_gpx_failed">Failed to delete route.</string>
     <string name="warn_display_trunc">Display list exceeded limits - dropping oldest %s entries.</string>
+    <string name="battery_opt_dialog_title">Improve scanning performance</string>
+    <string name="battery_opt_dialog_message">Android limits background scanning by default when the screen is off. Exempting WiGLE Wireless from battery optimization helps maintain consistent scanning.</string>
+    <string name="battery_opt_open_settings">Open Settings</string>
+    <string name="battery_opt_not_now">Not now</string>
+    <string name="battery_opt_settings_title">Battery optimization</string>
+    <string name="battery_opt_status_exempted">Exempted</string>
+    <string name="battery_opt_status_not_exempted">Not exempted (click to change)</string>
 </resources>

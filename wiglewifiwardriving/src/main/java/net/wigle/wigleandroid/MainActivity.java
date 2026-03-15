@@ -28,6 +28,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.net.TrafficStats;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -173,6 +174,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         int previousTab = 0;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
+        private PowerManager.WakeLock scanWakeLock;
         private int logPointer = 0;
         private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
@@ -400,6 +402,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.wakeLock.isHeld()) {
                 state.wakeLock.release();
             }
+        }
+        if (state.scanWakeLock == null) {
+            state.scanWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wiglewifiwardriving:ScanKeepAlive");
+            state.scanWakeLock.setReferenceCounted(false);
         }
 
         @SuppressLint("HardwareIds")
@@ -1051,6 +1057,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.bluetoothReceiver != null) {
                 state.bluetoothReceiver.stopScanning();
                 state.bluetoothReceiver.close();
+            }
+            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
+                try {
+                    state.scanWakeLock.release();
+                } catch (Exception ex) {
+                    Logging.info("exception releasing scanWakeLock in onDestroy: " + ex);
+                }
             }
             finishSoon(DESTROY_FINISH_MILLIS, false);
         } else {
@@ -2201,6 +2214,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return null;
     }
 
+    @SuppressLint("WakelockTimeout")
     private void internalHandleScanChange(final boolean isScanning) {
         Logging.info("\tmain internalHandleScanChange: isScanning now: " + isScanning);
         ListFragment listFragment = getListFragmentIfCurrent();
@@ -2222,6 +2236,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (!state.wifiLock.isHeld()) {
                 state.wifiLock.acquire();
             }
+            // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off
+            if (state.scanWakeLock != null && !state.scanWakeLock.isHeld()) {
+                //TODO: are we allowed to do this?
+                state.scanWakeLock.acquire();
+            }
+            optionalShowBatteryOptDialog();
         } else {
             if (listFragment != null) {
                 listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
@@ -2241,9 +2261,58 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("\texception releasing wifilock: " + ex);
                 }
             }
+            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
+                try {
+                    state.scanWakeLock.release();
+                } catch (Exception ex) {
+                    Logging.info("\texception releasing scanWakeLock: " + ex);
+                }
+            }
         }
         if (null != state && null != state.wigleService) {
             state.wigleService.setupNotification();
+        }
+    }
+
+    /**
+     * Show battery optimization dialog if not exempted / dismissed.
+     */
+    private void optionalShowBatteryOptDialog() {
+        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm == null) {
+            return;
+        }
+        if (pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (prefs.getBoolean(PreferenceKeys.PREF_BATTERY_OPT_DISMISSED, false)) {
+            return;
+        }
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.battery_opt_dialog_title);
+        builder.setMessage(R.string.battery_opt_dialog_message);
+        builder.setCancelable(true);
+        builder.setPositiveButton(R.string.battery_opt_open_settings, (dialog, which) -> {
+            prefs.edit().putBoolean(PreferenceKeys.PREF_BATTERY_OPT_DISMISSED, true).apply();
+            try {
+                final Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivity(intent);
+            } catch (ActivityNotFoundException ex) {
+                Logging.info("battery opt intent not available: " + ex);
+            }
+            dialog.dismiss();
+        });
+        builder.setNegativeButton(R.string.battery_opt_not_now, (dialog, which) -> {
+            prefs.edit().putBoolean(PreferenceKeys.PREF_BATTERY_OPT_DISMISSED, true).apply();
+            dialog.dismiss();
+        });
+        try {
+            builder.show();
+        } catch (Exception ex) {
+            Logging.info("exception showing battery opt dialog: " + ex);
         }
     }
 

@@ -483,4 +483,11 @@
     <string name="delete_gpx_success">路線已成功刪除。</string>
     <string name="delete_gpx_failed">刪除路線失敗。</string>
     <string name="warn_display_trunc">顯示列表超出限制 - 正在刪除最舊的 %s 條目。</string>
+    <string name="battery_opt_dialog_title">提高掃描性能</string>
+    <string name="battery_opt_dialog_message">螢幕關閉時，Android 預設會限制背景掃描。將 WiGLE 排除在電池優化之外有助於保持穩定的掃描。</string>
+    <string name="battery_opt_open_settings">開啟設定</string>
+    <string name="battery_opt_not_now">稍後</string>
+    <string name="battery_opt_settings_title">電池優化</string>
+    <string name="battery_opt_status_exempted">已豁免</string>
+    <string name="battery_opt_status_not_exempted">未豁免（點擊更改）</string>
 </resources>

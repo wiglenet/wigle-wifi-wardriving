@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Rutten har tagits bort.</string>
     <string name="delete_gpx_failed">Kunde inte ta bort rutten.</string>
     <string name="warn_display_trunc">Visningslistan överskred gränserna - tar bort äldsta %s-poster.</string>
+    <string name="battery_opt_dialog_title">Förbättra skanningsprestanda</string>
+    <string name="battery_opt_dialog_message">Android begränsar bakgrundsskanning som standard när skärmen är av. Att undanta WiGLE från batterioptimering hjälper till att upprätthålla konsekvent skanning.</string>
+    <string name="battery_opt_open_settings">Öppna inställningar</string>
+    <string name="battery_opt_not_now">Inte nu</string>
+    <string name="battery_opt_settings_title">Batterioptimering</string>
+    <string name="battery_opt_status_exempted">Undantagen</string>
+    <string name="battery_opt_status_not_exempted">Inte undantagen (tryck för att ändra)</string>
 </resources>

@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">경로가 성공적으로 삭제되었습니다.</string>
     <string name="delete_gpx_failed">경로 삭제에 실패했습니다.</string>
     <string name="warn_display_trunc">표시 목록이 제한을 초과했습니다 - 가장 오래된 %s 항목을 삭제합니다.</string>
+    <string name="battery_opt_dialog_title">스캔 성능 개선</string>
+    <string name="battery_opt_dialog_message">화면이 꺼져 있을 때 Android는 기본적으로 백그라운드 스캔을 제한합니다. WiGLE를 배터리 최적화에서 제외하면 일관된 스캔을 유지하는 데 도움이 됩니다.</string>
+    <string name="battery_opt_open_settings">설정 열기</string>
+    <string name="battery_opt_not_now">나중에</string>
+    <string name="battery_opt_settings_title">배터리 최적화</string>
+    <string name="battery_opt_status_exempted">제외됨</string>
+    <string name="battery_opt_status_not_exempted">제외되지 않음 (탭하여 변경)</string>
 </resources>

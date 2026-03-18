@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Route wurde erfolgreich gelöscht.</string>
     <string name="delete_gpx_failed">Route konnte nicht gelöscht werden.</string>
     <string name="warn_display_trunc">Anzeigeliste hat Grenzen überschritten - älteste %s-Einträge werden entfernt.</string>
+    <string name="battery_opt_dialog_title">Scan-Performance verbessern</string>
+    <string name="battery_opt_dialog_message">Android begrenzt Hintergrund-Scans standardmäßig bei ausgeschaltetem Bildschirm. Eine Ausnahme von der Batterieoptimierung hilft WiGLE, konstant zu scannen.</string>
+    <string name="battery_opt_open_settings">Einstellungen öffnen</string>
+    <string name="battery_opt_not_now">Nicht jetzt</string>
+    <string name="battery_opt_settings_title">Batterieoptimierung</string>
+    <string name="battery_opt_status_exempted">Ausgenommen</string>
+    <string name="battery_opt_status_not_exempted">Nicht ausgenommen (tippen zum Ändern)</string>
 </resources>

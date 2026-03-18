@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Az útvonal sikeresen törölve.</string>
     <string name="delete_gpx_failed">Az útvonal törlése sikertelen.</string>
     <string name="warn_display_trunc">A megjelenítési lista meghaladta a korlátokat - legrégebbi %s bejegyzések eltávolítása.</string>
+    <string name="battery_opt_dialog_title">Szkennelési teljesítmény javítása</string>
+    <string name="battery_opt_dialog_message">Az Android alapértelmezetten korlátozza a háttérszkennelést, ha a kijelző kikapcsolt. A WiGLE mentesítése az akkumulátor-optimalizálás alól segít a folyamatos szkennelés fenntartásában.</string>
+    <string name="battery_opt_open_settings">Beállítások megnyitása</string>
+    <string name="battery_opt_not_now">Most nem</string>
+    <string name="battery_opt_settings_title">Akkumulátor-optimalizálás</string>
+    <string name="battery_opt_status_exempted">Mentesítve</string>
+    <string name="battery_opt_status_not_exempted">Nincs mentesítve (érintse a módosításhoz)</string>
 </resources>

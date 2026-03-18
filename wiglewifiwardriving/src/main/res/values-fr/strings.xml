@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Itinéraire supprimé avec succès.</string>
     <string name="delete_gpx_failed">Échec de la suppression de l\'itinéraire.</string>
     <string name="warn_display_trunc">La liste d\'affichage a dépassé les limites - suppression des entrées %s les plus anciennes.</string>
+    <string name="battery_opt_dialog_title">Améliorer les performances de scan</string>
+    <string name="battery_opt_dialog_message">Android limite les scans en arrière-plan par défaut lorsque l\'écran est éteint. Exempter WiGLE de l\'optimisation de batterie permet de maintenir des scans réguliers.</string>
+    <string name="battery_opt_open_settings">Ouvrir les paramètres</string>
+    <string name="battery_opt_not_now">Pas maintenant</string>
+    <string name="battery_opt_settings_title">Optimisation de la batterie</string>
+    <string name="battery_opt_status_exempted">Exempté</string>
+    <string name="battery_opt_status_not_exempted">Non exempté (appuyer pour modifier)</string>
 </resources>

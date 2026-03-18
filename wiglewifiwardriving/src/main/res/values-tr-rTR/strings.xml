@@ -484,5 +484,12 @@
     <string name="delete_gpx_success">Rota başarıyla silindi.</string>
     <string name="delete_gpx_failed">Rota silinemedi.</string>
     <string name="warn_display_trunc">Görüntüleme listesi sınırları aştı - en eski %s girdileri kaldırılıyor.</string>
+    <string name="battery_opt_dialog_title">Tarama performansını iyileştir</string>
+    <string name="battery_opt_dialog_message">Ekran kapalıyken Android varsayılan olarak arka plan taramasını sınırlar. WiGLE\'yi pil optimizasyonundan muaf tutmak tutarlı tarama sağlamaya yardımcı olur.</string>
+    <string name="battery_opt_open_settings">Ayarları aç</string>
+    <string name="battery_opt_not_now">Şimdi değil</string>
+    <string name="battery_opt_settings_title">Pil optimizasyonu</string>
+    <string name="battery_opt_status_exempted">Muaf</string>
+    <string name="battery_opt_status_not_exempted">Muaf değil (değiştirmek için dokunun)</string>
 </resources>
 

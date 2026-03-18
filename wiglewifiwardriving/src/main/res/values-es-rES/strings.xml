@@ -483,4 +483,11 @@
     <string name="delete_gpx_success">Ruta eliminada correctamente.</string>
     <string name="delete_gpx_failed">No se pudo eliminar la ruta.</string>
     <string name="warn_display_trunc">La lista de visualización excedió los límites - eliminando las entradas %s más antiguas.</string>
+    <string name="battery_opt_dialog_title">Mejorar el rendimiento del escaneo</string>
+    <string name="battery_opt_dialog_message">Android limita el escaneo en segundo plano por defecto cuando la pantalla está apagada. Eximir WiGLE de la optimización de batería ayuda a mantener un escaneo constante.</string>
+    <string name="battery_opt_open_settings">Abrir configuración</string>
+    <string name="battery_opt_not_now">Ahora no</string>
+    <string name="battery_opt_settings_title">Optimización de batería</string>
+    <string name="battery_opt_status_exempted">Eximido</string>
+    <string name="battery_opt_status_not_exempted">No eximido (pulsar para cambiar)</string>
 </resources>

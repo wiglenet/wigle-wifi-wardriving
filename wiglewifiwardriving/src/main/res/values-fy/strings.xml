@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Rûte mei sukses fuortsmiten.</string>
     <string name="delete_gpx_failed">Rûte fuortsmite mislearre.</string>
     <string name="warn_display_trunc">Toanlist foarby de limieten - âldste %s-foarsjinnen fuortsmite.</string>
+    <string name="battery_opt_dialog_title">Skanningsprestaasje ferbetterje</string>
+    <string name="battery_opt_dialog_message">Android beheint standert eftergrûnskanning as it skerm út is. WiGLE frijstelle fan batterij-optimalisaasje helpt konstante skanning te behâlden.</string>
+    <string name="battery_opt_open_settings">Ynstellings iepenje</string>
+    <string name="battery_opt_not_now">No net</string>
+    <string name="battery_opt_settings_title">Batterij-optimalisaasje</string>
+    <string name="battery_opt_status_exempted">Frijsteld</string>
+    <string name="battery_opt_status_not_exempted">Net frijsteld (tik om te wizigjen)</string>
 </resources>

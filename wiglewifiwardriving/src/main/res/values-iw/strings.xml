@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">המסלול נמחק בהצלחה.</string>
     <string name="delete_gpx_failed">מחיקת המסלול נכשלה.</string>
     <string name="warn_display_trunc">רשימת התצוגה חרגה מהמגבלות - מוחקים את רשומות %s הישנות ביותר.</string>
+    <string name="battery_opt_dialog_title">שיפור ביצועי הסריקה</string>
+    <string name="battery_opt_dialog_message">Android מגביל סריקה ברקע כברירת מחדל כשהמסך כבוי. פטור WiGLE מאופטימיזציית הסוללה עוזר לשמור על סריקה עקבית.</string>
+    <string name="battery_opt_open_settings">פתח הגדרות</string>
+    <string name="battery_opt_not_now">לא עכשיו</string>
+    <string name="battery_opt_settings_title">אופטימיזציית סוללה</string>
+    <string name="battery_opt_status_exempted">פטור</string>
+    <string name="battery_opt_status_not_exempted">לא פטור (הקש לשינוי)</string>
 </resources>

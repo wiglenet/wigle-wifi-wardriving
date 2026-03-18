@@ -485,4 +485,11 @@
     <string name="delete_gpx_success">Ruten ble slettet.</string>
     <string name="delete_gpx_failed">Kunne ikke slette ruten.</string>
     <string name="warn_display_trunc">Visningslisten overskred grensen - fjerner eldste %s-poster.</string>
+    <string name="battery_opt_dialog_title">Forbedre skanningsytelse</string>
+    <string name="battery_opt_dialog_message">Android begrenser bakgrunnsskanning som standard når skjermen er av. Å fritage WiGLE fra batterioptimalisering hjelper med å opprettholde jevn skanning.</string>
+    <string name="battery_opt_open_settings">Åpne innstillinger</string>
+    <string name="battery_opt_not_now">Ikke nå</string>
+    <string name="battery_opt_settings_title">Batterioptimalisering</string>
+    <string name="battery_opt_status_exempted">Fritatt</string>
+    <string name="battery_opt_status_not_exempted">Ikke fritatt (trykk for å endre)</string>
 </resources>

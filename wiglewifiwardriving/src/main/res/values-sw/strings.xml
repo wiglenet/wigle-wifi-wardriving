@@ -483,4 +483,11 @@
     <string name="delete_gpx_success">Njia imefutwa kwa mafanikio.</string>
     <string name="delete_gpx_failed">Imeshindwa kufuta njia.</string>
     <string name="warn_display_trunc">Orodha ya onyesho ilizidi kikomo - kuondoa maingizo %s ya zamani zaidi.</string>
+    <string name="battery_opt_dialog_title">Boresha utendakazi wa uchanganuzi</string>
+    <string name="battery_opt_dialog_message">Android inazuia uchanganuzi wa mandharinyuma kwa chaguo-msingi wakati skrini iko mbali. Kuondoa WiGLE kutoka uboreshaji wa betri kunasaidia kudumisha uchanganuzi thabiti.</string>
+    <string name="battery_opt_open_settings">Fungua mipangilio</string>
+    <string name="battery_opt_not_now">Si sasa</string>
+    <string name="battery_opt_settings_title">Uboreshaji wa betri</string>
+    <string name="battery_opt_status_exempted">Umeondolewa</string>
+    <string name="battery_opt_status_not_exempted">Haijaondolewa (gusa kubadilisha)</string>
 </resources>

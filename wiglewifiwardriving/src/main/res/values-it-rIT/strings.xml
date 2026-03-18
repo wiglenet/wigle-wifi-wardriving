@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Percorso eliminato con successo.</string>
     <string name="delete_gpx_failed">Impossibile eliminare il percorso.</string>
     <string name="warn_display_trunc">L\'elenco di visualizzazione ha superato i limiti - rimozione delle voci %s più vecchie.</string>
+    <string name="battery_opt_dialog_title">Migliora le prestazioni di scansione</string>
+    <string name="battery_opt_dialog_message">Android limita la scansione in background di default quando lo schermo è spento. Esentare WiGLE dall\'ottimizzazione della batteria aiuta a mantenere una scansione costante.</string>
+    <string name="battery_opt_open_settings">Apri impostazioni</string>
+    <string name="battery_opt_not_now">Non ora</string>
+    <string name="battery_opt_settings_title">Ottimizzazione batteria</string>
+    <string name="battery_opt_status_exempted">Esonerato</string>
+    <string name="battery_opt_status_not_exempted">Non esonerato (tocca per modificare)</string>
 </resources>

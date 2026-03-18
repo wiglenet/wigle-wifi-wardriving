@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Reitti poistettu onnistuneesti.</string>
     <string name="delete_gpx_failed">Reitin poistaminen epäonnistui.</string>
     <string name="warn_display_trunc">Näyttölista ylitti rajat - vanhimpien %s-tietueiden poistaminen.</string>
+    <string name="battery_opt_dialog_title">Paranna skannaussuorituskykyä</string>
+    <string name="battery_opt_dialog_message">Android rajoittaa taustaskannauksia oletuksena, kun näyttö on pois päältä. WiGLE:n vapauttaminen akun optimoinnista auttaa ylläpitämään tasaisempaa skannausta.</string>
+    <string name="battery_opt_open_settings">Avaa asetukset</string>
+    <string name="battery_opt_not_now">Ei nyt</string>
+    <string name="battery_opt_settings_title">Akun optimointi</string>
+    <string name="battery_opt_status_exempted">Vapautettu</string>
+    <string name="battery_opt_status_not_exempted">Ei vapautettu (napauta muuttaaksesi)</string>
 </resources>

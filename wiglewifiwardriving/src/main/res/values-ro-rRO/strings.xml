@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Ruta a fost ștearsă cu succes.</string>
     <string name="delete_gpx_failed">Ștergerea rutei a eșuat.</string>
     <string name="warn_display_trunc">Lista de afișare a depășit limitele - eliminare intrări %s cele mai vechi.</string>
+    <string name="battery_opt_dialog_title">Îmbunătățește performanța scanării</string>
+    <string name="battery_opt_dialog_message">Android limitează scanarea în fundal implicit când ecranul este stins. Excluderea WiGLE din optimizarea bateriei ajută la menținerea unei scanări constante.</string>
+    <string name="battery_opt_open_settings">Deschide setări</string>
+    <string name="battery_opt_not_now">Nu acum</string>
+    <string name="battery_opt_settings_title">Optimizare baterie</string>
+    <string name="battery_opt_status_exempted">Exemptat</string>
+    <string name="battery_opt_status_not_exempted">Neexemptat (apasă pentru a modifica)</string>
 </resources>

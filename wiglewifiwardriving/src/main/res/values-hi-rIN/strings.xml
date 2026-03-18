@@ -483,4 +483,11 @@
     <string name="delete_gpx_success">मार्ग सफलतापूर्वक हटा दिया गया।</string>
     <string name="delete_gpx_failed">मार्ग हटाने में विफल।</string>
     <string name="warn_display_trunc">डिस्प्ले सूची सीमा पार कर गई - सबसे पुरानी %s प्रविष्टियाँ हटा रहा है।</string>
+    <string name="battery_opt_dialog_title">स्कैन प्रदर्शन में सुधार करें</string>
+    <string name="battery_opt_dialog_message">स्क्रीन बंद होने पर Android डिफ़ॉल्ट रूप से पृष्ठभूमि स्कैन को सीमित करता है। WiGLE को बैटरी अनुकूलन से छूट देने से लगातार स्कैन बनाए रखने में मदद मिलती है।</string>
+    <string name="battery_opt_open_settings">सेटिंग खोलें</string>
+    <string name="battery_opt_not_now">अभी नहीं</string>
+    <string name="battery_opt_settings_title">बैटरी अनुकूलन</string>
+    <string name="battery_opt_status_exempted">छूट प्राप्त</string>
+    <string name="battery_opt_status_not_exempted">छूट प्राप्त नहीं (बदलने के लिए टैप करें)</string>
 </resources>

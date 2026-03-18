@@ -487,4 +487,11 @@ KMLにエクスポート</string>
     <string name="delete_gpx_success">ルートが正常に削除されました。</string>
     <string name="delete_gpx_failed">ルートの削除に失敗しました。</string>
     <string name="warn_display_trunc">表示リストが制限を超えました - 最も古い%sエントリを削除しています。</string>
+    <string name="battery_opt_dialog_title">スキャン性能の向上</string>
+    <string name="battery_opt_dialog_message">画面がオフのとき、Androidはデフォルトでバックグラウンドスキャンを制限します。WiGLEをバッテリ最適化から除外すると、安定したスキャンを維持できます。</string>
+    <string name="battery_opt_open_settings">設定を開く</string>
+    <string name="battery_opt_not_now">後で</string>
+    <string name="battery_opt_settings_title">バッテリ最適化</string>
+    <string name="battery_opt_status_exempted">除外済み</string>
+    <string name="battery_opt_status_not_exempted">除外されていません（タップして変更）</string>
 </resources>

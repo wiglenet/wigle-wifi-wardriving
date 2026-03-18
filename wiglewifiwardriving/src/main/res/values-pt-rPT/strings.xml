@@ -483,4 +483,11 @@
     <string name="delete_gpx_success">Percurso eliminado com sucesso.</string>
     <string name="delete_gpx_failed">Falha ao eliminar o percurso.</string>
     <string name="warn_display_trunc">Lista de visualização excedeu os limites - a remover as entradas %s mais antigas.</string>
+    <string name="battery_opt_dialog_title">Melhorar desempenho da pesquisa</string>
+    <string name="battery_opt_dialog_message">O Android limita a pesquisa em segundo plano por predefinição quando o ecrã está desligado. Isentar o WiGLE da otimização da bateria ajuda a manter uma pesquisa consistente.</string>
+    <string name="battery_opt_open_settings">Abrir definições</string>
+    <string name="battery_opt_not_now">Agora não</string>
+    <string name="battery_opt_settings_title">Otimização da bateria</string>
+    <string name="battery_opt_status_exempted">Isento</string>
+    <string name="battery_opt_status_not_exempted">Não isento (toque para alterar)</string>
 </resources>

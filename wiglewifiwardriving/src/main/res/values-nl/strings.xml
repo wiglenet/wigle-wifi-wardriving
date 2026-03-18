@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Route succesvol verwijderd.</string>
     <string name="delete_gpx_failed">Route verwijderen mislukt.</string>
     <string name="warn_display_trunc">Weergavelijst heeft limieten overschreden - oudste %s-vermeldingen verwijderen.</string>
+    <string name="battery_opt_dialog_title">Scanprestaties verbeteren</string>
+    <string name="battery_opt_dialog_message">Android beperkt standaard achtergrondscans wanneer het scherm uit staat. WiGLE vrijstellen van batterijoptimalisatie helpt consistente scans te behouden.</string>
+    <string name="battery_opt_open_settings">Instellingen openen</string>
+    <string name="battery_opt_not_now">Niet nu</string>
+    <string name="battery_opt_settings_title">Batterijoptimalisatie</string>
+    <string name="battery_opt_status_exempted">Vrijgesteld</string>
+    <string name="battery_opt_status_not_exempted">Niet vrijgesteld (tik om te wijzigen)</string>
 </resources>

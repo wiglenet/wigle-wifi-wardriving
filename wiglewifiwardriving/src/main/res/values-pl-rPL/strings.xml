@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Trasa została pomyślnie usunięta.</string>
     <string name="delete_gpx_failed">Nie udało się usunąć trasy.</string>
     <string name="warn_display_trunc">Lista wyświetlania przekroczyła limity - usuwanie najstarszych wpisów %s.</string>
+    <string name="battery_opt_dialog_title">Popraw wydajność skanowania</string>
+    <string name="battery_opt_dialog_message">Android domyślnie ogranicza skanowanie w tle, gdy ekran jest wyłączony. Wyłączenie WiGLE z optymalizacji baterii pomaga utrzymać stałe skanowanie.</string>
+    <string name="battery_opt_open_settings">Otwórz ustawienia</string>
+    <string name="battery_opt_not_now">Nie teraz</string>
+    <string name="battery_opt_settings_title">Optymalizacja baterii</string>
+    <string name="battery_opt_status_exempted">Zwolnione</string>
+    <string name="battery_opt_status_not_exempted">Nie zwolnione (dotknij, aby zmienić)</string>
 </resources>

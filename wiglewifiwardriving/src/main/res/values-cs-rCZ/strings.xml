@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Trasa byla úspěšně smazána.</string>
     <string name="delete_gpx_failed">Nepodařilo se smazat trasu.</string>
     <string name="warn_display_trunc">Seznam zobrazení překročil limity - odstraňování nejstarších položek %s.</string>
+    <string name="battery_opt_dialog_title">Zlepšit výkon skenování</string>
+    <string name="battery_opt_dialog_message">Android ve výchozím nastavení omezuje skenování na pozadí při vypnuté obrazovce. Vyloučení WiGLE z optimalizace baterie pomáhá udržovat konzistentní skenování.</string>
+    <string name="battery_opt_open_settings">Otevřít nastavení</string>
+    <string name="battery_opt_not_now">Teď ne</string>
+    <string name="battery_opt_settings_title">Optimalizace baterie</string>
+    <string name="battery_opt_status_exempted">Vyloučeno</string>
+    <string name="battery_opt_status_not_exempted">Nevyloučeno (klepněte pro změnu)</string>
 </resources>

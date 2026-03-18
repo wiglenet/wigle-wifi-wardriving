@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">تم حذف المسار بنجاح.</string>
     <string name="delete_gpx_failed">فشل في حذف المسار.</string>
     <string name="warn_display_trunc">قائمة العرض تجاوزت الحدود - إسقاط أقدم إدخالات %s.</string>
+    <string name="battery_opt_dialog_title">تحسين أداء المسح</string>
+    <string name="battery_opt_dialog_message">يحدّ Android من المسح في الخلفية افتراضيًا عند إطفاء الشاشة. إعفاء WiGLE من تحسين البطارية يساعد في الحفاظ على مسح ثابت.</string>
+    <string name="battery_opt_open_settings">فتح الإعدادات</string>
+    <string name="battery_opt_not_now">ليس الآن</string>
+    <string name="battery_opt_settings_title">تحسين البطارية</string>
+    <string name="battery_opt_status_exempted">معفى</string>
+    <string name="battery_opt_status_not_exempted">غير معفى (انقر للتغيير)</string>
 </resources>

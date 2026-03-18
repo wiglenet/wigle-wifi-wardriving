@@ -484,4 +484,11 @@
     <string name="delete_gpx_success">Маршрут успешно удалён.</string>
     <string name="delete_gpx_failed">Не удалось удалить маршрут.</string>
     <string name="warn_display_trunc">Список отображения превысил лимиты - удаление самых старых записей %s.</string>
+    <string name="battery_opt_dialog_title">Улучшить производительность сканирования</string>
+    <string name="battery_opt_dialog_message">Android по умолчанию ограничивает фоновое сканирование при выключенном экране. Исключение WiGLE из оптимизации батареи помогает поддерживать стабильное сканирование.</string>
+    <string name="battery_opt_open_settings">Открыть настройки</string>
+    <string name="battery_opt_not_now">Не сейчас</string>
+    <string name="battery_opt_settings_title">Оптимизация батареи</string>
+    <string name="battery_opt_status_exempted">Исключено</string>
+    <string name="battery_opt_status_not_exempted">Не исключено (нажмите для изменения)</string>
 </resources>

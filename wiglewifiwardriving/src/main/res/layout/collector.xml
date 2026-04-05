@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0f172a"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/sc_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="SHADOWCHECK COLLECTOR"
+        android:textColor="#f8fafc"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/sc_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:text="@string/sc_status_active"
+        android:textColor="#22c55e"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="#1e293b"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/sc_case_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Case: UNSET"
+            android:textColor="#94a3b8"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/sc_wifi_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="WiFi: 0"
+                android:textColor="#f59e0b"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/sc_bt_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="BT: 0"
+                android:textColor="#f59e0b"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/sc_cell_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Cell: 0"
+                android:textColor="#f59e0b"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="LIVE DETECTION FEED"
+        android:textColor="#94a3b8"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/sc_live_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:divider="#1e293b"
+        android:dividerHeight="1dp"
+        tools:listitem="@layout/row" />
+
+    <Button
+        android:id="@+id/sc_upload_button"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:backgroundTint="#f59e0b"
+        android:text="UPLOAD TO SHADOWCHECK"
+        android:textColor="#0f172a"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:text="Powered by WiGLE (BSD License)"
+        android:textColor="#475569"
+        android:textSize="10sp" />
+
+</LinearLayout>

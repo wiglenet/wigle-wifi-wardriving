@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
@@ -123,11 +122,6 @@ public class SettingsUtil {
                 }
                 if ( pref.equals(PreferenceKeys.PREF_DAYNIGHT_MODE) ) {
                     ThemeUtil.setTheme(prefs);
-                    try {
-                        ThemeUtil.setNavTheme(((Activity) v.getContext()).getWindow(), context, prefs);
-                    } catch (NullPointerException npe) {
-                        //ALIBI: ignorable here.
-                    }
                 }
             }
             @Override

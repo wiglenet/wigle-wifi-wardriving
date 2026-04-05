@@ -24,11 +24,13 @@ import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.RouteConfigurable;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.RouteExportSelector;
+import net.wigle.wigleandroid.util.RouteDeleteSelector;
 
 import java.text.DateFormat;
 
 public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.ViewHolder>  {
     public static final int EXPORT_GPX_DIALOG = 130;
+    public static final int DELETE_GPX_DIALOG = 131;
 
     private final Context context;
     private final FragmentActivity fragmentActivity;
@@ -38,13 +40,14 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     private final DataSetObserver dataSetObserver;
     private final RouteConfigurable configurable;
     private final RouteExportSelector routeSelector;
+    private final RouteDeleteSelector routeDeleteSelector;
     private final SharedPreferences prefs;
     private final DateFormat dateFormat;
     private final DateFormat timeFormat;
     private int selectedPos = RecyclerView.NO_POSITION;
 
     public GpxRecyclerAdapter(Context context, FragmentActivity fragmentActivity, Cursor cursor, RouteConfigurable configurable, RouteExportSelector routeSelector,
-                              SharedPreferences prefs, DateFormat dateFormat, DateFormat timeFormat) {
+                              RouteDeleteSelector routeDeleteSelector, SharedPreferences prefs, DateFormat dateFormat, DateFormat timeFormat) {
         this.context = context;
         this.fragmentActivity = fragmentActivity;
         this.cursor = cursor;
@@ -56,6 +59,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
         }
         this.configurable = configurable;
         this.routeSelector = routeSelector;
+        this.routeDeleteSelector = routeDeleteSelector;
         this.prefs = prefs;
         this.dateFormat = dateFormat;
         this.timeFormat = timeFormat;
@@ -64,18 +68,13 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
         private final ImageButton shareButton;
+        private final ImageButton deleteButton;
 
         public ViewHolder(View view) {
             super(view);
             textView = view.findViewById(R.id.gpxItemLabel);
             shareButton = view.findViewById(R.id.share_route);
-        }
-
-        public TextView getTextView() {
-            return textView;
-        }
-        public ImageButton getShareButton() {
-            return shareButton;
+            deleteButton = view.findViewById(R.id.delete_route);
         }
     }
 
@@ -186,7 +185,16 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
             } else {
                 Logging.error("unable to get fragment activity");
             }
-
+        });
+        holder.deleteButton.setOnClickListener(view -> {
+            Logging.info("delete route "+clickedId);
+            if (null != context && routeDeleteSelector != null) {
+                routeDeleteSelector.setRouteToDelete(clickedId);
+                WiGLEConfirmationDialog.createConfirmation(fragmentActivity,
+                        context.getString(R.string.delete_gpx_detail), R.id.nav_data, DELETE_GPX_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity or route delete selector");
+            }
         });
         holder.textView.setText(listItem.getName());
     }
@@ -210,5 +218,21 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
             return cursor.getCount();
         }
         return 0;
+    }
+
+    /**
+     * Set the selected position and notify the adapter to update the UI.
+     * @param position the position to select
+     */
+    public void setSelectedPosition(int position) {
+        if (position == selectedPos) return;
+        int oldPos = selectedPos;
+        selectedPos = position;
+        if (oldPos != RecyclerView.NO_POSITION) {
+            notifyItemChanged(oldPos);
+        }
+        if (selectedPos != RecyclerView.NO_POSITION) {
+            notifyItemChanged(selectedPos);
+        }
     }
 }

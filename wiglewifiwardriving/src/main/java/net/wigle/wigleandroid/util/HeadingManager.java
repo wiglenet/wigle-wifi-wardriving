@@ -5,8 +5,11 @@ import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.app.Activity;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import net.wigle.wigleandroid.BuildConfig;
@@ -143,11 +146,16 @@ public class HeadingManager implements SensorEventListener {
             b.append(typeEmoji.get(i)).append(" accuracy: ").append(
                     (null!=accuracy)?qualityEmoji.get(accuracy):"?");
         }
-        CharSequence text = b.toString();
-        int duration = Toast.LENGTH_SHORT;
+        final CharSequence text = b.toString();
+        final int duration = Toast.LENGTH_SHORT;
 
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        // Sensor callbacks run on background thread; must show toast on main thread
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (context != null && context instanceof Activity && !((Activity) context).isFinishing()) {
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+        });
     }
 
     public Float getHeading(final Location location) {

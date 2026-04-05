@@ -46,6 +46,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
@@ -139,6 +140,13 @@ public final class DatabaseHelper extends Thread {
     private static final String NETWORK_DELETE = "drop table " + NETWORK_TABLE;
     private static final String ROUTE_DELETE = "drop table " + ROUTE_TABLE;
 
+    /**
+     * keeps observation queries fast ({@code WHERE bssid = ? ORDER BY _id DESC}).
+     * ALIBI: we can't guarantee safe execution on existing large databases; as a result, we can only apply on new/clear
+     */
+    private static final String LOCATION_BSSID_ID_INDEX_CREATE =
+            "CREATE INDEX IF NOT EXISTS idx_location_bssid__id ON " + LOCATION_TABLE + "(bssid, _id)";
+
     private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
         + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
@@ -157,6 +165,7 @@ public final class DatabaseHelper extends Thread {
     private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
     private static final String CLEAR_DEFAULT_ROUTE = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = 0";
+    private static final String DELETE_ROUTE_BY_ID = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
     private SQLiteDatabase db;
 
@@ -455,27 +464,16 @@ public final class DatabaseHelper extends Thread {
             db = context.openOrCreateDatabase( dbFilename, Context.MODE_PRIVATE, null );
         }
 
-        try {
-            db.rawQuery( "SELECT count(*) FROM "+NETWORK_TABLE, null).close();
-        }
-        catch ( final SQLiteException ex ) {
-            Logging.info("exception selecting from network, try to create. ex: " + ex );
+        if ( ! tableExists( db, NETWORK_TABLE ) ) {
+            Logging.info( "network table missing, will create" );
             doCreateNetwork = true;
         }
-
-        try {
-            db.rawQuery( "SELECT count(*) FROM "+LOCATION_TABLE, null).close();
-        }
-        catch ( final SQLiteException ex ) {
-            Logging.info("exception selecting from location, try to create. ex: " + ex );
+        if ( ! tableExists( db, LOCATION_TABLE ) ) {
+            Logging.info( "location table missing, will create" );
             doCreateLocation = true;
         }
-
-        try {
-            db.rawQuery( "SELECT max(run_id) FROM "+ROUTE_TABLE, null).close();
-        }
-        catch ( final SQLiteException ex ) {
-            Logging.info("exception selecting from route, try to create. ex: " + ex );
+        if ( ! tableExists( db, ROUTE_TABLE ) ) {
+            Logging.info( "route table missing, will create" );
             doCreateRoute = true;
         }
 
@@ -505,6 +503,7 @@ public final class DatabaseHelper extends Thread {
             Logging.info( "creating location table" );
             try {
                 db.execSQL(LOCATION_CREATE);
+                createFreshLocationObservationIndex();
                 // new database, reset a marker, if any
                 final Editor edit = prefs.edit();
                 edit.putLong( PreferenceKeys.PREF_DB_MARKER, 0L );
@@ -617,6 +616,15 @@ public final class DatabaseHelper extends Thread {
 
         insertRoute = db.compileStatement( "INSERT INTO "+ROUTE_TABLE
                 + " (run_id,wifi_visible,cell_visible,bt_visible,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?,?,?)" );
+    }
+
+    private void createFreshLocationObservationIndex() {
+        try {
+            db.execSQL( LOCATION_BSSID_ID_INDEX_CREATE );
+        }
+        catch ( final SQLiteException ex ) {
+            Logging.warn( "fresh location observation index: " + ex );
+        }
     }
 
     /**
@@ -1316,10 +1324,15 @@ public final class DatabaseHelper extends Thread {
 
     private long getCountFromDB( final String table ) throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery("select count(*) FROM " + table, null)) {
-            cursor.moveToFirst();
-            final long count = cursor.getLong(0);
-            return count;
+        return DatabaseUtils.longForQuery( db, "SELECT COUNT(*) FROM " + table, null );
+    }
+
+    /** table presence check (avoids COUNT(*) in {@link #open()}). */
+    private static boolean tableExists( final SQLiteDatabase database, final String tableName ) {
+        try (Cursor c = database.rawQuery(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+                new String[]{ tableName } ) ) {
+            return c.moveToFirst();
         }
     }
 
@@ -1439,6 +1452,19 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
+    /**
+     * Delete a route and all its points by run_id.
+     * @param runId the run_id of the route to delete
+     * @throws DBException if the database is unavailable
+     */
+    public void deleteRoute(long runId) throws DBException {
+        checkDB();
+        if (null != db) {
+            db.execSQL(DELETE_ROUTE_BY_ID, new Object[]{runId});
+            Logging.info("Deleted route run_id=" + runId);
+        }
+    }
+
     public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{
             Logging.info("currentRouteIterator");
             checkDB();
@@ -1515,8 +1541,12 @@ public final class DatabaseHelper extends Thread {
             }
             Logging.info( "creating location table" );
             db.execSQL(LOCATION_CREATE);
+            createFreshLocationObservationIndex();
             db.execSQL(ROUTE_CREATE);
             db.setTransactionSuccessful();
+            networkCount.set( 0 );
+            locationCount.set( 0 );
+            currentRoutePointCount.set( 0 );
             //TODO: update list header count
         } catch ( final SQLiteException ex ) {
             Logging.error( "sqlite exception: " + ex, ex );

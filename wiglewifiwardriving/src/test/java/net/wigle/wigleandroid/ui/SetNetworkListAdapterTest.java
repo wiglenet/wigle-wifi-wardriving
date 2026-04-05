@@ -278,7 +278,8 @@ public class SetNetworkListAdapterTest {
 
         System.out.print("Removing 1 Cell net from SetBackedNetworkList...");
         start = System.currentTimeMillis();
-        netlist.remove(cellLarge.get(51));
+        // Use a cell from the tail - eldest are evicted when cellLarge exceeds MAX_CELL_SET_SIZE (5000)
+        netlist.remove(cellLarge.get(cellLarge.size() - 1));
         end = System.currentTimeMillis();
         System.out.println(" removed in ("+(end-start)+"ms)");
 
@@ -332,6 +333,138 @@ public class SetNetworkListAdapterTest {
             Assert.assertEquals(wifiSize+1, netlist.size());
         }
 
+    }
+
+    private static final int TEST_WIFI_CAP = 100;
+    private static final int TEST_BT_CAP = 100;
+    private static final int TEST_CELL_CAP = 500;
+
+    /**
+     * Test that WiFi networks are capped at MAX_WIFI_SET_SIZE.
+     * Adding more than the cap should evict eldest entries.
+     */
+    @Test
+    public void testWifiCap() {
+        SetBackedNetworkList netlist = new SetBackedNetworkList();
+        netlist.MAX_WIFI_SET_SIZE = TEST_WIFI_CAP;
+        List<Network> wifiOverCap = new ArrayList<>();
+        for (int i = 0; i < 500; i++) {
+            wifiOverCap.add(new Network(randomMACAddress(), "SSID" + i, 1, "test",
+                    -100, NetworkType.WIFI));
+        }
+        netlist.addAll(wifiOverCap);
+        Assert.assertEquals("WiFi list should be capped at MAX_WIFI_SET_SIZE",
+                TEST_WIFI_CAP, netlist.size());
+        // First-added networks should have been evicted
+        Assert.assertFalse("Eldest WiFi should have been evicted",
+                netlist.contains(wifiOverCap.get(0)));
+        Assert.assertTrue("Most recent WiFi should still be present",
+                netlist.contains(wifiOverCap.get(wifiOverCap.size() - 1)));
+    }
+
+    /**
+     * Test that BT networks are capped at MAX_BT_SET_SIZE.
+     */
+    @Test
+    public void testBtCap() {
+        SetBackedNetworkList netlist = new SetBackedNetworkList();
+        netlist.MAX_BT_SET_SIZE = TEST_BT_CAP;
+        List<Network> btOverCap = new ArrayList<>();
+        for (int i = 0; i < 500; i++) {
+            btOverCap.add(new Network(randomMACAddress(), "BT" + i, 1, "test",
+                    -100, NetworkType.BT));
+        }
+        netlist.addAll(btOverCap);
+        Assert.assertEquals("BT list should be capped at MAX_BT_SET_SIZE",
+                TEST_BT_CAP, netlist.size());
+        Assert.assertFalse("Eldest BT should have been evicted",
+                netlist.contains(btOverCap.get(0)));
+        Assert.assertTrue("Most recent BT should still be present",
+                netlist.contains(btOverCap.get(btOverCap.size() - 1)));
+    }
+
+    /**
+     * Test that BLE networks are capped at MAX_BT_SET_SIZE.
+     */
+    @Test
+    public void testBleCap() {
+        SetBackedNetworkList netlist = new SetBackedNetworkList();
+        netlist.MAX_BT_SET_SIZE = TEST_BT_CAP;
+        List<Network> bleOverCap = new ArrayList<>();
+        for (int i = 0; i < 500; i++) {
+            bleOverCap.add(new Network(randomMACAddress(), "BLE" + i, 0, "test",
+                    -100, NetworkType.BLE));
+        }
+        netlist.addAll(bleOverCap);
+        Assert.assertEquals("BLE list should be capped at MAX_BT_SET_SIZE",
+                TEST_BT_CAP, netlist.size());
+        Assert.assertFalse("Eldest BLE should have been evicted",
+                netlist.contains(bleOverCap.get(0)));
+        Assert.assertTrue("Most recent BLE should still be present",
+                netlist.contains(bleOverCap.get(bleOverCap.size() - 1)));
+    }
+
+    /**
+     * Test that cell networks are capped at MAX_CELL_SET_SIZE.
+     */
+    @Test
+    public void testCellCap() {
+        SetBackedNetworkList netlist = new SetBackedNetworkList();
+        netlist.MAX_CELL_SET_SIZE = TEST_CELL_CAP;
+        List<Network> cellOverCap = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            cellOverCap.add(new Network(randomMACAddress(), "cell" + i, 1, "test",
+                    -90, NetworkType.LTE));
+        }
+        netlist.addAll(cellOverCap);
+        Assert.assertEquals("Cell list should be capped at MAX_CELL_SET_SIZE",
+                TEST_CELL_CAP, netlist.size());
+        Assert.assertFalse("Eldest cell should have been evicted",
+                netlist.contains(cellOverCap.get(0)));
+        Assert.assertTrue("Most recent cell should still be present",
+                netlist.contains(cellOverCap.get(cellOverCap.size() - 1)));
+    }
+
+    /**
+     * Test that caps are enforced per network type; adding mixed types does not
+     * cause cross-type eviction.
+     */
+    @Test
+    public void testCapsPerType() {
+        SetBackedNetworkList netlist = new SetBackedNetworkList();
+        netlist.MAX_WIFI_SET_SIZE = TEST_WIFI_CAP;
+        netlist.MAX_BT_SET_SIZE = TEST_BT_CAP;
+        // Add 100 WiFi (at cap)
+        List<Network> wifi100 = new ArrayList<>();
+        for (int i = 0; i < TEST_WIFI_CAP; i++) {
+            wifi100.add(new Network(randomMACAddress(), "SSID" + i, 1, "test",
+                    -100, NetworkType.WIFI));
+        }
+        netlist.addAll(wifi100);
+        Assert.assertEquals(TEST_WIFI_CAP, netlist.size());
+
+        // Add 100 BT (at cap) - total 200
+        List<Network> bt100 = new ArrayList<>();
+        for (int i = 0; i < TEST_BT_CAP; i++) {
+            bt100.add(new Network(randomMACAddress(), "BT" + i, 1, "test",
+                    -100, NetworkType.BT));
+        }
+        netlist.addAll(bt100);
+        Assert.assertEquals(TEST_WIFI_CAP + TEST_BT_CAP, netlist.size());
+
+        // Add 100 more WiFi - should evict eldest WiFi, total stays 200
+        List<Network> wifi100More = new ArrayList<>();
+        for (int i = 0; i < TEST_WIFI_CAP; i++) {
+            wifi100More.add(new Network(randomMACAddress(), "SSID2-" + i, 1, "test",
+                    -100, NetworkType.WIFI));
+        }
+        netlist.addAll(wifi100More);
+        Assert.assertEquals("Total should remain 200 (100 WiFi + 100 BT)",
+                TEST_WIFI_CAP + TEST_BT_CAP, netlist.size());
+        Assert.assertFalse("Eldest WiFi should have been evicted",
+                netlist.contains(wifi100.get(0)));
+        Assert.assertTrue("Original BT should be untouched",
+                netlist.contains(bt100.get(0)));
     }
 
     @Test

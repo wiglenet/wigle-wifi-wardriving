@@ -479,4 +479,16 @@
     <string name="foss_map_base_url">URL de base du style du serveur de tuiles vectorielles de carte</string>
     <string name="foss_map_key">Clé de base de la carte vectorielle</string>
     <string name="check_credentials">Vérifier</string>
+    <string name="delete_gpx_detail">Êtes-vous sûr de vouloir supprimer l\'itinéraire sélectionné ?</string>
+    <string name="delete_gpx">Supprimer l\'itinéraire</string>
+    <string name="delete_gpx_success">Itinéraire supprimé avec succès.</string>
+    <string name="delete_gpx_failed">Échec de la suppression de l\'itinéraire.</string>
+    <string name="warn_display_trunc">La liste d\'affichage a dépassé les limites - suppression des entrées %s les plus anciennes.</string>
+    <string name="battery_opt_dialog_title">Améliorer les performances de scan</string>
+    <string name="battery_opt_dialog_message">Android limite les scans en arrière-plan par défaut lorsque l\'écran est éteint. Exempter WiGLE de l\'optimisation de batterie permet de maintenir des scans réguliers.</string>
+    <string name="battery_opt_open_settings">Ouvrir les paramètres</string>
+    <string name="battery_opt_not_now">Pas maintenant</string>
+    <string name="battery_opt_settings_title">Optimisation de la batterie</string>
+    <string name="battery_opt_status_exempted">Exempté</string>
+    <string name="battery_opt_status_not_exempted">Non exempté (appuyer pour modifier)</string>
 </resources>

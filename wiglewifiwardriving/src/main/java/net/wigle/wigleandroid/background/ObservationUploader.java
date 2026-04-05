@@ -25,6 +25,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.api.UploadReseponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.net.WiGLEApiManager;
+import net.wigle.wigleandroid.util.BuildReleaseTag;
 import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -440,7 +441,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final CSVPrinter headerPrinter = new CSVPrinter(headerBuffer, CSV_FORMAT);
         headerPrinter.printRecord(
                 "WigleWifi-1.6",
-                "appRelease=" + pi.versionName,
+                "appRelease=" + BuildReleaseTag.tagVersionForExports(pi.versionName),
                 "model=" + android.os.Build.MODEL,
                 "release=" + android.os.Build.VERSION.RELEASE,
                 "device=" + android.os.Build.DEVICE,

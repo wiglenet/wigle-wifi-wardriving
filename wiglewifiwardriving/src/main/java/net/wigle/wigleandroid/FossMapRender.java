@@ -472,6 +472,7 @@ public class FossMapRender {
             }
             if (null != icon && null != icon.getBitmap()) {
                 options.icon(icon);
+
                 marker = map.addMarker(options);
                 if (marker != null) {
                     markersByBssid.put(bssid, marker);

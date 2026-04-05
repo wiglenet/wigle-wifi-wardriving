@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -132,6 +134,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
         //hack manual padding
         view.post(() -> {
+            if (!isAdded()) {
+                return;
+            }
             final Context context = getContext();
             int navBarHeight = context == null ? 0 : LayoutUtil.getNavigationBarHeight(getActivity(), context.getResources());
             if (navBarHeight > 0 && view.getPaddingBottom() == 0) {
@@ -243,8 +248,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             if (allowRefresh) {
                 allowRefresh = false;
                 final View view = getView();
-
-                updateView(view);
+                if (view != null) {
+                    updateView(view);
+                }
 
                 //ALIBI: what doesn't work here:
                 //does not successfully reload
@@ -627,6 +633,29 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
         SettingsUtil.doSpinner( R.id.battery_kill_spinner, view, PreferenceKeys.PREF_BATTERY_KILL_PERCENT,
                 MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName, getContext() );
+
+        // battery optimization status (API 23+)
+        final View batteryOptRow = view.findViewById(R.id.battery_opt_row);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && batteryOptRow != null) {
+            batteryOptRow.setVisibility(VISIBLE);
+            final TextView batteryOptStatus = view.findViewById(R.id.battery_opt_status);
+            final PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+            final boolean exempted = pm != null && pm.isIgnoringBatteryOptimizations(activity.getPackageName());
+            if (batteryOptStatus != null) {
+                batteryOptStatus.setText(exempted ? R.string.battery_opt_status_exempted : R.string.battery_opt_status_not_exempted);
+                batteryOptStatus.setTextAppearance(exempted ? R.style.ListDetail : R.style.ListDebug);
+            }
+            batteryOptRow.setOnClickListener(v -> {
+                try {
+                    final Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    intent.setData(Uri.parse("package:" + activity.getPackageName()));
+                    startActivity(intent);
+                } catch (ActivityNotFoundException ex) {
+                    Logging.info("battery opt intent not available: " + ex);
+                }
+            });
+        }
 
         // reset wifi spinner
         final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };

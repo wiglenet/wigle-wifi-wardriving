@@ -28,6 +28,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.net.TrafficStats;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -97,6 +98,7 @@ import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.BluetoothUtil;
+import net.wigle.wigleandroid.util.BuildReleaseTag;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -173,6 +175,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         int previousTab = 0;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
+        private PowerManager.WakeLock scanWakeLock;
         private int logPointer = 0;
         private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
@@ -241,6 +244,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
+
+    private SharedPreferences.OnSharedPreferenceChangeListener mutedPreferenceListener;
 
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
@@ -398,6 +403,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.wakeLock.isHeld()) {
                 state.wakeLock.release();
             }
+        }
+        if (state.scanWakeLock == null) {
+            state.scanWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wiglewifiwardriving:ScanKeepAlive");
+            state.scanWakeLock.setReferenceCounted(false);
         }
 
         @SuppressLint("HardwareIds")
@@ -990,6 +999,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onDestroy() {
         Logging.info("MAIN: destroy.");
+        if (mutedPreferenceListener != null) {
+            getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE)
+                    .unregisterOnSharedPreferenceChangeListener(mutedPreferenceListener);
+            mutedPreferenceListener = null;
+        }
         super.onDestroy();
         stopHeartbeat();
         if (!state.uiRestart.get()) {
@@ -1024,6 +1038,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.bluetoothReceiver != null) {
                 state.bluetoothReceiver.stopScanning();
                 state.bluetoothReceiver.close();
+            }
+            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
+                try {
+                    state.scanWakeLock.release();
+                } catch (Exception ex) {
+                    Logging.info("exception releasing scanWakeLock in onDestroy: " + ex);
+                }
             }
             finishSoon(DESTROY_FINISH_MILLIS, false);
         } else {
@@ -1364,7 +1385,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         final DateFormat format = SimpleDateFormat.getDateTimeInstance();
                         builder.append(format.format(new Date())).append("\n");
                         if (pi != null) {
-                            builder.append("versionName: ").append(pi.versionName).append("\n");
+                            builder.append("versionName: ").append(BuildReleaseTag.tagVersionForExports(pi.versionName)).append("\n");
                             builder.append("packageName: ").append(pi.packageName).append("\n");
                         }
                         if (detail != null) {
@@ -1519,12 +1540,29 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidAlertList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_ADDRS);
             state.bleMfgrIdList = generateBssidFilterMatcher(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
             //TODO: port SSID matcher over as well?
+            registerMutedPreferenceListener(prefs);
             if (null != state.bssidAlertList || null != state.bleMfgrIdList) {
                 startHeartbeat(prefs);
             } else {
                 stopHeartbeat();
             }
         }
+    }
+
+    private void registerMutedPreferenceListener(final SharedPreferences prefs) {
+        if (mutedPreferenceListener != null) {
+            prefs.unregisterOnSharedPreferenceChangeListener(mutedPreferenceListener);
+        }
+        mutedPreferenceListener = (sharedPrefs, key) -> {
+            if (PreferenceKeys.PREF_MUTED.equals(key)) {
+                if (sharedPrefs.getBoolean(PreferenceKeys.PREF_MUTED, true)) {
+                    stopHeartbeat();
+                } else if (state.bssidAlertList != null || state.bleMfgrIdList != null) {
+                    startHeartbeat(sharedPrefs);
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(mutedPreferenceListener);
     }
 
     /**
@@ -2157,6 +2195,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return null;
     }
 
+    @SuppressLint("WakelockTimeout")
     private void internalHandleScanChange(final boolean isScanning) {
         Logging.info("\tmain internalHandleScanChange: isScanning now: " + isScanning);
         ListFragment listFragment = getListFragmentIfCurrent();
@@ -2178,6 +2217,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (!state.wifiLock.isHeld()) {
                 state.wifiLock.acquire();
             }
+            // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off
+            if (state.scanWakeLock != null && !state.scanWakeLock.isHeld()) {
+                //TODO: are we allowed to do this?
+                state.scanWakeLock.acquire();
+            }
+            optionalShowBatteryOptDialog();
         } else {
             if (listFragment != null) {
                 listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
@@ -2197,9 +2242,58 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("\texception releasing wifilock: " + ex);
                 }
             }
+            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
+                try {
+                    state.scanWakeLock.release();
+                } catch (Exception ex) {
+                    Logging.info("\texception releasing scanWakeLock: " + ex);
+                }
+            }
         }
         if (null != state && null != state.wigleService) {
             state.wigleService.setupNotification();
+        }
+    }
+
+    /**
+     * Show battery optimization dialog if not exempted / dismissed.
+     */
+    private void optionalShowBatteryOptDialog() {
+        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm == null) {
+            return;
+        }
+        if (pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (prefs.getBoolean(PreferenceKeys.PREF_BATTERY_OPT_DISMISSED, false)) {
+            return;
+        }
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.battery_opt_dialog_title);
+        builder.setMessage(R.string.battery_opt_dialog_message);
+        builder.setCancelable(true);
+        builder.setPositiveButton(R.string.battery_opt_open_settings, (dialog, which) -> {
+            prefs.edit().putBoolean(PreferenceKeys.PREF_BATTERY_OPT_DISMISSED, true).apply();
+            try {
+                final Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivity(intent);
+            } catch (ActivityNotFoundException ex) {
+                Logging.info("battery opt intent not available: " + ex);
+            }
+            dialog.dismiss();
+        });
+        builder.setNegativeButton(R.string.battery_opt_not_now, (dialog, which) -> {
+            prefs.edit().putBoolean(PreferenceKeys.PREF_BATTERY_OPT_DISMISSED, true).apply();
+            dialog.dismiss();
+        });
+        try {
+            builder.show();
+        } catch (Exception ex) {
+            Logging.info("exception showing battery opt dialog: " + ex);
         }
     }
 
@@ -2500,7 +2594,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("MAIN: finish.");
         if (!state.uiRestart.get()) {
             if (state.wifiReceiver != null) {
-                Logging.info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+                Logging.info("MAIN: finish. wifi networks: "
+                        + state.wifiReceiver.getRunNetworkCount()
+                        + " bt networks " + state.bluetoothReceiver.getRunNetworkCount());
             }
 
             final boolean wasFinishing = state.finishing.getAndSet(true);
@@ -2826,8 +2922,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.bssidMatchHeartbeat.interrupt();
             state.bssidMatchHeartbeat = null;
         }
+        if (prefs.getBoolean(PreferenceKeys.PREF_MUTED, true)) {
+            return;
+        }
         state.bssidMatchHeartbeat = new BssidMatchingAudioThread(
-                prefs,
                 state.soundScanning,
                 state.soundContact, state.lastHighestSignal, state.wifiReceiver);
         state.bssidMatchHeartbeat.start();

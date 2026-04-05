@@ -479,4 +479,16 @@
     <string name="foss_map_base_url">Kortvektortileserver-stil URL-basis</string>
     <string name="foss_map_key">Kortvektor basisnøgle</string>
     <string name="check_credentials">Verificer</string>
+    <string name="delete_gpx_detail">Er du sikker på, at du vil slette den valgte rute?</string>
+    <string name="delete_gpx">Slet rute</string>
+    <string name="delete_gpx_success">Rute blev slettet.</string>
+    <string name="delete_gpx_failed">Kunne ikke slette rute.</string>
+    <string name="warn_display_trunc">Visningslisten overskred grænserne - fjerner ældste %s-poster.</string>
+    <string name="battery_opt_dialog_title">Forbedre skanningsydelse</string>
+    <string name="battery_opt_dialog_message">Android begrænser baggrundsskanning som standard, når skærmen er slukket. At fritage WiGLE fra batterioptimering hjælper med at opretholde konstant skanning.</string>
+    <string name="battery_opt_open_settings">Åbn indstillinger</string>
+    <string name="battery_opt_not_now">Ikke nu</string>
+    <string name="battery_opt_settings_title">Batterioptimering</string>
+    <string name="battery_opt_status_exempted">Fritaget</string>
+    <string name="battery_opt_status_not_exempted">Ikke fritaget (tryk for at ændre)</string>
 </resources>

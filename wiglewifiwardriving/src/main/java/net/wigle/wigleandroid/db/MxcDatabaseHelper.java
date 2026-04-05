@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.db;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -85,6 +86,10 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
             //ALIBI: ugly, but can't use the assetManager to get size without decompressing
             if (freeAppSpaceBytes <= EST_MXC_DB_SIZE) {
                 handler.post(() -> {
+                    // Check at show-time; isFinishing param can be stale if activity destroyed before post ran
+                    if (!(context instanceof Activity) || ((Activity) context).isFinishing()) {
+                        return;
+                    }
                     AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(context);
                     iseDlgBuilder.setMessage(R.string.no_mxc_space_message)
                             .setTitle(R.string.no_internal_space_title)
@@ -99,7 +104,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                             });
 
                     final Dialog dialog = iseDlgBuilder.create();
-                    if (!isFinishing) {
+                    if (!((Activity) context).isFinishing()) {
                         dialog.show();
                     }
                 });

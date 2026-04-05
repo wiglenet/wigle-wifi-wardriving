@@ -1,3 +1,11 @@
+* 2.107 (04/05/2026)
+Startup counts improvements
+Cap unbounded network sets
+BSSID/MAC/MfgrId sounds obey global mute
+Fix crash on theme switch
+FOSS branch overhaul
+Various bug fixes
+
 * 2.104 (02/07/2026)
 Heuristic for random/public BLE identification
 Backgrounding two tasks to lessen ANRs

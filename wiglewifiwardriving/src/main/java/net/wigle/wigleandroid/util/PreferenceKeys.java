@@ -29,6 +29,7 @@ public class PreferenceKeys {
     public static final String PREF_LANGUAGE = "speechLanguage";
     public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
+    public static final String PREF_BATTERY_OPT_DISMISSED = "batteryOptDismissed";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_BT_WAS_OFF = "btWasOff";
     public static final String PREF_SCAN_BT = "scanBluetooth";

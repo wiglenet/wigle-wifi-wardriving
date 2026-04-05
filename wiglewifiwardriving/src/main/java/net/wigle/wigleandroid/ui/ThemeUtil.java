@@ -5,10 +5,8 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
+import android.util.TypedValue;
 import android.view.Window;
-import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -18,19 +16,16 @@ import androidx.appcompat.app.AppCompatDelegate;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class ThemeUtil {
+
+    /**
+     * Apply AppCompat day/night on the main thread. Direct UI elements must invoke this synchronously on callback.
+     */
     public static void setTheme(final SharedPreferences prefs) {
         if (Build.VERSION.SDK_INT > 28) {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            Handler handler = new Handler(Looper.getMainLooper());
-            executor.execute(() -> {
-                final int displayMode = prefs.getInt(PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-                Logging.info("set theme called: " + displayMode);
-                handler.post(() -> AppCompatDelegate.setDefaultNightMode(displayMode));
-            });
+            final int displayMode = prefs.getInt(PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            Logging.info("set theme called: " + displayMode);
+            AppCompatDelegate.setDefaultNightMode(displayMode);
         } else {
             //Force night mode
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -38,19 +33,21 @@ public class ThemeUtil {
     }
 
     public static void setNavTheme(final Window w, final Context c, final SharedPreferences prefs) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-        executor.execute(() -> {
-            final int displayMode = prefs.getInt(PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            handler.post(() -> {
-                if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
-                        (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
-                                nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
-                    w.setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                }
-            });
-        });
+        if (w == null || c == null) {
+            return;
+        }
+        final int displayMode = prefs.getInt(PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+        final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
+                (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
+                        nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
+            w.setNavigationBarColor(0x80000000);
+        } else {
+            final TypedValue tv = new TypedValue();
+            if (c.getTheme().resolveAttribute(android.R.attr.navigationBarColor, tv, true)) {
+                w.setNavigationBarColor(tv.data);
+            }
+        }
     }
 
 //    public static void setMapTheme(final GoogleMap googleMap, final Context c, final SharedPreferences prefs, final int mapNightThemeId) {

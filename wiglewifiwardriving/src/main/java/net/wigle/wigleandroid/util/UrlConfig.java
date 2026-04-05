@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.util;
 
+import net.wigle.wigleandroid.BuildConfig;
+
 /**
  * Utility class that holds the WiGLE URLs used throughout the app
  */
@@ -18,6 +20,10 @@ public class UrlConfig {
 
     // optional auth
     public static final String FILE_POST_URL = API_HOST+"/api/v2/file/upload";
+
+    // ShadowCheck S3 import pipeline URL
+    public static final String SHADOWCHECK_POST_URL = BuildConfig.SHADOWCHECK_POST_URL;
+    public static final String SHADOWCHECK_API_KEY = BuildConfig.SHADOWCHECK_API_KEY;
 
     // api token auth
     public static final String UPLOADS_STATS_URL = API_HOST+"/api/v2/file/transactions";

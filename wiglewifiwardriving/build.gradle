@@ -36,6 +36,11 @@ android {
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
         buildConfigField "boolean", "FOSS_MAIN_BUILD", "${isFossMainBuild()}"
+
+        buildConfigField "String", "SHADOWCHECK_POST_URL",
+          '"' + (project.findProperty('shadowcheck.url') ?: '') + '"'
+        buildConfigField "String", "SHADOWCHECK_API_KEY",
+          '"' + (project.findProperty('shadowcheck.key') ?: '') + '"'
     }
     buildFeatures {
         buildConfig = true
@@ -221,3 +226,31 @@ tasks.register('downloadBtMemberFile') {
 
 
 build.dependsOn downloadFile, createMccMncDB, downloadBtMemberFile
+
+tasks.register('ingestToWeb') {
+    group = "shadowcheck"
+    description = "Pulls the latest DB from a connected Android device and places it in shadowcheck-web imports folder."
+    doLast {
+        def webRepoPath = "/home/dbcooper/repos/shadowcheck-web"
+        def importDir = "$webRepoPath/imports"
+        def timestamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+        def targetFile = "$importDir/dev_ingest_${timestamp}.sqlite"
+        
+        println "Creating import directory: $importDir"
+        new File(importDir).mkdirs()
+
+        // Path on modern Android 11+ (API 30+)
+        def devicePath = "/sdcard/Android/data/net.wigle.wigleandroid/files/wiglewifi/wiglewifi.sqlite"
+        
+        println "Pulling $devicePath from device..."
+        def proc = "adb pull $devicePath $targetFile".execute()
+        proc.waitFor()
+        
+        if (proc.exitValue() == 0) {
+            println "Successfully synced to: $targetFile"
+            println "You can now run: npx tsx etl/load/sqlite-import.ts $targetFile dev_device"
+        } else {
+            println "Error pulling file (is device connected/unlocked?): " + proc.err.text
+        }
+    }
+}

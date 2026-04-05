@@ -21,6 +21,8 @@ def isFossMainBuild() {
     return false
 }
 
+def isAab = gradle.startParameter.taskNames.any { it.toLowerCase().contains("bundle") }
+
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
 apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
@@ -50,6 +52,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
+            // suppress x86 on release apks to reduce size due to .so files
+            if (!isAab) {
+                ndk {
+                    abiFilters "armeabi-v7a", "arm64-v8a"
+                }
+            }
         }
     }
     packagingOptions {

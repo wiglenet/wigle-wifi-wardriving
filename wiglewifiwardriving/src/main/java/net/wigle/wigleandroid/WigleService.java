@@ -21,6 +21,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -35,6 +36,9 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE;
 import static android.os.Build.VERSION.SDK_INT;
 
+import android.net.wifi.WifiManager;
+import android.os.PowerManager;
+
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
 
@@ -46,6 +50,8 @@ public final class WigleService extends Service {
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
     private RemoteViews smallRemoteViews;
+    private PowerManager.WakeLock wakeLock;
+    private WifiManager.WifiLock wifiLock;
 
     // Binder given to clients
     private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
@@ -137,6 +143,7 @@ public final class WigleService extends Service {
     @Override
     public void onCreate() {
         Logging.info( "service: onCreate" );
+        FileUtility.setContext(this);
 
         setupNotification();
 
@@ -151,6 +158,7 @@ public final class WigleService extends Service {
         Logging.info( "service: onDestroy" );
         // Make sure our notification is gone.
         shutdownNotification();
+        releaseLocks();
         setDone();
         super.onDestroy();
     }
@@ -189,6 +197,41 @@ public final class WigleService extends Service {
 
     private void shutdownNotification() {
         stopForeground(true);
+    }
+
+    private void acquireLocks() {
+        if (wakeLock == null) {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wiglewifiwardriving:ServiceScanKeepAlive");
+            wakeLock.setReferenceCounted(false);
+        }
+        if (!wakeLock.isHeld()) {
+            Logging.info("Acquiring service wakeLock");
+            wakeLock.acquire();
+        }
+
+        if (wifiLock == null) {
+            WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wm != null) {
+                wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "wiglewifiwardriving:ServiceWifiLock");
+                wifiLock.setReferenceCounted(false);
+            }
+        }
+        if (wifiLock != null && !wifiLock.isHeld()) {
+            Logging.info("Acquiring service wifiLock");
+            wifiLock.acquire();
+        }
+    }
+
+    private void releaseLocks() {
+        if (wakeLock != null && wakeLock.isHeld()) {
+            Logging.info("Releasing service wakeLock");
+            wakeLock.release();
+        }
+        if (wifiLock != null && wifiLock.isHeld()) {
+            Logging.info("Releasing service wifiLock");
+            wifiLock.release();
+        }
     }
 
     public void setupNotification() {
@@ -237,6 +280,13 @@ public final class WigleService extends Service {
                 }
                 if (!MainActivity.isScanning(context)) {
                     text = context.getString(R.string.list_scanning_off) + " " + text;
+                    releaseLocks();
+                } else {
+                    if (prefs.getBoolean(PreferenceKeys.PREF_KEEP_ALIVE, true)) {
+                        acquireLocks();
+                    } else {
+                        releaseLocks();
+                    }
                 }
                 if (largeIcon == null) {
                     largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.wiglewifi);
@@ -331,7 +381,7 @@ public final class WigleService extends Service {
         builder.setSmallIcon(R.drawable.wiglewifi_small_white);
         builder.setOngoing(true);
         builder.setCategory("SERVICE");
-        builder.setPriority(NotificationCompat.PRIORITY_LOW);
+        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
         builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
@@ -361,7 +411,7 @@ public final class WigleService extends Service {
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager == null) return null;
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                    title, NotificationManager.IMPORTANCE_DEFAULT);
+                    title, NotificationManager.IMPORTANCE_HIGH);
             channel.setSound(null, null); // turns off notification sound
             channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
@@ -433,7 +483,7 @@ public final class WigleService extends Service {
         }
 
         final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                title, NotificationManager.IMPORTANCE_DEFAULT);
+                title, NotificationManager.IMPORTANCE_HIGH);
         channel.setSound(null, null); // turns off notification sound
         channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(channel);

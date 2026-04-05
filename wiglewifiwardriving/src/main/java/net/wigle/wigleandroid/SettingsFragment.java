@@ -541,9 +541,54 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, c);
             SettingsUtil.doScanSpinner(R.id.gps_spinner, PreferenceKeys.GPS_SCAN_PERIOD,
                     MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, c);
+
+            SettingsUtil.doSpinner(R.id.edit_mapbox_api_key, view, PreferenceKeys.PREF_MAPBOX_API_KEY, "", new String[]{}, new String[]{}, c); // Placeholder for consistency
+
+            final String[] mapThemes = new String[]{"default", "mapbox_streets", "mapbox_sat", "mapbox_dark"};
+            final String[] mapThemeNames = new String[]{getString(R.string.map_theme_default), getString(R.string.map_theme_mapbox_streets),
+                    getString(R.string.map_theme_mapbox_sat), getString(R.string.map_theme_mapbox_dark)};
+            SettingsUtil.doSpinner(R.id.map_theme_spinner, view, PreferenceKeys.PREF_MAP_THEME, "default", mapThemes, mapThemeNames, c);
+
+            final Long[] tPeriods = new Long[]{ 5*60*1000L, 10*60*1000L, 15*60*1000L, 30*60*1000L, 60*60*1000L };
+            final String[] tPeriodNames = new String[]{ "5 mins", "10 mins", "15 mins", "30 mins", "1 hour" };
+            SettingsUtil.doSpinner(R.id.tracker_time_spinner, view, PreferenceKeys.PREF_TRACKER_TIME_THRESHOLD, 15*60*1000L, tPeriods, tPeriodNames, c);
+
+            final Float[] dPeriods = new Float[]{ 100f, 250f, 500f, 1000f, 5000f };
+            final String[] dPeriodNames = new String[]{ "100m", "250m", "500m", "1km", "5km" };
+            SettingsUtil.doSpinner(R.id.tracker_dist_spinner, view, PreferenceKeys.PREF_TRACKER_DIST_THRESHOLD, 500f, dPeriods, dPeriodNames, c);
         }
         final Activity thisActivity = this.getActivity();
         if (null != thisActivity) {
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_tracker_alerts, PreferenceKeys.PREF_ENABLE_TRACKER_ALERTS, false);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_keep_alive, PreferenceKeys.PREF_KEEP_ALIVE, true);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_collector_mode, PreferenceKeys.PREF_COLLECTOR_MODE, false, value -> {
+                MainActivity m = MainActivity.getMainActivity();
+                if (m != null) {
+                    m.finish();
+                    startActivity(m.getIntent());
+                }
+            });
+
+            final EditText caseId = view.findViewById(R.id.edit_case_id);
+            caseId.setText(prefs.getString(PreferenceKeys.PREF_CASE_ID, ""));
+            caseId.addTextChangedListener(new SetWatcher() {
+                @Override
+                public void onTextChanged(final String s) {
+                    editor.putString(PreferenceKeys.PREF_CASE_ID, s.trim());
+                    editor.apply();
+                }
+            });
+
+            final EditText mapboxKey = view.findViewById(R.id.edit_mapbox_api_key);
+            mapboxKey.setText(prefs.getString(PreferenceKeys.PREF_MAPBOX_API_KEY, ""));
+            mapboxKey.addTextChangedListener(new SetWatcher() {
+                @Override
+                public void onTextChanged(final String s) {
+                    editor.putString(PreferenceKeys.PREF_MAPBOX_API_KEY, s.trim());
+                    editor.apply();
+                }
+            });
+
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.found_sound, PreferenceKeys.PREF_FOUND_SOUND, true);

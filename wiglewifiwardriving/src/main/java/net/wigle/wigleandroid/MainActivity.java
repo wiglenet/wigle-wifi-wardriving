@@ -148,6 +148,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
         public DatabaseHelper dbHelper;
+        public net.wigle.wigleandroid.background.TrackerEngine trackerEngine;
+        public net.wigle.wigleandroid.util.BarometerManager barometerManager;
         ServiceConnection serviceConnection;
         WigleService wigleService;
         AtomicBoolean finishing;
@@ -178,10 +180,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private PowerManager.WakeLock scanWakeLock;
         private int logPointer = 0;
         private final String[] logs = new String[25];
-        Matcher bssidLogExclusions;
-        Matcher bssidDisplayExclusions;
-        Matcher bssidAlertList;
-        Matcher bleMfgrIdList;
+        public Matcher bssidLogExclusions;
+        public Matcher bssidDisplayExclusions;
+        public Matcher bssidAlertList;
+        public Matcher bleMfgrIdList;
         int uiMode;
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
@@ -291,6 +293,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         ThemeUtil.setTheme(prefs);
         ThemeUtil.setNavTheme(this.getWindow(), this, prefs);
         mainActivity = this;
+        FileUtility.setContext(this);
 
         // set language
         setLocale(this);
@@ -800,7 +803,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * Swaps fragments in the main content view
      */
     public void selectFragment(final int itemId) {
-        if (itemId == R.id.nav_exit) {
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        final boolean collectorMode = prefs.getBoolean(PreferenceKeys.PREF_COLLECTOR_MODE, false);
+        int targetId = itemId;
+        if (collectorMode) {
+            if (itemId == R.id.nav_list || itemId == R.id.nav_dash || itemId == R.id.nav_map || itemId == R.id.nav_rank || itemId == R.id.nav_news) {
+                targetId = R.id.nav_list;
+            }
+        }
+
+        if (targetId == R.id.nav_exit) {
             finishSoon();
             return;
         }
@@ -810,7 +822,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             applyExitBackground(navigationView);
         }
         final Map<Integer, String> fragmentTitles = new HashMap<>();
-        fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
+        fragmentTitles.put(R.id.nav_list, collectorMode ? "SC Collector" : getString(R.string.mapping_app_name));
         fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
         fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
         fragmentTitles.put(R.id.nav_search, getString(R.string.tab_search));
@@ -820,20 +832,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
         fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
         fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
-        //fragmentTitles.put(R.id.nav_, getString(R.string.site_stats_app_name));
 
         try {
             final FragmentManager fragmentManager = getSupportFragmentManager();
-            final Fragment frag = (Fragment) classForFragmentNavId(itemId).newInstance();
+            final Fragment frag = (Fragment) classForFragmentNavId(targetId).newInstance();
             Bundle bundle = new Bundle();
             frag.setArguments(bundle);
 
-
-            //fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+itemId);
-
             try {
                 fragmentManager.beginTransaction()
-                        .replace(R.id.tabcontent, frag, FRAGMENT_TAG_PREFIX + itemId)
+                        .replace(R.id.tabcontent, frag, FRAGMENT_TAG_PREFIX + targetId)
                         .commit();
             } catch (final NullPointerException | IllegalStateException ex) {
                 final String message = "exception in fragment switch: " + ex;
@@ -841,12 +849,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
 
             // Highlight the selected item, update the title, and close the drawer
-            state.currentTab = itemId;
-            setTitle(fragmentTitles.get(itemId));
+            state.currentTab = targetId;
+            setTitle(fragmentTitles.get(targetId));
         } catch (IllegalAccessException ex) {
-            Logging.error("Unable to get fragment for id: " + itemId, ex);
+            Logging.error("Unable to get fragment for id: " + targetId, ex);
         } catch (InstantiationException ex) {
-            Logging.error("Unable to make fragment for id: " + itemId, ex);
+            Logging.error("Unable to make fragment for id: " + targetId, ex);
         }
     }
 
@@ -878,6 +886,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private static Class classForFragmentNavId(final int navId) {
         if (navId == R.id.nav_list) {
+            if (null != mainActivity) {
+                SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+                if (prefs.getBoolean(PreferenceKeys.PREF_COLLECTOR_MODE, false)) {
+                    return CollectorFragment.class;
+                }
+            }
             return ListFragment.class;
         } else if (navId == R.id.nav_dash) {
             return DashboardFragment.class;
@@ -991,6 +1005,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.dbHelper.start();
             ListFragment.lameStatic.dbHelper = state.dbHelper;
         }
+        if (state.trackerEngine == null) {
+            state.trackerEngine = new net.wigle.wigleandroid.background.TrackerEngine(getApplicationContext(), prefs);
+        }
+        if (state.barometerManager == null) {
+            state.barometerManager = new net.wigle.wigleandroid.util.BarometerManager(getApplicationContext());
+        }
         if (state.mxcDbHelper == null) {
             state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext(), prefs);
         }
@@ -1093,6 +1113,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.info("release wake lock");
             state.wakeLock.release();
         }
+        if (state.barometerManager != null) {
+            state.barometerManager.stop();
+        }
     }
 
     @Override
@@ -1100,6 +1123,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("MAIN: resume.");
         super.onResume();
         mainActivity = this;
+
+        if (state.barometerManager != null) {
+            state.barometerManager.start();
+        }
 
         // deal with wake lock
         if (!state.wakeLock.isHeld() && state.screenLocked) {

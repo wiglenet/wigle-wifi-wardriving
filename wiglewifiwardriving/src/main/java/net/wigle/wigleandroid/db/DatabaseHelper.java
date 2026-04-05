@@ -53,10 +53,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+
+import net.wigle.wigleandroid.ListFragment;
 
 /**
  * our database helper, makes a great data meal.
@@ -70,7 +73,6 @@ public final class DatabaseHelper extends Thread {
     private static final double BIG_LATLON_CHANGE = 0.01D;
     private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
-    private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
@@ -79,6 +81,7 @@ public final class DatabaseHelper extends Thread {
     private long prevPendingQueueCullTime = 0L;
 
     private Location lastLoggedLocation;
+    private String dbFilename;
 
     private SQLiteStatement insertNetwork;
     private SQLiteStatement insertLocationExternal;
@@ -133,7 +136,13 @@ public final class DatabaseHelper extends Thread {
                     + "lon double not null,"
                     + "altitude double not null,"
                     + "accuracy float not null,"
-                    + "time long not null"
+                    + "time long not null,"
+                    + "device_model text,"
+                    + "device_brand text,"
+                    + "os_release text,"
+                    + "device_id text,"
+                    + "case_id text,"
+                    + "barometer double"
                     + ")";
 
     private static final String LOCATION_DELETE = "drop table " + LOCATION_TABLE;
@@ -437,15 +446,30 @@ public final class DatabaseHelper extends Thread {
     private void open() {
         // if(true) throw new SQLiteException("meat puppets");
 
-        String dbFilename = DATABASE_NAME;
+        dbFilename = DATABASE_NAME;
         final boolean hasSD = FileUtility.hasSD();
+        final String sdPath = FileUtility.getSDPath();
         if ( hasSD ) {
-            File path = new File( EXTERNAL_DATABASE_PATH );
+            File path = new File( sdPath );
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
-            dbFilename = EXTERNAL_DATABASE_PATH + DATABASE_NAME;
+            dbFilename = sdPath + DATABASE_NAME;
             info("made path: " + path + " exists: " + path.exists() + " write: " + path.canWrite());
         }
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q && hasSD) {
+            final File internalDbFile = context.getDatabasePath(DATABASE_NAME);
+            final File externalDbFile = new File(dbFilename);
+            if (internalDbFile.exists() && !externalDbFile.exists()) {
+                Logging.info("Migrating database from internal to visible external storage: " + dbFilename);
+                try {
+                    FileUtility.copyFile(internalDbFile, externalDbFile);
+                } catch (IOException e) {
+                    Logging.error("Failed to migrate database: " + e);
+                }
+            }
+        }
+
         final File dbFile = new File( dbFilename );
         boolean doCreateNetwork = false;
         boolean doCreateLocation = false;
@@ -595,6 +619,48 @@ public final class DatabaseHelper extends Thread {
             }
         }
 
+        if (db.getVersion() == 4) {
+            Logging.info("upgrading db from 4 to 5");
+            try {
+                db.execSQL("ALTER TABLE " + ROUTE_TABLE + " ADD COLUMN device_model text");
+                db.execSQL("ALTER TABLE " + ROUTE_TABLE + " ADD COLUMN device_brand text");
+                db.execSQL("ALTER TABLE " + ROUTE_TABLE + " ADD COLUMN os_release text");
+                db.execSQL("ALTER TABLE " + ROUTE_TABLE + " ADD COLUMN device_id text");
+                db.setVersion(5);
+            } catch (SQLiteException ex) {
+                Logging.info("ex: " + ex, ex);
+                if (ex.toString().contains("duplicate column name")) {
+                    db.setVersion(5);
+                }
+            }
+        }
+
+        if (db.getVersion() == 5) {
+            Logging.info("upgrading db from 5 to 6");
+            try {
+                db.execSQL("ALTER TABLE " + ROUTE_TABLE + " ADD COLUMN case_id text");
+                db.setVersion(6);
+            } catch (SQLiteException ex) {
+                Logging.info("ex: " + ex, ex);
+                if (ex.toString().contains("duplicate column name")) {
+                    db.setVersion(6);
+                }
+            }
+        }
+
+        if (db.getVersion() == 6) {
+            Logging.info("upgrading db from 6 to 7");
+            try {
+                db.execSQL("ALTER TABLE " + ROUTE_TABLE + " ADD COLUMN barometer double");
+                db.setVersion(7);
+            } catch (SQLiteException ex) {
+                Logging.info("ex: " + ex, ex);
+                if (ex.toString().contains("duplicate column name")) {
+                    db.setVersion(7);
+                }
+            }
+        }
+
         // drop index, was never publicly released
         db.execSQL("DROP INDEX IF EXISTS type");
 
@@ -615,7 +681,7 @@ public final class DatabaseHelper extends Thread {
                 + " type = ? WHERE bssid = ?" );
 
         insertRoute = db.compileStatement( "INSERT INTO "+ROUTE_TABLE
-                + " (run_id,wifi_visible,cell_visible,bt_visible,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?,?,?)" );
+                + " (run_id,wifi_visible,cell_visible,bt_visible,lat,lon,altitude,accuracy,time,device_model,device_brand,os_release,device_id,case_id,barometer) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" );
     }
 
     private void createFreshLocationObservationIndex() {
@@ -1216,6 +1282,22 @@ public final class DatabaseHelper extends Thread {
                     insertRoute.bindDouble(7, location.getAltitude());
                     insertRoute.bindDouble(8, location.getAccuracy());
                     insertRoute.bindLong(9, location.getTime());
+                    insertRoute.bindString(10, android.os.Build.MODEL);
+                    insertRoute.bindString(11, android.os.Build.BRAND);
+                    insertRoute.bindString(12, android.os.Build.VERSION.RELEASE);
+                    final String androidId = android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+                    insertRoute.bindString(13, androidId);
+                    final String caseId = prefs.getString(PreferenceKeys.PREF_CASE_ID, "");
+                    if (caseId.isEmpty()) {
+                        insertRoute.bindNull(14);
+                    } else {
+                        insertRoute.bindString(14, caseId);
+                    }
+                    if (ListFragment.lameStatic.barometer == null) {
+                        insertRoute.bindNull(15);
+                    } else {
+                        insertRoute.bindDouble(15, ListFragment.lameStatic.barometer);
+                    }
                     long start = System.currentTimeMillis();
 
                     try {
@@ -1328,6 +1410,13 @@ public final class DatabaseHelper extends Thread {
     }
 
     /** table presence check (avoids COUNT(*) in {@link #open()}). */
+    public File getDbFile() {
+        if (dbFilename != null) {
+            return new File(dbFilename);
+        }
+        return null;
+    }
+
     private static boolean tableExists( final SQLiteDatabase database, final String tableName ) {
         try (Cursor c = database.rawQuery(
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
@@ -1435,7 +1524,7 @@ public final class DatabaseHelper extends Thread {
         Logging.info( "routeMetaIterator" );
         final String[] args = new String[]{};
         //ALIBI: we'd love to parameterize min observations here, but SQLite rawQuery doesn't seem to respect ? parameterization in HAVING statements.
-        return db.rawQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
+        return db.rawQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs, device_model, device_brand, os_release, device_id, case_id FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
     }
 
     public Cursor currentRouteIterator() throws DBException {
@@ -1490,7 +1579,7 @@ public final class DatabaseHelper extends Thread {
         String outputFilename = "backup-" + System.currentTimeMillis() + SQL_EXT;
 
         if (hasSD()) {
-            file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
+            file = new File(FileUtility.getSDPath(), DATABASE_NAME);
         }
         Pair<Boolean,String> result;
         try (InputStream input = new FileInputStream(file)){

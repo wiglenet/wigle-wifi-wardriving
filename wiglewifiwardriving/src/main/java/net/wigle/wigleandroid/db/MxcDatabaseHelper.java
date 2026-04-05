@@ -36,7 +36,6 @@ import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 
 public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private static final String MXC_DB_NAME = "mmcmnc"+SQL_EXT;
-    private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
     private static final int MXC_DATABASE_VERSION = 1;
     private static final int MAX_INSTALL_TRIES = 5;
 
@@ -61,7 +60,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private File getMxcFile() {
         final File dbFile;
         if (hasSD) {
-            final String mxcPath = EXTERNAL_DATABASE_PATH + MXC_DB_NAME;
+            final String mxcPath = FileUtility.getSDPath() + MXC_DB_NAME;
             dbFile = new File(mxcPath);
         }
         else {

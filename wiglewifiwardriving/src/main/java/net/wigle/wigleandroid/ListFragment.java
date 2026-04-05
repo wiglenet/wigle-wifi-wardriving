@@ -45,6 +45,7 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.background.ShadowCheckUploader;
 import net.wigle.wigleandroid.background.UniqueTaskExecutorService;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -126,6 +127,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public int currCells;
         public int currBt;
         public int pendingCellCount;
+        public Double barometer;
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
@@ -841,6 +843,24 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                         makeUploadDialog(main);
                     }
                 }
+            });
+        }
+
+        final Button shadowButton = view.findViewById( R.id.shadowcheck_button );
+        if (null != shadowButton) {
+            MainActivity m = MainActivity.getMainActivity();
+            if (null != m && m.isTransferring()) {
+                shadowButton.setEnabled(false);
+            }
+
+            shadowButton.setOnClickListener(view1 -> {
+                final MainActivity main = MainActivity.getMainActivity(ListFragment.this);
+                if (main == null) {
+                    return;
+                }
+                main.setTransferring();
+                ShadowCheckUploader uploader = new ShadowCheckUploader(main, ListFragment.lameStatic.dbHelper, this);
+                uploader.start();
             });
         }
     }

@@ -290,6 +290,10 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                         if (!matches) {
                             dbHelper.addObservation(network, location, added);
+                            final MainActivity.State s = MainActivity.getStaticState();
+                            if (s != null && s.trackerEngine != null) {
+                                s.trackerEngine.evaluateNetwork(network, location);
+                            }
                         }
                         // }
                     }

@@ -488,6 +488,22 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                     bleToolsLayout.setVisibility(GONE);
                 }
             }
+            final Button locateButton = findViewById(R.id.locate_beacon_button);
+            if (locateButton != null) {
+                locateButton.setVisibility(GONE); // ARLocateActivity is missing
+                /*
+                locateButton.setOnClickListener(v -> {
+                    final Intent arIntent = new Intent(AbstractNetworkActivity.this, ARLocateActivity.class);
+                    arIntent.putExtra("bssid", bssid);
+                    arIntent.putExtra("ssid", network.getSsid());
+                    if (network.getLatLng() != null) {
+                        arIntent.putExtra("lat", network.getLatLng().latitude);
+                        arIntent.putExtra("lon", network.getLatLng().longitude);
+                    }
+                    startActivity(arIntent);
+                });
+                */
+            }
             setupQuery();
         }
     }

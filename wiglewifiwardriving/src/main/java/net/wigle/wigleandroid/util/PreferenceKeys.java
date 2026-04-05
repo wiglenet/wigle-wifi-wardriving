@@ -57,6 +57,7 @@ public class PreferenceKeys {
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
     public static final String PREF_START_AT_BOOT = "startAtBoot";
     public static final String PREF_LOG_ROUTES = "logRoutes";
+    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
     public static final String PREF_DAYNIGHT_MODE = "dayNightMode";
     public static final String PREF_ALERT_ADDRS = "alertOnAddresses";
 
@@ -74,7 +75,14 @@ public class PreferenceKeys {
     public static final String PREF_MAP_TRAFFIC = "mapTraffic";
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     public static final String PREF_MAP_HIDE_NETS = "hideNetsMap";
-    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
+    public static final String PREF_ENABLE_TRACKER_ALERTS = "enableTrackerAlerts";
+    public static final String PREF_TRACKER_TIME_THRESHOLD = "trackerTimeThreshold";
+    public static final String PREF_TRACKER_DIST_THRESHOLD = "trackerDistThreshold";
+    public static final String PREF_KEEP_ALIVE = "keepAlive";
+    public static final String PREF_COLLECTOR_MODE = "collectorMode";
+    public static final String PREF_CASE_ID = "caseId";
+    public static final String PREF_MAPBOX_API_KEY = "mapboxApiKey";
+    public static final String PREF_MAP_THEME = "mapTheme";
     public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
     public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
     public static final String PREF_MAPS_FOLLOW_DAYNIGHT = "mapThemeMatchDayNight";

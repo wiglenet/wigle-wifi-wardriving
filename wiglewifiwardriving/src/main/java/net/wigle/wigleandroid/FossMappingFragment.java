@@ -109,12 +109,19 @@ public class FossMappingFragment extends AbstractMappingFragment {
                     prefs.getString(PREF_FOSS_MAPS_VECTOR_TILE_KEY, null) : null;
             final String mapServerUrl = prefs != null ?
                     prefs.getString(PREF_FOSS_MAPS_VECTOR_TILE_STYLE, null) : null;
+            final String mapTheme = prefs != null ?
+                    prefs.getString(PreferenceKeys.PREF_MAP_THEME, "default") : "default";
+            final String mapboxKey = prefs != null ?
+                    prefs.getString(PreferenceKeys.PREF_MAPBOX_API_KEY, "") : "";
 
-            //TODO: day/night style?
             String styleUrl;
-            if (mapServerKey != null && !mapServerKey.isEmpty()) {
+            if (!mapboxKey.isEmpty() && mapTheme.startsWith("mapbox_")) {
+                String styleId = "streets-v12";
+                if ("mapbox_sat".equals(mapTheme)) styleId = "satellite-v9";
+                else if ("mapbox_dark".equals(mapTheme)) styleId = "dark-v11";
+                styleUrl = "https://api.mapbox.com/styles/v1/mapbox/" + styleId + "?access_token=" + mapboxKey;
+            } else if (mapServerKey != null && !mapServerKey.isEmpty()) {
                 styleUrl = mapServerUrl + mapServerKey;
-                //e.g. "https://api.maptiler.com/maps/streets-v2/style.json?key=" + mapServerKey;
             } else {
                 styleUrl = "https://demotiles.maplibre.org/style.json";
             }

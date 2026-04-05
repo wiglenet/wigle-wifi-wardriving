@@ -387,6 +387,10 @@ public class CellReceiver {
         }
         if (location != null) {
             dbHelper.addObservation(network, location, newForRun);
+            MainActivity m = MainActivity.getMainActivity();
+            if (m != null && m.getState().trackerEngine != null) {
+                m.getState().trackerEngine.evaluateNetwork(network, location);
+            }
         }
         return network;
     }

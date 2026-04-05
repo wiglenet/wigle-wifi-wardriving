@@ -5,9 +5,11 @@ import android.os.Environment;
 import android.os.StatFs;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +18,17 @@ import java.util.List;
  */
 public class FileUtility {
 
+    private static Context context;
+
+    public static void setContext(final Context context) {
+        if (context != null) {
+            FileUtility.context = context.getApplicationContext();
+        }
+    }
+
     //directory locations - centrally managed here, but must be in sync with fileprovider defs
-    private  final static String APP_DIR = "wiglewifi";
-    private final static String APP_SUB_DIR = "/"+APP_DIR+"/";
+    public final static String APP_DIR = "wiglewifi";
+    public final static String APP_SUB_DIR = "/"+APP_DIR+"/";
     private static final String GPX_DIR = APP_SUB_DIR+"gpx/";
     private final static String KML_DIR = "app_kml";
     private static final String M8B_DIR = APP_SUB_DIR+"m8b/";
@@ -93,6 +103,9 @@ public class FileUtility {
      */
     public static boolean hasSD() {
         if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.Q) {
+            if (context != null) {
+                return context.getExternalFilesDir(null) != null;
+            }
             // past android 10 external doesn't detect properly, but also isn't available
             return false;
         }
@@ -109,6 +122,12 @@ public class FileUtility {
      * @return the string file path
      */
     public static String getSDPath() {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.Q && context != null) {
+            File external = context.getExternalFilesDir(null);
+            if (external != null) {
+                return safeFilePath(external) + APP_SUB_DIR;
+            }
+        }
         return safeFilePath(Environment.getExternalStorageDirectory()) + APP_SUB_DIR;
     }
 
@@ -358,6 +377,21 @@ public class FileUtility {
             }
         } else {
             Logging.error("Null file listing for "+directory.toString());
+        }
+    }
+
+    /**
+     * Copy a file from one location to another
+     * @param fromFile source file
+     * @param toFile destination file
+     * @throws IOException if there's a problem copying
+     */
+    public static void copyFile(final File fromFile, final File toFile) throws IOException {
+        try (FileInputStream is = new FileInputStream(fromFile);
+             FileOutputStream os = new FileOutputStream(toFile);
+             FileChannel inChannel = is.getChannel();
+             FileChannel outChannel = os.getChannel()) {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
         }
     }
 

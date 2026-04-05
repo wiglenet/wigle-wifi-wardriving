@@ -853,6 +853,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 // w/ location
                 if (!matches) {
                     dbHelper.addObservation(network, location, newForRun, deviceTypeUpdate, btTypeUpdate);
+                    if (m.getState().trackerEngine != null) {
+                        m.getState().trackerEngine.evaluateNetwork(network, location);
+                    }
                 }
             } else {
                 // bob asks "since BT are often indoors, should we be saving regardless of loc?"

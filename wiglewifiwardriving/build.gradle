@@ -31,7 +31,7 @@ android {
     namespace "net.wigle.wigleandroid"
     compileSdk = 36
     defaultConfig {
-        applicationId "net.wigle.wigleandroid.foss"
+        applicationId "net.wigle.wigleandroid"
         minSdkVersion 24
         targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

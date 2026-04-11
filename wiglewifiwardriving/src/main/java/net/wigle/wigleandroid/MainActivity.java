@@ -2596,7 +2596,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.wifiReceiver != null) {
                 Logging.info("MAIN: finish. wifi networks: "
                         + state.wifiReceiver.getRunNetworkCount()
-                        + " bt networks " + state.bluetoothReceiver.getRunNetworkCount());
+                        + (state.bluetoothReceiver != null ?
+                            " bt networks " + state.bluetoothReceiver.getRunNetworkCount() : ""));
             }
 
             final boolean wasFinishing = state.finishing.getAndSet(true);

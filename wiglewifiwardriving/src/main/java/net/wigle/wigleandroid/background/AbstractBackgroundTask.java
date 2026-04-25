@@ -169,9 +169,6 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
                 clearProgressDialog();
                 updateTransferringState(false, uploadButton, importObservedButton);
             });
-            //ALIBI: this will get replaced as soon as the progress is set for the first time
-            progressBar.setIndeterminate(true);
-
             //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
             // setting global state to make sure they get set on show
             updateTransferringState(true, uploadButton, importObservedButton);

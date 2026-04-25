@@ -47,9 +47,6 @@ public abstract class ProgressPanelRunnable implements AlertSettable {
                 //taskCancelButton.setOnClickListener(v -> {
                 // TODO: make these subclasses cancellable, link to cancel button
                 //  });
-                //ALIBI: this will get replaced as soon as the progress is set for the first time
-                progressBar.setIndeterminate(true);
-
                 //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
                 // setting global state to make sure they get set on show
                 //updateTransferringState(true, uploadButton, importObservedButton);

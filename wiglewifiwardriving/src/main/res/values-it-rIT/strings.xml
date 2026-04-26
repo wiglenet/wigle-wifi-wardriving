@@ -267,7 +267,7 @@
     <string name="map_toast_satellite">Tipo di Mappa: Satellite</string>
     <string name="map_toast_hybrid">Tipo di Mappa: Ibrida</string>
     <string name="map_toast_terrain">Tipo di Mappa: Terreno</string>
-    <string name="map_needs_playservice">La Mappa necessità di Google Play Service</string>
+    <string name="map_needs_playservice">La Mappa necessità di Google Play Services</string>
     <string name="drawer_open">Cassetto Aperto</string>
     <string name="drawer_close">Cassetto Chiuso</string>
     <string name="site_stats_app_name">Generali</string>

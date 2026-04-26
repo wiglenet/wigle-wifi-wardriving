@@ -158,7 +158,7 @@
     <string name="signal">Signal</string>
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
-    <string name="best_results">For best results, unset "Network notification" in "Wireless &amp; networks"-&gt;"WiFi settings"</string>
+    <string name="best_results">For best results, disable Android\'s "available networks" notifications in your Wi-Fi settings.</string>
     <string name="turn_on_wifi">Please turn on WiFi</string>
     <string name="no_gps_device">No GPS detected in device!</string>
     <string name="turn_on_gps">Please turn on GPS</string>
@@ -268,7 +268,7 @@
     <string name="map_toast_satellite">Map Type: Satellite</string>
     <string name="map_toast_hybrid">Map Type: Hybrid</string>
     <string name="map_toast_terrain">Map Type: Terrain</string>
-    <string name="map_needs_playservice">Map requires Google Play Service</string>
+    <string name="map_needs_playservice">Map requires Google Play Services</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
@@ -399,7 +399,7 @@
     <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
     <string name="q_bad">Android 10 throttles WiFi scans unless disabled in Developer Settings.</string>
     <string name="enable_developer">To enable developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="disable_throttle">To disable WiFi scan throttling: open Developer options and turn "WiFi scan throttling" off.</string>
     <string name="no_internal_space_title">No Space Available</string>
     <string name="no_internal_space_message">There isn\'t enough internal application storage on your device.</string>
     <string name="no_external_space_title">No Space Available</string>
@@ -439,7 +439,7 @@
     <string name="filter_show_btle">Show Bluetooth LE</string>
     <string name="settings_gps_head">GPS Settings</string>
     <string name="enable_kalman">Filter GPS noise</string>
-    <string name="gps_old_message">This device is no longer supported via the app store due to Google\'s policies. Please back-up your data and side-load the WiGLE v. 2.67 .apk (or lower) from https://github.com/wiglenet/wigle-wifi-wardriving/ . Sorry for the inconvenience!</string>
+    <string name="gps_old_message">This device is no longer supported via the app store due to Google\'s policies. Please back up your data and side-load the WiGLE v. 2.67 .apk (or lower) from https://github.com/wiglenet/wigle-wifi-wardriving/ . Sorry for the inconvenience!</string>
     <string name="gps_old_title">Unable to initialize GPS</string>
     <string name="enable_map_bearing">Follow my bearing/heading</string>
     <string name="login_title">Login required</string>
@@ -448,8 +448,8 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Register&lt;/a&gt; @WiGLE.net or &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activate now with QR code&lt;/a&gt;</string>
     <string name="ble_services">BLE UUIDs:</string>
     <string name="ble_vendor">BLE Vendor ID:</string>
-    <string name="speech_new_bt">New bluetooth to DB</string>
-    <string name="tts_new_bt">New bluetooth</string>
+    <string name="speech_new_bt">New Bluetooth to DB</string>
+    <string name="tts_new_bt">New Bluetooth</string>
     <string name="gnss_full">Use GNSS full tracking (large battery drain)</string>
     <string name="search_area">Search area:</string>
     <string name="queued_jobs">(%1$d queued tasks)</string>

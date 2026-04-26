@@ -267,7 +267,7 @@
     <string name="map_toast_satellite">Kaarttype: Satelliet</string>
     <string name="map_toast_hybrid">Kaarttype: hybride</string>
     <string name="map_toast_terrain">Kaarttype: Terrein</string>
-    <string name="map_needs_playservice">Map vereist Google Play Service</string>
+    <string name="map_needs_playservice">Map vereist Google Play Services</string>
     <string name="drawer_open">Lade open</string>
     <string name="drawer_close">Lade gesloten</string>
     <string name="site_stats_app_name">WiGLE.net Statistieken</string>
@@ -447,8 +447,8 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registreer&lt;/a&gt; @WiGLE.net of &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activeer nu met QR-code&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID\'s:</string>
     <string name="ble_vendor">BLE-leveranciers-ID:</string>
-    <string name="speech_new_bt">Nije bluetooth nei DB</string>
-    <string name="tts_new_bt">Nije bluetooth</string>
+    <string name="speech_new_bt">Nije Bluetooth nei DB</string>
+    <string name="tts_new_bt">Nije Bluetooth</string>
     <string name="gnss_full">Brûk GNSS folsleine tracking (grutte batterij drain)</string>
     <string name="search_area">Zoekgebied:</string>
     <string name="queued_jobs">(%1$d taken in de wachtrij)</string>

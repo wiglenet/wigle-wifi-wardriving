@@ -267,7 +267,7 @@
     <string name="map_toast_satellite">Kaarttype: Satelliet</string>
     <string name="map_toast_hybrid">Kaarttype: hybride</string>
     <string name="map_toast_terrain">Kaarttype: Terrein</string>
-    <string name="map_needs_playservice">Map vereist Google Play Service</string>
+    <string name="map_needs_playservice">Map vereist Google Play Services</string>
     <string name="drawer_open">Lade open</string>
     <string name="drawer_close">Lade gesloten</string>
     <string name="site_stats_app_name">WiGLE.net Statistieken</string>

@@ -267,7 +267,7 @@
     <string name="map_toast_satellite">Type de carte : Satellite</string>
     <string name="map_toast_hybrid">Type de carte : Hybride</string>
     <string name="map_toast_terrain">Type de carte : Terrain</string>
-    <string name="map_needs_playservice">La carte nécessite Google Play Service</string>
+    <string name="map_needs_playservice">La carte nécessite Google Play Services</string>
     <string name="drawer_open">Tiroir ouvert</string>
     <string name="drawer_close">Tiroir fermé</string>
     <string name="site_stats_app_name">Statistiques WiGLE.net</string>

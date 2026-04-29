@@ -36,7 +36,7 @@ public class KalmanLatLong {
     public void process(double latMeasurement, double lngMeasurement, float accuracy, long timeStampMillis) {
         if (accuracy < minAccuracy) accuracy = minAccuracy;
         if (variance < 0) {
-            // if variance < 0, object is unitialised, so initialise with current values
+            // if variance < 0, object is uninitialised, so initialise with current values
             this.TimeStamp_milliseconds = timeStampMillis;
             lat=latMeasurement; lng = lngMeasurement; variance = accuracy*accuracy;
         } else {
@@ -50,13 +50,13 @@ public class KalmanLatLong {
                 // TO DO: USE VELOCITY INFORMATION HERE TO GET A BETTER ESTIMATE OF CURRENT POSITION
             }
 
-            // Kalman gain matrix K = Covarariance * Inverse(Covariance + MeasurementVariance)
+            // Kalman gain matrix K = Covariance * Inverse(Covariance + MeasurementVariance)
             // NB: because K is dimensionless, it doesn't matter that variance has different units to lat and lng
             float K = variance / (variance + accuracy * accuracy);
             // apply K
             lat += K * (latMeasurement - lat);
             lng += K * (lngMeasurement - lng);
-            // new Covarariance  matrix is (IdentityMatrix - K) * Covarariance
+            // new Covariance  matrix is (IdentityMatrix - K) * Covariance
             variance = (1 - K) * variance;
         }
     }

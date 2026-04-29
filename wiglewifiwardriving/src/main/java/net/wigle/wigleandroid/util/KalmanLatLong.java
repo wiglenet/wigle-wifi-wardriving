@@ -26,9 +26,9 @@ public class KalmanLatLong {
     }
 
     /// <summary>
-    /// Kalman filter processing for lattitude and longitude
+    /// Kalman filter processing for latitude and longitude
     /// </summary>
-    /// <param name="lat_measurement_degrees">new measurement of lattidude</param>
+    /// <param name="lat_measurement_degrees">new measurement of latitude</param>
     /// <param name="lng_measurement">new measurement of longitude</param>
     /// <param name="accuracy">measurement of 1 standard deviation error in metres</param>
     /// <param name="TimeStamp_milliseconds">time of measurement</param>

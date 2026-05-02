@@ -118,6 +118,7 @@ public class MapRender {
                     return CELL_ICON;
                 case BT:
                 case BLE:
+                case BLE_RANDOM:
                     if (network.isNew()) {
                         return BT_ICON_NEW;
                     }

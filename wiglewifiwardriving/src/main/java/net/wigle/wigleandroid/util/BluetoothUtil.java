@@ -240,4 +240,68 @@ public class BluetoothUtil {
         return 0xFF & intByte;
     }
 
+    /**
+     * Subtype of a BLE Random Device Address per Bluetooth Core Spec Vol 6 Part B Sec 1.3.2.
+     * Determined by the top 2 bits of the 48-bit address (i.e. random_address[47:46]).
+     */
+    public enum BleRandomSubtype {
+        NOT_APPLICABLE,            // address null/short, or top 2 bits == 0b10 (reserved/unused for random)
+        NON_RESOLVABLE_PRIVATE,    // top 2 bits == 0b00
+        RESOLVABLE_PRIVATE,        // top 2 bits == 0b01
+        STATIC                     // top 2 bits == 0b11
+    }
+
+    /**
+     * Human-readable label for a BLE network's address type. Returns "Public" for BLE Public, or the
+     * specific random subtype ("Static" / "Resolvable" / "Non-Resolvable") derived from the bssid for
+     * BLE_RANDOM. Returns null for non-BLE network types (callers should fall back to their default).
+     */
+    public static String bleAddressTypeLabel(final net.wigle.wigleandroid.model.NetworkType type, final String bssid) {
+        if (type == null) return null;
+        switch (type) {
+            case BLE:
+                return "Public";
+            case BLE_RANDOM:
+                switch (bleRandomSubtypeFromBssid(bssid)) {
+                    case STATIC:                  return "Static";
+                    case RESOLVABLE_PRIVATE:      return "Resolvable";
+                    case NON_RESOLVABLE_PRIVATE:  return "Non-Resolvable";
+                    case NOT_APPLICABLE:
+                    default:                       return "Random";
+                }
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Derive the BLE Random Address subtype from a BD_ADDR string of the form "XX:XX:XX:XX:XX:XX"
+     * (or "XXXXXXXXXXXX"). Reads the top 2 bits of the most-significant byte per Bluetooth Core
+     * Spec Vol 6 Part B Sec 1.3.2.
+     *
+     * Caller is expected to invoke this only on addresses already classified as Random; for Public
+     * addresses the bits carry no subtype meaning.
+     *
+     * @param bssid BD_ADDR string
+     * @return the derived subtype, or NOT_APPLICABLE if the input is null/short/unparseable or the
+     *         top 2 bits are 0b10 (a value reserved for Public)
+     */
+    public static BleRandomSubtype bleRandomSubtypeFromBssid(final String bssid) {
+        if (bssid == null || bssid.length() < 2) {
+            return BleRandomSubtype.NOT_APPLICABLE;
+        }
+        try {
+            final int firstByte = Integer.parseInt(bssid.substring(0, 2), 16);
+            final int top2 = (firstByte >> 6) & 0x03;
+            switch (top2) {
+                case 0b00: return BleRandomSubtype.NON_RESOLVABLE_PRIVATE;
+                case 0b01: return BleRandomSubtype.RESOLVABLE_PRIVATE;
+                case 0b11: return BleRandomSubtype.STATIC;
+                default:   return BleRandomSubtype.NOT_APPLICABLE; // 0b10 is reserved
+            }
+        } catch (NumberFormatException ignored) {
+            return BleRandomSubtype.NOT_APPLICABLE;
+        }
+    }
+
 }

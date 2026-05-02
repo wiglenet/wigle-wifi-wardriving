@@ -78,12 +78,13 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
     private final byte RANDOM_ADDRESS_BIT = 0x01;
 
-    // Address type constants for pattern-based detection
-    // Note: These extend beyond Android's API constants to include sub-types
-    private static final int PATTERN_ADDRESS_TYPE_PUBLIC = 0;
-    private static final int PATTERN_ADDRESS_TYPE_RANDOM_STATIC = 1;        // bits [1:0] = 01
-    private static final int PATTERN_ADDRESS_TYPE_RANDOM_RESOLVABLE = 2;    // bits [1:0] = 10
-    private static final int PATTERN_ADDRESS_TYPE_RANDOM_NON_RESOLVABLE = 3; // bits [1:0] = 11
+    // Top-2-bits-of-MSB values per Bluetooth Core Spec Vol 6 Part B Sec 1.3.2 (random_address[47:46]).
+    // The detailed subtype is derived on read from the bssid via BluetoothUtil.bleRandomSubtypeFromBssid;
+    // these constants are kept here only for readability inside the pattern detector.
+    private static final int TOP_BITS_NON_RESOLVABLE_PRIVATE = 0b00;
+    private static final int TOP_BITS_RESOLVABLE_PRIVATE     = 0b01;
+    private static final int TOP_BITS_RESERVED               = 0b10; // Reserved for Future Use (RFU)
+    private static final int TOP_BITS_STATIC                 = 0b11;
 
     private static final Map<Integer, String> DEVICE_TYPE_LEGEND;
 
@@ -233,28 +234,19 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                                 device.getAddressType() : null;
 
                 final String address = device.getAddress();
-                final int deviceType = device.getType();
-                Integer patternAddressType = null;
-
-                if ((deviceType == DEVICE_TYPE_LE || deviceType == DEVICE_TYPE_DUAL)) {
-                    patternAddressType = getAddressTypeFromPattern(address);
-                }
-                if (bleAddressType == null && guessLeAddressType) {
-                    // API unavailable - use pattern detection (only for BLE devices)
-                    if (patternAddressType != null) {
-                        bleAddressType = patternAddressType;
-                        if (DEBUG_BLUETOOTH_DATA && patternAddressType == ADDRESS_TYPE_RANDOM) {
-                            Logging.info("API unavailable, detected random address via pattern: " + address);
-                        }
-                    } else {
-                        // default to public
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            bleAddressType = ADDRESS_TYPE_PUBLIC;
-                        } else {
-                            bleAddressType = 0;
-                        }
+                // Always attempt pattern detection: we're inside the LE scan callback so any incoming
+                // BD_ADDR is a BLE advertiser, regardless of what device.getType() reports (which is
+                // commonly DEVICE_TYPE_UNKNOWN for never-bonded peripherals). Pattern detection is
+                // spec-correct + OUI-cross-checked, so it works on every API level.
+                final Integer patternAddressType = getAddressTypeFromPattern(address);
+                if (bleAddressType == null) {
+                    // API unavailable (pre-API-35) - take the pattern result, defaulting to PUBLIC
+                    // only when the address itself can't be parsed.
+                    bleAddressType = (patternAddressType != null) ? patternAddressType : ADDRESS_TYPE_PUBLIC;
+                    if (DEBUG_BLUETOOTH_DATA && patternAddressType != null && patternAddressType == ADDRESS_TYPE_RANDOM) {
+                        Logging.info("API unavailable, detected random address via pattern: " + address);
                     }
-                } else if (null != bleAddressType) {
+                } else {
                     if (bleAddressType == ADDRESS_TYPE_PUBLIC && patternAddressType != null && patternAddressType == ADDRESS_TYPE_RANDOM) {
                         // API says PUBLIC but pattern suggests RANDOM - trust pattern (with OUI verification)
                         if (DEBUG_BLUETOOTH_DATA) {
@@ -338,9 +330,10 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
 
                 if (MainActivity.getMainActivity() != null) {
+                    final NetworkType refinedType = refineBleType(NetworkType.BLE, bleAddressType);
                     addOrUpdateBt(bssid, ssid, type, capabilities,
-                            scanResult.getRssi(), NetworkType.BLE,
-                            uuid16Services, mfgrKey, location, prefs, batch, bleAddressType);
+                            scanResult.getRssi(), refinedType,
+                            uuid16Services, mfgrKey, location, prefs, batch);
                 }
             }
         } catch (SecurityException se) {
@@ -538,12 +531,22 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         Logging.warn("null gpsListener in BTR onReceive");
                     }
 
+                    // For BLE-classified or unknown-type devices, fall back to pattern detection if the
+                    // API didn't supply an address type (i.e. on pre-API-35). Classic BT discovery on
+                    // some Android versions surfaces BLE peripherals here too, so the address may be
+                    // a random one despite arriving via this path.
+                    final NetworkType baseType = btNetworkType(device.getType());
+                    Integer effectiveBleType = bleAddressType;
+                    if (effectiveBleType == null && !NetworkType.BT.equals(baseType)) {
+                        effectiveBleType = getAddressTypeFromPattern(bssid);
+                    }
+                    final NetworkType refinedType = refineBleType(baseType, effectiveBleType);
                     final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi,
-                            btNetworkType(device.getType()),
+                            refinedType,
                             //TODO: will BTLE networks in this callback ever contain uuids/mfgrId ?
                             null, null,
                             location, prefs,
-                            false, bleAddressType);
+                            false);
                     if (listAdapter != null) {
                         SetNetworkListAdapter l = listAdapter.get();
                         if (null != l) {
@@ -715,19 +718,19 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
      * @param deviceType BLE/BC
      * @param capabilities the computed capabilities list
      * @param strength signal strength
-     * @param type composite of reported type (BC) and discovered capabilities/services (BLE)
+     * @param type composite of reported type (BC) and discovered capabilities/services (BLE).
+     *             Already includes the BLE Public/Random refinement (see {@link #refineBleType}).
      * @param uuid16Services services uuid16 values for BLE
      * @param mfgrId manufacturer ID for BLE
      * @param location location at time of observation
      * @param prefs SharedPreferences instance
      * @param batch whether this is part of a batch update (false = single add)
-     * @param bleAddressType address type PUBLIC/RANDOM (not seen IRL yet)
      * @return the new or updated Network instance
      */
     private Network addOrUpdateBt(final String bssid, final String ssid,
                                     final int deviceType, /*final String networkTypeName*/final String capabilities,
                                     final int strength, final NetworkType type, final List<String> uuid16Services, final Integer mfgrId,
-                                    final Location location, SharedPreferences prefs, final boolean batch, final Integer bleAddressType) {
+                                    final Location location, SharedPreferences prefs, final boolean batch) {
 
         final ConcurrentLinkedHashMap<String, Network> networkCache = MainActivity.getNetworkCache();
         final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
@@ -747,7 +750,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         boolean btTypeUpdate = false;
         if (network == null) {
             //DEBUG: MainActivity.info("new BT net: "+bssid + "(new: "+newForRun+")");
-            network = new Network(bssid, ssid, deviceType, capabilities, strength, type, uuid16Services, mfgrId, null, bleAddressType);
+            network = new Network(bssid, ssid, deviceType, capabilities, strength, type, uuid16Services, mfgrId, null);
             networkCache.put(bssid, network);
         } else {
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
@@ -771,19 +774,21 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 }
             }
 
-            if (null != bleAddressType) {
-                network.setBleAddressType(bleAddressType);
-            }
-
-            if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
+            final NetworkType existingType = network.getType();
+            if (NetworkType.BT.equals(type) && NetworkType.isBleType(existingType)) {
                 if (DEBUG_BLUETOOTH_DATA) {
                     Logging.info("had a BLE record, got BC: " + network.getBssid() + "(new: " + newForRun + ")");
                 }
-            } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
+            } else if (NetworkType.isBleType(type) && NetworkType.BT.equals(existingType)) {
                 //ALIBI: detected via standard bluetooth, updated as LE (LE should win)
                 //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid()+ "(new: "+newForRun+")");
                 btTypeUpdate = true;
-                network.setType(NetworkType.BLE);
+                network.setType(type);
+            } else if (NetworkType.BLE_RANDOM.equals(type) && NetworkType.BLE.equals(existingType)) {
+                //ALIBI: previously stored as BLE (Public/unknown), now positively classified as Random.
+                // Promote the row so the persisted "type" gets updated to "R".
+                btTypeUpdate = true;
+                network.setType(NetworkType.BLE_RANDOM);
             } else {
                 //ALIBI: update capabilities only if was Misc/Uncategorized, now recognized?
                 //DEBUG: MainActivity.info("existing BT net: "+network.getBssid() + "(new: "+newForRun+")");
@@ -821,7 +826,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         if (batch) {
                             if (NetworkType.BT.equals(network.getType())) {
                                 listAdapter.get().enqueueBluetooth(network);
-                            } else if (NetworkType.BLE.equals(network.getType())) {
+                            } else if (NetworkType.isBleType(network.getType())) {
                                 listAdapter.get().enqueueBluetoothLe(network);
                             } else {
                                 Logging.error("MISSED enqueue for "+network.getBssid() + " " + network.getType());
@@ -830,7 +835,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                             if (NetworkType.BT.equals(network.getType())) {
                                 listAdapter.get().addBluetooth(network);
                                 //Logging.info("add BTC "+network.getBssid());
-                            } else if (NetworkType.BLE.equals(network.getType())) {
+                            } else if (NetworkType.isBleType(network.getType())) {
                                 listAdapter.get().addBluetoothLe(network);
                                 //Logging.info("add BLE "+network.getBssid());
                             } else {
@@ -1127,14 +1132,21 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     }
 
     /**
-     * Guess BLE address types
-     * - 00 = Public address
-     * - 01 = Random static address
-     * - 10 = Random private resolvable address
-     * - 11 = Random private non-resolvable address
-     * @param address MAC address string in format "XX:XX:XX:XX:XX:XX"
-     * @return Integer address type: ADDRESS_TYPE_PUBLIC (0), ADDRESS_TYPE_RANDOM (1) for any random type,
-     *         or null if address is invalid or OUI check indicates it's likely public
+     * Guess BLE address type from a BD_ADDR string.
+     *
+     * Per Bluetooth Core Spec Vol 6 Part B Sec 1.3.2, a random address is identified by the top two
+     * bits of the 48-bit address (random_address[47:46]). In a colon-notation BD_ADDR like
+     * "AA:BB:CC:DD:EE:FF", AA is the most-significant byte, so the type bits are (AA >> 6) & 0x03:
+     *   - 0b11 -> Random Static
+     *   - 0b01 -> Random Resolvable Private
+     *   - 0b00 -> Random Non-Resolvable Private (or Public, since 00 is also valid for many OUIs)
+     *   - 0b10 -> reserved/unused for random; the address is effectively Public-only
+     * Because 0b00 and 0b10 are ambiguous between Random and Public, we cross-check against the
+     * OUI database: a known IEEE-assigned OUI is taken as definitive evidence of Public.
+     *
+     * @param address BD_ADDR string in format "XX:XX:XX:XX:XX:XX"
+     * @return Integer address type: ADDRESS_TYPE_PUBLIC (0) or ADDRESS_TYPE_RANDOM (1),
+     *         or null if the address can't be parsed.
      */
     private Integer getAddressTypeFromPattern(String address) {
         if (address == null || address.length() < 2) {
@@ -1142,60 +1154,66 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         }
 
         try {
-            String firstByteStr = address.substring(0, 2);
-            int firstByte = Integer.parseInt(firstByteStr, 16);
-            int addressTypeBits = firstByte & 0x03;
+            final int firstByte = Integer.parseInt(address.substring(0, 2), 16);
+            final int top2 = (firstByte >> 6) & 0x03;
 
-            // 00 -> public for sure
-            if (addressTypeBits == PATTERN_ADDRESS_TYPE_PUBLIC) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    return ADDRESS_TYPE_PUBLIC;
-                } else {
-                    return 0;
+            // OUI cross-check: a registered IEEE OUI on the top 24 bits is strong evidence of Public.
+            // (Devices that randomize their address generally don't collide with assigned OUIs.)
+            final String addressNoColons = address.replace(":", "").toUpperCase();
+            boolean ouiMatchesAssigned = false;
+            if (addressNoColons.length() >= 6 && ListFragment.lameStatic.oui != null) {
+                final String ouiPrefix = addressNoColons.substring(0, 6);
+                final String ouiResult = ListFragment.lameStatic.oui.getOui(ouiPrefix);
+                ouiMatchesAssigned = (ouiResult != null && !ouiResult.isEmpty());
+            }
+
+            if (ouiMatchesAssigned) {
+                if (DEBUG_BLUETOOTH_DATA && (top2 == TOP_BITS_STATIC || top2 == TOP_BITS_RESOLVABLE_PRIVATE)) {
+                    Logging.info("Address " + address + " has random bit pattern (top2: " + top2 +
+                            ") but OUI is assigned; treating as PUBLIC");
                 }
+                return ADDRESS_TYPE_PUBLIC;
             }
 
-            // check first 24 bits, make sure we have no OUI matching this
-            String addressNoColons = address.replace(":", "").toUpperCase();
-            if (addressNoColons.length() < 6) {
-                return null;
+            // No OUI match. The reserved 0b10 pattern is not used for random per spec, so absent an
+            // assigned OUI it's still not a positive Random signal — call it Public.
+            if (top2 == TOP_BITS_RESERVED) {
+                return ADDRESS_TYPE_PUBLIC;
             }
 
-            String ouiPrefix = addressNoColons.substring(0, 6);
-            if (ListFragment.lameStatic.oui != null) {
-                String ouiResult = ListFragment.lameStatic.oui.getOui(ouiPrefix);
-                if (ouiResult != null && !ouiResult.isEmpty()) {
-                    if (DEBUG_BLUETOOTH_DATA) {
-                        Logging.info("Address " + address + " has random bit pattern (type bits: " + addressTypeBits +
-                                ") but OUI " + ouiPrefix + " is in database (" + ouiResult + "), treating as public");
-                    }
-                    return ADDRESS_TYPE_PUBLIC;
-                }
-            }
             if (DEBUG_BLUETOOTH_DATA) {
-                String subType = "unknown";
-                switch (addressTypeBits) {
-                    case PATTERN_ADDRESS_TYPE_RANDOM_STATIC:
-                        subType = "static";
-                        break;
-                    case PATTERN_ADDRESS_TYPE_RANDOM_RESOLVABLE:
-                        subType = "resolvable";
-                        break;
-                    case PATTERN_ADDRESS_TYPE_RANDOM_NON_RESOLVABLE:
-                        subType = "non-resolvable";
-                        break;
+                final String subType;
+                switch (top2) {
+                    case TOP_BITS_STATIC:               subType = "static"; break;
+                    case TOP_BITS_RESOLVABLE_PRIVATE:   subType = "resolvable-private"; break;
+                    case TOP_BITS_NON_RESOLVABLE_PRIVATE: subType = "non-resolvable-private"; break;
+                    default:                             subType = "unknown";
                 }
-                Logging.info("Detected random address type: " + subType + " (bits: " + addressTypeBits + ") for " + address);
+                Logging.info("Pattern-detected random address (subtype: " + subType + ", top2: " + top2 + ") for " + address);
             }
             return ADDRESS_TYPE_RANDOM;
         } catch (NumberFormatException e) {
             Logging.warn("Failed to parse MAC address for random address detection: " + address, e);
             return null;
         } catch (Exception e) {
-            //presume public on error.
             Logging.warn("Error checking OUI database for address: " + address, e);
             return null;
         }
+    }
+
+    /**
+     * Map a BLE address type Integer (Android API value: 0=PUBLIC, 1=RANDOM) plus a base
+     * {@link NetworkType} into the precise persisted type. Returns BT/BLE/BLE_RANDOM unchanged
+     * if no signal is available.
+     */
+    private static NetworkType refineBleType(final NetworkType base, final Integer bleAddressType) {
+        if (bleAddressType != null && bleAddressType == ADDRESS_TYPE_RANDOM) {
+            // Only BLE-classified observations get the random flavor; classic BR/EDR cannot be random.
+            if (NetworkType.BLE.equals(base) || NetworkType.BLE_RANDOM.equals(base)) {
+                return NetworkType.BLE_RANDOM;
+            }
+        }
+        return base;
     }
 
 }

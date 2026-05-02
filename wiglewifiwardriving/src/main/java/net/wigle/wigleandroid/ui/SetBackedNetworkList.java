@@ -122,6 +122,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         if (o instanceof Network) {
             switch (((Network) o).getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     return leNets.contains(o);
                 case BT:
                     return btNets.contains(o);
@@ -175,6 +176,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
             boolean newNet;
             switch (network.getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     newNet = leNets.add(network);
                     break;
                 case BT:
@@ -212,6 +214,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
             boolean found;
             switch (((Network) o).getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     found = leNets.remove(o);
                     break;
                 case BT:
@@ -250,6 +253,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         for (Network net: collection) {
             switch (net.getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     if (leNets.add(net)) {
                         added.add(net);
                     }
@@ -353,6 +357,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
             boolean newNet = false;
             switch (network.getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     newNet = leNets.add(network);
                     break;
                 case BT:
@@ -390,6 +395,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
             boolean newNet = false;
             switch (network.getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     newNet = leNets.add(network);
                     break;
                 case BT:
@@ -424,6 +430,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         if (null != n) {
             switch (n.getType()) {
                 case BLE:
+                case BLE_RANDOM:
                     leNets.remove(n);
                     break;
                 case BT:

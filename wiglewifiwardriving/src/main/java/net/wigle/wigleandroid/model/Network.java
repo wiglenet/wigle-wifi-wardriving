@@ -56,8 +56,6 @@ public final class Network implements ClusterItem {
     private Integer bleMfgrId;
     private String bleMfgr;
 
-    private Integer bleAddressType = null;
-
     private boolean passpoint;
 
     private String detail;
@@ -123,30 +121,30 @@ public final class Network implements ClusterItem {
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null, null, null, null, null, scanResult.isPasspointNetwork());
+                scanResult.level,  NetworkType.WIFI, null, null, null, null, scanResult.isPasspointNetwork());
     }
 
     // load from CSV/observation list
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, null, null, null);
     }
 
     // new Network, no location
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime, final Integer bleAddressType) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, bleAddressType, null);
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final Long lastTime) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId, null, lastTime, null);
     }
 
     // for WiFiSearchResponse
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null, null, null);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng, null, null);
     }
 
     private Network(final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId,
-                    final LatLng latLng, final Long lastTime, final Integer bleAddressType, final Boolean passpoint ) {
+                    final LatLng latLng, final Long lastTime, final Boolean passpoint ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
@@ -158,16 +156,13 @@ public final class Network implements ClusterItem {
         } else {
             this.passpoint = false;
         }
-        if (bleAddressType != null) {
-            this.bleAddressType = bleAddressType;
-        }
         if (null != lastTime && lastTime > 0L) {
             this.lastTime = lastTime;
         }
         if (bleMfgrId != null) this.bleMfgrId = bleMfgrId;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
-        } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
+        } else if (NetworkType.isBtType(this.type)) {
             if (null != bleServiceUuid16s && !bleServiceUuid16s.isEmpty()) {
                 this.bleServiceUuids = bleServiceUuid16s;
                 bleMfgr = lookupMfgrByServiceUuid(bleServiceUuids.get(0));
@@ -308,7 +303,7 @@ public final class Network implements ClusterItem {
         this.frequency = frequency;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
-        } else if (!NetworkType.BLE.equals(this.type) && !NetworkType.BT.equals(this.type) && frequency != 0 && frequency != Integer.MAX_VALUE) {
+        } else if (!NetworkType.isBtType(this.type) && frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         }
@@ -339,16 +334,6 @@ public final class Network implements ClusterItem {
         if (bleMfgrId != null) {
             //ALIBI: in conjunction with addBleServiceUuid, Mfgr takes precedence over service UUID-derived name in this impl.
             bleMfgr = lookupMfgrByMfgrId(id);
-        }
-    }
-
-    public Integer getBleAddressType() {
-        return bleAddressType;
-    }
-
-    public void setBleAddressType(final Integer bleAddressType) {
-        if (null != bleAddressType && (null == this.bleAddressType || bleAddressType > this.bleAddressType)) {
-            this.bleAddressType = bleAddressType;
         }
     }
 
@@ -413,7 +398,8 @@ public final class Network implements ClusterItem {
         if ( detail == null ) {
             final StringBuilder detailBuild = new StringBuilder( 40 );
             if (!NetworkType.WIFI.equals(type)) {
-                detailBuild.append(type).append(BAR_STRING);
+                final String bleLabel = net.wigle.wigleandroid.util.BluetoothUtil.bleAddressTypeLabel(type, bssid);
+                detailBuild.append(bleLabel != null ? bleLabel : type.name()).append(BAR_STRING);
             }
             detailBuild.append( getShowCapabilities() );
             detail = detailBuild.toString();
@@ -432,7 +418,7 @@ public final class Network implements ClusterItem {
 
     public String getOui(final OUI oui) {
         String retval = "";
-        if (NetworkType.BLE.equals(type)) {
+        if (NetworkType.isBleType(type)) {
             if (bleMfgr != null && !bleMfgr.isEmpty()) {
                 return bleMfgr;
             }

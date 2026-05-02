@@ -227,6 +227,7 @@ public class NetworkIconGenerator {
             case BT:
                 return R.drawable.bt_white;
             case BLE:
+            case BLE_RANDOM:
                 return R.drawable.btle_white;
             case NR:
                 return R.drawable.ic_cell_5g;
@@ -257,6 +258,7 @@ public class NetworkIconGenerator {
         switch (t) {
             case BT:
             case BLE:
+            case BLE_RANDOM:
                 if (isNew) {
                     return STYLE_BT_NEW;
                 }

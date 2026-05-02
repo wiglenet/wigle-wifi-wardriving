@@ -11,7 +11,8 @@ public enum NetworkType {
     WCDMA("D"),
     NR("N"),
     BT("B"),
-    BLE("E"),
+    BLE("E"), // Recommend this be changed to BLE_PUBLIC("P")
+    BLE_RANDOM("R"),
     NFC("F");
 
     private static final Map<String,NetworkType> types = new HashMap<>();
@@ -50,10 +51,14 @@ public enum NetworkType {
     }
 
     public static boolean isBtType (NetworkType type) {
-        if (NetworkType.BT.equals(type) || NetworkType.BLE.equals(type)) {
+        if (NetworkType.BT.equals(type) || NetworkType.BLE.equals(type) || NetworkType.BLE_RANDOM.equals(type)) {
             return true;
         }
         return false;
+    }
+
+    public static boolean isBleType (NetworkType type) {
+        return NetworkType.BLE.equals(type) || NetworkType.BLE_RANDOM.equals(type);
     }
 
     public static final String channelCodeTypeForNetworkType(NetworkType type) {

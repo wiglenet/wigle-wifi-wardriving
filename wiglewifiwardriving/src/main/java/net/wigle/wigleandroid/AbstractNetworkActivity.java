@@ -355,7 +355,7 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             ico.setImageResource(image);
 
             final ImageView btico = findViewById(R.id.bticon);
-            if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
+            if (NetworkType.isBtType(network.getType())) {
                 btico.setVisibility(VISIBLE);
                 Integer btImageId = NetworkListUtil.getBtImage(network);
                 if (null == btImageId) {
@@ -378,7 +378,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             tv.setText(numberFormat.format(level));
 
             tv = findViewById(R.id.na_type);
-            tv.setText(network.getType().name());
+            final String bleLabel = net.wigle.wigleandroid.util.BluetoothUtil.bleAddressTypeLabel(network.getType(), network.getBssid());
+            tv.setText(bleLabel != null ? bleLabel : network.getType().name());
 
             tv = findViewById(R.id.na_firsttime);
             tv.setText(NetworkListUtil.getTime(network, true, getApplicationContext()));
@@ -481,7 +482,7 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             setupMap(network, savedInstanceState, prefs);
             // kick off the query now that we have our map
             setupButtons(network, prefs);
-            if (NetworkType.BLE.equals(network.getType())) {
+            if (NetworkType.isBleType(network.getType())) {
                 setupBleInspection(this, network);
             } else {
                 if (bleToolsLayout != null) {

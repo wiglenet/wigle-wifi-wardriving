@@ -1,8 +1,5 @@
 package net.wigle.wigleandroid.ui;
 
-import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_ANONYMOUS;
-import static android.bluetooth.BluetoothDevice.ADDRESS_TYPE_RANDOM;
-
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,6 +22,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.BluetoothUtil;
+import net.wigle.wigleandroid.util.BluetoothUtil.BleRandomSubtype;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.text.SimpleDateFormat;
@@ -199,7 +198,7 @@ public class NetworkListUtil {
             }
         } else if (NetworkType.BT.equals(network.getType())) {
             resource = drawable.ic_bt;
-        } else if (NetworkType.BLE.equals(network.getType())) {
+        } else if (NetworkType.isBleType(network.getType())) {
             resource = drawable.ic_btle;
         } else if (NetworkType.NR.equals(network.getType())) {
             resource = drawable.ic_cell_5g;
@@ -347,14 +346,21 @@ public class NetworkListUtil {
         return resource;
     }
 
-    public static Integer getBleAddrTypeImage(final Integer type) {
-        switch (type) {
-            case ADDRESS_TYPE_ANONYMOUS:
-                return drawable.balaclava;
-            //case ADDRESS_TYPE_ PRIVATE_RESOLVABLE / PRIVATE_NONRESOLVABLE: - not yet in Android API
-                //return drawable.groucho
-            case ADDRESS_TYPE_RANDOM:
+    /**
+     * Pick the icon to display next to a BLE Random network in the list, based on the random
+     * subtype derived from the BD_ADDR. All three subtypes currently use the same dice icon —
+     * different drawables can be wired in later without touching call sites.
+     */
+    public static Integer getBleRandomSubtypeImage(final BleRandomSubtype subtype) {
+        if (subtype == null) {
+            return null;
+        }
+        switch (subtype) {
+            case STATIC:
+            case RESOLVABLE_PRIVATE:
+            case NON_RESOLVABLE_PRIVATE:
                 return drawable.d6;
+            case NOT_APPLICABLE:
             default:
                 return null;
         }

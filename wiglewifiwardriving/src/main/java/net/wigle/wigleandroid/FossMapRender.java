@@ -555,6 +555,7 @@ public class FossMapRender {
                 resId = R.drawable.bt_white;
                 break;
             case BLE:
+            case BLE_RANDOM:
                 resId = R.drawable.btle_white;
                 break;
             case WIFI:

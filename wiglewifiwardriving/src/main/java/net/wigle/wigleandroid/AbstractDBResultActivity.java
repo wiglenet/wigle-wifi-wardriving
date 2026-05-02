@@ -247,7 +247,7 @@ public abstract class AbstractDBResultActivity extends ProgressThrobberActivity 
         if (queryArgs.getType() != null && !NetworkFilterType.ALL.equals(queryArgs.getType())) {
             switch (queryArgs.getType()) {
                 case BT:
-                    sql += " AND type IN ('B','E')";
+                    sql += " AND type IN ('B','E','R')";
                     break;
                 case CELL:
                     sql += " AND type IN ('G','C','L','D','N')";

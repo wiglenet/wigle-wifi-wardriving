@@ -227,7 +227,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                 if (capabilities.contains("WPA")) {
                     style = "red";
                 }
-            } else if (NetworkType.BLE.equals(type)) {
+            } else if (NetworkType.isBleType(type)) {
                 style = "ltblue";
             } else if (NetworkType.BT.equals(type)) {
                 style = "blue";

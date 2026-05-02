@@ -199,7 +199,7 @@ public final class DatabaseHelper extends Thread {
 
     public enum NetworkFilter {
         WIFI("type = 'W'"),
-        BT("type IN ('B','E')"),
+        BT("type IN ('B','E','R')"),
         CELL("type IN ('G','C','L','D','N')");
 
         final String filter;
@@ -872,7 +872,7 @@ public final class DatabaseHelper extends Thread {
             newNetworkCount.incrementAndGet();
             if ( NetworkType.WIFI.equals( network.getType() ) ) {
                 newWifiCount.incrementAndGet();
-            } else if ( NetworkType.BT.equals( network.getType() ) || NetworkType.BLE.equals( network.getType() ) ) {
+            } else if ( NetworkType.isBtType( network.getType() ) ) {
                 newBtCount.incrementAndGet();
             } else if ( NetworkType.NFC.equals( network.getType() ) ) {
                 //TODO:
@@ -1417,7 +1417,7 @@ public final class DatabaseHelper extends Thread {
                             new ArrayList<>(Arrays.asList(service.split(" ")));
 
                     final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
-                    retval = new Network( bssid, ssid, frequency, capabilities, level, type, serviceUUIDs, mfgrid, lastTime, null /*TODO: BLE address type*/ );
+                    retval = new Network( bssid, ssid, frequency, capabilities, level, type, serviceUUIDs, mfgrid, lastTime );
                     if (bestlat != 0 && bestlon != 0) {
                         retval.setLatLng( new LatLng(bestlat, bestlon) );
                     } else {

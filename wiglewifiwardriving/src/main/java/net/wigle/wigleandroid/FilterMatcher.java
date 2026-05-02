@@ -99,7 +99,7 @@ public final class FilterMatcher {
                 if (!prefs.getBoolean(prefix + PreferenceKeys.PREF_MAPF_BT, true)) {
                     return false;
                 }
-            } else if (NetworkType.BLE.equals(network.getType()) ) {
+            } else if (NetworkType.isBleType(network.getType()) ) {
                 if (!prefs.getBoolean(prefix + PreferenceKeys.PREF_MAPF_BTLE, true)) {
                     return false;
                 }

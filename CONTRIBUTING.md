@@ -12,8 +12,8 @@ Changes can be proposed either by [filing a GitHub issue](https://github.com/wig
 
 Pull requests:
 - must be clearly documented to indicate the purpose of the change, approach, and explain any non-intuitive or complex alterations
-- must be tested in real-world circumstances (not just in emulation or unit tests)
-- must be focused on a single feature or bug, taking a reasonable and maintable approach to implementation (no "wish-list" PRs)
+- must be tested in real-world circumstances (not just in emulation or unit tests) if the changes impact running code
+- must be focused on a single feature or bug, taking a reasonable and maintainable approach to implementation (no "wish-list" PRs)
 - may expand the capabilities of the application, but _may not_ repurpose the application or trade core functionality / performance for features not within the stated purpose of the app or WiGLE as project.
 - may not imply changes to the server-side infrastructure without discussion and approval with the WiGLE team
 - must obey the API contract specified at http://api.wigle.net

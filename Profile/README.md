@@ -78,3 +78,8 @@ Sounds for proximity detection by Balcoran:
  - Blip: https://freesound.org/people/Balcoran/sounds/478187/
 
 This project is maintained by the WiGLE.net team
+Toggle navigation
+home
+Your Account
+Email status: unverified. Database queries limited until email verification is complete.re-send verification email
+Query limits start low, but increase over time na

@@ -26,6 +26,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.MapBounds;
@@ -223,17 +224,22 @@ public abstract class AbstractSearchFragment extends Fragment {
             int searchTypeId = rbg.getCheckedRadioButtonId();
             final boolean local = searchTypeId != R.id.radio_search_wigle;
 
-            final String fail = SearchUtil.setupQuery(view, getActivity(), local);
-
-            if (fail != null) {
-                WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
-            } else {
-                ListFragment.lameStatic.queryArgs.setSearchWiGLE(!local);
-                final Intent settingsIntent = new Intent(getActivity(),
-                        prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false) ?
-                                FossDBResultActivity.class : DBResultActivity.class);
-                startActivity(settingsIntent);
-            }
+            SearchUtil.setupQuery(view, getActivity(), local, fail -> {
+                final FragmentActivity activity = getActivity();
+                if (activity == null || activity.isFinishing()) {
+                    // fragment / activity is gone - swallow the result rather than crash
+                    return;
+                }
+                if (fail != null) {
+                    WiGLEToast.showOverFragment(activity, R.string.error_general, fail);
+                } else {
+                    ListFragment.lameStatic.queryArgs.setSearchWiGLE(!local);
+                    final Intent settingsIntent = new Intent(activity,
+                            prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false) ?
+                                    FossDBResultActivity.class : DBResultActivity.class);
+                    startActivity(settingsIntent);
+                }
+            });
 
         });
 

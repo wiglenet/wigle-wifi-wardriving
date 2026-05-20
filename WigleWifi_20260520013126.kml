@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Style id="red"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style><Style id="yellow"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow.png</href></Icon></IconStyle></Style><Style id="green"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green.png</href></Icon></IconStyle></Style><Style id="blue"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/blue.png</href></Icon></IconStyle></Style><Style id="pink"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/pink.png</href></Icon></IconStyle></Style><Style id="ltblue"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/lightblue.png</href></Icon></IconStyle></Style><Style id="zeroConfidence"><IconStyle><Icon><href>https://maps.google.com/mapfiles/kml/pal2/icon18.png</href></Icon></IconStyle></Style><Folder><name>Wifi Networks</name>
+<Placemark>
+<name><![CDATA[Sureeporn]]></name>
+<description><![CDATA[Network ID: 8c:68:c8:e1:79:9e
+Capabilities: [WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][RSN-PSK-TKIP+CCMP][ESS][WPS]
+Frequency: 2432
+Timestamp: 1779152818000
+Time: 2026-05-19T08:06:58+0700
+Signal: -82
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19976608992235,17.098345506876672</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[POP_2.4G]]></name>
+<description><![CDATA[Network ID: d8:a0:e8:46:c2:70
+Capabilities: [WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][RSN-PSK-TKIP+CCMP][ESS][WPS]
+Frequency: 2462
+Timestamp: 1779189808913
+Time: 2026-05-19T18:23:28+0700
+Signal: -79
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.1994225,17.098556</coordinates></Point>
+</Placemark>
+</Folder>
+<Folder><name>Cellular Networks</name>
+</Folder>
+<Folder><name>Bluetooth Networks</name>
+</Folder>
+</Document></kml>

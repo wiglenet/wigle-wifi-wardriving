@@ -1,0 +1,63 @@
+WigleWifi error log - May 19, 2026 21:26:42
+versionName: 2.108
+packageName: net.wigle.wigleandroid
+MODEL: V2102
+RELEASE: 11
+BOARD: QC_Reference_Phone
+BRAND: vivo
+DEVICE: 2034
+DISPLAY: RP1A.200720.012 release-keys
+FINGERPRINT: vivo/2102/2034:11/RP1A.200720.012/compiler07110951:user/release-keys
+HOST: compiler0180
+ID: RP1A.200720.012
+PRODUCT: 2102
+TAGS: release-keys
+TIME: 1752198686000
+TYPE: user
+USER: compiler
+baseError: IllegalArgumentException: Expected URL scheme 'http' or 'https' but no scheme was found for curl -...
+
+java.lang.IllegalArgumentException: Expected URL scheme 'http' or 'https' but no scheme was found for curl -...
+	at okhttp3.HttpUrl$Builder.parse$okhttp(HttpUrl.kt:1360)
+	at okhttp3.HttpUrl$Companion.get(HttpUrl.kt:1734)
+	at okhttp3.Request$Builder.url(Request.kt:233)
+	at net.wigle.wigleandroid.SettingsFragment.lambda$setupFossMapEditFields$15$net-wigle-wigleandroid-SettingsFragment(SettingsFragment.java:819)
+	at net.wigle.wigleandroid.SettingsFragment$$ExternalSyntheticLambda8.onClick(D8$$SyntheticClass:0)
+	at android.view.View.performClick(View.java:7505)
+	at android.view.View.performClickInternal(View.java:7477)
+	at android.view.View.access$3600(View.java:824)
+	at android.view.View$PerformClick.run(View.java:28675)
+	at android.os.Handler.handleCallback(Handler.java:938)
+	at android.os.Handler.dispatchMessage(Handler.java:99)
+	at android.os.Looper.loop(Looper.java:257)
+	at android.app.ActivityThread.main(ActivityThread.java:8183)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:626)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1015)
+Thread: Thread[main,5,main] throwable: java.lang.IllegalArgumentException: Expected URL scheme 'http' or 'https' but no scheme was found for curl -...
+
+21:25:47.361 main] current selection: ALL: (1)
+21:25:47.404 main] LIST: onDestroyView.
+21:25:47.406 main] LIST: destroy.
+21:25:47.407 main] LIST: onDetach.
+21:25:47.408 main] resume settings.
+21:25:47.411 main] Resume with allow: false
+21:25:47.738 main] current lang: en new lang: en
+21:25:47.738 main] set theme called: -1
+21:25:47.739 main] showMyDiscovered setting map data: ALL
+21:25:49.471 main] speak: Run 2, New WiFi 0, New cell 0, New bluetooth 0, from 33.7 feet, 9 25 PM, battery 18 percent, 
+21:25:54.483 main] mini LE batch...
+21:25:59.167 GuardThread-Thread-3] Service is foreground: true (8)
+21:26:01.490 main] speak: Run 2, New WiFi 0, New cell 0, New bluetooth 0, from 74.5 feet, 9 26 PM, battery 18 percent, 
+21:26:04.505 main] mini LE batch...
+21:26:13.501 main] speak: Run 3, New WiFi 0, New cell 0, New bluetooth 0, from 88.4 feet, 9 26 PM, battery 18 percent, 
+21:26:14.181 GuardThread-Thread-3] Service is foreground: true (8)
+21:26:14.618 main] mini LE batch...
+21:26:24.610 main] mini LE batch...
+21:26:25.505 main] speak: Run 3, New WiFi 0, New cell 0, New bluetooth 0, from 88.4 feet, 9 26 PM, battery 18 percent, 
+21:26:29.200 GuardThread-Thread-3] Service is foreground: true (8)
+21:26:34.612 main] mini LE batch...
+21:26:37.547 main] speak: Run 4, New WiFi 0, New cell 0, New bluetooth 0, from 88.4 feet, 9 26 PM, battery 18 percent, 
+21:26:42.747 main] Thread: Thread[main,5,main] throwable: java.lang.IllegalArgumentException: Expected URL scheme 'http' or 'https' but no scheme was found for curl -...
+21:26:42.749 main] Thread: Thread[main,5,main] throwable: java.lang.IllegalArgumentException: Expected URL scheme 'http' or 'https' but no scheme was found for curl -...
+21:26:42.750 main] Writing stackfile to: /data/user/0/net.wigle.wigleandroid/files/errorstack_1779200802750.txt

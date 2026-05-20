@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Style id="red"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style><Style id="yellow"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow.png</href></Icon></IconStyle></Style><Style id="green"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green.png</href></Icon></IconStyle></Style><Style id="blue"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/blue.png</href></Icon></IconStyle></Style><Style id="pink"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/pink.png</href></Icon></IconStyle></Style><Style id="ltblue"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/lightblue.png</href></Icon></IconStyle></Style><Style id="zeroConfidence"><IconStyle><Icon><href>https://maps.google.com/mapfiles/kml/pal2/icon18.png</href></Icon></IconStyle></Style><Folder><name>Wifi Networks</name>
+<Placemark>
+<name><![CDATA[Sureeporn]]></name>
+<description><![CDATA[Network ID: 8c:68:c8:e1:79:9e
+Capabilities: [WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][RSN-PSK-TKIP+CCMP][ESS][WPS]
+Frequency: 2432
+Timestamp: 1779152818000
+Time: 2026-05-19T08:06:58+0700
+Signal: -82
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19976608992235,17.098345506876672</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[Sriwalee162]]></name>
+<description><![CDATA[Network ID: 26:f6:03:dd:e4:58
+Capabilities: [WPA2-PSK-CCMP+TKIP][RSN-PSK-CCMP+TKIP][WPA-PSK-CCMP+TKIP][ESS][WPS]
+Frequency: 2442
+Timestamp: 1779184998587
+Time: 2026-05-19T17:03:18+0700
+Signal: -83
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.2003070497185,17.098284928007512</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[TP-Link_158E]]></name>
+<description><![CDATA[Network ID: 5c:a6:e6:b3:15:8e
+Capabilities: [WPA2-PSK-CCMP][RSN-PSK-CCMP][ESS][WPS]
+Frequency: 2457
+Timestamp: 1779202509000
+Time: 2026-05-19T21:55:09+0700
+Signal: -64
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19984166,17.09831702</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[POP_2.4G]]></name>
+<description><![CDATA[Network ID: d8:a0:e8:46:c2:70
+Capabilities: [WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][RSN-PSK-TKIP+CCMP][ESS][WPS]
+Frequency: 2462
+Timestamp: 1779189808913
+Time: 2026-05-19T18:23:28+0700
+Signal: -79
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.1994225,17.098556</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[KWANG KWANG]]></name>
+<description><![CDATA[Network ID: 14:22:33:6a:ae:fb
+Capabilities: [WPA2-PSK-CCMP][RSN-PSK-CCMP][WPA-PSK-CCMP][ESS]
+Frequency: 2462
+Timestamp: 1779193093000
+Time: 2026-05-19T19:18:13+0700
+Signal: -79
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19979209456635,17.098245586798047</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[vivo 1906]]></name>
+<description><![CDATA[Network ID: 4e:f8:ff:e6:a9:c5
+Capabilities: [WPA2-PSK-CCMP][RSN-PSK-CCMP][ESS]
+Frequency: 2457
+Timestamp: 1779189808913
+Time: 2026-05-19T18:23:28+0700
+Signal: -87
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.1994225,17.098556</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[??????????]]></name>
+<description><![CDATA[Network ID: b2:9d:42:0c:28:ff
+Capabilities: [WPA2-PSK-CCMP][RSN-PSK-CCMP][ESS]
+Frequency: 2412
+Timestamp: 1779185438000
+Time: 2026-05-19T17:10:38+0700
+Signal: -86
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19978572416402,17.098256490827232</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[Galaxy S26 Ultra 1 T]]></name>
+<description><![CDATA[Network ID: 76:35:3c:da:4e:c4
+Capabilities: [WPA2-PSK-CCMP][RSN-PSK-CCMP][ESS]
+Frequency: 2412
+Timestamp: 1779186062000
+Time: 2026-05-19T17:21:02+0700
+Signal: -89
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19983796030832,17.098248290278235</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[Thoasa]]></name>
+<description><![CDATA[Network ID: 6c:a5:d1:22:4f:96
+Capabilities: [WPA2-PSK-CCMP+TKIP][RSN-PSK-CCMP+TKIP][WPA-PSK-CCMP+TKIP][ESS]
+Frequency: 2412
+Timestamp: 1779193461000
+Time: 2026-05-19T19:24:21+0700
+Signal: -79
+RoamingCOIs: 
+Type: WIFI
+Encryption: WPA2
+]]></description><styleUrl>#red</styleUrl>
+<Point>
+<coordinates>104.19981217134553,17.098273594732095</coordinates></Point>
+</Placemark>
+</Folder>
+<Folder><name>Cellular Networks</name>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_4707_12666112
+Capabilities: LTE;52004
+Frequency: 250
+Timestamp: 1779205053000
+Time: 2026-05-19T22:37:33+0700
+Signal: -97
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.19989715,17.09827619</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_44707_49079614
+Capabilities: LTE;52004
+Frequency: 3750
+Timestamp: 1779205068000
+Time: 2026-05-19T22:37:48+0700
+Signal: -95
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.19989401,17.09827708</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_44707_49079754
+Capabilities: LTE;52004
+Frequency: 9310
+Timestamp: 1779215251542
+Time: 2026-05-20T01:27:31+0700
+Signal: -101
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.1994235,17.0985558</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_54747_12666136
+Capabilities: LTE;52004
+Frequency: 125
+Timestamp: 1779200912000
+Time: 2026-05-19T21:28:32+0700
+Signal: -98
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.19975004956527,17.098260103660955</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_44707_12666172
+Capabilities: LTE;52004
+Frequency: 3750
+Timestamp: 1779194952000
+Time: 2026-05-19T19:49:12+0700
+Signal: -99
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.19978063822157,17.09823687918882</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_4707_49079584
+Capabilities: LTE;52004
+Frequency: 1275
+Timestamp: 1779203713000
+Time: 2026-05-19T22:15:13+0700
+Signal: -97
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.19983847,17.09826825</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[True Move H Universal Communication Company Ltd.]]></name>
+<description><![CDATA[Network ID: 52004_44707_12666312
+Capabilities: LTE;52004
+Frequency: 9310
+Timestamp: 1779205651000
+Time: 2026-05-19T22:47:31+0700
+Signal: -102
+Type: LTE]]></description><styleUrl>#pink</styleUrl>
+<Point>
+<coordinates>104.1997989,17.0982804</coordinates></Point>
+</Placemark>
+</Folder>
+<Folder><name>Bluetooth Networks</name>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 4c:71:06:b4:79:05
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -87
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: c2:4c:48:06:8a:54
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -94
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: e0:b6:72:fb:0d:0b
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -92
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 59:f6:06:1c:9f:a9
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -92
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 6e:16:e2:51:68:b2
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -96
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 7c:53:b0:14:04:ba
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -93
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: fd:bc:e6:1c:76:d2
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185422000
+Time: 2026-05-19T17:10:22+0700
+Signal: -98
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978582514311,17.098256636121814</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: ed:31:fc:03:28:4d
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185427000
+Time: 2026-05-19T17:10:27+0700
+Signal: -94
+ManufacturerId: 47138
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978545524198,17.0982566129207</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 6d:be:50:fb:64:60
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185437000
+Time: 2026-05-19T17:10:37+0700
+Signal: -96
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978590717795,17.09825640400638</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 52:39:ce:4d:45:c4
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185467000
+Time: 2026-05-19T17:11:07+0700
+Signal: -98
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978566903751,17.098254802866194</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 7a:e2:5e:cd:44:57
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185467000
+Time: 2026-05-19T17:11:07+0700
+Signal: -98
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19978566903751,17.098254802866194</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 5c:ed:9c:bd:8d:fa
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185472000
+Time: 2026-05-19T17:11:12+0700
+Signal: -99
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19979151027628,17.09824780496465</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[CAR MULTIMEDIA]]></name>
+<description><![CDATA[Network ID: f8:3c:80:4b:f9:5d
+Capabilities: Handsfree;10
+Frequency: 1032
+Timestamp: 1779185484000
+Time: 2026-05-19T17:11:24+0700
+Signal: -95
+ManufacturerId: 0
+Service: 
+Type: BT]]></description><styleUrl>#blue</styleUrl>
+<Point>
+<coordinates>104.1997950949159,17.098237633970975</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 7d:e2:69:d1:82:0f
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185776000
+Time: 2026-05-19T17:16:16+0700
+Signal: -94
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19980839649762,17.098248115476423</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 70:fa:b3:43:b8:0d
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779185776000
+Time: 2026-05-19T17:16:16+0700
+Signal: -95
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19980839649762,17.098248115476423</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 67:5a:90:3b:25:d1
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779189929000
+Time: 2026-05-19T18:25:29+0700
+Signal: -87
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19979255678322,17.098282292758455</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[YSCCU_00000005368372]]></name>
+<description><![CDATA[Network ID: e8:c0:5c:86:19:82
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779189929000
+Time: 2026-05-19T18:25:29+0700
+Signal: -99
+ManufacturerId: 0
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19979255678322,17.098282292758455</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 3a:03:25:5c:22:45
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779192702000
+Time: 2026-05-19T19:11:42+0700
+Signal: -87
+ManufacturerId: 0
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19975386496411,17.098245999071395</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[TWS]]></name>
+<description><![CDATA[Network ID: 41:42:25:a1:19:d2
+Capabilities: null;12
+Frequency: 1028
+Timestamp: 1779192837000
+Time: 2026-05-19T19:13:57+0700
+Signal: -58
+ManufacturerId: 0
+Service: 
+Type: BT]]></description><styleUrl>#blue</styleUrl>
+<Point>
+<coordinates>104.19975337656102,17.098243416385532</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 5e:54:ee:4b:09:bf
+Capabilities: Uncategorized;10
+Frequency: 7936
+Timestamp: 1779192897000
+Time: 2026-05-19T19:14:57+0700
+Signal: -90
+ManufacturerId: 0
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19975355820259,17.098243655445007</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: b0:d8:88:a7:88:47
+Capabilities: Handsfree;10
+Frequency: 1032
+Timestamp: 1779193493000
+Time: 2026-05-19T19:24:53+0700
+Signal: -91
+ManufacturerId: 0
+Service: 
+Type: BT]]></description><styleUrl>#blue</styleUrl>
+<Point>
+<coordinates>104.19981130251108,17.09827493145081</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[CAR-KIT]]></name>
+<description><![CDATA[Network ID: a2:0b:f0:73:44:17
+Capabilities: Handsfree;10
+Frequency: 1032
+Timestamp: 1779193681000
+Time: 2026-05-19T19:28:01+0700
+Signal: -86
+ManufacturerId: 0
+Service: 
+Type: BT]]></description><styleUrl>#blue</styleUrl>
+<Point>
+<coordinates>104.19979659249599,17.098254354248404</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[(no SSID)]]></name>
+<description><![CDATA[Network ID: 6e:41:1e:84:bb:d6
+Capabilities: Misc
+Frequency: 0
+Timestamp: 1779194355000
+Time: 2026-05-19T19:39:15+0700
+Signal: -91
+ManufacturerId: 76
+Service: 
+Type: BLE]]></description><styleUrl>#ltblue</styleUrl>
+<Point>
+<coordinates>104.19972982956388,17.098227083631585</coordinates></Point>
+</Placemark>
+<Placemark>
+<name><![CDATA[CAR AUDIO]]></name>
+<description><![CDATA[Network ID: a4:04:50:62:8d:e0
+Capabilities: Handsfree;10
+Frequency: 1032
+Timestamp: 1779200923000
+Time: 2026-05-19T21:28:43+0700
+Signal: -87
+ManufacturerId: 0
+Service: 
+Type: BT]]></description><styleUrl>#blue</styleUrl>
+<Point>
+<coordinates>104.19975374574466,17.09826213553625</coordinates></Point>
+</Placemark>
+</Folder>
+</Document></kml>

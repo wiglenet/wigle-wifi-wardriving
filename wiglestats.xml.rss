@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>WiGLE Stats</title>
+    <link>https://wigle.net/stats</link>
+    <description>WiFi wireless networking: a slow march to infinity</description>
+    <language>en-us</language>
+    <copyright>Copyright 2001-2026</copyright>
+    <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+    <dc:date>2026-05-20T01:57:05Z</dc:date>
+    <dc:language>en-us</dc:language>
+    <dc:rights>Copyright 2001-2026</dc:rights>
+    <item>
+      <title>Networks with default SSID</title>
+      <link>https://wigle.net/stats#dfltssid</link>
+      <description>19966641</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#dfltssid</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Unique Cells w/ location</title>
+      <link>https://wigle.net/stats#genloc</link>
+      <description>29273473</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#genloc</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Unique Cell towers in DB</title>
+      <link>https://wigle.net/stats#gentotal</link>
+      <description>29612898</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#gentotal</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Unique WiFi locations in DB</title>
+      <link>https://wigle.net/stats#loctotal</link>
+      <description>25252149592</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#loctotal</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Unique networks w/ location</title>
+      <link>https://wigle.net/stats#netloc</link>
+      <description>1878903115</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netloc</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>New yesterday with location</title>
+      <link>https://wigle.net/stats#netlocd2</link>
+      <description>990503</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netlocd2</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>New today with location</title>
+      <link>https://wigle.net/stats#netlocdy</link>
+      <description>820565</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netlocdy</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Networks without Encryption</title>
+      <link>https://wigle.net/stats#netnowep</link>
+      <description>33513264</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netnowep</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>New unique networks today</title>
+      <link>https://wigle.net/stats#nettoday</link>
+      <description>824792</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#nettoday</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Unique WiFi networks in DB</title>
+      <link>https://wigle.net/stats#nettotal</link>
+      <description>1899260936</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#nettotal</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Networks with WEP Encryption</title>
+      <link>https://wigle.net/stats#netwep</link>
+      <description>48222158</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netwep</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Networks with Unknown Encryption</title>
+      <link>https://wigle.net/stats#netwep?</link>
+      <description>283336792</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netwep?</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Networks with WPA Encryption</title>
+      <link>https://wigle.net/stats#netwpa</link>
+      <description>39403400</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netwpa</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Networks with WPA2 Encryption</title>
+      <link>https://wigle.net/stats#netwpa2</link>
+      <description>1416217924</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#netwpa2</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Files Processed One Day Ago</title>
+      <link>https://wigle.net/stats#trans1da</link>
+      <description>2854</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#trans1da</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>File Uploaded Two Days Ago</title>
+      <link>https://wigle.net/stats#trans2da</link>
+      <description>2904</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#trans2da</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Files Uploaded Today Processed</title>
+      <link>https://wigle.net/stats#transtdy</link>
+      <description>2463</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#transtdy</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Total Files parsed</title>
+      <link>https://wigle.net/stats#transtot</link>
+      <description>8214549</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#transtot</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+    <item>
+      <title>Registered Users</title>
+      <link>https://wigle.net/stats#userstot</link>
+      <description>699894</description>
+      <pubDate>Wed, 20 May 2026 01:57:05 GMT</pubDate>
+      <guid>https://wigle.net/stats#userstot</guid>
+      <dc:date>2026-05-20T01:57:05Z</dc:date>
+    </item>
+  </channel>
+</rss>
+

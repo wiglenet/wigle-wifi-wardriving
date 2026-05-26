@@ -167,16 +167,18 @@ public class ActivateActivity extends AppCompatActivity {
                                     for (Barcode qr : barcodes) {
                                         if (qr.getDisplayValue() != null && qr.getDisplayValue().matches("^.*:[a-zA-Z0-9]*:[a-zA-Z0-9]*$")) {
                                             String[] tokens = qr.getDisplayValue().split(":");
-
-                                            final SharedPreferences prefs = MainActivity.getMainActivity().
-                                                    getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                                            final SharedPreferences.Editor editor = prefs.edit();
-                                            editor.putString(PreferenceKeys.PREF_USERNAME, tokens[0]);
-                                            editor.putString(PreferenceKeys.PREF_AUTHNAME, tokens[1]);
-                                            editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
-                                            editor.apply();
-                                            TokenAccess.setApiToken(prefs, tokens[2]);
-                                            MainActivity.refreshApiManager();
+                                            final MainActivity ma = MainActivity.getMainActivity();
+                                            if (null != ma) {
+                                                final SharedPreferences prefs = ma.
+                                                        getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                                final SharedPreferences.Editor editor = prefs.edit();
+                                                editor.putString(PreferenceKeys.PREF_USERNAME, tokens[0]);
+                                                editor.putString(PreferenceKeys.PREF_AUTHNAME, tokens[1]);
+                                                editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+                                                editor.apply();
+                                                TokenAccess.setApiToken(prefs, tokens[2]);
+                                                MainActivity.refreshApiManager();
+                                            }
                                             image.close();
                                             finish();
                                         }

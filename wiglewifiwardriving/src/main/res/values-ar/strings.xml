@@ -497,4 +497,5 @@
     <string name="backup_restore">النسخ الاحتياطي والاستعادة</string>
     <string name="flag_whole_database">تعيين قاعدة البيانات بالكامل للتحميل</string>
     <string name="file_size_warning">ستكون عمليات رفع متعددة ضرورية.</string>
+    <string name="invalid_foss_config">يبدو أن إعدادات خريطة FOSS الخاصة بك غير صالحة. يرجى التحقق من الإعدادات.</string>
 </resources>

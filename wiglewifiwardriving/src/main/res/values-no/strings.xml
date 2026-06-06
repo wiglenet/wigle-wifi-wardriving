@@ -498,4 +498,5 @@
     <string name="backup_restore">Sikkerhetskopi og gjenoppretting</string>
     <string name="flag_whole_database">Angi hele databasen for opplasting</string>
     <string name="file_size_warning">Flere opplastinger vil være nødvendige.</string>
+    <string name="invalid_foss_config">Det ser ut til at FOSS-kartkonfigurasjonen din er ugyldig. Vennligst sjekk innstillingene dine.</string>
 </resources>

@@ -497,4 +497,5 @@
     <string name="backup_restore">Varmuuskopiointi ja palautus</string>
     <string name="flag_whole_database">Merkitse koko tietokanta lähetettäväksi</string>
     <string name="file_size_warning">Useita lähetyksiä tarvitaan.</string>
+    <string name="invalid_foss_config">FOSS-karttamääritys vaikuttaa virheelliseltä. Tarkista asetuksesi.</string>
 </resources>

@@ -496,4 +496,5 @@
     <string name="backup_restore">Cópia de segurança e restauro</string>
     <string name="flag_whole_database">Marcar toda a base de dados para envio</string>
     <string name="file_size_warning">Serão necessários vários envios.</string>
+    <string name="invalid_foss_config">Parece que a sua configuração do mapa FOSS é inválida. Por favor, verifique as suas definições.</string>
 </resources>

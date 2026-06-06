@@ -497,4 +497,5 @@
     <string name="backup_restore">Kopia zapasowa i przywracanie</string>
     <string name="flag_whole_database">Oznacz całą bazę do przesłania</string>
     <string name="file_size_warning">Konieczne będzie kilka przesłań.</string>
+    <string name="invalid_foss_config">Wygląda na to, że konfiguracja mapy FOSS jest nieprawidłowa. Sprawdź swoje ustawienia.</string>
 </resources>

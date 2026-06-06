@@ -497,4 +497,5 @@
     <string name="backup_restore">Zálohování a obnovení</string>
     <string name="flag_whole_database">Označit celou databázi k nahrání</string>
     <string name="file_size_warning">Bude nutné provést několik nahrání.</string>
+    <string name="invalid_foss_config">Zdá se, že konfigurace mapy FOSS je neplatná. Zkontrolujte prosím své nastavení.</string>
 </resources>

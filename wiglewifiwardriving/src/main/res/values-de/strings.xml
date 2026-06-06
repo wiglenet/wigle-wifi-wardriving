@@ -497,4 +497,5 @@
     <string name="backup_restore">Sichern und Wiederherstellen</string>
     <string name="flag_whole_database">Gesamte Datenbank zum Upload markieren</string>
     <string name="file_size_warning">Mehrere Uploads sind erforderlich.</string>
+    <string name="invalid_foss_config">Es scheint, dass Ihre FOSS-Kartenkonfiguration ungültig ist. Bitte überprüfen Sie Ihre Einstellungen.</string>
 </resources>

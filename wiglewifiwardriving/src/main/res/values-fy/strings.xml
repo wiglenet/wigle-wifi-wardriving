@@ -497,4 +497,5 @@
     <string name="backup_restore">Backup en weromsette</string>
     <string name="flag_whole_database">Hiele database foar upload setten</string>
     <string name="file_size_warning">Meardere uploads binne nedich.</string>
+    <string name="invalid_foss_config">It liket derop dat jo FOSS-kaartkonfiguraasje ûnjildich is. Kontrolearje jo ynstellings.</string>
 </resources>

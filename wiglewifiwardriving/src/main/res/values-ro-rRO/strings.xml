@@ -497,4 +497,5 @@
     <string name="backup_restore">Backup și restaurare</string>
     <string name="flag_whole_database">Marchează întreaga bază pentru încărcare</string>
     <string name="file_size_warning">Vor fi necesare mai multe încărcări.</string>
+    <string name="invalid_foss_config">Se pare că configurația hărții FOSS este invalidă. Vă rugăm să verificați setările.</string>
 </resources>

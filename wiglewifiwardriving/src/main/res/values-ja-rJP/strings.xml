@@ -500,4 +500,5 @@ KMLにエクスポート</string>
     <string name="backup_restore">バックアップと復元</string>
     <string name="flag_whole_database">アップロード用にデータベース全体を設定</string>
     <string name="file_size_warning">複数回のアップロードが必要になります。</string>
+    <string name="invalid_foss_config">FOSS マップの設定が無効のようです。設定を確認してください。</string>
 </resources>

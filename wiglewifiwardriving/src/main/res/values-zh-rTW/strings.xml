@@ -496,4 +496,5 @@
     <string name="backup_restore">備份與還原</string>
     <string name="flag_whole_database">將整個資料庫設為上傳</string>
     <string name="file_size_warning">需要多次上傳。</string>
+    <string name="invalid_foss_config">您的 FOSS 地圖設定似乎無效。請檢查您的設定。</string>
 </resources>

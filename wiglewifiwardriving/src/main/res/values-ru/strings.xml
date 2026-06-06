@@ -497,4 +497,5 @@
     <string name="backup_restore">Резервное копирование и восстановление</string>
     <string name="flag_whole_database">Пометить всю базу для выгрузки</string>
     <string name="file_size_warning">Потребуется несколько загрузок.</string>
+    <string name="invalid_foss_config">Похоже, ваша конфигурация карты FOSS недействительна. Пожалуйста, проверьте настройки.</string>
 </resources>

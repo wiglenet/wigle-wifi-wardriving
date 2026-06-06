@@ -497,4 +497,5 @@
     <string name="backup_restore">备份与恢复</string>
     <string name="flag_whole_database">将整个数据库标记为上传</string>
     <string name="file_size_warning">需要多次上传。</string>
+    <string name="invalid_foss_config">您的 FOSS 地图配置似乎无效。请检查您的设置。</string>
 </resources>

@@ -497,4 +497,5 @@
     <string name="backup_restore">Sikkerhedskopi og gendannelse</string>
     <string name="flag_whole_database">Angiv hele databasen til upload</string>
     <string name="file_size_warning">Flere uploads vil være nødvendige.</string>
+    <string name="invalid_foss_config">Det ser ud til, at din FOSS-kortkonfiguration er ugyldig. Tjek venligst dine indstillinger.</string>
 </resources>

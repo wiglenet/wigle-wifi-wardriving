@@ -497,4 +497,5 @@
     <string name="backup_restore">Backup e ripristino</string>
     <string name="flag_whole_database">Imposta l’intero database per il caricamento</string>
     <string name="file_size_warning">Saranno necessari più caricamenti.</string>
+    <string name="invalid_foss_config">Sembra che la configurazione della mappa FOSS non sia valida. Si prega di controllare le impostazioni.</string>
 </resources>

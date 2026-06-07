@@ -1,3 +1,11 @@
+* 2.109 (05/13/2026)
+Overhaul database activity
+Upload partitioning
+BLE classification fixes (thanks XenoKovah)
+Harden FOSS map url parsing
+Spelling fixes (thanks BennyWaitWhat)
+Handle Google removing certtrans library support
+
 * 2.107 - 2.108 (04/08/2026)
 Startup counts improvements
 Cap unbounded network sets

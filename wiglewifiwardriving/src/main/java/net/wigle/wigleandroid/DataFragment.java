@@ -324,24 +324,28 @@ public final class DataFragment extends Fragment implements DialogListener {
         Button button = view.findViewById( R.id.perform_search_button);
         button.setOnClickListener(buttonView -> {
 
-        final String fail = SearchUtil.setupQuery(view, getActivity(), true);
-        if (null != ListFragment.lameStatic.queryArgs) {
-            ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
-        }
-        if (fail != null) {
-            WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
-        } else {
-            MainActivity m = MainActivity.getMainActivity();
-            if (null != m) {
-                final SharedPreferences prefs = m.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                final boolean useFossMaps = prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false);
-                // start db result activity
-                final Intent settingsIntent = new Intent(getActivity(), useFossMaps ?
-                        FossDBResultActivity.class : DBResultActivity.class);
-                startActivity(settingsIntent);
-
+        SearchUtil.setupQuery(view, getActivity(), true, fail -> {
+            final FragmentActivity activity = getActivity();
+            if (activity == null || activity.isFinishing()) {
+                return;
             }
-        }
+            if (null != ListFragment.lameStatic.queryArgs) {
+                ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
+            }
+            if (fail != null) {
+                WiGLEToast.showOverFragment(activity, R.string.error_general, fail);
+            } else {
+                MainActivity m = MainActivity.getMainActivity();
+                if (null != m) {
+                    final SharedPreferences prefs = m.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    final boolean useFossMaps = prefs.getBoolean(PreferenceKeys.PREF_USE_FOSS_MAPS, false);
+                    // start db result activity
+                    final Intent settingsIntent = new Intent(activity, useFossMaps ?
+                            FossDBResultActivity.class : DBResultActivity.class);
+                    startActivity(settingsIntent);
+                }
+            }
+        });
     });
 
     button = view.findViewById( R.id.reset_button );

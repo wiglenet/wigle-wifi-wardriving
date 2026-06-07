@@ -28,9 +28,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import net.wigle.wigleandroid.model.MapBounds;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.util.GeocodingUtil;
 import net.wigle.wigleandroid.util.Logging;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -143,26 +143,31 @@ public class SearchFragment extends AbstractSearchFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                String location = searchView.getQuery().toString();
-                if (location != null || location.equals("")) {
-                    Geocoder geocoder = new Geocoder(context);
-                    try {
-                        List<Address> addressList = geocoder.getFromLocationName(location, 1);
-                        if (null != addressList && addressList.size() > 0) {
-                            Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
-                            if (null != address) {
-                                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                                mapView.getMapAsync(googleMap -> {
-                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-                                });
-                                return true;
-                            }
-                        }
-                    } catch (IOException e) {
-                        Logging.error("Geocoding failed: ",e);
-                    }
+                final String location = searchView.getQuery().toString();
+                if (location == null || location.isEmpty()) {
+                    return false;
                 }
-                return false;
+                GeocodingUtil.getFromLocationName(context, location, 1, new GeocodingUtil.GeocodeCallback() {
+                    @Override
+                    public void onResult(@NonNull List<Address> addressList) {
+                        if (addressList.isEmpty() || mapView == null) {
+                            return;
+                        }
+                        Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
+                        if (null == address) {
+                            return;
+                        }
+                        final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        mapView.getMapAsync(googleMap ->
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14)));
+                    }
+
+                    @Override
+                    public void onError(@NonNull Exception e) {
+                        Logging.error("Geocoding failed: ", e);
+                    }
+                });
+                return true;
             }
             @Override
             public boolean onQueryTextChange(String newText) {

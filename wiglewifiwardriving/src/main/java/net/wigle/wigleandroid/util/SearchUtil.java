@@ -2,11 +2,12 @@ package net.wigle.wigleandroid.util;
 
 import android.content.Context;
 import android.location.Address;
-import android.location.Geocoder;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+
+import androidx.annotation.NonNull;
 
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.R;
@@ -15,6 +16,7 @@ import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.model.WiFiSecurityType;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import br.com.sapereaude.maskedEditText.MaskedEditText;
@@ -50,34 +52,74 @@ public class SearchUtil {
         cellId.setText("");
     }
 
-    public static String setupQuery(final View view, final Context context, final boolean local) {
+    public static void setupQuery(final View view, final Context context, final boolean local,
+                                  @NonNull final Consumer<String> resultCallback) {
         final QueryArgs queryArgs = new QueryArgs();
-        String fail = null;
-        String errorField = null;
-        boolean okValue = false;
 
         try {
             final Spinner networkTypeSpinner = view.findViewById(R.id.type_spinner);
             final Spinner wifiEncryptionSpinner = view.findViewById(R.id.encryption_spinner);
 
-            errorField = context.getString(R.string.network_type);
             if (null != networkTypeSpinner) {
                 queryArgs.setType((NetworkFilterType) networkTypeSpinner.getSelectedItem());
-                //okValue = true; //ALIBI: these still result in runaway searches on their own
-                errorField = context.getString(R.string.crypto_security);
                 if (null != wifiEncryptionSpinner && (NetworkFilterType.ALL.equals(networkTypeSpinner.getSelectedItem()) || NetworkFilterType.WIFI.equals(networkTypeSpinner.getSelectedItem()))) {
                     queryArgs.setCrypto((WiFiSecurityType) wifiEncryptionSpinner.getSelectedItem());
                 } else {
                     queryArgs.setCrypto(null);
                 }
             }
-
         } catch (Exception e) {
-            Logging.error("Problem with type/encryption selection: ",e);
+            Logging.error("Problem with type/encryption selection: ", e);
         }
+
+        final EditText addressEdit = view.findViewById(R.id.query_address);
+        final String addressText = (addressEdit == null) ? "" : addressEdit.getText().toString().trim();
+
+        if (addressText.isEmpty()) {
+            // ALIBI: only applies for the search UI, NOT for the database tab.
+            // These aren't directly editable, so we have to persist them into the new
+            // queryArgs if set via the UI.
+            if (null != ListFragment.lameStatic.queryArgs && null != ListFragment.lameStatic.queryArgs.getLocationBounds()) {
+                queryArgs.setLocationBounds(ListFragment.lameStatic.queryArgs.getLocationBounds());
+            }
+            finishSetupQuery(view, context, queryArgs, local, /*addressOk*/ false, resultCallback);
+            return;
+        }
+
+        // Address resolution can hit the network/disk - run off the main thread.
+        GeocodingUtil.getFromLocationName(context, addressText, 1, new GeocodingUtil.GeocodeCallback() {
+            @Override
+            public void onResult(@NonNull List<Address> addresses) {
+                if (addresses.isEmpty()) {
+                    resultCallback.accept(context.getString(R.string.no_address_found));
+                    return;
+                }
+                queryArgs.setAddress(addresses.get(0));
+                finishSetupQuery(view, context, queryArgs, local, /*addressOk*/ true, resultCallback);
+            }
+
+            @Override
+            public void onError(@NonNull Exception e) {
+                resultCallback.accept(context.getString(R.string.problem_with_field)
+                        + " '" + context.getString(R.string.address) + "': " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Validate the non-address fields (SSID / BSSID / cell op-net-id) and commit the result.
+     * Runs synchronously - none of these touch the network or disk.
+     */
+    private static void finishSetupQuery(final View view, final Context context,
+                                         final QueryArgs queryArgs, final boolean local,
+                                         final boolean addressOk,
+                                         @NonNull final Consumer<String> resultCallback) {
+        String fail = null;
+        String errorField = null;
+        boolean okValue = addressOk;
         final boolean isCellSearch = (null != queryArgs.getType()) && NetworkFilterType.CELL.equals(queryArgs.getType());
 
-        for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid, R.id.query_cell_op, R.id.query_cell_net, R.id.query_cell_id }) {
+        for (final int id : new int[]{R.id.query_ssid, R.id.query_bssid, R.id.query_cell_op, R.id.query_cell_net, R.id.query_cell_id}) {
             if (fail != null) {
                 break;
             }
@@ -94,29 +136,11 @@ public class SearchUtil {
                 }
             }
             if (text.isEmpty()) {
-                if (id == R.id.query_address) {
-                    //TODO: this only applies for the search UI, NOT for the database tab. :(
-                    //ALIBI: these aren't directly editable, so we have to persist them into the new queryArgs if set via the UI
-                    if (null != ListFragment.lameStatic.queryArgs && null != ListFragment.lameStatic.queryArgs.getLocationBounds()) {
-                        queryArgs.setLocationBounds(ListFragment.lameStatic.queryArgs.getLocationBounds());
-                    }
-                }
                 continue;
             }
 
             try {
-                if (id == R.id.query_address){
-                    //NB: only applies in Database view now
-                    errorField = context.getString(R.string.address);
-                    Geocoder gc = new Geocoder(context);
-                    List<Address> addresses = gc.getFromLocationName(text, 1);
-                    if (addresses.size() < 1) {
-                        fail = context.getString(R.string.no_address_found);
-                        break;
-                    }
-                    queryArgs.setAddress(addresses.get(0));
-                    okValue = true;
-                } else if (id == R.id.query_ssid) {
+                if (id == R.id.query_ssid) {
                     errorField = context.getString(R.string.ssid);
                     //TODO: validation of SSID
                     queryArgs.setSSID(text);
@@ -160,9 +184,9 @@ public class SearchUtil {
                             }
 
                             if (((text.length() == 9) || (text.length() == 12) || (text.length() == 15))
-                                    && (text.charAt(text.length()-1) == ':')) {
+                                    && (text.charAt(text.length() - 1) == ':')) {
                                 //remove trailing ':'s
-                                queryArgs.setBSSID(text.substring(0,text.length()-1));
+                                queryArgs.setBSSID(text.substring(0, text.length() - 1));
                                 //DEBUG: Logging.info("text: "+text);
                                 okValue = true;
                             } else if (text.length() < 8) {
@@ -196,6 +220,6 @@ public class SearchUtil {
         } catch (Exception e) {
             fail = context.getString(R.string.problem_with_field) + " '" + errorField + "': " + e.getMessage(); //TODO: not language aware 2/2 - replace w/ templated message
         }
-        return fail;
+        resultCallback.accept(fail);
     }
 }

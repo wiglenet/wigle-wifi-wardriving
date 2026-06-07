@@ -23,6 +23,7 @@ import androidx.appcompat.widget.SearchView;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.MapBounds;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.util.FossConfigDialogUtil;
 import net.wigle.wigleandroid.util.Logging;
 
 import org.maplibre.android.MapLibre;
@@ -42,9 +43,31 @@ public class FossSearchFragment extends AbstractSearchFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final Activity a = getActivity();
         if (null != a) {
-            MapLibre.getInstance(a);
+            // ALIBI: MapLibre must be initialized before R.layout.foss_search_nets (which contains
+            // an inline <org.maplibre.android.maps.MapView/>) is inflated; otherwise inflation
+            // throws and crashes the app.
+            try {
+                MapLibre.getInstance(a);
+            } catch (Throwable t) {
+                Logging.error("Failed to initialize MapLibre for FossSearchFragment: ", t);
+            }
         }
-        final View view = inflater.inflate(R.layout.foss_search_nets, container, false);
+        final View view;
+        try {
+            view = inflater.inflate(R.layout.foss_search_nets, container, false);
+        } catch (RuntimeException re) {
+            Logging.error("Failed to inflate FOSS search layout: ", re);
+            FossConfigDialogUtil.show(a, () -> {
+                try {
+                    if (isAdded()) {
+                        getParentFragmentManager().popBackStack();
+                    }
+                } catch (Throwable t) {
+                    Logging.error("Failed to pop back stack after FOSS inflate failure: ", t);
+                }
+            });
+            return (a != null) ? new View(a) : null;
+        }
         super.onCreateView(inflater, container, savedInstanceState);
         return super.setupView(view, savedInstanceState);
     }
@@ -112,10 +135,15 @@ public class FossSearchFragment extends AbstractSearchFragment {
                     styleUrl = "https://demotiles.maplibre.org/style.json";
                 }
 
-                mapLibreMap.setStyle(styleUrl);
-                mapLibreMap.setCameraPosition(
-                        new CameraPosition.Builder().target(
-                                new org.maplibre.android.geometry.LatLng(0.0, 0.0)).zoom(1.0).build());
+                try {
+                    mapLibreMap.setStyle(styleUrl);
+                    mapLibreMap.setCameraPosition(
+                            new CameraPosition.Builder().target(
+                                    new org.maplibre.android.geometry.LatLng(0.0, 0.0)).zoom(1.0).build());
+                } catch (RuntimeException styleEx) {
+                    Logging.error("Failed to apply FOSS search map style '" + styleUrl + "': ", styleEx);
+                    FossConfigDialogUtil.show(getActivity(), null);
+                }
             });
             if ((center != null)) {
                 mapView.getMapAsync(mapLibreMap -> {

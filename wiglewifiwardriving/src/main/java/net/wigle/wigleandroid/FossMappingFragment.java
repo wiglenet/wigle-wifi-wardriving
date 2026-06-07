@@ -25,6 +25,7 @@ import com.goebl.simplify.Simplify;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.util.FossConfigDialogUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -73,8 +74,31 @@ public class FossMappingFragment extends AbstractMappingFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final Activity a = getActivity();
         if (null != a) {
-            MapLibre.getInstance(a);
-            final View view = inflater.inflate(getLayoutResourceId(), container, false);
+            // ALIBI: MapLibre must be initialized before R.layout.foss_map (which contains an
+            // inline <org.maplibre.android.maps.MapView/>) is inflated; otherwise inflation
+            // throws and crashes the app.
+            try {
+                MapLibre.getInstance(a);
+            } catch (Throwable t) {
+                Logging.error("Failed to initialize MapLibre for FossMappingFragment: ", t);
+            }
+            final View view;
+            try {
+                view = inflater.inflate(getLayoutResourceId(), container, false);
+            } catch (RuntimeException re) {
+                Logging.error("Failed to inflate FOSS map fragment layout: ", re);
+                FossConfigDialogUtil.show(a, () -> {
+                    try {
+                        if (isAdded()) {
+                            getParentFragmentManager().popBackStack();
+                        }
+                    } catch (Throwable t) {
+                        Logging.error("Failed to pop back stack after FOSS inflate failure: ", t);
+                    }
+                });
+                // Return an empty placeholder so the fragment lifecycle can complete cleanly.
+                return new View(a);
+            }
             mapView = view.findViewById(R.id.mapLibreMap);
             if (mapView != null) {
                 try {
@@ -104,6 +128,9 @@ public class FossMappingFragment extends AbstractMappingFragment {
         final SharedPreferences prefs = (a != null) ? a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0) : null;
         final boolean visualizeRoute = prefs != null && prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false);
 
+        if (mapView == null) {
+            return;
+        }
         mapView.getMapAsync(mapLibreMap -> {
             final String mapServerKey = prefs != null ?
                     prefs.getString(PREF_FOSS_MAPS_VECTOR_TILE_KEY, null) : null;
@@ -118,18 +145,23 @@ public class FossMappingFragment extends AbstractMappingFragment {
             } else {
                 styleUrl = "https://demotiles.maplibre.org/style.json";
             }
-            mapLibreMap.setStyle(styleUrl, style -> {
-                final Activity activity = getActivity();
-                if (activity != null) {
-                    mapRender = new FossMapRender(activity, mapLibreMap, false);
-                }
-                configureMapSettings(mapLibreMap, prefs, style);
-                setupLocationTracking(mapLibreMap, prefs, style);
-                setupCameraListeners(mapLibreMap, prefs, style);
-                setupTileOverlay(mapLibreMap, prefs, style);
-                setupRouteVisualization(mapLibreMap, prefs, visualizeRoute);
-                initializeCameraPosition(mapLibreMap, oldCenter, oldZoom, prefs);
-            });
+            try {
+                mapLibreMap.setStyle(styleUrl, style -> {
+                    final Activity activity = getActivity();
+                    if (activity != null) {
+                        mapRender = new FossMapRender(activity, mapLibreMap, false);
+                    }
+                    configureMapSettings(mapLibreMap, prefs, style);
+                    setupLocationTracking(mapLibreMap, prefs, style);
+                    setupCameraListeners(mapLibreMap, prefs, style);
+                    setupTileOverlay(mapLibreMap, prefs, style);
+                    setupRouteVisualization(mapLibreMap, prefs, visualizeRoute);
+                    initializeCameraPosition(mapLibreMap, oldCenter, oldZoom, prefs);
+                });
+            } catch (RuntimeException styleEx) {
+                Logging.error("Failed to apply FOSS map style '" + styleUrl + "': ", styleEx);
+                FossConfigDialogUtil.show(getActivity(), null);
+            }
         });
         setupCenterLocationButton(view);
     }

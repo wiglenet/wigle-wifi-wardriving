@@ -4,9 +4,11 @@ import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_FOSS_MAPS_VECTOR_T
 import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.widget.RelativeLayout;
 
 import net.wigle.wigleandroid.model.RouteDescriptor;
+import net.wigle.wigleandroid.util.FossConfigDialogUtil;
 import net.wigle.wigleandroid.util.Logging;
 
 import org.maplibre.android.MapLibre;
@@ -25,10 +27,32 @@ import java.util.List;
 public class FossGpxManagementActivity extends AbstractGpxManagementActivity {
     private MapView mapView;
     private Polyline routePolyline;
+    private boolean inflationFailed = false;
 
     @Override
     protected void initializeMapLibrary() {
-        MapLibre.getInstance(this);
+        try {
+            MapLibre.getInstance(this);
+        } catch (Throwable t) {
+            Logging.error("Failed to initialize MapLibre for FossGpxManagementActivity: ", t);
+        }
+    }
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        try {
+            super.onCreate(savedInstanceState);
+        } catch (RuntimeException re) {
+            // Most commonly an android.view.InflateException for the inline MapView when the
+            // user's FOSS map style/key configuration is invalid or MapLibre cannot start.
+            inflationFailed = true;
+            Logging.error("Failed to inflate FOSS GPX management layout: ", re);
+            FossConfigDialogUtil.show(this, () -> {
+                if (!isFinishing()) {
+                    finish();
+                }
+            });
+        }
     }
 
     @Override
@@ -38,8 +62,11 @@ public class FossGpxManagementActivity extends AbstractGpxManagementActivity {
 
     @Override
     protected void setupMap(SharedPreferences prefs) {
+        if (inflationFailed) {
+            return;
+        }
         final RelativeLayout rlView = findViewById( R.id.ml_gpx_map_rl );
-        mapView = rlView.findViewById(R.id.maplibreView);
+        mapView = (rlView != null) ? rlView.findViewById(R.id.maplibreView) : null;
         super.mapView = mapView;
         if (null != mapView) {
             mapView.getMapAsync(mapLibreMap -> {
@@ -56,13 +83,24 @@ public class FossGpxManagementActivity extends AbstractGpxManagementActivity {
                 } else {
                     styleUrl = "https://demotiles.maplibre.org/style.json";
                 }
-                mapLibreMap.setStyle(styleUrl);
-                mapLibreMap.setCameraPosition(
-                        new CameraPosition.Builder().target(
-                                new LatLng(0.0, 0.0)).zoom(1.0).build());
+                try {
+                    mapLibreMap.setStyle(styleUrl);
+                    mapLibreMap.setCameraPosition(
+                            new CameraPosition.Builder().target(
+                                    new LatLng(0.0, 0.0)).zoom(1.0).build());
+                } catch (RuntimeException styleEx) {
+                    Logging.error("Failed to apply FOSS GPX map style '" + styleUrl + "': ", styleEx);
+                    FossConfigDialogUtil.show(FossGpxManagementActivity.this, null);
+                }
             });
         } else {
             Logging.error("Failed to find mapView");
+            inflationFailed = true;
+            FossConfigDialogUtil.show(this, () -> {
+                if (!isFinishing()) {
+                    finish();
+                }
+            });
         }
     }
 

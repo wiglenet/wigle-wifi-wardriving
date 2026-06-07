@@ -4,8 +4,6 @@ package net.wigle.wigleandroid;
 import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_KEY;
 import static net.wigle.wigleandroid.util.PreferenceKeys.PREF_FOSS_MAPS_VECTOR_TILE_STYLE;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -17,6 +15,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.api.BtSearchResponse;
 import net.wigle.wigleandroid.model.api.CellSearchResponse;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
+import net.wigle.wigleandroid.util.FossConfigDialogUtil;
 import net.wigle.wigleandroid.util.Logging;
 
 import org.maplibre.android.MapLibre;
@@ -67,32 +66,11 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
      * the activity on dismiss to prevent subsequent NPE/lifecycle crashes.
      */
     private void showInvalidFossConfigDialog() {
-        try {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.app_name);
-            builder.setMessage(R.string.invalid_foss_config);
-            builder.setCancelable(true);
-            final DialogInterface.OnClickListener dismissAndFinish = (dialog, which) -> {
-                dialog.dismiss();
-                finish();
-            };
-            builder.setPositiveButton(android.R.string.ok, dismissAndFinish);
-            final AlertDialog dialog = builder.create();
-            dialog.setOnCancelListener(d -> finish());
-            dialog.setOnDismissListener(d -> {
-                if (!isFinishing()) {
-                    finish();
-                }
-            });
-            dialog.show();
-        } catch (Throwable t) {
-            // Last-resort: if even the dialog cannot be shown (e.g. activity window already gone),
-            // just finish so we don't crash.
-            Logging.error("Could not show invalid FOSS config dialog: ", t);
+        FossConfigDialogUtil.show(this, () -> {
             if (!isFinishing()) {
                 finish();
             }
-        }
+        });
     }
 
     @Override

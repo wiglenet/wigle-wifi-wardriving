@@ -1350,7 +1350,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public boolean isMuted() {
         //noinspection SimplifiableIfStatement
-        if (state.phoneState != null && state.phoneState.isPhoneActive()) {
+        if (state != null && state.phoneState != null && state.phoneState.isPhoneActive()) {
             // always be quiet when the phone is active
             return true;
         }

@@ -163,7 +163,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     private LeScanCallback scanCallback;
     private final SharedPreferences prefs;
 
-    private Handler bluetoothTimer;
     private long scanRequestTime = Long.MIN_VALUE;
     private long lastScanResponseTime = Long.MIN_VALUE;
 
@@ -590,56 +589,22 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     }
 
     /**
-     * create the bluetooth timer thread
+     * Setup for Bluetooth scanning. First scan is scheduled when scanning starts (internalHandleScanChange).
      */
     public void setupBluetoothTimer( final boolean turnedBtOn ) {
-        Logging.info( "create Bluetooth timer" );
-        final MainActivity m = MainActivity.getMainActivity();
-        if ( bluetoothTimer == null) {
-            bluetoothTimer = new Handler();
-            final Runnable mUpdateTimeTask = new Runnable() {
-                @Override
-                public void run() {
-                    // make sure the app isn't trying to finish
-                    if ( null != m && !m.isFinishing() ) {
-                        // info( "timer start scan" );
-                        // schedule a bluetooth scan
-                        doBluetoothScan();
-                        if ( scanRequestTime <= 0 ) {
-                            scanRequestTime = System.currentTimeMillis();
-                        }
-                        long period = getScanPeriod();
-                        // check if set to "continuous"
-                        if ( period == 0L ) {
-                            // set to default here, as a scan will also be requested on the scan result listener
-                            period = MainActivity.SCAN_DEFAULT;
-                        }
-                        // info("bluetoothtimer: " + period );
-                        bluetoothTimer.postDelayed( this, period );
-                    }
-                    else {
-                        Logging.info( "finishing timer" );
-                    }
-                }
-            };
-            bluetoothTimer.removeCallbacks( mUpdateTimeTask );
-            bluetoothTimer.postDelayed( mUpdateTimeTask, 100 );
-
-            if ( turnedBtOn ) {
-                Logging.info( "not immediately running BT scan, since it was just turned on"
-                        + " it will block for a few seconds and fail anyway");
-            }
-            else {
-                Logging.info( "start first bluetooth scan");
-                // starts scan, sends event when done
-                final boolean scanOK = doBluetoothScan();
-
-                if ( scanRequestTime <= 0 ) {
-                    scanRequestTime = System.currentTimeMillis();
-                }
-                Logging.info( "startup finished. BT scanOK: " + scanOK );
-            }
+        Logging.info( "setup Bluetooth scan alarms" );
+        if ( turnedBtOn ) {
+            Logging.info( "not immediately running BT scan, since it was just turned on"
+                    + " it will block for a few seconds and fail anyway");
         }
+        // First scan scheduled when scanning starts via ScanAlarmScheduler
+    }
+
+    /**
+     * Trigger a Bluetooth scan (called from alarm).
+     */
+    public void triggerBluetoothScan() {
+        doBluetoothScan();
     }
 
     public boolean doBluetoothScan() {

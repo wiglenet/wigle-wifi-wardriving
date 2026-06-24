@@ -159,9 +159,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         MediaPlayer soundContact;
         WifiLock wifiLock;
         GNSSListener GNSSListener;
-        WifiReceiver wifiReceiver;
-        BluetoothReceiver bluetoothReceiver;
-        CellReceiver cellReceiver;
+        public WifiReceiver wifiReceiver;
+        public BluetoothReceiver bluetoothReceiver;
+        public CellReceiver cellReceiver;
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
@@ -1132,6 +1132,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("exception releasing scanWakeLock in onDestroy: " + ex);
                 }
             }
+            net.wigle.wigleandroid.util.ScanAlarmScheduler.cancelAll(getApplicationContext());
             finishSoon(DESTROY_FINISH_MILLIS, false);
         } else {
             state.uiRestart.set(false);
@@ -2297,6 +2298,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.cellReceiver != null) {
                 state.cellReceiver.setupCellTimer(false);
             }
+            // Schedule first scan alarms (replaces Handler.postDelayed; fires even in Doze)
+            net.wigle.wigleandroid.util.ScanAlarmScheduler.scheduleNext(getApplicationContext(),
+                    net.wigle.wigleandroid.util.ScanAlarmScheduler.ScanType.WIFI, 100);
+            net.wigle.wigleandroid.util.ScanAlarmScheduler.scheduleNext(getApplicationContext(),
+                    net.wigle.wigleandroid.util.ScanAlarmScheduler.ScanType.BLUETOOTH, 100);
+            net.wigle.wigleandroid.util.ScanAlarmScheduler.scheduleNext(getApplicationContext(),
+                    net.wigle.wigleandroid.util.ScanAlarmScheduler.ScanType.CELL, 100);
             // turn on location updates
             this.setLocationUpdates(getLocationSetPeriod(), 0f);
 
@@ -2314,6 +2322,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
                 listFragment.setScanningStatusIndicator(false);
             }
+            net.wigle.wigleandroid.util.ScanAlarmScheduler.cancelAll(getApplicationContext());
             if (state.cellReceiver != null) {
                 state.cellReceiver.stopCellTimer();
             }

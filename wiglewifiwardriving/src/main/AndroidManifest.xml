@@ -346,6 +346,14 @@
                 <action android:name="net.wigle.wigleandroid.UPLOAD" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".listener.ScanAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.WIFI_SCAN_ALARM" />
+                <action android:name="net.wigle.wigleandroid.BT_SCAN_ALARM" />
+                <action android:name="net.wigle.wigleandroid.CELL_SCAN_ALARM" />
+            </intent-filter>
+        </receiver>
         <receiver android:name=".listener.ScanControlReceiver"
             android:exported="true"
             tools:ignore="ExportedReceiver">

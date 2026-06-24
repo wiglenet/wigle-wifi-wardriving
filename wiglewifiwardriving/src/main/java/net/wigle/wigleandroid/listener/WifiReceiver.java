@@ -56,7 +56,6 @@ public class WifiReceiver extends BroadcastReceiver {
     private final NumberFormat numberFormat1;
     private final SsidSpeaker ssidSpeaker;
 
-    private Handler wifiTimer;
     private long scanRequestTime = Long.MIN_VALUE;
     private long lastScanResponseTime = Long.MIN_VALUE;
     private long lastWifiUnjamTime = 0;
@@ -510,51 +509,16 @@ public class WifiReceiver extends BroadcastReceiver {
         previousTalkTime = now;
     }
 
+    /**
+     * Setup for WiFi scanning. First scan is scheduled when scanning starts (internalHandleScanChange).
+     */
     public void setupWifiTimer( final boolean turnedWifiOn ) {
-        Logging.info( "create wifi timer" );
-        if ( wifiTimer == null ) {
-            wifiTimer = new Handler();
-            final Runnable mUpdateTimeTask = new Runnable() {
-                @Override
-                public void run() {
-                    // make sure the app isn't trying to finish
-                    if ( ! mainActivity.isFinishing() ) {
-                        // info( "timer start scan" );
-                        doWifiScan();
-                        if ( scanRequestTime <= 0 ) {
-                            scanRequestTime = System.currentTimeMillis();
-                        }
-                        long period = getScanPeriod();
-                        // check if set to "continuous"
-                        if ( period == 0L ) {
-                            // set to default here, as a scan will also be requested on the scan result listener
-                            period = MainActivity.SCAN_DEFAULT;
-                        }
-                        // info("wifitimer: " + period );
-                        wifiTimer.postDelayed( this, period );
-                    }
-                    else {
-                        Logging.info( "finishing timer" );
-                    }
-                }
-            };
-            wifiTimer.removeCallbacks( mUpdateTimeTask );
-            wifiTimer.postDelayed( mUpdateTimeTask, 100 );
-
-            if ( turnedWifiOn ) {
-                Logging.info( "not immediately running wifi scan, since it was just turned on"
-                        + " it will block for a few seconds and fail anyway");
-            }
-            else {
-                Logging.info( "start first wifi scan");
-                // starts scan, sends event when done
-                final boolean scanOK = doWifiScan();
-                if ( scanRequestTime <= 0 ) {
-                    scanRequestTime = System.currentTimeMillis();
-                }
-                Logging.info( "startup finished. wifi scanOK: " + scanOK );
-            }
+        Logging.info( "setup wifi scan alarms" );
+        if ( turnedWifiOn ) {
+            Logging.info( "not immediately running wifi scan, since it was just turned on"
+                    + " it will block for a few seconds and fail anyway");
         }
+        // First scan scheduled when scanning starts via ScanAlarmScheduler
     }
 
     /**
@@ -574,10 +538,19 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Schedule the next WiFi scan
+     * Trigger a WiFi scan (called from alarm or scheduleScan).
+     */
+    public void triggerWifiScan() {
+        doWifiScan();
+    }
+
+    /**
+     * Schedule the next WiFi scan. With AlarmManager, triggers immediately.
      */
     public void scheduleScan() {
-        wifiTimer.post(this::doWifiScan);
+        if (mainActivity != null && mainActivity.isScanning()) {
+            doWifiScan();
+        }
     }
 
     public synchronized void registerWiFiScanUpdater(final WiFiScanUpdater updater, final Set<String> watchBssids) {
@@ -615,8 +588,12 @@ public class WifiReceiver extends BroadcastReceiver {
                     mainHandler.post(() -> {
                         if (!scanSuccess) {
                             scanInFlight = false;
+                            final long sinceLastSec = (System.currentTimeMillis() - lastScanResponseTime) / 1000;
+                            Logging.warn("WifiManager.startScan() returned false (throttled or rejected). " +
+                                    "Last response " + sinceLastSec + "s ago. Check Developer options: WiFi scan throttling.");
+                        } else {
+                            Logging.debug("startScan returned true. last response seconds ago: " + (System.currentTimeMillis() - lastScanResponseTime) / 1000d);
                         }
-                        Logging.debug("startScan returned " + scanSuccess + ". last response seconds ago: " + (System.currentTimeMillis() - lastScanResponseTime) / 1000d);
                     });
                 });
             }

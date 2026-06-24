@@ -86,7 +86,6 @@ public class CellReceiver {
     private final DatabaseHelper dbHelper;
     private final ExecutorService cellExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private Handler cellTimer;
     private SetNetworkListAdapter listAdapter;
     private final Set<String> runCells = new HashSet<>();
 
@@ -115,38 +114,28 @@ public class CellReceiver {
         return ScanUtil.getWifiScanPeriod(prefs, location);
     }
 
+    /**
+     * Setup for cell scanning. First scan is scheduled when scanning starts (internalHandleScanChange).
+     */
     public void setupCellTimer(final boolean delayFirstScan) {
-        Logging.info("create cell timer");
-        if (cellTimer == null) {
-            cellTimer = new Handler();
-            final Runnable mUpdateTimeTask = new Runnable() {
-                @Override
-                public void run() {
-                    if (mainActivity != null && !mainActivity.isFinishing() && mainActivity.isScanning()) {
-                        doCellScan();
-                        long period = getScanPeriod();
-                        if (period == 0L) {
-                            period = MainActivity.SCAN_DEFAULT;
-                        }
-                        cellTimer.postDelayed(this, period);
-                    } else {
-                        Logging.info("cell timer: finishing or not scanning");
-                    }
-                }
-            };
-            cellTimer.removeCallbacks(mUpdateTimeTask);
-            cellTimer.postDelayed(mUpdateTimeTask, delayFirstScan ? 500 : 100);
-            if (!delayFirstScan) {
-                doCellScan();
-            }
+        Logging.info("setup cell scan alarms");
+        // First scan scheduled when scanning starts via ScanAlarmScheduler
+    }
+
+    /**
+     * Stop cell scan alarms. Called when scanning is paused.
+     */
+    public void stopCellTimer() {
+        if (mainActivity != null) {
+            net.wigle.wigleandroid.util.ScanAlarmScheduler.cancel(mainActivity.getApplicationContext(), net.wigle.wigleandroid.util.ScanAlarmScheduler.ScanType.CELL);
         }
     }
 
-    public void stopCellTimer() {
-        if (cellTimer != null) {
-            cellTimer.removeCallbacksAndMessages(null);
-            cellTimer = null;
-        }
+    /**
+     * Trigger a cell scan (called from alarm).
+     */
+    public void triggerCellScan() {
+        doCellScan();
     }
 
     private void doCellScan() {

@@ -498,4 +498,5 @@
     <string name="backup_restore">Sikkerhetskopi og gjenoppretting</string>
     <string name="flag_whole_database">Angi hele databasen for opplasting</string>
     <string name="file_size_warning">Flere opplastinger vil være nødvendige.</string>
+    <string name="menu_drawer_title">Meny</string>
 </resources>

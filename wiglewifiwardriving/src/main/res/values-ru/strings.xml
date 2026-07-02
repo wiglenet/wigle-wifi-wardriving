@@ -497,4 +497,5 @@
     <string name="backup_restore">Резервное копирование и восстановление</string>
     <string name="flag_whole_database">Пометить всю базу для выгрузки</string>
     <string name="file_size_warning">Потребуется несколько загрузок.</string>
+    <string name="menu_drawer_title">Меню</string>
 </resources>

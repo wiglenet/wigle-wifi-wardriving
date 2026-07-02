@@ -497,4 +497,5 @@
     <string name="backup_restore">גיבוי ושחזור</string>
     <string name="flag_whole_database">סמן את כל מסד הנתונים להעלאה</string>
     <string name="file_size_warning">נדרשות העלאות מרובות.</string>
+    <string name="menu_drawer_title">תפריט</string>
 </resources>

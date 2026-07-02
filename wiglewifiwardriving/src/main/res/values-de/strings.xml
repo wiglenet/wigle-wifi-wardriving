@@ -497,4 +497,5 @@
     <string name="backup_restore">Sichern und Wiederherstellen</string>
     <string name="flag_whole_database">Gesamte Datenbank zum Upload markieren</string>
     <string name="file_size_warning">Mehrere Uploads sind erforderlich.</string>
+    <string name="menu_drawer_title">Menü</string>
 </resources>

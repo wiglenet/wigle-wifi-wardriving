@@ -497,4 +497,5 @@
     <string name="backup_restore">Kopia zapasowa i przywracanie</string>
     <string name="flag_whole_database">Oznacz całą bazę do przesłania</string>
     <string name="file_size_warning">Konieczne będzie kilka przesłań.</string>
+    <string name="menu_drawer_title">Menu</string>
 </resources>

@@ -746,13 +746,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
+                final CharSequence restored = getTitleForNavId(state.currentTab);
+                if (restored != null) {
+                    setTitle(restored);
+                }
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                final ActionBar actionBar = getSupportActionBar();
-                if (actionBar != null) actionBar.setTitle("Menu");
+                setTitle(getString(R.string.menu_drawer_title));
                 InputMethodManager inputMethodManager = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager != null && getCurrentFocus() != null) {
@@ -875,18 +878,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null != navigationView) {
             applyExitBackground(navigationView);
         }
-        final Map<Integer, String> fragmentTitles = new HashMap<>();
-        fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
-        fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
-        fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
-        fragmentTitles.put(R.id.nav_search, getString(R.string.tab_search));
-        fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
-        fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
-        fragmentTitles.put(R.id.nav_stats, getString(R.string.tab_stats));
-        fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
-        fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
-        fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
-        //fragmentTitles.put(R.id.nav_, getString(R.string.site_stats_app_name));
 
         try {
             final FragmentManager fragmentManager = getSupportFragmentManager();
@@ -908,12 +899,35 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             // Highlight the selected item, update the title, and close the drawer
             state.currentTab = itemId;
-            setTitle(fragmentTitles.get(itemId));
+            final CharSequence title = getTitleForNavId(itemId);
+            if (title != null) {
+                setTitle(title);
+            }
         } catch (IllegalAccessException ex) {
             Logging.error("Unable to get fragment for id: " + itemId, ex);
         } catch (InstantiationException ex) {
             Logging.error("Unable to make fragment for id: " + itemId, ex);
         }
+    }
+
+    /**
+     * Look up the ActionBar title for a given navigation-drawer item id. Returns null if no
+     * mapping is known (e.g. the drawer has never selected anything). Used by
+     * {@link #selectFragment(int)} on tap and by the drawer-close listener to restore the
+     * per-tab title after the user dismisses the drawer without making a selection.
+     */
+    private CharSequence getTitleForNavId(final int itemId) {
+        if (itemId == R.id.nav_list) return getString(R.string.mapping_app_name);
+        if (itemId == R.id.nav_dash) return getString(R.string.dashboard_app_name);
+        if (itemId == R.id.nav_data) return getString(R.string.data_activity_name);
+        if (itemId == R.id.nav_search) return getString(R.string.tab_search);
+        if (itemId == R.id.nav_news) return getString(R.string.news_app_name);
+        if (itemId == R.id.nav_rank) return getString(R.string.rank_stats_app_name);
+        if (itemId == R.id.nav_stats) return getString(R.string.tab_stats);
+        if (itemId == R.id.nav_uploads) return getString(R.string.uploads_app_name);
+        if (itemId == R.id.nav_settings) return getString(R.string.settings_app_name);
+        if (itemId == R.id.nav_exit) return getString(R.string.menu_exit);
+        return null;
     }
 
     private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {

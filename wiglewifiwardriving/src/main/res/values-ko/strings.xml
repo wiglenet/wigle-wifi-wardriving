@@ -498,4 +498,5 @@
     <string name="flag_whole_database">업로드용 전체 데이터베이스로 설정</string>
     <string name="file_size_warning">여러 차례 업로드가 필요합니다.</string>
     <string name="invalid_foss_config">FOSS 지도 구성이 잘못된 것 같습니다. 설정을 확인하십시오.</string>
+    <string name="menu_drawer_title">메뉴</string>
 </resources>

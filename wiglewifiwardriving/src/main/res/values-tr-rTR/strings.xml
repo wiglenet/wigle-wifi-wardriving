@@ -498,5 +498,6 @@
     <string name="flag_whole_database">Yükleme için tüm veritabanını işaretle</string>
     <string name="file_size_warning">Birden fazla yükleme gerekecek.</string>
     <string name="invalid_foss_config">FOSS harita yapılandırmanız geçersiz görünüyor. Lütfen ayarlarınızı kontrol edin.</string>
+    <string name="menu_drawer_title">Menü</string>
 </resources>
 

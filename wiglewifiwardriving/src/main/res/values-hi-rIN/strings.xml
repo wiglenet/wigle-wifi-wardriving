@@ -497,4 +497,5 @@
     <string name="flag_whole_database">अपलोड के लिए पूरा डेटाबेस सेट करें</string>
     <string name="file_size_warning">एकाधिक अपलोड आवश्यक होंगे।</string>
     <string name="invalid_foss_config">ऐसा प्रतीत होता है कि आपका FOSS मानचित्र कॉन्फ़िगरेशन अमान्य है। कृपया अपनी सेटिंग्स की जाँच करें।</string>
+    <string name="menu_drawer_title">मेन्यू</string>
 </resources>

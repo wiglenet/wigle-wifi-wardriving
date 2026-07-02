@@ -502,4 +502,5 @@
     <string name="flag_whole_database">Set entire database for upload</string>
     <string name="file_size_warning">Multiple uploads will be necessary.</string>
     <string name="invalid_foss_config">It appears your FOSS map configuration is invalid. Please check your settings.</string>
+    <string name="menu_drawer_title">Menu</string>
 </resources>

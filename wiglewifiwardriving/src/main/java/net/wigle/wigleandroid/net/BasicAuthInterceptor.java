@@ -2,6 +2,8 @@ package net.wigle.wigleandroid.net;
 
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -24,6 +26,7 @@ public class BasicAuthInterceptor implements Interceptor {
         this.credentials = Credentials.basic(authname, token);
     }
 
+    @NonNull
     @Override
     public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
         Request request = chain.request();

@@ -497,4 +497,5 @@
     <string name="flag_whole_database">Marcar toda la base de datos para subir</string>
     <string name="file_size_warning">Serán necesarias varias subidas.</string>
     <string name="invalid_foss_config">Parece que la configuración del mapa FOSS no es válida. Por favor, revise sus ajustes.</string>
+    <string name="menu_drawer_title">Menú</string>
 </resources>

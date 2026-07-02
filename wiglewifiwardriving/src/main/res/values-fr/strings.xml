@@ -498,4 +498,5 @@
     <string name="flag_whole_database">Marquer toute la base pour l’envoi</string>
     <string name="file_size_warning">Plusieurs envois seront nécessaires.</string>
     <string name="invalid_foss_config">Il semble que votre configuration de carte FOSS soit invalide. Veuillez vérifier vos paramètres.</string>
+    <string name="menu_drawer_title">Menu</string>
 </resources>

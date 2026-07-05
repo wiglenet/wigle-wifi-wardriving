@@ -364,6 +364,7 @@ public class FossMappingFragment extends AbstractMappingFragment {
                         new org.maplibre.android.geometry.LatLng(
                             centerPoint.latitude, centerPoint.longitude))
                     .zoom(zoom).build());
+        state.cameraInitialized = true;
     }
 
     /**
@@ -596,7 +597,10 @@ public class FossMappingFragment extends AbstractMappingFragment {
                 mapView.getMapAsync(map -> {
                     // Check if we're still finishing (defensive check)
                     if (finishing.get()) {
-                        // save zoom
+                        if (!state.cameraInitialized) {
+                            Logging.info("skipping FOSS map state save: camera never initialized");
+                            return;
+                        }
                         final Activity a = getActivity();
                         if (null != a) {
                             final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);

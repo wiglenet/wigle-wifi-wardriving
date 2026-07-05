@@ -116,12 +116,13 @@ public final class MappingFragment extends AbstractMappingFragment {
         final boolean visualizeRoute = prefs != null && prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false);
 
         mapView.getMapAsync(googleMap -> {
-            configureMapSettings(googleMap, prefs);
+            // NB: Order matters here
             setupLocationTracking(googleMap, prefs);
+            configureMapSettings(googleMap, prefs);
             setupCameraListeners(googleMap);
+            initializeCameraPosition(googleMap, oldCenter, oldZoom, prefs);
             setupTileOverlay(googleMap, prefs);
             setupRouteVisualization(googleMap, prefs, visualizeRoute);
-            initializeCameraPosition(googleMap, oldCenter, oldZoom, prefs);
         });
         Logging.info("done setupMapView.");
     }
@@ -296,6 +297,7 @@ public final class MappingFragment extends AbstractMappingFragment {
                 .zoom(zoom)
                 .build();
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        state.cameraInitialized = true;
     }
 
     private class MapRunnable implements Runnable {
@@ -466,20 +468,22 @@ public final class MappingFragment extends AbstractMappingFragment {
         finishing.set(true);
 
         mapView.getMapAsync(googleMap -> {
-            // save zoom
+            if (!state.cameraInitialized) {
+                Logging.info("skipping map state save: camera not yet initialized");
+                return;
+            }
             final Activity a = getActivity();
             if (null != a) {
-            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-            if (null != prefs) {
-                final Editor edit = prefs.edit();
-                edit.putFloat(PreferenceKeys.PREF_PREV_ZOOM, googleMap.getCameraPosition().zoom);
-                edit.apply();
-            } else {
-                Logging.warn("failed saving map state - unable to get preferences.");
-            }
-            // save center
-            state.oldCenter = new LatLng(googleMap.getCameraPosition().target.latitude,
-                    googleMap.getCameraPosition().target.longitude);
+                final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                if (null != prefs) {
+                    final Editor edit = prefs.edit();
+                    edit.putFloat(PreferenceKeys.PREF_PREV_ZOOM, googleMap.getCameraPosition().zoom);
+                    edit.apply();
+                } else {
+                    Logging.warn("failed saving map state - unable to get preferences.");
+                }
+                state.oldCenter = new LatLng(googleMap.getCameraPosition().target.latitude,
+                        googleMap.getCameraPosition().target.longitude);
             }
         });
         try {

@@ -125,16 +125,21 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
         }
         stopAnimation();
         listAdapter.clear();
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        final LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        int validPointCount = 0;
+        LatLng lastValidPoint = null;
 
         if (null != searchResponse && null != searchResponse.getResults()) {
             for (WiFiSearchResponse.WiFiNetwork net : searchResponse.getResults()) {
                 if (null != net) {
                     final Network n = WiFiSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(new LatLng(n.getLatLng().latitude, n.getLatLng().longitude));
-//1/3: TODO: not working
-
+                    final net.wigle.wigleandroid.model.LatLng pos = n.getLatLng();
+                    if (null != pos) {
+                        lastValidPoint = new LatLng(pos.latitude, pos.longitude);
+                        builder.include(lastValidPoint);
+                        validPointCount++;
+                    }
                 }
             }
         } else if (null != btSearchResponse && null != btSearchResponse.getResults()) {
@@ -142,9 +147,12 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = BtSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(new LatLng(n.getLatLng().latitude, n.getLatLng().longitude));
-
-//2/3: TODO: not working
+                    final net.wigle.wigleandroid.model.LatLng pos = n.getLatLng();
+                    if (null != pos) {
+                        lastValidPoint = new LatLng(pos.latitude, pos.longitude);
+                        builder.include(lastValidPoint);
+                        validPointCount++;
+                    }
                 }
             }
         } else if (null != cellSearchResponse && null != cellSearchResponse.getResults()) {
@@ -152,18 +160,29 @@ public class FossDBResultActivity extends AbstractDBResultActivity {
                 if (null != net) {
                     final Network n = CellSearchResponse.asNetwork(net);
                     listAdapter.add(n);
-                    builder.include(new LatLng(n.getLatLng().latitude, n.getLatLng().longitude));
-
-//3/3: TODO: not working
+                    final net.wigle.wigleandroid.model.LatLng pos = n.getLatLng();
+                    if (null != pos) {
+                        lastValidPoint = new LatLng(pos.latitude, pos.longitude);
+                        builder.include(lastValidPoint);
+                        validPointCount++;
+                    }
                 }
             }
         }
-        if (!listAdapter.isEmpty()) {
-            try {
-                mapView.getMapAsync(mapLibre -> mapLibre.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
-            } catch (IllegalStateException ise) {
-                Logging.error("Illegal state exception on map move: ", ise);
-            }
+        if (mapView != null && validPointCount > 0) {
+            final int finalValidPointCount = validPointCount;
+            final LatLng singlePoint = lastValidPoint;
+            mapView.getMapAsync(mapLibre -> {
+                try {
+                    if (finalValidPointCount > 1) {
+                        mapLibre.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0));
+                    } else {
+                        mapLibre.moveCamera(CameraUpdateFactory.newLatLng(singlePoint));
+                    }
+                } catch (RuntimeException ex) {
+                    Logging.error("Exception on map move: ", ex);
+                }
+            });
         }
         resultList.clear();
     }

@@ -123,6 +123,10 @@ public class WifiReceiver extends BroadcastReceiver {
         scanInFlight = false;
         final long now = System.currentTimeMillis();
         lastScanResponseTime = now;
+        // Refresh the scan PARTIAL_WAKE_LOCK on scan completed instead of pinning the CPU
+        if (mainActivity != null) {
+            mainActivity.refreshScanWakeLock();
+        }
         // final long start = now;
         final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         List<ScanResult> results = null;

@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -177,6 +178,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private PowerManager.WakeLock scanWakeLock;
+        // Whether scanning is currently on + wants scan wake lock while the display is off.
+        private boolean wantsScanWakeLock = false;
         private int logPointer = 0;
         private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
@@ -227,6 +230,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final long FINISH_TIME_MILLIS = 10L;
     private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
 
+    // Timeout used for the scan-cycle PARTIAL_WAKE_LOCK. Refreshed from WifiReceiver.onReceive() so
+    // that as long as scans keep firing we hold the lock. Combat excessive wake-locks.
+    private static final long SCAN_WAKE_REFRESH_MS = 30_000L;
+
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
     public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
     public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
@@ -241,6 +248,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private static MainActivity mainActivity;
     private BatteryLevelReceiver batteryLevelReceiver;
+    private BroadcastReceiver screenStateReceiver;
     private boolean playServiceShown = false;
 
     private DrawerLayout mDrawerLayout;
@@ -453,6 +461,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setupDatabase(prefs);
         Logging.info("MAIN: setupBattery");
         setupBattery();
+        Logging.info("MAIN: setupScreenStateReceiver");
+        setupScreenStateReceiver();
         Logging.info("MAIN: setupSound");
         setupSound();
         Logging.info("MAIN: setupActivationDialog");
@@ -1139,13 +1149,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bluetoothReceiver.stopScanning();
                 state.bluetoothReceiver.close();
             }
-            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
+            if (screenStateReceiver != null) {
                 try {
-                    state.scanWakeLock.release();
-                } catch (Exception ex) {
-                    Logging.info("exception releasing scanWakeLock in onDestroy: " + ex);
+                    Logging.info("unregister screenStateReceiver");
+                    unregisterReceiver(screenStateReceiver);
+                } catch (final IllegalArgumentException ex) {
+                    Logging.info("screenStateReceiver not registered: " + ex);
                 }
+                screenStateReceiver = null;
             }
+            if (state != null) {
+                state.wantsScanWakeLock = false;
+            }
+            releaseScanWakeLock();
             finishSoon(DESTROY_FINISH_MILLIS, false);
         } else {
             state.uiRestart.set(false);
@@ -2170,6 +2186,33 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
+    /**
+     * Register a receiver for screen on/off so we can gate the scan PARTIAL_WAKE_LOCK on screen
+     * state. Combats "excessive wake lock" time as reported by Play Console.
+     */
+    private void setupScreenStateReceiver() {
+        if (screenStateReceiver != null) {
+            return;
+        }
+        screenStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(final Context context, final Intent intent) {
+                final String action = intent == null ? null : intent.getAction();
+                if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                    Logging.info("SCREEN_OFF: acquiring scan wake lock if scanning");
+                    acquireScanWakeLockIfNeeded();
+                } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                    Logging.info("SCREEN_ON: releasing scan wake lock");
+                    releaseScanWakeLock();
+                }
+            }
+        };
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenStateReceiver, filter);
+    }
+
     public void setTransferring() {
         Logging.info("setTransferring");
         state.transferring.set(true);
@@ -2295,7 +2338,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return null;
     }
 
-    @SuppressLint("WakelockTimeout")
     private void internalHandleScanChange(final boolean isScanning) {
         Logging.info("\tmain internalHandleScanChange: isScanning now: " + isScanning);
         ListFragment listFragment = getListFragmentIfCurrent();
@@ -2317,11 +2359,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (!state.wifiLock.isHeld()) {
                 state.wifiLock.acquire();
             }
-            // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off
-            if (state.scanWakeLock != null && !state.scanWakeLock.isHeld()) {
-                //TODO: are we allowed to do this?
-                state.scanWakeLock.acquire();
-            }
+            // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off. Actually acquired
+            // by acquireScanWakeLockIfNeeded() and by the SCREEN_OFF broadcast; refreshed each time
+            // WifiReceiver.onReceive() fires.
+            state.wantsScanWakeLock = true;
+            acquireScanWakeLockIfNeeded();
             optionalShowBatteryOptDialog();
         } else {
             if (listFragment != null) {
@@ -2342,16 +2384,53 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("\texception releasing wifilock: " + ex);
                 }
             }
-            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
-                try {
-                    state.scanWakeLock.release();
-                } catch (Exception ex) {
-                    Logging.info("\texception releasing scanWakeLock: " + ex);
-                }
-            }
+            state.wantsScanWakeLock = false;
+            releaseScanWakeLock();
         }
         if (null != state && null != state.wigleService) {
             state.wigleService.setupNotification();
+        }
+    }
+
+    /**
+     * Acquire (or refresh) the scan PARTIAL_WAKE_LOCK if scanning is on and the screen is off
+     */
+    @SuppressLint("Wakelock")
+    private void acquireScanWakeLockIfNeeded() {
+        if (state == null || state.scanWakeLock == null || !state.wantsScanWakeLock) {
+            return;
+        }
+        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm == null || pm.isInteractive()) {
+            // screen is on - display already keeps CPU up, no PARTIAL_WAKE_LOCK needed
+            return;
+        }
+        try {
+            // safe to call whether or not it's already held; refreshes the timeout
+            state.scanWakeLock.acquire(SCAN_WAKE_REFRESH_MS);
+        } catch (Exception ex) {
+            Logging.info("exception acquiring scanWakeLock: " + ex);
+        }
+    }
+
+    /**
+     * Called by WifiReceiver.onReceive() to bump the timed wake lock while scans are actively
+     * completing. If scans stop firing, the wake lock lapses on its own within SCAN_WAKE_REFRESH_MS.
+     */
+    public void refreshScanWakeLock() {
+        acquireScanWakeLockIfNeeded();
+    }
+
+    private void releaseScanWakeLock() {
+        if (state == null || state.scanWakeLock == null) {
+            return;
+        }
+        if (state.scanWakeLock.isHeld()) {
+            try {
+                state.scanWakeLock.release();
+            } catch (Exception ex) {
+                Logging.info("\texception releasing scanWakeLock: " + ex);
+            }
         }
     }
 

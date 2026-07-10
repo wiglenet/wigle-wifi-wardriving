@@ -599,19 +599,20 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             });
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_map_theme, PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);
-            final String[] languages = new String[]{"", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
+            final String[] languages = new String[]{"", "en", "ar", "cs", "da", "de", "el-rGR", "es-rES", "fi", "fr", "fy",
                     "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
                     "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK"};
             final String[] languageName = new String[]{getString(R.string.auto), getString(R.string.language_en),
                     getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
-                    getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
-                    getString(R.string.language_fr), getString(R.string.language_fy), getString(R.string.language_he),
-                    getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
-                    getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
-                    getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
-                    getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO), getString(R.string.language_ru),
-                    getString(R.string.language_sv), getString(R.string.language_sw), getString(R.string.language_tr),
-                    getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
+                    getString(R.string.language_de), getString(R.string.language_el), getString(R.string.language_es),
+                    getString(R.string.language_fi), getString(R.string.language_fr), getString(R.string.language_fy),
+                    getString(R.string.language_he), getString(R.string.language_hi), getString(R.string.language_hu),
+                    getString(R.string.language_it), getString(R.string.language_ja), getString(R.string.language_ko),
+                    getString(R.string.language_nl), getString(R.string.language_no), getString(R.string.language_pl),
+                    getString(R.string.language_pt), getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO),
+                    getString(R.string.language_ru), getString(R.string.language_sv), getString(R.string.language_sw),
+                    getString(R.string.language_tr), getString(R.string.language_zh_cn), getString(R.string.language_zh_tw),
+                    getString(R.string.language_zh_hk),
             };
             SettingsUtil.doSpinner(R.id.language_spinner, view, PreferenceKeys.PREF_LANGUAGE, "", languages, languageName, getContext());
             final CheckBox fossMapOn = PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.foss_maps, PreferenceKeys.PREF_USE_FOSS_MAPS, false, value -> {

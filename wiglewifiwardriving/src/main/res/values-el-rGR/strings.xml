@@ -328,7 +328,7 @@
     <string name="authorize">Σύνδεση (login)</string>
     <string name="anonymous_confirm">Ανώνυμη μεταφόρτωση; Αυτό θα καταργήσει τυχόν υπάρχουσες πληροφορίες σύνδεσης από τη συσκευή σας.</string>
     <string name="title_activity_activate">Σάρωση για ενεργοποίηση</string>
-    <string name="unknown_number">??</string>
+    <string name="unknown_number">\?\?</string>
     <string name="show_discovered_since">Εμφάνιση Δικτύων που Ανακαλύφθηκαν Από</string>
     <string name="show_discovered">Εμφάνιση Ανακαλυφθέντων Δικτύων στον Χάρτη</string>
     <string name="map_none">Κανένα</string>

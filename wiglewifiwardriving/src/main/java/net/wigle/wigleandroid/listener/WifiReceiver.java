@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.listener;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DecimalFormat;
@@ -221,7 +222,11 @@ public class WifiReceiver extends BroadcastReceiver {
                         String rcois = null;
                         for ( ScanResult.InformationElement info : result.getInformationElements()) {
                             if (info.getId() == net.wigle.wigleandroid.listener.WifiReceiver.EID_ROAMING_CONSORTIUM) {
-                                rcois = net.wigle.wigleandroid.listener.WifiReceiver.getConcatenatedRcois(info);
+                                try {
+                                    rcois = net.wigle.wigleandroid.listener.WifiReceiver.getConcatenatedRcois(info);
+                                } catch (RuntimeException ex) {
+                                    Logging.warn("Failed to parse Roaming Consortium IE: " + ex);
+                                }
                             }
                         }
                         network.setRcois(rcois);
@@ -405,11 +410,23 @@ public class WifiReceiver extends BroadcastReceiver {
             // ElementID (1 Octet), Length (1 Octet), Number of OIs (1 Octet), OI #1 and #2 Lengths (1 Octet), OI#1 (variable), OI#2 (variable), OI#3 (variable)
             // where 1 octet "OI #1 and #2 Length" comprises: OI#1 Length [B0-B3], OI#2 Length [B4-B7]
             ByteBuffer data = ie.getBytes().order(ByteOrder.LITTLE_ENDIAN);
+            if (data.remaining() < 2) {
+                Logging.warn("RCOI IE too short: " + data.remaining());
+                return null;
+            }
             data.get(); // anqpOICount
             int oi12Length = data.get() & BYTE_MASK;
             int oi1Length = oi12Length & NIBBLE_MASK;
             int oi2Length = (oi12Length >>> 4) & NIBBLE_MASK;
-            int oi3Length = ie.getBytes().limit() - 2 - oi1Length - oi2Length;
+            int oi3Length = data.limit() - 2 - oi1Length - oi2Length;
+
+            // Claimed OI lengths must fit in the IE payload (header is the 2 bytes already consumed).
+            if (oi1Length + oi2Length > data.remaining() || oi3Length < 0) {
+                Logging.warn("RCOI IE OI lengths exceed payload: oi1=" + oi1Length
+                        + " oi2=" + oi2Length + " oi3=" + oi3Length
+                        + " remaining=" + data.remaining());
+                return null;
+            }
 
             if (oi1Length > 0) {
                 final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi1Length, 0);
@@ -417,15 +434,23 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             if (oi2Length > 0) {
                 final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi2Length, oi1Length);
-                concatenatedRcois += " " + formatRcoi(rcoiInteger);
+                concatenatedRcois = appendRcoi(concatenatedRcois, rcoiInteger);
             }
             if (oi3Length > 0) {
                 final long rcoiInteger = getInteger(data, ByteOrder.BIG_ENDIAN, oi3Length, oi2Length + oi1Length);
-                concatenatedRcois += " " + formatRcoi(rcoiInteger);
+                concatenatedRcois = appendRcoi(concatenatedRcois, rcoiInteger);
             }
         }
         // OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
         return concatenatedRcois;
+    }
+
+    private static String appendRcoi(final String existing, final long rcoi) {
+        final String formatted = formatRcoi(rcoi);
+        if (existing == null || existing.isEmpty()) {
+            return formatted;
+        }
+        return existing + " " + formatted;
     }
 
     private static String formatRcoi(final long rcoi) {
@@ -436,7 +461,14 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     public static long getInteger(ByteBuffer payload, ByteOrder bo, int size, int position) {
-        payload.position(position + 2);
+        if (size < 0) {
+            throw new IllegalArgumentException("RCOI size < 0: " + size);
+        }
+        final int start = position + 2;
+        if (start < 0 || size > payload.limit() - start) {
+            throw new BufferUnderflowException();
+        }
+        payload.position(start);
         long value = 0;
         if (bo == ByteOrder.LITTLE_ENDIAN) {
             final byte[] octets = new byte[size];

@@ -32,6 +32,7 @@ import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.ClipboardManager;
 import android.text.InputType;
@@ -84,6 +85,7 @@ import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -114,6 +116,7 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     protected int observations = 0;
     protected boolean isDbResult = false;
     protected NumberFormat numberFormat;
+    private ObservationQueryHandler observationQueryHandler;
 
     /**
      * Observation query for network
@@ -495,6 +498,10 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     @Override
     public void onDestroy() {
         Logging.info("NET: onDestroy");
+        if (observationQueryHandler != null) {
+            observationQueryHandler.removeCallbacksAndMessages(null);
+            observationQueryHandler = null;
+        }
         destroyMapView();
         super.onDestroy();
     }
@@ -527,21 +534,9 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         super.onLowMemory();
     }
 
-    @SuppressLint("HandlerLeak")
     protected void setupQuery() {
-        // what runs on the gui thread
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage( final Message msg ) {
-                final TextView tv = findViewById( R.id.na_observe );
-                if ( msg.what == MSG_OBS_UPDATE ) {
-                    tv.setText( numberFormat.format( observations ));
-                } else if ( msg.what == MSG_OBS_DONE ) {
-                    tv.setText( numberFormat.format( observations ) );
-                    mapObservations();
-                }
-            }
-        };
+        // Static handler + WeakReference so a long DB query cannot pin this Activity
+        observationQueryHandler = new ObservationQueryHandler(this);
 
         PooledQueryExecutor.enqueue( new PooledQueryExecutor.Request( OBSERVATION_QUERY_SQL,
                 new String[]{network.getBssid(), obsMap.maxSize()+""}, new PooledQueryExecutor.ResultHandler() {
@@ -551,17 +546,50 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                 obsMap.put( new net.wigle.wigleandroid.model.LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
                 if ( ( observations % 10 ) == 0 ) {
                     // change things on the gui thread
-                    handler.sendEmptyMessage( MSG_OBS_UPDATE );
+                    final ObservationQueryHandler handler = observationQueryHandler;
+                    if (handler != null) {
+                        handler.sendEmptyMessage( MSG_OBS_UPDATE );
+                    }
                 }
                 return true;
             }
 
             @Override
             public void complete() {
-                handler.sendEmptyMessage( MSG_OBS_DONE );
+                final ObservationQueryHandler handler = observationQueryHandler;
+                if (handler != null) {
+                    handler.sendEmptyMessage( MSG_OBS_DONE );
+                }
             }
         }, ListFragment.lameStatic.dbHelper ));
         //ListFragment.lameStatic.dbHelper.addToQueue( request );
+    }
+
+    private static final class ObservationQueryHandler extends Handler {
+        private final WeakReference<AbstractNetworkActivity> activityRef;
+
+        ObservationQueryHandler(final AbstractNetworkActivity activity) {
+            super(Looper.getMainLooper());
+            this.activityRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(final Message msg) {
+            final AbstractNetworkActivity activity = activityRef.get();
+            if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+            final TextView tv = activity.findViewById(R.id.na_observe);
+            if (tv == null || activity.numberFormat == null) {
+                return;
+            }
+            if (msg.what == MSG_OBS_UPDATE) {
+                tv.setText(activity.numberFormat.format(activity.observations));
+            } else if (msg.what == MSG_OBS_DONE) {
+                tv.setText(activity.numberFormat.format(activity.observations));
+                activity.mapObservations();
+            }
+        }
     }
 
     /**

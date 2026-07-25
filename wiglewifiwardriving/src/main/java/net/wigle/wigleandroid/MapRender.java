@@ -69,6 +69,7 @@ public class MapRender {
     private static final int MAX_LABELS = MainActivity.getNetworkCache().maxSize() / 10;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private volatile boolean destroyed;
 
     private class NetworkRenderer extends DefaultClusterRenderer<Network> {
         final NetworkIconGenerator iconFactory;
@@ -203,26 +204,54 @@ public class MapRender {
         private void setupRelabelingTask() {
             // setup camera change listener to fire the asynctask
             Handler handler = new Handler(Looper.getMainLooper());
-            final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
-            map.setOnCameraIdleListener(() -> executor.execute(() -> {
-                final Collection<Network> nets = MainActivity.getNetworkCache().values();
-                final ArrayList<String> ssids = new ArrayList<>(nets.size());
-                for (final Network network : nets) {
-                    final Marker marker = NetworkRenderer.this.getMarker(network);
-                    if (marker != null && network.getLatLng() != null) {
-                        final boolean inBounds = bounds.contains(network.getPosition());
-                        if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
-                            // MainActivity.info("sendupdate: " + network.getBssid());
-                            ssids.add(network.getBssid());
+            map.setOnCameraIdleListener(() -> {
+                if (destroyed || executor.isShutdown()) {
+                    return;
+                }
+                final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+                executor.execute(() -> {
+                    if (destroyed) {
+                        return;
+                    }
+                    final Collection<Network> nets = MainActivity.getNetworkCache().values();
+                    final ArrayList<String> ssids = new ArrayList<>(nets.size());
+                    for (final Network network : nets) {
+                        final Marker marker = NetworkRenderer.this.getMarker(network);
+                        if (marker != null && network.getLatLng() != null) {
+                            final boolean inBounds = bounds.contains(network.getPosition());
+                            if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
+                                // MainActivity.info("sendupdate: " + network.getBssid());
+                                ssids.add(network.getBssid());
+                            }
                         }
                     }
-                }
-                if (!ssids.isEmpty()) {
-                    sendUpdateNetwork(ssids);
-                }
-                handler.post(mClusterManager::cluster);
-            }));
+                    if (!ssids.isEmpty()) {
+                        sendUpdateNetwork(ssids);
+                    }
+                    if (!destroyed) {
+                        handler.post(() -> {
+                            if (!destroyed) {
+                                mClusterManager.cluster();
+                            }
+                        });
+                    }
+                });
+            });
         }
+    }
+
+    /**
+     * Avoid race conditions on destruction (mirrors FossMapRender.destroy).
+     */
+    public void destroy() {
+        destroyed = true;
+        try {
+            map.setOnCameraIdleListener(null);
+        } catch (final Exception ex) {
+            Logging.info("MapRender: exception clearing camera idle listener: " + ex);
+        }
+        updateMarkersHandler.removeCallbacksAndMessages(null);
+        executor.shutdown();
     }
 
     public MapRender(final Context context, final GoogleMap map, final boolean isDbResult) {
@@ -288,6 +317,9 @@ public class MapRender {
     }
 
     public void addItem(final Network network) {
+        if (destroyed) {
+            return;
+        }
         if (network.getPosition() != null) {
             final int count = networkCount.incrementAndGet();
             if (count > MainActivity.getNetworkCache().size() * 1.3) {
@@ -302,6 +334,9 @@ public class MapRender {
     }
 
     public void clear() {
+        if (destroyed) {
+            return;
+        }
         Logging.info("MapRender: clear");
         labeledNetworks.clear();
         networkCount.set(0);
@@ -310,6 +345,9 @@ public class MapRender {
     }
 
     public void reCluster() {
+        if (destroyed) {
+            return;
+        }
         Logging.info("MapRender: reCluster");
         clear();
         if (!isDbResult) {
@@ -318,17 +356,26 @@ public class MapRender {
     }
 
     public void onResume() {
+        if (destroyed) {
+            return;
+        }
         ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
         reCluster();
     }
 
     public void updateNetwork(final Network network) {
+        if (destroyed) {
+            return;
+        }
         if (okForMapTab(network)) {
             sendUpdateNetwork(network.getBssid());
         }
     }
 
     private void sendUpdateNetwork(final String bssid) {
+        if (destroyed) {
+            return;
+        }
         final Bundle data = new Bundle();
         data.putString(MESSAGE_BSSID, bssid);
         Message message = new Message();
@@ -337,6 +384,9 @@ public class MapRender {
     }
 
     private void sendUpdateNetwork(final ArrayList<String> bssids) {
+        if (destroyed) {
+            return;
+        }
         final Bundle data = new Bundle();
         data.putStringArrayList(MESSAGE_BSSID_LIST, bssids);
         Message message = new Message();
@@ -347,6 +397,9 @@ public class MapRender {
     final Handler updateMarkersHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(final Message message) {
+            if (destroyed) {
+                return;
+            }
             final String bssid = message.getData().getString(MESSAGE_BSSID);
             if (bssid != null) {
                 // MainActivity.info("handleMessage: " + bssid);

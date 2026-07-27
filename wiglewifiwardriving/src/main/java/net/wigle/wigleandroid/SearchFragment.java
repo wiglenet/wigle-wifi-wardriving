@@ -44,6 +44,10 @@ public class SearchFragment extends AbstractSearchFragment {
 
     @Override
     public void onDestroy() {
+        if (mapRender != null) {
+            mapRender.destroy();
+            mapRender = null;
+        }
         if (mapView != null) {
             mapView.onDestroy();
         }

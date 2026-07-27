@@ -143,6 +143,10 @@ public class DBResultActivity extends AbstractDBResultActivity {
 
     @Override
     public void onDestroy() {
+        if (mapRender != null) {
+            mapRender.destroy();
+            mapRender = null;
+        }
         if (mapView != null) {
             mapView.onDestroy();
         }

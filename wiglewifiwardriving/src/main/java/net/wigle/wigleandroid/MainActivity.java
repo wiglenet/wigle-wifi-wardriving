@@ -150,6 +150,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
         public DatabaseHelper dbHelper;
+        public net.wigle.wigleandroid.util.RssiHistoryCache rssiHistoryCache;
         ServiceConnection serviceConnection;
         WigleService wigleService;
         AtomicBoolean finishing;
@@ -1084,6 +1085,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.mxcDbHelper == null) {
             state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext(), prefs);
         }
+        final boolean histogramsEnabled = prefs.getBoolean(
+                PreferenceKeys.PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS, false);
+        if (state.rssiHistoryCache == null) {
+            state.rssiHistoryCache = new net.wigle.wigleandroid.util.RssiHistoryCache(histogramsEnabled);
+        } else {
+            state.rssiHistoryCache.setEnabled(histogramsEnabled);
+        }
     }
 
     public static State getStaticState() {
@@ -1421,6 +1429,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     public static ConcurrentLinkedHashMap<String, Network> getNetworkCache() {
         return ListFragment.lameStatic.networkCache;
+    }
+
+    /**
+     * Record a timestamped RSSI sample into the global history cache.
+     * No-op when the cache is absent or disabled (pref off).
+     */
+    public static void recordRssiSample(final String bssid, final int level) {
+        final State s = getStaticState();
+        if (s != null && s.rssiHistoryCache != null) {
+            s.rssiHistoryCache.record(bssid, level);
+        }
     }
 
     public static void addNetworkToMap(final Network network) {

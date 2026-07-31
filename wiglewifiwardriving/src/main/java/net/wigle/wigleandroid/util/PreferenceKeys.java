@@ -10,6 +10,7 @@ public class PreferenceKeys {
     public static final String PREF_TOKEN_IV = "tokenIV";
     public static final String PREF_TOKEN_TAG_LENGTH = "tokenTagLength";
     public static final String PREF_SHOW_CURRENT = "showCurrent";
+    public static final String PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS = "displayInlineListSignalHistograms";
     public static final String PREF_BE_ANONYMOUS = "beAnonymous";
     public static final String PREF_DONATE = "donate";
     public static final String PREF_DB_MARKER = "dbMarker";

@@ -238,6 +238,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     // cache hit, just set the level
                     network.setLevel( result.level );
                 }
+                MainActivity.recordRssiSample(network.getBssid(), result.level);
 
                 final boolean added = runNetworks.add( result.BSSID );
                 if ( added ) {

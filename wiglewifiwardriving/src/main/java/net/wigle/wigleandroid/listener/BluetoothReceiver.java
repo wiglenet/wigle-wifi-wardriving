@@ -799,6 +799,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 }
             }
         }
+        MainActivity.recordRssiSample(network.getBssid(), network.getLevel());
 
         if ( location != null && (newForRun || network.getLatLng() == null) ) {
             // set the LatLng for mapping

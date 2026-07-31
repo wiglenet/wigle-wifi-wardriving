@@ -1,12 +1,12 @@
 package net.wigle.wigleandroid.ui;
 
 import static android.view.View.GONE;
-import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static net.wigle.wigleandroid.R.color.list_item_match_background;
 import static net.wigle.wigleandroid.model.NetworkType.BLE;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
@@ -25,10 +25,13 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
+import net.wigle.wigleandroid.model.RssiSample;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.RssiHistoryCache;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Matcher;
 
 /**
@@ -41,6 +44,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
 
     private final boolean historical;
     private final MainActivity mainActivity;
+    private final SharedPreferences prefs;
 
     public SetNetworkListAdapter(final Context context, final boolean historical, final int rowLayout) {
         super(context, rowLayout);
@@ -49,6 +53,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             ListFragment.lameStatic.oui = new OUI(context.getAssets());
         }
         mainActivity = MainActivity.getMainActivity();
+        prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     public void updateBssidFilterMatcher() {
@@ -187,13 +192,19 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     @NonNull
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        // long start = System.currentTimeMillis();
-        View row;
+        final ViewHolder holder;
+        final View row;
 
         if (null == convertView) {
             row = mInflater.inflate(R.layout.row, parent, false);
+            holder = new ViewHolder(row);
+            final int fillColor = ContextCompat.getColor(getContext(), R.color.colorListSsidText);
+            holder.histogramDrawable = new RssiHistogramDrawable(fillColor);
+            holder.histogramView.setBackground(holder.histogramDrawable);
+            row.setTag(holder);
         } else {
             row = convertView;
+            holder = (ViewHolder) row.getTag();
         }
 
         Network network;
@@ -231,96 +242,141 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             row.setBackgroundColor(0);
         }
 
-        final ImageView ico = row.findViewById(R.id.wepicon);
-        ico.setImageResource(NetworkListUtil.getImage(network));
+        bindHistogram(holder, network);
 
-        final ImageView btico = row.findViewById(R.id.bticon);
+        holder.wepIcon.setImageResource(NetworkListUtil.getImage(network));
+
         if (NetworkType.BT.equals(network.getType()) || BLE.equals(network.getType())) {
-            btico.setVisibility(View.VISIBLE);
+            holder.btIcon.setVisibility(View.VISIBLE);
             Integer btImageId = NetworkListUtil.getBtImage(network);
             if (null == btImageId) {
-                btico.setVisibility(View.GONE);
+                holder.btIcon.setVisibility(View.GONE);
             } else {
-                btico.setImageResource(btImageId);
-                ImageViewCompat.setImageTintList(btico, ColorStateList.valueOf(
+                holder.btIcon.setImageResource(btImageId);
+                ImageViewCompat.setImageTintList(holder.btIcon, ColorStateList.valueOf(
                         ContextCompat.getColor(getContext(), R.color.colorNavigationItemFg)));
             }
         } else {
-            btico.setVisibility(View.GONE);
+            holder.btIcon.setVisibility(View.GONE);
         }
 
-        final ImageView passpointIcon = row.findViewById(R.id.passpoint_logo_view);
         if (NetworkType.WIFI.equals(network.getType())) {
             if (network.isPasspoint()) {
-                passpointIcon.setVisibility(VISIBLE);
+                holder.passpointIcon.setVisibility(VISIBLE);
             } else {
-                passpointIcon.setVisibility(GONE);
+                holder.passpointIcon.setVisibility(GONE);
             }
         } else {
-            passpointIcon.setVisibility(GONE);
+            holder.passpointIcon.setVisibility(GONE);
         }
 
-        final ImageView btRandom = row.findViewById(R.id.btrandom);
         if (BLE.equals(network.getType())) {
             final Integer bleAddressType = network.getBleAddressType();
             if (null != bleAddressType /*&& (bleAddressType == ADDRESS_TYPE_RANDOM || bleAddressType == ADDRESS_TYPE_ANONYMOUS)*/) {
                 final Integer img = NetworkListUtil.getBleAddrTypeImage(bleAddressType, network.getBssid());
                 if (null != img) {
-                    btRandom.setImageResource(img);
-                    btRandom.setVisibility(View.VISIBLE);
+                    holder.btRandom.setImageResource(img);
+                    holder.btRandom.setVisibility(View.VISIBLE);
                 } else {
-                    btRandom.setVisibility(View.GONE);
+                    holder.btRandom.setVisibility(View.GONE);
                 }
             } else {
                 //DEBUG: Logging.error("null/random address type: "+bleAddressType);
-                btRandom.setVisibility(View.GONE);
+                holder.btRandom.setVisibility(View.GONE);
             }
         } else {
-            btRandom.setVisibility(View.GONE);
+            holder.btRandom.setVisibility(View.GONE);
         }
 
-        TextView tv = row.findViewById(R.id.ssid);
-        tv.setText(network.getSsid());
+        holder.ssid.setText(network.getSsid());
 
-        tv = row.findViewById(R.id.oui);
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
-        tv.setText(ouiString + sep);
+        holder.oui.setText(ouiString + sep);
         if (BLE.equals(network.getType())) {
-            tv.setTextAppearance(R.style.ListBt);
+            holder.oui.setTextAppearance(R.style.ListBt);
         } else {
-            tv.setTextAppearance(R.style.ListOui);
+            holder.oui.setTextAppearance(R.style.ListOui);
         }
 
-        tv = row.findViewById(R.id.time);
-        tv.setText(NetworkListUtil.getTime(network, historical, getContext()));
+        holder.time.setText(NetworkListUtil.getTime(network, historical, getContext()));
 
-        tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tv.setTextColor(NetworkListUtil.getTextColorForSignal(parent.getContext(), level));
+            holder.level.setTextColor(NetworkListUtil.getTextColorForSignal(parent.getContext(), level));
         } else {
-            tv.setTextColor(NetworkListUtil.getSignalColor(level, false));
+            holder.level.setTextColor(NetworkListUtil.getSignalColor(level, false));
         }
-        tv.setText(Integer.toString(level));
+        holder.level.setText(Integer.toString(level));
 
-        tv = row.findViewById(R.id.mac_string);
-        tv.setText(network.getBssid());
+        holder.mac.setText(network.getBssid());
 
-        tv = row.findViewById(R.id.chan_freq_string);
         if (NetworkType.WIFI.equals(network.getType())) {
-            tv.setText(network.getFrequency()+"MHz");
+            holder.chanFreq.setText(network.getFrequency()+"MHz");
         } else if (BLE.equals(network.getType())) {
-            tv.setText(network.getType().toString());
+            holder.chanFreq.setText(network.getType().toString());
         } else {
-            tv.setText("");
+            holder.chanFreq.setText("");
         }
 
-        tv = row.findViewById(R.id.detail);
-        String det = network.getDetail();
-        tv.setText(det);
-        // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );
+        holder.detail.setText(network.getDetail());
 
         return row;
+    }
+
+    private void bindHistogram(final ViewHolder holder, final Network network) {
+        if (holder.histogramDrawable == null || holder.histogramView == null) {
+            return;
+        }
+        final boolean show = !historical
+                && prefs != null
+                && prefs.getBoolean(PreferenceKeys.PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS, false);
+        if (!show) {
+            holder.histogramDrawable.clear();
+            return;
+        }
+        final MainActivity.State state = MainActivity.getStaticState();
+        final RssiHistoryCache cache = state != null ? state.rssiHistoryCache : null;
+        if (cache == null || !cache.isEnabled()) {
+            holder.histogramDrawable.clear();
+            return;
+        }
+        final List<RssiSample> samples = cache.getSeries(network.getBssid());
+        if (samples.isEmpty()) {
+            holder.histogramDrawable.clear();
+            return;
+        }
+        holder.histogramDrawable.setSamples(samples, System.currentTimeMillis());
+    }
+
+    private static final class ViewHolder {
+        final View histogramView;
+        final ImageView wepIcon;
+        final ImageView btIcon;
+        final ImageView passpointIcon;
+        final ImageView btRandom;
+        final TextView ssid;
+        final TextView oui;
+        final TextView time;
+        final TextView level;
+        final TextView mac;
+        final TextView chanFreq;
+        final TextView detail;
+        RssiHistogramDrawable histogramDrawable;
+
+        ViewHolder(final View row) {
+            histogramView = row.findViewById(R.id.rssi_histogram);
+            wepIcon = row.findViewById(R.id.wepicon);
+            btIcon = row.findViewById(R.id.bticon);
+            passpointIcon = row.findViewById(R.id.passpoint_logo_view);
+            btRandom = row.findViewById(R.id.btrandom);
+            ssid = row.findViewById(R.id.ssid);
+            oui = row.findViewById(R.id.oui);
+            time = row.findViewById(R.id.time);
+            level = row.findViewById(R.id.level_string);
+            mac = row.findViewById(R.id.mac_string);
+            chanFreq = row.findViewById(R.id.chan_freq_string);
+            detail = row.findViewById(R.id.detail);
+        }
     }
 }

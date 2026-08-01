@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -14,12 +15,12 @@ import net.wigle.wigleandroid.R;
 
 /**
  * {@link DrawerArrowDrawable} variant that paints a faint WiGLE "W" logo
- * ({@code R.drawable.ic_w_logo_simple_mono}) behind the animated
- * hamburger / back-arrow indicator.
+ * outline ({@code R.drawable.ic_w_logo_simple_mono_outline}) behind the
+ * animated hamburger / back-arrow indicator.
  *
- * <p>The watermark is tinted with the same color as the DrawerArrowDrawable
- * itself (which resolves to the theme's action-bar foreground /
- * {@code colorControlNormal}), so it automatically tracks light/dark themes.
+ * <p>The watermark is stroke-only (no fill) and tinted with the theme's
+ * {@code UploadColor} text color so it tracks light/dark (and API-level)
+ * UploadColor variants independently of the hamburger/arrow color.
  *
  * <p>The watermark also fades out as the drawer opens: at
  * {@link #setProgress(float)} progress {@code 0} (drawer fully closed, plain
@@ -45,19 +46,32 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
      */
     private static final float WATERMARK_SCALE = 1.67f;
 
+    /** Fallback matching values/styles.xml UploadColor when style resolve fails. */
+    private static final int UPLOAD_COLOR_FALLBACK = 0xFFEABA44;
+
     private final Drawable watermark;
     private final Rect watermarkBounds = new Rect();
+    private final int uploadColor;
 
     public WLogoDrawerArrowDrawable(@NonNull final Context context) {
         super(context);
-        // mutate() so setAlpha/setTint on this instance don't leak to any
-        // other place that also renders ic_w_logo_simple_mono (e.g. the
-        // WigleService status-bar icon).
-        final Drawable src = ContextCompat.getDrawable(context, R.drawable.ic_w_logo_simple_mono);
+        this.uploadColor = resolveUploadColor(context);
+        // Stroke-only outline variant; mutate() so tint/alpha stay local.
+        final Drawable src = ContextCompat.getDrawable(context, R.drawable.ic_w_logo_simple_mono_outline);
         this.watermark = (src != null) ? src.mutate() : null;
         if (this.watermark != null) {
-            DrawableCompat.setTint(this.watermark, getColor());
+            DrawableCompat.setTint(this.watermark, uploadColor);
             this.watermark.setAlpha(WATERMARK_MAX_ALPHA);
+        }
+    }
+
+    private static int resolveUploadColor(@NonNull final Context context) {
+        final TypedArray a = context.obtainStyledAttributes(
+                R.style.UploadColor, new int[]{android.R.attr.textColor});
+        try {
+            return a.getColor(0, UPLOAD_COLOR_FALLBACK);
+        } finally {
+            a.recycle();
         }
     }
 
@@ -91,14 +105,4 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
         }
     }
 
-    @Override
-    public void setColor(final int color) {
-        super.setColor(color);
-        if (watermark != null) {
-            // Keep the watermark tint in lockstep with the arrow color so
-            // theme changes / setColor() calls stay visually consistent.
-            DrawableCompat.setTint(watermark, color);
-            invalidateSelf();
-        }
-    }
 }

@@ -131,6 +131,11 @@
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
 
+    <CheckBox android:id="@+id/display_inline_histograms"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/display_inline_histograms" />
+
     <CheckBox android:id="@+id/use_metric"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -382,6 +382,7 @@ public class CellReceiver {
         } else {
             network.setLevel(strength);
         }
+        MainActivity.recordRssiSample(network.getBssid(), network.getLevel());
         if (location != null && (newForRun || network.getLatLng() == null)) {
             network.setLatLng(new LatLng(location.getLatitude(), location.getLongitude()));
         }
@@ -433,6 +434,7 @@ public class CellReceiver {
                 network.setLevel((strength == Integer.MAX_VALUE) ? CELL_MIN_STRENGTH : strength);
                 network.setFrequency(frequency);
             }
+            MainActivity.recordRssiSample(network.getBssid(), network.getLevel());
             if (location != null && (newForRun || network.getLatLng() == null)) {
                 network.setLatLng(new LatLng(location.getLatitude(), location.getLongitude()));
             }

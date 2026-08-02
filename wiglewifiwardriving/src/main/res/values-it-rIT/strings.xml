@@ -500,4 +500,7 @@
     <string name="file_size_warning">Saranno necessari più caricamenti.</string>
     <string name="invalid_foss_config">Sembra che la configurazione della mappa FOSS non sia valida. Si prega di controllare le impostazioni.</string>
     <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">Mostra gli istogrammi RSSI sullo sfondo dell\'elenco</string>
+    <string name="anniversary_mode_enabled">Modalità 25° anniversario attivata</string>
+    <string name="anniversary_mode_disabled">Modalità 25° anniversario disattivata</string>
 </resources>

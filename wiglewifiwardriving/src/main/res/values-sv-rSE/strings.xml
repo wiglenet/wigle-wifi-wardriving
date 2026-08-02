@@ -500,4 +500,7 @@
     <string name="file_size_warning">Flera uppladdningar kommer att krävas.</string>
     <string name="invalid_foss_config">Det verkar som att din FOSS-kartkonfiguration är ogiltig. Kontrollera dina inställningar.</string>
     <string name="menu_drawer_title">Meny</string>
+    <string name="display_inline_histograms">Visa RSSI-histogram i listbakgrunden</string>
+    <string name="anniversary_mode_enabled">25-årsjubileumsläge aktiverat</string>
+    <string name="anniversary_mode_disabled">25-årsjubileumsläge inaktiverat</string>
 </resources>

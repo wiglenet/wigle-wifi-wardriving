@@ -500,4 +500,7 @@
     <string name="file_size_warning">Több feltöltésre lesz szükség.</string>
     <string name="invalid_foss_config">Úgy tűnik, hogy a FOSS térkép konfigurációja érvénytelen. Kérjük, ellenőrizze a beállításait.</string>
     <string name="menu_drawer_title">Menü</string>
+    <string name="display_inline_histograms">RSSI hisztogramok megjelenítése a lista háttérében</string>
+    <string name="anniversary_mode_enabled">25. évforduló mód bekapcsolva</string>
+    <string name="anniversary_mode_disabled">25. évforduló mód kikapcsolva</string>
 </resources>

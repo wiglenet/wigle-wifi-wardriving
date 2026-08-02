@@ -499,4 +499,7 @@
     <string name="file_size_warning">एकाधिक अपलोड आवश्यक होंगे।</string>
     <string name="invalid_foss_config">ऐसा प्रतीत होता है कि आपका FOSS मानचित्र कॉन्फ़िगरेशन अमान्य है। कृपया अपनी सेटिंग्स की जाँच करें।</string>
     <string name="menu_drawer_title">मेन्यू</string>
+    <string name="display_inline_histograms">सूची पृष्ठभूमि में RSSI हिस्टोग्राम दिखाएँ</string>
+    <string name="anniversary_mode_enabled">25वीं वर्षगांठ मोड सक्षम</string>
+    <string name="anniversary_mode_disabled">25वीं वर्षगांठ मोड अक्षम</string>
 </resources>

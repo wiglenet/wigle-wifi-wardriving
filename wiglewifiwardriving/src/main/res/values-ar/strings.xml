@@ -500,4 +500,7 @@
     <string name="file_size_warning">ستكون عمليات رفع متعددة ضرورية.</string>
     <string name="invalid_foss_config">يبدو أن إعدادات خريطة FOSS الخاصة بك غير صالحة. يرجى التحقق من الإعدادات.</string>
     <string name="menu_drawer_title">القائمة</string>
+    <string name="display_inline_histograms">إظهار مخططات RSSI في خلفية القائمة</string>
+    <string name="anniversary_mode_enabled">تم تفعيل وضع الذكرى السنوية الـ25</string>
+    <string name="anniversary_mode_disabled">تم تعطيل وضع الذكرى السنوية الـ25</string>
 </resources>

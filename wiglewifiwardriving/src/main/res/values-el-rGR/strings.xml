@@ -503,4 +503,7 @@
     <string name="file_size_warning">Θα χρειαστούν πολλαπλές μεταφορτώσεις.</string>
     <string name="invalid_foss_config">Φαίνεται ότι η διαμόρφωση του χάρτη FOSS είναι άκυρη. Παρακαλώ ελέγξτε τις ρυθμίσεις σας.</string>
     <string name="menu_drawer_title">Μενού</string>
+    <string name="display_inline_histograms">Εμφάνιση ιστογραμμάτων RSSI στο φόντο της λίστας</string>
+    <string name="anniversary_mode_enabled">Η λειτουργία 25ης επετείου ενεργοποιήθηκε</string>
+    <string name="anniversary_mode_disabled">Η λειτουργία 25ης επετείου απενεργοποιήθηκε</string>
 </resources>

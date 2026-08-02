@@ -500,4 +500,7 @@
     <string name="file_size_warning">Vor fi necesare mai multe încărcări.</string>
     <string name="invalid_foss_config">Se pare că configurația hărții FOSS este invalidă. Vă rugăm să verificați setările.</string>
     <string name="menu_drawer_title">Meniu</string>
+    <string name="display_inline_histograms">Afișați histogramele RSSI pe fundalul listei</string>
+    <string name="anniversary_mode_enabled">Modul aniversare 25 de ani activat</string>
+    <string name="anniversary_mode_disabled">Modul aniversare 25 de ani dezactivat</string>
 </resources>

@@ -500,6 +500,7 @@
     <string name="file_size_warning">Meardere uploads binne nedich.</string>
     <string name="invalid_foss_config">It liket derop dat jo FOSS-kaartkonfiguraasje ûnjildich is. Kontrolearje jo ynstellings.</string>
     <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">RSSI-histogrammen yn listeneftergrûn toane</string>
     <string name="anniversary_mode_enabled">25-jierrich jubileummodus ynskeakele</string>
     <string name="anniversary_mode_disabled">25-jierrich jubileummodus útskeakele</string>
 </resources>

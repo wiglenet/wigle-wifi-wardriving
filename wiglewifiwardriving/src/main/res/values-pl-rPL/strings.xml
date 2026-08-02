@@ -500,6 +500,7 @@
     <string name="file_size_warning">Konieczne będzie kilka przesłań.</string>
     <string name="invalid_foss_config">Wygląda na to, że konfiguracja mapy FOSS jest nieprawidłowa. Sprawdź swoje ustawienia.</string>
     <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">Pokaż histogramy RSSI w tle listy</string>
     <string name="anniversary_mode_enabled">Tryb 25. rocznicy włączony</string>
     <string name="anniversary_mode_disabled">Tryb 25. rocznicy wyłączony</string>
 </resources>

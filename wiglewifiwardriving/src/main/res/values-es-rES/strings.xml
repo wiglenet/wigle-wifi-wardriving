@@ -499,6 +499,7 @@
     <string name="file_size_warning">Serán necesarias varias subidas.</string>
     <string name="invalid_foss_config">Parece que la configuración del mapa FOSS no es válida. Por favor, revise sus ajustes.</string>
     <string name="menu_drawer_title">Menú</string>
+    <string name="display_inline_histograms">Mostrar histogramas RSSI en el fondo de la lista</string>
     <string name="anniversary_mode_enabled">Modo 25.º aniversario activado</string>
     <string name="anniversary_mode_disabled">Modo 25.º aniversario desactivado</string>
 </resources>

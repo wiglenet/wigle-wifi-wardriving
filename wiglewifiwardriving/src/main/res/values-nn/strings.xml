@@ -500,6 +500,7 @@
     <string name="file_size_warning">Fleire opplastingar vil vera naudsynt.</string>
     <string name="invalid_foss_config">FOSS-kartoppsettet ser ut til å vera ugyldig. Sjekk innstillingane dine.</string>
     <string name="menu_drawer_title">Meny</string>
+    <string name="display_inline_histograms">Vis RSSI-histogram i listebakgrunnen</string>
     <string name="anniversary_mode_enabled">25-årsjubileumsmodus aktivert</string>
     <string name="anniversary_mode_disabled">25-årsjubileumsmodus deaktivert</string>
 </resources>

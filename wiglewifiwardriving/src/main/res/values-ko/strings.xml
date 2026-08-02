@@ -500,6 +500,7 @@
     <string name="file_size_warning">여러 차례 업로드가 필요합니다.</string>
     <string name="invalid_foss_config">FOSS 지도 구성이 잘못된 것 같습니다. 설정을 확인하십시오.</string>
     <string name="menu_drawer_title">메뉴</string>
+    <string name="display_inline_histograms">목록 배경에 RSSI 히스토그램 표시</string>
     <string name="anniversary_mode_enabled">25주년 기념 모드 사용</string>
     <string name="anniversary_mode_disabled">25주년 기념 모드 사용 안 함</string>
 </resources>

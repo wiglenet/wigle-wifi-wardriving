@@ -500,6 +500,7 @@
     <string name="file_size_warning">需要多次上传。</string>
     <string name="invalid_foss_config">您的 FOSS 地图配置似乎无效。请检查您的设置。</string>
     <string name="menu_drawer_title">菜单</string>
+    <string name="display_inline_histograms">在列表背景显示 RSSI 直方图</string>
     <string name="anniversary_mode_enabled">25周年纪念模式已启用</string>
     <string name="anniversary_mode_disabled">25周年纪念模式已禁用</string>
 </resources>

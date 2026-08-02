@@ -500,6 +500,7 @@
     <string name="file_size_warning">Er zijn meerdere uploads nodig.</string>
     <string name="invalid_foss_config">Het lijkt erop dat uw FOSS-kaartconfiguratie ongeldig is. Controleer uw instellingen.</string>
     <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">RSSI-histogrammen op lijstachtergrond tonen</string>
     <string name="anniversary_mode_enabled">25-jarig jubileummodus ingeschakeld</string>
     <string name="anniversary_mode_disabled">25-jarig jubileummodus uitgeschakeld</string>
 </resources>

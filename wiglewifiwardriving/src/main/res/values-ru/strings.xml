@@ -500,6 +500,7 @@
     <string name="file_size_warning">Потребуется несколько загрузок.</string>
     <string name="invalid_foss_config">Похоже, ваша конфигурация карты FOSS недействительна. Пожалуйста, проверьте настройки.</string>
     <string name="menu_drawer_title">Меню</string>
+    <string name="display_inline_histograms">Показывать гистограммы RSSI на фоне списка</string>
     <string name="anniversary_mode_enabled">Режим 25-летия включён</string>
     <string name="anniversary_mode_disabled">Режим 25-летия выключен</string>
 </resources>

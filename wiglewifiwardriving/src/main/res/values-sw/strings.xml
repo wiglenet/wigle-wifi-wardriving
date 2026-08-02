@@ -499,6 +499,7 @@
     <string name="file_size_warning">Itahitajika kupakia mara kwa mara.</string>
     <string name="invalid_foss_config">Inaonekana usanidi wa ramani ya FOSS si halali. Tafadhali angalia mipangilio yako.</string>
     <string name="menu_drawer_title">Menyu</string>
+    <string name="display_inline_histograms">Onyesha histogramu za RSSI kwenye mandharinyuma ya orodha</string>
     <string name="anniversary_mode_enabled">Hali ya maadhimisho ya miaka 25 imewezeshwa</string>
     <string name="anniversary_mode_disabled">Hali ya maadhimisho ya miaka 25 imezimwa</string>
 </resources>

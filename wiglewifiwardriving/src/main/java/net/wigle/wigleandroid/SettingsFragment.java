@@ -70,6 +70,7 @@ import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -96,6 +97,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
     private static final int DEAUTHORIZE_DIALOG=114;
+    private static final int ANNIVERSARY_MODE_TAPS = 25;
+
+    private int anniversaryTapCount = 0;
 
     public boolean allowRefresh = false;
 
@@ -712,6 +716,27 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             } catch (PackageManager.NameNotFoundException e) {
                 Logging.error("Unable to get version number: ",e);
             }
+            appVersion.setClickable(true);
+            appVersion.setFocusable(true);
+            appVersion.setOnClickListener(v -> {
+                anniversaryTapCount++;
+                if (anniversaryTapCount < ANNIVERSARY_MODE_TAPS) {
+                    return;
+                }
+                anniversaryTapCount = 0;
+                final boolean enabled = !prefs.getBoolean(PreferenceKeys.PREF_CUSTOM_MENU_ICON, false);
+                prefs.edit().putBoolean(PreferenceKeys.PREF_CUSTOM_MENU_ICON, enabled).apply();
+                final MainActivity mainActivity = MainActivity.getMainActivity();
+                if (mainActivity != null) {
+                    mainActivity.applyCustomMenuIcon();
+                }
+                final FragmentActivity fa = getActivity();
+                if (fa != null) {
+                    WiGLEToast.showOverFragment(fa, R.string.app_name,
+                            getString(enabled ? R.string.anniversary_mode_enabled
+                                    : R.string.anniversary_mode_disabled));
+                }
+            });
         }
     }
 

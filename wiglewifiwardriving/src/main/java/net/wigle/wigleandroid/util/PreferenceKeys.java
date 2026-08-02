@@ -61,8 +61,8 @@ public class PreferenceKeys {
     public static final String PREF_LOG_ROUTES = "logRoutes";
     public static final String PREF_DAYNIGHT_MODE = "dayNightMode";
     public static final String PREF_ALERT_ADDRS = "alertOnAddresses";
-
     public static final String PREF_ALERT_BLE_MFGR_IDS = "alertOnBleMfgrId";
+    public static final String PREF_CUSTOM_MENU_ICON = "customMenuIcon";
 
     // map prefs
     public static final String PREF_MAP_NO_TILE = "NONE";

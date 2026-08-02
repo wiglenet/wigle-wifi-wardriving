@@ -22,6 +22,10 @@ import net.wigle.wigleandroid.R;
  * {@code UploadColor} text color so it tracks light/dark (and API-level)
  * UploadColor variants independently of the hamburger/arrow color.
  *
+ * <p>The hamburger bars are dimmed while idle (drawer closed, not pressed) and
+ * return to full opacity when pressed or while the drawer morphs open. The
+ * watermark alpha is managed separately and is unaffected by bar dimming.
+ *
  * <p>The watermark also fades out as the drawer opens: at
  * {@link #setProgress(float)} progress {@code 0} (drawer fully closed, plain
  * hamburger) the watermark is at its maximum alpha; at progress {@code 1}
@@ -32,10 +36,24 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
 
     /**
      * Maximum alpha (0-255) for the watermark when the drawer is fully closed.
-     * ~56% of 255 &mdash; faint enough to feel like a watermark, bright enough
-     * to be recognizable. Tune here if you want more/less prominence.
+     * Full opacity in anniversary mode; still fades out as the drawer opens.
      */
-    private static final int WATERMARK_MAX_ALPHA = 143;
+    private static final int WATERMARK_MAX_ALPHA = 255;
+
+    /**
+     * Alpha for the hamburger bars when idle (drawer closed, not pressed).
+     * ~20% of full opacity so the W watermark reads as the primary mark.
+     */
+    private static final int ARROW_IDLE_ALPHA = 51;
+
+    /** Full opacity for bars when pressed or while the drawer is open/morphing. */
+    private static final int ARROW_ACTIVE_ALPHA = 255;
+
+    /**
+     * Treat progress above this as "active" so bars stay opaque during the
+     * hamburger↔arrow morph and while the drawer is open.
+     */
+    private static final float PROGRESS_ACTIVE_EPSILON = 0.01f;
 
     /**
      * Scale applied to the DrawerArrowDrawable's own bounds when laying out
@@ -53,9 +71,15 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
     private final Rect watermarkBounds = new Rect();
     private final int uploadColor;
 
+    /** RGB of the theme arrow color (alpha ignored; we apply idle/active alpha). */
+    private int arrowRgb;
+    private boolean pressed;
+    private float drawerProgress;
+
     public WLogoDrawerArrowDrawable(@NonNull final Context context) {
         super(context);
         this.uploadColor = resolveUploadColor(context);
+        this.arrowRgb = getColor() & 0x00FFFFFF;
         // Stroke-only outline variant; mutate() so tint/alpha stay local.
         final Drawable src = ContextCompat.getDrawable(context, R.drawable.ic_w_logo_simple_mono_outline);
         this.watermark = (src != null) ? src.mutate() : null;
@@ -63,6 +87,7 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
             DrawableCompat.setTint(this.watermark, uploadColor);
             this.watermark.setAlpha(WATERMARK_MAX_ALPHA);
         }
+        applyArrowAlpha();
     }
 
     private static int resolveUploadColor(@NonNull final Context context) {
@@ -73,6 +98,52 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
         } finally {
             a.recycle();
         }
+    }
+
+    @Override
+    public boolean isStateful() {
+        return true;
+    }
+
+    @Override
+    protected boolean onStateChange(final int[] state) {
+        boolean nowPressed = false;
+        for (final int flag : state) {
+            if (flag == android.R.attr.state_pressed) {
+                nowPressed = true;
+                break;
+            }
+        }
+        final boolean changed = nowPressed != pressed;
+        pressed = nowPressed;
+        if (changed) {
+            applyArrowAlpha();
+        }
+        return changed || super.onStateChange(state);
+    }
+
+    @Override
+    public void setColor(final int color) {
+        arrowRgb = color & 0x00FFFFFF;
+        applyArrowAlpha();
+    }
+
+    @Override
+    public void setAlpha(final int alpha) {
+        // Framework / toggle may push drawable alpha; keep bar opacity under
+        // our idle/pressed/progress policy instead.
+        applyArrowAlpha();
+    }
+
+    /**
+     * Dim bars when idle; full opacity when pressed or drawer morphing/open.
+     * Uses {@link DrawerArrowDrawable#setColor} so only the paint for the bars
+     * is affected — watermark draw uses its own tint/alpha.
+     */
+    private void applyArrowAlpha() {
+        final boolean active = pressed || drawerProgress > PROGRESS_ACTIVE_EPSILON;
+        final int alpha = active ? ARROW_ACTIVE_ALPHA : ARROW_IDLE_ALPHA;
+        super.setColor((alpha << 24) | arrowRgb);
     }
 
     @Override
@@ -93,7 +164,9 @@ public class WLogoDrawerArrowDrawable extends DrawerArrowDrawable {
 
     @Override
     public void setProgress(final float progress) {
+        drawerProgress = progress;
         super.setProgress(progress);
+        applyArrowAlpha();
         if (watermark != null) {
             // Fade watermark linearly to 0 as the drawer opens.
             final float clamped = Math.max(0f, Math.min(1f, progress));

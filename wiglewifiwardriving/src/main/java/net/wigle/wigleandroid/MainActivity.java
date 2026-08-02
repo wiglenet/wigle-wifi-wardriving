@@ -63,6 +63,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 
 import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
@@ -98,6 +99,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.ui.WLogoDrawerArrowDrawable;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.BuildReleaseTag;
@@ -778,6 +780,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
             }
         };
+        applyCustomMenuIcon();
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         final NavigationView navigationView = findViewById(R.id.left_drawer);
@@ -928,12 +931,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * per-tab title after the user dismisses the drawer without making a selection.
      */
     private CharSequence getTitleForNavId(final int itemId) {
-        if (itemId == R.id.nav_list) return getString(R.string.mapping_app_name);
+        if (itemId == R.id.nav_list) return getString(R.string.list_app_name);
+        if (itemId == R.id.nav_map) return getString(R.string.mapping_app_name);
         if (itemId == R.id.nav_dash) return getString(R.string.dashboard_app_name);
         if (itemId == R.id.nav_data) return getString(R.string.data_activity_name);
         if (itemId == R.id.nav_search) return getString(R.string.tab_search);
         if (itemId == R.id.nav_news) return getString(R.string.news_app_name);
+        if (itemId == R.id.nav_user_stats) return getString(R.string.user_stats_app_name);
         if (itemId == R.id.nav_rank) return getString(R.string.rank_stats_app_name);
+        if (itemId == R.id.nav_site_stats) return getString(R.string.site_stats_app_name);
         if (itemId == R.id.nav_stats) return getString(R.string.tab_stats);
         if (itemId == R.id.nav_uploads) return getString(R.string.uploads_app_name);
         if (itemId == R.id.nav_settings) return getString(R.string.settings_app_name);
@@ -1221,6 +1227,23 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 playServiceShown = true;
             }
         }
+    }
+
+    /**
+     * Apply or clear the custom W-logo hamburger watermark based on
+     * {@link PreferenceKeys#PREF_CUSTOM_MENU_ICON} (default false).
+     */
+    public void applyCustomMenuIcon() {
+        if (mDrawerToggle == null) {
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (prefs.getBoolean(PreferenceKeys.PREF_CUSTOM_MENU_ICON, false)) {
+            mDrawerToggle.setDrawerArrowDrawable(new WLogoDrawerArrowDrawable(this));
+        } else {
+            mDrawerToggle.setDrawerArrowDrawable(new DrawerArrowDrawable(this));
+        }
+        mDrawerToggle.syncState();
     }
 
     @Override

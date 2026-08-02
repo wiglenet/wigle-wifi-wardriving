@@ -500,4 +500,6 @@
     <string name="file_size_warning">Mehrere Uploads sind erforderlich.</string>
     <string name="invalid_foss_config">Es scheint, dass Ihre FOSS-Kartenkonfiguration ungültig ist. Bitte überprüfen Sie Ihre Einstellungen.</string>
     <string name="menu_drawer_title">Menü</string>
+    <string name="anniversary_mode_enabled">25-Jahre-Jubiläumsmodus aktiviert</string>
+    <string name="anniversary_mode_disabled">25-Jahre-Jubiläumsmodus deaktiviert</string>
 </resources>

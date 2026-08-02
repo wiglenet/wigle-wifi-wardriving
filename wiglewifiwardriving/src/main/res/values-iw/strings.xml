@@ -500,4 +500,6 @@
     <string name="file_size_warning">נדרשות העלאות מרובות.</string>
     <string name="invalid_foss_config">נראה שתצורת מפת FOSS שלך אינה חוקית. אנא בדוק את ההגדרות שלך.</string>
     <string name="menu_drawer_title">תפריט</string>
+    <string name="anniversary_mode_enabled">מצב יום השנה ה-25 הופעל</string>
+    <string name="anniversary_mode_disabled">מצב יום השנה ה-25 הושבת</string>
 </resources>

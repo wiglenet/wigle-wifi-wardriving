@@ -500,4 +500,6 @@
     <string name="file_size_warning">Flere uploads vil være nødvendige.</string>
     <string name="invalid_foss_config">Det ser ud til, at din FOSS-kortkonfiguration er ugyldig. Tjek venligst dine indstillinger.</string>
     <string name="menu_drawer_title">Menu</string>
+    <string name="anniversary_mode_enabled">25-års jubilæumstilstand aktiveret</string>
+    <string name="anniversary_mode_disabled">25-års jubilæumstilstand deaktiveret</string>
 </resources>

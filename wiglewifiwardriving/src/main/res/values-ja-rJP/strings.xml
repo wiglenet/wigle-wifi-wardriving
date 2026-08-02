@@ -503,4 +503,6 @@ KMLにエクスポート</string>
     <string name="file_size_warning">複数回のアップロードが必要になります。</string>
     <string name="invalid_foss_config">FOSS マップの設定が無効のようです。設定を確認してください。</string>
     <string name="menu_drawer_title">メニュー</string>
+    <string name="anniversary_mode_enabled">25周年記念モードが有効になりました</string>
+    <string name="anniversary_mode_disabled">25周年記念モードが無効になりました</string>
 </resources>

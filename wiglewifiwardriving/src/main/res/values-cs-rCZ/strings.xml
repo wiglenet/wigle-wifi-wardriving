@@ -500,4 +500,6 @@
     <string name="file_size_warning">Bude nutné provést několik nahrání.</string>
     <string name="invalid_foss_config">Zdá se, že konfigurace mapy FOSS je neplatná. Zkontrolujte prosím své nastavení.</string>
     <string name="menu_drawer_title">Nabídka</string>
+    <string name="anniversary_mode_enabled">Režim 25. výročí povolen</string>
+    <string name="anniversary_mode_disabled">Režim 25. výročí zakázán</string>
 </resources>

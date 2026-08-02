@@ -500,4 +500,6 @@
     <string name="file_size_warning">Plusieurs envois seront nécessaires.</string>
     <string name="invalid_foss_config">Il semble que votre configuration de carte FOSS soit invalide. Veuillez vérifier vos paramètres.</string>
     <string name="menu_drawer_title">Menu</string>
+    <string name="anniversary_mode_enabled">Mode 25e anniversaire activé</string>
+    <string name="anniversary_mode_disabled">Mode 25e anniversaire désactivé</string>
 </resources>

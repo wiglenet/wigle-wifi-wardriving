@@ -507,4 +507,7 @@
     <string name="display_inline_histograms">Show list background RSSI histograms</string>
     <string name="anniversary_mode_enabled">25th anniversary mode enabled</string>
     <string name="anniversary_mode_disabled">25th anniversary mode disabled</string>
+    <string name="export_alert_filter">Export alert filter</string>
+    <string name="export_alert_filter_description_hint">Filter description</string>
+    <string name="export_alert_filter_empty">No alert addresses or BLE manufacturer IDs to export</string>
 </resources>

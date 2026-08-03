@@ -140,5 +140,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/filter_enabled" />
+        <Button android:id="@+id/export_alert_filter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:text="@string/export_alert_filter"
+            android:layout_weight="1"
+            android:paddingTop="10dip"
+            android:paddingBottom="10dip"/>
+
     </LinearLayout>
 </ScrollView>

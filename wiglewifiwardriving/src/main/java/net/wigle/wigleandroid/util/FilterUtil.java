@@ -3,16 +3,26 @@ package net.wigle.wigleandroid.util;
 import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.BT_SUB_BOX_IDS;
 import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
 
+import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.CheckBox;
 
+import com.google.gson.Gson;
+
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.model.Filter;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Filter utilities
  */
 public class FilterUtil {
+    /** Stored full MAC form, e.g. {@code AA:BB:CC:DD:EE:FF}. Shorter alert-addr entries are OUIs. */
+    private static final int FULL_MAC_LENGTH = 17;
+
     public static void updateWifiGroupCheckbox(final View view) {
         PrefsBackedCheckbox.checkBoxGroupControl(view, R.id.showwifi,
                 WIFI_SUB_BOX_IDS,
@@ -37,5 +47,68 @@ public class FilterUtil {
                         }
                     }
                 });
+    }
+
+    /**
+     * Build an exportable {@link Filter} from alert address / BLE manufacturer-ID prefs.
+     * Full MACs go to {@code macAddresses}, shorter address entries to {@code ouis},
+     * and BLE manufacturer IDs to {@code ble.mfgrIds}.
+     *
+     * @return the filter, or {@code null} if there are no alert entries to export
+     */
+    public static Filter buildAlertFilterFromPrefs(final SharedPreferences prefs,
+                                                   final String description) {
+        if (prefs == null) {
+            return null;
+        }
+        final List<String> macAddresses = new ArrayList<>();
+        final List<String> ouis = new ArrayList<>();
+        for (final String entry : prefStringList(prefs, PreferenceKeys.PREF_ALERT_ADDRS)) {
+            if (entry == null || entry.isEmpty()) {
+                continue;
+            }
+            if (entry.length() == FULL_MAC_LENGTH) {
+                macAddresses.add(entry);
+            } else {
+                ouis.add(entry);
+            }
+        }
+        final List<String> bleMfgrIds = prefStringList(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
+
+        if (macAddresses.isEmpty() && ouis.isEmpty() && bleMfgrIds.isEmpty()) {
+            return null;
+        }
+
+        final Filter.Builder builder = Filter.builder()
+                .exclude(false);
+        if (description != null && !description.isEmpty()) {
+            builder.description(description);
+        }
+        if (!macAddresses.isEmpty()) {
+            builder.macAddresses(macAddresses);
+        }
+        if (!ouis.isEmpty()) {
+            builder.ouis(ouis);
+        }
+        if (!bleMfgrIds.isEmpty()) {
+            builder.ble(Filter.BleFilter.builder()
+                    .bleMfgrIds(bleMfgrIds)
+                    .build());
+        }
+        return builder.build();
+    }
+
+    private static List<String> prefStringList(final SharedPreferences prefs, final String key) {
+        final String[] values = new Gson().fromJson(prefs.getString(key, "[]"), String[].class);
+        if (values == null || values.length == 0) {
+            return new ArrayList<>();
+        }
+        final List<String> list = new ArrayList<>(values.length);
+        for (final String value : values) {
+            if (value != null && !value.isEmpty()) {
+                list.add(value);
+            }
+        }
+        return list;
     }
 }

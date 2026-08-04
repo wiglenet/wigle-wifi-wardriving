@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -45,6 +46,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +54,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
@@ -311,8 +312,10 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         final View toolsWrapper = findViewById(R.id.bottom_tools_wrapper);
         if (null != toolsWrapper) {
             ViewCompat.setOnApplyWindowInsetsListener(toolsWrapper, (v, insets) -> {
+                // against the end edge in landscape this can meet a cutout as well as the nav bar
                 final Insets innerPadding = insets.getInsets(
-                        WindowInsetsCompat.Type.navigationBars());
+                        WindowInsetsCompat.Type.navigationBars() |
+                                WindowInsetsCompat.Type.displayCutout());
                 // insets are reported against the window, so padding every row by the bottom
                 // value wedges a nav-bar-sized gap between them; only the spacer gets it
                 v.setPadding(innerPadding.left, 0, innerPadding.right, 0);
@@ -323,6 +326,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                 return insets;
             });
         }
+
+        applyOverlayPanelLayout();
 
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra(ListFragment.NETWORK_EXTRA_BSSID);
@@ -541,6 +546,14 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     }
 
     @Override
+    public void onConfigurationChanged(@NonNull final Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // configChanges keeps this activity alive across rotation, so nothing re-reads the
+        // layout for us
+        applyOverlayPanelLayout();
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull final Bundle outState) {
         Logging.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
@@ -573,8 +586,10 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             return;
         }
         if (null == rssiSparkline) {
+            // list rows have to stay legible over this, but here it owns the strip, so it can
+            // carry the same signal color the list uses for text
             rssiSparkline = new RssiHistogramDrawable(
-                    ContextCompat.getColor(this, R.color.colorListSsidText));
+                    NetworkListUtil.getTextColorForSignal(this, network.getLevel()));
             graph.setBackground(rssiSparkline);
         }
     }
@@ -615,8 +630,47 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             return;
         }
         rssiSparklineRow.setVisibility(VISIBLE);
+        rssiSparkline.setFillColor(NetworkListUtil.getTextColorForSignal(
+                this, samples.get(samples.size() - 1).level));
         rssiSparkline.setSamples(samples, System.currentTimeMillis());
         updateToolsInsetSpacer();
+    }
+
+    /**
+     * Full-width overlays waste most of a landscape window, so once the window is wider than it
+     * is tall, cap both at the window's minor dimension and drive them into opposite corners:
+     * detail at the top start, tools at the bottom end. That cap leaves each filter column the
+     * same width it gets in portrait, so nothing inside has to reflow. Params are rewritten in
+     * place because re-inflating would tear down the live MapView.
+     */
+    private void applyOverlayPanelLayout() {
+        final Configuration conf = getResources().getConfiguration();
+        final boolean wide = conf.screenWidthDp > conf.screenHeightDp;
+        // recomputed every time: a multi-window resize changes the minor dimension
+        final int panelWidth = wide
+                ? Math.round(Math.min(conf.screenWidthDp, conf.screenHeightDp)
+                        * getResources().getDisplayMetrics().density)
+                : RelativeLayout.LayoutParams.MATCH_PARENT;
+        constrainPanel(R.id.na_detail_panel, panelWidth, RelativeLayout.ALIGN_PARENT_START);
+        constrainPanel(R.id.bottom_tools_wrapper, panelWidth,
+                wide ? RelativeLayout.ALIGN_PARENT_END : RelativeLayout.ALIGN_PARENT_START);
+    }
+
+    /**
+     * Vertical rules are left alone, so each panel keeps the edge it was laid out against.
+     */
+    private void constrainPanel(final int panelId, final int width, final int edgeRule) {
+        final View panel = findViewById(panelId);
+        if (null == panel) {
+            return;
+        }
+        final RelativeLayout.LayoutParams params =
+                (RelativeLayout.LayoutParams) panel.getLayoutParams();
+        params.width = width;
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START == edgeRule
+                ? RelativeLayout.ALIGN_PARENT_END : RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(edgeRule);
+        panel.setLayoutParams(params);
     }
 
     /**

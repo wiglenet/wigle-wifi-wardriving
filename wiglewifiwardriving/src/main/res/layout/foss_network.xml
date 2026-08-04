@@ -20,6 +20,7 @@
             android:layout_height="match_parent"/>
     </RelativeLayout>
     <RelativeLayout
+        android:id="@+id/na_detail_panel"
         style="@style/NetworkViewOverlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

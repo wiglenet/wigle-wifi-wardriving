@@ -57,8 +57,13 @@ public final class RssiHistogramDrawable extends Drawable {
         strokePaint.setColor(withAlpha(opaqueColor, STROKE_ALPHA));
     }
 
+    /** Callers may re-assert the color on every sample, so an unchanged color costs nothing. */
     public void setFillColor(final int opaqueColor) {
-        fillPaint.setColor(withAlpha(opaqueColor, FILL_ALPHA));
+        final int fill = withAlpha(opaqueColor, FILL_ALPHA);
+        if (fill == fillPaint.getColor()) {
+            return;
+        }
+        fillPaint.setColor(fill);
         strokePaint.setColor(withAlpha(opaqueColor, STROKE_ALPHA));
         invalidateSelf();
     }

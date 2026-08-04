@@ -15,6 +15,7 @@
         android:layout_alignParentTop="true"
         tools:background="@tools:sample/backgrounds/scenic" />
     <RelativeLayout
+        android:id="@+id/na_detail_panel"
         style="@style/NetworkViewOverlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -199,7 +199,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             row = mInflater.inflate(R.layout.row, parent, false);
             holder = new ViewHolder(row);
             final int fillColor = ContextCompat.getColor(getContext(), R.color.colorListSsidText);
-            holder.histogramDrawable = new RssiHistogramDrawable(fillColor);
+            holder.histogramDrawable = RssiHistogramDrawable.forListRow(fillColor);
             holder.histogramView.setBackground(holder.histogramDrawable);
             row.setTag(holder);
         } else {

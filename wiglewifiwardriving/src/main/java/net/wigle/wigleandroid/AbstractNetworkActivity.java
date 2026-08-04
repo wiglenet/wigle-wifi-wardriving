@@ -588,7 +588,7 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         if (null == rssiSparkline) {
             // list rows have to stay legible over this, but here it owns the strip, so it can
             // carry the same signal color the list uses for text
-            rssiSparkline = new RssiHistogramDrawable(
+            rssiSparkline = RssiHistogramDrawable.forOwnStrip(
                     NetworkListUtil.getTextColorForSignal(this, network.getLevel()));
             graph.setBackground(rssiSparkline);
         }

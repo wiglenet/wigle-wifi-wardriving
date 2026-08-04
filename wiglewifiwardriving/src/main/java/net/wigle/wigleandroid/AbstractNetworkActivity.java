@@ -502,6 +502,11 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             observationQueryHandler.removeCallbacksAndMessages(null);
             observationQueryHandler = null;
         }
+        // WifiReceiver outlives this activity, so a survey left running would pin it forever
+        final MainActivity.State state = MainActivity.getStaticState();
+        if (state != null && state.wifiReceiver != null) {
+            state.wifiReceiver.unregisterWiFiScanUpdater(this);
+        }
         destroyMapView();
         super.onDestroy();
     }

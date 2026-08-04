@@ -70,9 +70,10 @@ public class WifiReceiver extends BroadcastReceiver {
     private long prevScanPeriod;
     private boolean scanInFlight = false;
 
-    private Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
 
-    private WiFiScanUpdater updateOnSeen = null;
+    /** the scan callback reads this without the monitor that register/unregister hold */
+    private volatile WiFiScanUpdater updateOnSeen = null;
 
     /** Executor for running WifiManager.startScan() off the main thread to avoid ANR from Binder blocking. */
     private final ExecutorService wifiScanExecutor = Executors.newSingleThreadExecutor();
@@ -324,9 +325,10 @@ public class WifiReceiver extends BroadcastReceiver {
                     }
                 }
 
-                if (null != updateOnSeen && null != safeWatchSsids && null != location) {
+                final WiFiScanUpdater seenUpdater = updateOnSeen;
+                if (null != seenUpdater && null != safeWatchSsids && null != location) {
                     if (safeWatchSsids.contains(network.getBssid())) {
-                        updateOnSeen.handleWiFiSeen(network.getBssid(), result.level, location);
+                        seenUpdater.handleWiFiSeen(network.getBssid(), result.level, location);
                     }
                 }
             }
@@ -618,6 +620,8 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     public synchronized void registerWiFiScanUpdater(final WiFiScanUpdater updater, final Set<String> watchBssids) {
+        // only one updater at a time, so the watch set belongs to the incoming registration alone
+        safeWatchSsids.clear();
         safeWatchSsids.addAll(watchBssids);
         updateOnSeen = updater;
     }
@@ -625,6 +629,16 @@ public class WifiReceiver extends BroadcastReceiver {
     public synchronized void unregisterWiFiScanUpdater() {
         updateOnSeen = null;
         safeWatchSsids.clear();
+    }
+
+    /**
+     * Unregister only if {@code updater} still holds the registration, so a teardown
+     * arriving after someone else registered can't cancel the newer listener.
+     */
+    public synchronized void unregisterWiFiScanUpdater(final WiFiScanUpdater updater) {
+        if (updateOnSeen == updater) {
+            unregisterWiFiScanUpdater();
+        }
     }
 
     /**

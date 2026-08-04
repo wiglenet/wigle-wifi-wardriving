@@ -35,13 +35,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DashboardFragment extends Fragment {
+  /** Below this the two dashboard halves stack; at or above they sit side by side. */
+  private static final int SIDE_BY_SIDE_MIN_WIDTH_DP = 600;
+
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
   private NumberFormat integerFormat;
   private ScrollView scrollView;
-  private View landscape;
-  private View portrait;
+  private View wide;
+  private View narrow;
+  private Boolean showingWide;
 
   /** Called when the activity is first created. */
   @Override
@@ -77,25 +81,37 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    final int orientation = getResources().getConfiguration().orientation;
-    Logging.info("DASH: onCreateView. orientation: " + orientation);
+    Logging.info("DASH: onCreateView. widthDp: " + getResources().getConfiguration().screenWidthDp);
     scrollView = (ScrollView) inflater.inflate(R.layout.dash, container, false);
-    landscape = inflater.inflate(R.layout.dashlandscape, container, false);
-    portrait = inflater.inflate(R.layout.dashportrait, container, false);
     switchView();
     return scrollView;
   }
 
+  /**
+   * Pick the dashboard arrangement from the width of our own window rather than device
+   * orientation, which no longer implies available width under multi-window, foldables,
+   * or desktop windowing. Halves are inflated on first use and cached until the view goes away.
+   */
   private void switchView() {
-    if (scrollView != null) {
-      final int orientation = getResources().getConfiguration().orientation;
-      View component = portrait;
-      if (orientation == 2) {
-        component = landscape;
-      }
-      scrollView.removeAllViews();
-      scrollView.addView(component);
+    if (scrollView == null) {
+      return;
     }
+    final boolean useWide =
+        getResources().getConfiguration().screenWidthDp >= SIDE_BY_SIDE_MIN_WIDTH_DP;
+    if (showingWide != null && showingWide == useWide && scrollView.getChildCount() > 0) {
+      return;
+    }
+    final LayoutInflater inflater = LayoutInflater.from(scrollView.getContext());
+    if (useWide) {
+      if (wide == null) {
+        wide = inflater.inflate(R.layout.dashwide, scrollView, false);
+      }
+    } else if (narrow == null) {
+      narrow = inflater.inflate(R.layout.dashnarrow, scrollView, false);
+    }
+    scrollView.removeAllViews();
+    scrollView.addView(useWide ? wide : narrow);
+    showingWide = useWide;
   }
 
   private final Runnable mUpdateTimeTask = new Runnable() {
@@ -292,6 +308,17 @@ public class DashboardFragment extends Fragment {
   }
 
   @Override
+  public void onDestroyView() {
+    Logging.info( "DASH: onDestroyView" );
+    // cached halves still point at the outgoing ScrollView as their parent, so drop them
+    scrollView = null;
+    wide = null;
+    narrow = null;
+    showingWide = null;
+    super.onDestroyView();
+  }
+
+  @Override
   public void onDestroy() {
     Logging.info( "DASH: onDestroy" );
     finishing.set( true );
@@ -330,9 +357,9 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
-    Logging.info( "DASH: config changed" );
-    switchView();
+    Logging.info( "DASH: config changed. widthDp: " + newConfig.screenWidthDp );
     super.onConfigurationChanged( newConfig );
+    switchView();
   }
 
   /* Creates the menu items */

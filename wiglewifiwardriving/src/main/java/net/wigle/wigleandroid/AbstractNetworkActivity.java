@@ -307,32 +307,20 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         }
 
         View bleToolsLayout = findViewById(R.id.ble_tools_row);
-        if (null != bleToolsLayout) {
-            ViewCompat.setOnApplyWindowInsetsListener(bleToolsLayout, new OnApplyWindowInsetsListener() {
-                @Override
-                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
-                    final Insets innerPadding = insets.getInsets(
-                            WindowInsetsCompat.Type.navigationBars());
-                    v.setPadding(
-                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
-                    );
-                    return insets;
-                }
-            });
-        }
 
-        View filterToolsLayout = findViewById(R.id.filter_row);
-        if (null != filterToolsLayout) {
-            ViewCompat.setOnApplyWindowInsetsListener(filterToolsLayout, new OnApplyWindowInsetsListener() {
-                @Override
-                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
-                    final Insets innerPadding = insets.getInsets(
-                            WindowInsetsCompat.Type.navigationBars());
-                    v.setPadding(
-                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
-                    );
-                    return insets;
+        final View toolsWrapper = findViewById(R.id.bottom_tools_wrapper);
+        if (null != toolsWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(toolsWrapper, (v, insets) -> {
+                final Insets innerPadding = insets.getInsets(
+                        WindowInsetsCompat.Type.navigationBars());
+                // insets are reported against the window, so padding every row by the bottom
+                // value wedges a nav-bar-sized gap between them; only the spacer gets it
+                v.setPadding(innerPadding.left, 0, innerPadding.right, 0);
+                final View spacer = v.findViewById(R.id.na_tools_inset_spacer);
+                if (null != spacer) {
+                    spacer.setPadding(0, 0, 0, innerPadding.bottom);
                 }
+                return insets;
             });
         }
 
@@ -429,18 +417,16 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             tv.setText(network.getCapabilities().replace("][", "]  ["));
 
             final ImageView ppImg = findViewById(R.id.passpoint_logo_net);
+            final View passpointRow = findViewById(R.id.passpoint_row);
             if (network.isPasspoint()) {
                 ppImg.setVisibility(VISIBLE);
+                passpointRow.setVisibility(VISIBLE);
             } else {
                 ppImg.setVisibility(GONE);
+                passpointRow.setVisibility(GONE);
             }
             tv = findViewById(R.id.na_rcois);
-            if (network.getRcois() != null) {
-                tv.setText(network.getRcois());
-            } else {
-                TextView row = findViewById(R.id.na_rcoi_label);
-                row.setVisibility(View.INVISIBLE);
-            }
+            tv.setText(network.getRcois());
 
             if (NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
@@ -511,6 +497,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                     bleToolsLayout.setVisibility(GONE);
                 }
             }
+            // now that the network type has decided which tool rows exist
+            updateToolsInsetSpacer();
             setupQuery();
         }
     }
@@ -623,10 +611,32 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         if (samples.isEmpty()) {
             rssiSparkline.clear();
             rssiSparklineRow.setVisibility(GONE);
+            updateToolsInsetSpacer();
             return;
         }
         rssiSparklineRow.setVisibility(VISIBLE);
         rssiSparkline.setSamples(samples, System.currentTimeMillis());
+        updateToolsInsetSpacer();
+    }
+
+    /**
+     * The spacer only exists to hold the navigation bar inset under the tools, so on a network
+     * with no tool rows at all it would be a bare strip of overlay across the map.
+     */
+    private void updateToolsInsetSpacer() {
+        final View spacer = findViewById(R.id.na_tools_inset_spacer);
+        if (null == spacer) {
+            return;
+        }
+        final boolean anyTools = isViewVisible(R.id.filter_row)
+                || isViewVisible(R.id.ble_tools_row)
+                || isViewVisible(R.id.na_rssi_sparkline_row);
+        spacer.setVisibility(anyTools ? VISIBLE : GONE);
+    }
+
+    private boolean isViewVisible(final int viewId) {
+        final View view = findViewById(viewId);
+        return null != view && view.getVisibility() == VISIBLE;
     }
 
     protected void setupQuery() {

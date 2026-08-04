@@ -52,6 +52,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
@@ -76,7 +77,9 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.Observation;
+import net.wigle.wigleandroid.model.RssiSample;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
+import net.wigle.wigleandroid.ui.RssiHistogramDrawable;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
@@ -84,12 +87,14 @@ import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.RssiHistoryCache;
 
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -109,6 +114,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     protected static final int MSG_OBS_UPDATE = 1;
     protected static final int MSG_OBS_DONE = 2;
     protected static final int DEFAULT_ZOOM = 18;
+    /** Faster than the scan period, so the sparkline scrolls smoothly between samples. */
+    private static final long SPARKLINE_REFRESH_MS = 1000L;
     // used for shutting extraneous activities down on an error
     protected final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
     protected final ConcurrentLinkedHashMap<LatLng, Observation> localObsMap = new ConcurrentLinkedHashMap<>(1024);
@@ -117,6 +124,19 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     protected boolean isDbResult = false;
     protected NumberFormat numberFormat;
     private ObservationQueryHandler observationQueryHandler;
+    private View rssiSparklineRow;
+    private RssiHistogramDrawable rssiSparkline;
+    private Handler sparklineHandler;
+    private final Runnable sparklineTick = new Runnable() {
+        @Override
+        public void run() {
+            refreshRssiSparkline();
+            final Handler handler = sparklineHandler;
+            if (handler != null) {
+                handler.postDelayed(this, SPARKLINE_REFRESH_MS);
+            }
+        }
+    };
 
     /**
      * Observation query for network
@@ -502,6 +522,9 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             observationQueryHandler.removeCallbacksAndMessages(null);
             observationQueryHandler = null;
         }
+        stopRssiSparkline();
+        sparklineHandler = null;
+
         // WifiReceiver outlives this activity, so a survey left running would pin it forever
         final MainActivity.State state = MainActivity.getStaticState();
         if (state != null && state.wifiReceiver != null) {
@@ -515,12 +538,16 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     public void onResume() {
         Logging.info("NET: onResume");
         super.onResume();
+        // re-read the pref here so toggling it in settings takes effect on the way back
+        setupRssiSparkline();
+        startRssiSparkline();
         resumeMapView();
     }
 
     @Override
     public void onPause() {
         Logging.info("NET: onPause");
+        stopRssiSparkline();
         pauseMapView();
         super.onPause();
     }
@@ -537,6 +564,69 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         Logging.info("NET: onLowMemory");
         onLowMemoryMapView();
         super.onLowMemory();
+    }
+
+    /**
+     * Attach (or detach) the sparkline drawable to match the current pref. Idempotent, so
+     * it can run on every resume.
+     */
+    private void setupRssiSparkline() {
+        final View row = findViewById(R.id.na_rssi_sparkline_row);
+        final View graph = findViewById(R.id.na_rssi_sparkline);
+        if (null == row || null == graph || null == network) {
+            return;
+        }
+        rssiSparklineRow = row;
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        if (!prefs.getBoolean(PreferenceKeys.PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS, false)) {
+            rssiSparkline = null;
+            graph.setBackground(null);
+            row.setVisibility(GONE);
+            return;
+        }
+        if (null == rssiSparkline) {
+            rssiSparkline = new RssiHistogramDrawable(
+                    ContextCompat.getColor(this, R.color.colorListSsidText));
+            graph.setBackground(rssiSparkline);
+        }
+    }
+
+    private void startRssiSparkline() {
+        if (null == rssiSparkline) {
+            return;
+        }
+        if (null == sparklineHandler) {
+            sparklineHandler = new Handler(Looper.getMainLooper());
+        }
+        sparklineHandler.removeCallbacks(sparklineTick);
+        sparklineHandler.post(sparklineTick);
+    }
+
+    private void stopRssiSparkline() {
+        if (null != sparklineHandler) {
+            sparklineHandler.removeCallbacks(sparklineTick);
+        }
+    }
+
+    /**
+     * Pull the current window of samples for this network. The row stays hidden until the
+     * cache actually holds something, so historical-only networks don't show an empty strip.
+     */
+    private void refreshRssiSparkline() {
+        if (null == rssiSparkline || null == rssiSparklineRow || null == network) {
+            return;
+        }
+        final MainActivity.State state = MainActivity.getStaticState();
+        final RssiHistoryCache cache = null != state ? state.rssiHistoryCache : null;
+        final List<RssiSample> samples = (null != cache && cache.isEnabled())
+                ? cache.getSeries(network.getBssid()) : Collections.emptyList();
+        if (samples.isEmpty()) {
+            rssiSparkline.clear();
+            rssiSparklineRow.setVisibility(GONE);
+            return;
+        }
+        rssiSparklineRow.setVisibility(VISIBLE);
+        rssiSparkline.setSamples(samples, System.currentTimeMillis());
     }
 
     protected void setupQuery() {

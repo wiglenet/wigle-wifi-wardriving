@@ -24,7 +24,7 @@ import java.util.Map;
  *   "macAddresses": ["AA:BB:CC:DD:EE:FF"],
  *   "ouis": ["AA:BB:CC"],
  *   "ble": {
- *     "mfgrIds": ["0x004C"],
+ *     "mfgrIds": ["004C"],
  *     "service": {
  *       "any": [
  *         { "description": "Find My", "uuid": "FD6F" }

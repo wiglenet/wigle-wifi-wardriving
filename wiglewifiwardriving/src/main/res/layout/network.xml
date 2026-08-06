@@ -15,6 +15,7 @@
         android:layout_alignParentTop="true"
         tools:background="@tools:sample/backgrounds/scenic" />
     <RelativeLayout
+        android:id="@+id/na_detail_panel"
         style="@style/NetworkViewOverlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -247,7 +248,9 @@
                     android:layout_below="@+id/channel_row"
                     android:orientation="horizontal"
                     android:paddingHorizontal="1dp"
-                    android:paddingBottom="2dp">
+                    android:paddingBottom="2dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
                     <TextView
                         android:id="@+id/na_rcoi_label"
                         android:layout_width="wrap_content"
@@ -481,7 +484,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="4dp"
             android:visibility="gone"
-            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/filter_row"
             style="@style/NetworkViewOverlay"
             tools:visibility="visible"
             >
@@ -508,7 +511,7 @@
             android:paddingHorizontal="4dp"
             android:paddingVertical="4dp"
             style="@style/NetworkViewOverlay"
-            android:layout_above="@id/ble_tools_row"
+            android:layout_below="@+id/na_rssi_sparkline_row"
             tools:visibility="visible"
             >
             <LinearLayout
@@ -636,5 +639,30 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+        <FrameLayout
+            android:id="@+id/na_rssi_sparkline_row"
+            android:layout_width="fill_parent"
+            android:layout_height="44dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/network_signal"
+            style="@style/NetworkViewOverlay"
+            android:visibility="gone"
+            tools:visibility="visible">
+            <View
+                android:id="@+id/na_rssi_sparkline"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+        <!-- empty, so its height is exactly the navigation bar inset padded onto it;
+             sits below whichever tool row is last so the overlay reaches the screen edge -->
+        <FrameLayout
+            android:id="@+id/na_tools_inset_spacer"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/ble_tools_row"
+            style="@style/NetworkViewOverlay"
+            android:visibility="gone" />
     </RelativeLayout>
 </RelativeLayout>

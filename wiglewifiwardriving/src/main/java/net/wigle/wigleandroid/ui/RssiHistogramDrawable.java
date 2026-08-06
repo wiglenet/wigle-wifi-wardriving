@@ -19,16 +19,19 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Faint filled sparkline of recent RSSI vs time for list-row backgrounds.
+ * Filled sparkline of recent RSSI vs time, either behind list-row text or on a strip of its own.
  * X = last {@link RssiHistoryCache#WINDOW_MS}; Y = fixed dBm scale.
  */
 public final class RssiHistogramDrawable extends Drawable {
     private static final int MIN_DBM = -100;
     private static final int MAX_DBM = -30;
     /** Area fill under the sparkline (slightly dimmer than the top edge). */
-    private static final int FILL_ALPHA = 0x1C;
+    private static final int LIST_FILL_ALPHA = 0x1C;
     /** Top edge stroke — a bit lighter so the silhouette reads clearly. */
-    private static final int STROKE_ALPHA = 0x48;
+    private static final int LIST_STROKE_ALPHA = 0x48;
+    /** Nothing has to stay legible over a strip of its own, so the graph can carry it. */
+    private static final int STRIP_FILL_ALPHA = 0x4D;
+    private static final int STRIP_STROKE_ALPHA = 0xC0;
     private static final float STROKE_WIDTH_DP = 1.25f;
     /** Quantize window end so rapid list rebinds share one skip key. */
     private static final long WINDOW_BUCKET_MS = 250L;
@@ -46,20 +49,42 @@ public final class RssiHistogramDrawable extends Drawable {
     private int lastHeight = -1;
     private boolean pathDirty = true;
 
-    public RssiHistogramDrawable(final int opaqueColor) {
+    private final int fillAlpha;
+    private final int strokeAlpha;
+
+    /** Faint, for drawing behind the text of a list row. */
+    public static RssiHistogramDrawable forListRow(final int opaqueColor) {
+        return new RssiHistogramDrawable(opaqueColor, LIST_FILL_ALPHA, LIST_STROKE_ALPHA);
+    }
+
+    /** Stronger, for a strip the graph has to itself. */
+    public static RssiHistogramDrawable forOwnStrip(final int opaqueColor) {
+        return new RssiHistogramDrawable(opaqueColor, STRIP_FILL_ALPHA, STRIP_STROKE_ALPHA);
+    }
+
+    private RssiHistogramDrawable(final int opaqueColor, final int fillAlpha,
+                                  final int strokeAlpha) {
+        this.fillAlpha = fillAlpha;
+        this.strokeAlpha = strokeAlpha;
+
         fillPaint.setStyle(Paint.Style.FILL);
-        fillPaint.setColor(withAlpha(opaqueColor, FILL_ALPHA));
+        fillPaint.setColor(withAlpha(opaqueColor, fillAlpha));
 
         strokePaint.setStyle(Paint.Style.STROKE);
         strokePaint.setStrokeWidth(STROKE_WIDTH_DP * Resources.getSystem().getDisplayMetrics().density);
         strokePaint.setStrokeJoin(Paint.Join.ROUND);
         strokePaint.setStrokeCap(Paint.Cap.ROUND);
-        strokePaint.setColor(withAlpha(opaqueColor, STROKE_ALPHA));
+        strokePaint.setColor(withAlpha(opaqueColor, strokeAlpha));
     }
 
+    /** Callers may re-assert the color on every sample, so an unchanged color costs nothing. */
     public void setFillColor(final int opaqueColor) {
-        fillPaint.setColor(withAlpha(opaqueColor, FILL_ALPHA));
-        strokePaint.setColor(withAlpha(opaqueColor, STROKE_ALPHA));
+        final int fill = withAlpha(opaqueColor, fillAlpha);
+        if (fill == fillPaint.getColor()) {
+            return;
+        }
+        fillPaint.setColor(fill);
+        strokePaint.setColor(withAlpha(opaqueColor, strokeAlpha));
         invalidateSelf();
     }
 
@@ -175,8 +200,8 @@ public final class RssiHistogramDrawable extends Drawable {
 
     @Override
     public void setAlpha(final int alpha) {
-        fillPaint.setAlpha((alpha * FILL_ALPHA) / 255);
-        strokePaint.setAlpha((alpha * STROKE_ALPHA) / 255);
+        fillPaint.setAlpha((alpha * fillAlpha) / 255);
+        strokePaint.setAlpha((alpha * strokeAlpha) / 255);
         invalidateSelf();
     }
 

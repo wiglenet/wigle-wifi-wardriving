@@ -19,7 +19,7 @@ import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import net.wigle.wigleandroid.model.Filter;
+import net.wigle.wigleandroid.model.FilterSet;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.WiGLEToast;
@@ -193,23 +193,23 @@ public class FilterActivity extends ScreenChildActivity {
                 .setTitle(R.string.export_alert_filter)
                 .setView(container)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
-                    final String description = input.getText() != null
+                    final String name = input.getText() != null
                             ? input.getText().toString().trim() : "";
-                    exportAlertFilter(prefs, description);
+                    exportAlertFilter(prefs, name);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
-    private void exportAlertFilter(final SharedPreferences prefs, final String description) {
-        final Filter filter = FilterUtil.buildAlertFilterFromPrefs(prefs, description);
-        if (filter == null) {
+    private void exportAlertFilter(final SharedPreferences prefs, final String name) {
+        final FilterSet filterSet = FilterUtil.buildAlertFilterSetFromPrefs(prefs, name);
+        if (filterSet == null) {
             WiGLEToast.showOverActivity(this, R.string.export_alert_filter,
                     getString(R.string.export_alert_filter_empty));
             return;
         }
 
-        final String json = FilterJson.toPrettyJson(filter);
+        final String json = FilterJson.toPrettyJson(filterSet);
         final File dir = new File(getCacheDir(), "filters");
         if (!dir.exists() && !dir.mkdirs()) {
             Logging.error("Unable to create filter export cache dir: " + dir);
@@ -218,7 +218,7 @@ public class FilterActivity extends ScreenChildActivity {
             return;
         }
 
-        final String fileName = filterFileName(description);
+        final String fileName = filterFileName(name);
         final File outFile = new File(dir, fileName);
         try (final OutputStreamWriter writer = new OutputStreamWriter(
                 new FileOutputStream(outFile), StandardCharsets.UTF_8)) {
@@ -246,11 +246,11 @@ public class FilterActivity extends ScreenChildActivity {
         }
     }
 
-    private static String filterFileName(final String description) {
-        if (description == null || description.isEmpty()) {
+    private static String filterFileName(final String name) {
+        if (name == null || name.isEmpty()) {
             return "wigle-alert-filter.json";
         }
-        final String sanitized = description.replaceAll("[^A-Za-z0-9._-]+", "_")
+        final String sanitized = name.replaceAll("[^A-Za-z0-9._-]+", "_")
                 .replaceAll("^_+|_+$", "");
         if (sanitized.isEmpty()) {
             return "wigle-alert-filter.json";

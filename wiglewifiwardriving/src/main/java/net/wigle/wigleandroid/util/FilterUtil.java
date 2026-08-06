@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Filter;
+import net.wigle.wigleandroid.model.FilterSet;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 
 import java.util.ArrayList;
@@ -47,6 +48,25 @@ public class FilterUtil {
                         }
                     }
                 });
+    }
+
+    /**
+     * Build an exportable {@link FilterSet} from alert address / BLE manufacturer-ID prefs.
+     * The alerts describe a single way of matching, so the set holds one filter for now, and
+     * the caller's name serves as both the set name and that filter's description.
+     *
+     * @return the filter set, or {@code null} if there are no alert entries to export
+     */
+    public static FilterSet buildAlertFilterSetFromPrefs(final SharedPreferences prefs,
+                                                         final String name) {
+        final Filter filter = buildAlertFilterFromPrefs(prefs, name);
+        if (filter == null) {
+            return null;
+        }
+        return FilterSet.builder()
+                .name(name)
+                .addFilter(filter)
+                .build();
     }
 
     /**

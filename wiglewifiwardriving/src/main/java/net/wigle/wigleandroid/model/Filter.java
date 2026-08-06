@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Export-/Import-able network matching filter.
+ * Export-/Import-able network matching filter, carried in a {@link FilterSet}.
  * Provides description and a list of criteria to use in matching / exclusion from matching.
  * Serialize/deserialize via {@link net.wigle.wigleandroid.util.FilterJson}.
  *
  * <p>Sample JSON payload:
  * <pre>{@code
+ *
  * {
- *   "schemaVersion": 1,
  *   "description": "exclude AirTags",
  *   "exclude": true,
  *   "macAddresses": ["AA:BB:CC:DD:EE:FF"],
@@ -42,12 +42,7 @@ import java.util.Map;
  */
 public class Filter
 {
-    public static final int CURRENT_SCHEMA_VERSION = 1;
-
-    @SerializedName("schemaVersion")
-    private Integer schemaVersion;
-
-    private String description; // text description of this filter set.
+    private String description; // text description of this filter.
     private Boolean exclude; // whether this filter should be treated as positive matching criteria or exclusion criteria from matches
 
     @SerializedName("macAddresses")
@@ -63,8 +58,6 @@ public class Filter
     }
 
     private Filter(final Builder builder) {
-        this.schemaVersion = builder.schemaVersion != null
-                ? builder.schemaVersion : CURRENT_SCHEMA_VERSION;
         this.description = builder.description;
         this.exclude = builder.exclude;
         this.macAddress = builder.macAddress == null
@@ -76,10 +69,6 @@ public class Filter
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public Integer getSchemaVersion() {
-        return schemaVersion;
     }
 
     public String getDescription() {
@@ -104,9 +93,6 @@ public class Filter
 
     /** Light post-deserialize cleanup; leaves null lists as null. */
     public void normalize() {
-        if (schemaVersion == null) {
-            schemaVersion = CURRENT_SCHEMA_VERSION;
-        }
         if (ble != null) {
             ble.normalize();
         }
@@ -116,17 +102,11 @@ public class Filter
      * Fluent builder for {@link Filter}.
      */
     public static final class Builder {
-        private Integer schemaVersion = CURRENT_SCHEMA_VERSION;
         private String description;
         private Boolean exclude;
         private List<String> macAddress;
         private List<String> oui;
         private BleFilter ble;
-
-        public Builder schemaVersion(final Integer schemaVersion) {
-            this.schemaVersion = schemaVersion;
-            return this;
-        }
 
         public Builder description(final String description) {
             this.description = description;

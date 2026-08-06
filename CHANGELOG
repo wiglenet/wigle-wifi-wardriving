@@ -1,3 +1,10 @@
+* 2.111 (08/06/2026)
+Dashboard layout by width
+Filters export
+Per-row RSSI background histogram
+Memory use improvements
+Various bug fixes
+
 * 2.110 (07/22/2026)
 Greek language (thanks Yiannis Manassis!)
 More FOSS map config validation

@@ -332,6 +332,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/csvgz_paths" />
         </provider>
+        <provider
+            android:name=".util.FilterFileProvider"
+            android:authorities="${applicationId}.filterprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filter_paths" />
+        </provider>
         <receiver android:name=".listener.TerminationReceiver"
             android:exported="true"
             tools:ignore="ExportedReceiver">

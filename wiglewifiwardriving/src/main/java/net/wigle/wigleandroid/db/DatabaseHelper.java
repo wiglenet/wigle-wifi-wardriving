@@ -654,11 +654,11 @@ public final class DatabaseHelper extends Thread {
         if (db.enableWriteAheadLogging()) {
             Logging.info("WAL enabled");
             // WAL already fsyncs the log; FULL would fsync the main file on every drain too
-            db.execSQL("PRAGMA synchronous = NORMAL");
+            execPragma("PRAGMA synchronous = NORMAL");
         } else {
             Logging.warn("WAL not available; using rollback journal");
         }
-        db.execSQL("PRAGMA busy_timeout = " + BUSY_TIMEOUT_MS);
+        execPragma("PRAGMA busy_timeout = " + BUSY_TIMEOUT_MS);
 
         if ( ! tableExists( db, NETWORK_TABLE ) ) {
             Logging.info( "network table missing, will create" );
@@ -883,6 +883,13 @@ public final class DatabaseHelper extends Thread {
         final int remaining = openTrackedCursors.get();
         if (remaining > 0) {
             Logging.warn("still " + remaining + " DB readers after " + timeoutMs + " ms");
+        }
+    }
+
+    /** Assignment PRAGMAs still return a row; {@link SQLiteDatabase#execSQL} rejects that. */
+    private void execPragma(final String sql) {
+        try (Cursor cursor = db.rawQuery(sql, null)) {
+            cursor.moveToFirst();
         }
     }
 

@@ -192,6 +192,9 @@ public final class DatabaseHelper extends Thread {
     private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<>(MAX_QUEUE);
     private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<>(MAX_QUEUE); // how to size this better?
     private final AtomicBoolean done = new AtomicBoolean(false);
+    /** Held for the whole close sequence so a second caller waits until the file is actually released. */
+    private final Object closeLock = new Object();
+    private boolean fullyClosed = false;
     private final AtomicLong networkCount = new AtomicLong();
     private final AtomicLong currentRoutePointCount = new AtomicLong();
     private final AtomicLong locationCount = new AtomicLong();
@@ -558,6 +561,17 @@ public final class DatabaseHelper extends Thread {
             db = context.openOrCreateDatabase( dbFilename, Context.MODE_PRIVATE, null );
         }
 
+        // Android's API also grows the connection pool so readers can proceed during a write.
+        // Returns false on filesystems that cannot host the WAL (old FAT/SD); we then keep
+        // the platform rollback journal rather than forcing PERSIST.
+        if (db.enableWriteAheadLogging()) {
+            Logging.info("WAL enabled");
+            // WAL already fsyncs the log; FULL would fsync the main file on every drain too
+            db.execSQL("PRAGMA synchronous = NORMAL");
+        } else {
+            Logging.warn("WAL not available; using rollback journal");
+        }
+
         if ( ! tableExists( db, NETWORK_TABLE ) ) {
             Logging.info( "network table missing, will create" );
             doCreateNetwork = true;
@@ -631,8 +645,6 @@ public final class DatabaseHelper extends Thread {
         db.execSQL( "PRAGMA count_changes = false" );
         // keep transactions in memory until committed
         db.execSQL( "PRAGMA temp_store = MEMORY" );
-        // keep around the journal file, don't create and delete a ton of times
-        db.rawQuery( "PRAGMA journal_mode = PERSIST", null).close();
 
         Logging.info( "database version: " + db.getVersion() );
         if ( db.getVersion() == 0 ) {
@@ -756,41 +768,100 @@ public final class DatabaseHelper extends Thread {
     }
 
     /**
-     * close db, shut down thread
+     * Fold WAL frames into the main file. The cursor must be stepped or SQLite never
+     * runs the pragma. TRUNCATE also resets the WAL so a copy of the main file is complete;
+     * FULL is the fallback if a reader is still holding a snapshot.
+     */
+    private void checkpointWal() {
+        if (db == null || !db.isOpen() || !db.isWriteAheadLoggingEnabled()) {
+            return;
+        }
+        if (!runWalCheckpoint("TRUNCATE")) {
+            runWalCheckpoint("FULL");
+        }
+    }
+
+    private boolean runWalCheckpoint(final String mode) {
+        try (Cursor cursor = db.rawQuery("PRAGMA wal_checkpoint(" + mode + ")", null)) {
+            if (!cursor.moveToFirst()) {
+                Logging.warn("WAL checkpoint " + mode + " returned no row");
+                return false;
+            }
+            final int busy = cursor.getInt(0);
+            Logging.info("WAL checkpoint " + mode
+                    + " busy=" + busy
+                    + " log=" + cursor.getInt(1)
+                    + " checkpointed=" + cursor.getInt(2));
+            return busy == 0;
+        } catch (final SQLiteException ex) {
+            Logging.warn("WAL checkpoint " + mode + " failed: " + ex);
+            return false;
+        }
+    }
+
+    /**
+     * Stop the worker, wait until it has exited, then close the SQLite connection and drop the
+     * reference. Returns only once the file is released (or this is the worker thread itself).
+     * A second call waits for the first to finish, then returns; {@link #checkDB()} will not
+     * reopen afterwards.
      */
     public void close() {
-        done.set( true );
-
-        // interrupt the take, if any
-        this.interrupt();
-        // give time for db to finish any writes
-        int countdown = 30;
-        while ( this.isAlive() && countdown > 0 ) {
-            Logging.info( "db still alive. countdown: " + countdown );
-            MainActivity.sleep( 100L );
-            countdown--;
-            this.interrupt();
-        }
-
-        countdown = 50;
-        while ( db != null && db.isOpen() && countdown > 0 ) {
-            try {
-                synchronized ( this ) {
-                    closeCompiledStatements();
-                    if ( db.isOpen() ) {
-                        db.close();
+        synchronized (closeLock) {
+            if (fullyClosed) {
+                return;
+            }
+            done.set(true);
+            interrupt();
+            if (Thread.currentThread() != this) {
+                waitForWorkerExit();
+            }
+            synchronized (this) {
+                checkpointWal();
+                closeCompiledStatements();
+                if (db != null) {
+                    try {
+                        if (db.isOpen()) {
+                            db.close();
+                        }
+                    } catch (final SQLiteException ex) {
+                        Logging.error("db close after worker exit: " + ex, ex);
                     }
+                    db = null;
                 }
             }
-            catch ( SQLiteException ex ) {
-                Logging.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
-                MainActivity.sleep( 100L );
+            failQueuedWaiters(new DBException("db closed", null));
+            fullyClosed = true;
+        }
+    }
+
+    /**
+     * Interrupt {@code take()} until the worker leaves {@link #run()}. Does not hold
+     * {@code this}, so the worker can still finish a {@link #checkDB()} that needs that lock.
+     */
+    private void waitForWorkerExit() {
+        boolean closerInterrupted = false;
+        long waitedMs = 0L;
+        while (isAlive()) {
+            interrupt();
+            try {
+                join(250L);
+            } catch (final InterruptedException ex) {
+                closerInterrupted = true;
             }
-            countdown--;
+            waitedMs += 250L;
+            if (isAlive() && waitedMs % 5000L == 0L) {
+                Logging.warn("waiting for db worker to exit, waited " + waitedMs + " ms");
+            }
+        }
+        if (closerInterrupted) {
+            Thread.currentThread().interrupt();
         }
     }
 
     public synchronized void checkDB() throws DBException {
+        if (done.get()) {
+            throw new DBException("db closed", null);
+        }
         if ( db == null || ! db.isOpen() ) {
             Logging.info( "re-opening db in checkDB" );
             try {
@@ -805,6 +876,9 @@ public final class DatabaseHelper extends Thread {
     public void blockingAddExternalObservation(final Network network, final Location location, final boolean newForRun )
             throws InterruptedException {
 
+        if (done.get()) {
+            throw new InterruptedException("db closed");
+        }
         final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun, false, false, 1 );
         queue.put(update);
     }
@@ -1805,6 +1879,17 @@ public final class DatabaseHelper extends Thread {
 
         if (hasSD()) {
             file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
+        }
+        // fold committed WAL frames into the main file before we copy only that file
+        synchronized (TRANS_LOCK) {
+            try {
+                if (!done.get()) {
+                    checkDB();
+                    checkpointWal();
+                }
+            } catch (final DBException ex) {
+                Logging.warn("WAL checkpoint before backup skipped: " + ex);
+            }
         }
         Pair<Boolean,String> result;
         try (InputStream input = new FileInputStream(file)){

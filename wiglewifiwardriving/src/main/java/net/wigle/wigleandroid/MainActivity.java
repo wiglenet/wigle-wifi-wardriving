@@ -3005,16 +3005,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         //ALIBI: we'll piggyback off the current route, if we're logging it
         if (!logRoutes) {
             if (state != null && state.dbHelper != null) {
-                final DatabaseHelper dbHelper = state.dbHelper;
-                try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
-                    executor.execute(() -> {
-                        try {
-                            dbHelper.clearDefaultRoute();
-                        } catch (DBException dbe) {
-                            Logging.warn("unable to clear default route on startRouteMapping: ", dbe);
-                        }
-                    });
-                    executor.shutdown();
+                try {
+                    state.dbHelper.clearDefaultRoute();
+                } catch (DBException dbe) {
+                    Logging.warn("unable to clear default route on startRouteMapping: ", dbe);
                 }
             }
         }

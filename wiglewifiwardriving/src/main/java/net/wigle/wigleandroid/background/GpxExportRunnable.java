@@ -94,17 +94,14 @@ public class GpxExportRunnable extends ProgressPanelRunnable implements Runnable
             writer.append(GPX_HEADER_B);
             writer.append(nameStr);
 
-            Cursor cursor;
-            if (routeId == -1) {
-                cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
-            } else {
-                cursor = ListFragment.lameStatic.dbHelper.routeIterator(routeId);
+            try (Cursor cursor = (routeId == -1)
+                    ? ListFragment.lameStatic.dbHelper.currentRouteIterator()
+                    : ListFragment.lameStatic.dbHelper.routeIterator(routeId)) {
+                long segmentCount = writeSegmentsWithCursor(writer, cursor, df, totalCount);
+                Logging.info("wrote " + segmentCount + " segments");
             }
-            long segmentCount = writeSegmentsWithCursor(writer, cursor, df, totalCount);
-            Logging.info("wrote " + segmentCount + " segments");
             writer.append(GPX_FOOTER);
             writer.flush();
-            cursor.close();
         } catch (IOException | DBException | InterruptedException e) {
             Logging.error("Error writing GPX", e);
         } finally {

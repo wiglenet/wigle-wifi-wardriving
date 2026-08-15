@@ -1082,10 +1082,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private void setupDatabase(final SharedPreferences prefs) {
         // could be set by nonconfig retain
-        if (state.dbHelper == null) {
-            state.dbHelper = new DatabaseHelper(getApplicationContext(), prefs);
-            //state.dbHelper.checkDB();
-            state.dbHelper.start();
+        if (state.dbHelper == null || state.dbHelper.isFullyClosed()) {
+            state.dbHelper = DatabaseHelper.acquire(getApplicationContext(), prefs);
             ListFragment.lameStatic.dbHelper = state.dbHelper;
         }
         if (state.mxcDbHelper == null) {
@@ -2838,7 +2836,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
 
             // close the db. not in destroy, because it'll still write after that.
-            if (state.dbHelper != null) state.dbHelper.close();
+            if (state.dbHelper != null) {
+                state.dbHelper.close();
+                if (ListFragment.lameStatic.dbHelper == state.dbHelper) {
+                    ListFragment.lameStatic.dbHelper = null;
+                }
+                state.dbHelper = null;
+            }
             if (state.mxcDbHelper != null) state.mxcDbHelper.close();
 
             final LocationManager locationManager = (LocationManager) this.getApplicationContext().getSystemService(Context.LOCATION_SERVICE); //ALIBI: avoid activity context-based leaks

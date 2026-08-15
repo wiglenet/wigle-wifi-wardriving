@@ -52,6 +52,7 @@ import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
@@ -74,6 +75,10 @@ public final class DatabaseHelper extends Thread {
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
+    /** Native SQLITE_BUSY wait per statement (checkpoint, leaked connection, API≤29 SD). */
+    private static final int BUSY_TIMEOUT_MS = 5000;
+    /** Extra worker attempts after busy_timeout expires. */
+    private static final int BUSY_RETRIES = 3;
     private static final Object TRANS_LOCK = new Object();
 
     private static final long QUEUE_CULL_TIMEOUT = 10000L;
@@ -197,6 +202,12 @@ public final class DatabaseHelper extends Thread {
     /** Held for the whole close sequence so a second caller waits until the file is actually released. */
     private final Object closeLock = new Object();
     private boolean fullyClosed = false;
+    /**
+     * Process-wide owner of the on-disk file. WAL cannot have two writers; acquire() waits for
+     * the previous helper to finish closing before opening another.
+     */
+    private static final Object OWNER_LOCK = new Object();
+    private static DatabaseHelper owner;
     private final AtomicLong networkCount = new AtomicLong();
     private final AtomicLong currentRoutePointCount = new AtomicLong();
     private final AtomicLong locationCount = new AtomicLong();
@@ -366,7 +377,34 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
-    public DatabaseHelper( final Context context, final SharedPreferences prefs ) {
+    /**
+     * Return a new live helper after the previous one (if any) has fully released the file.
+     * Never reuses a still-running helper: a finishing activity would close it under a new
+     * activity that had borrowed it.
+     * <p>
+     * Lock order: {@link #OWNER_LOCK} then {@code closeLock}. Never reverse.
+     */
+    public static DatabaseHelper acquire(final Context context, final SharedPreferences prefs) {
+        synchronized (OWNER_LOCK) {
+            if (owner != null) {
+                Logging.info("closing previous DatabaseHelper before opening another");
+                owner.closeExclusive();
+                owner = null;
+            }
+            final DatabaseHelper helper = new DatabaseHelper(context, prefs);
+            helper.start();
+            owner = helper;
+            return helper;
+        }
+    }
+
+    public boolean isFullyClosed() {
+        synchronized (closeLock) {
+            return fullyClosed;
+        }
+    }
+
+    private DatabaseHelper( final Context context, final SharedPreferences prefs ) {
         this.context = context.getApplicationContext();
         this.prefs = prefs;
         setName("dbworker-" + getName());
@@ -495,27 +533,36 @@ public final class DatabaseHelper extends Thread {
                     final int drainSize = drain.size();
 
                     int countdown = 10;
+                    int busyCountdown = BUSY_RETRIES;
                     while ( countdown > 0 && ! done.get() ) {
-                        // doubt this will help the exclusive lock problems, but trying anyway
-                        synchronized(TRANS_LOCK) {
-                            try {
+                        try {
+                            synchronized(TRANS_LOCK) {
                                 applyDrain(drain);
-                                countdown = 0;
                             }
-                            catch ( SQLiteConstraintException ex ) {
-                                Logging.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
-                                countdown--;
+                            countdown = 0;
+                        }
+                        catch ( SQLiteConstraintException ex ) {
+                            Logging.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
+                            countdown--;
+                        }
+                        catch ( SQLiteDatabaseLockedException ex ) {
+                            Logging.warn("DB run loop locked, retries left: " + busyCountdown + " ex: " + ex );
+                            busyCountdown--;
+                            if ( busyCountdown <= 0 ) {
+                                failWaiters(drain, ex);
+                                throw ex;
                             }
-                            catch ( Exception ex ) {
-                                Logging.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
-                                countdown--;
-                                if ( countdown <= 0 ) {
-                                    failWaiters(drain, ex);
-                                    // give up
-                                    throw ex;
-                                }
-                                MainActivity.sleep(100L);
+                            MainActivity.sleep(100L);
+                        }
+                        catch ( Exception ex ) {
+                            Logging.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
+                            countdown--;
+                            if ( countdown <= 0 ) {
+                                failWaiters(drain, ex);
+                                // give up
+                                throw ex;
                             }
+                            MainActivity.sleep(100L);
                         }
                     }
 
@@ -611,6 +658,7 @@ public final class DatabaseHelper extends Thread {
         } else {
             Logging.warn("WAL not available; using rollback journal");
         }
+        db.execSQL("PRAGMA busy_timeout = " + BUSY_TIMEOUT_MS);
 
         if ( ! tableExists( db, NETWORK_TABLE ) ) {
             Logging.info( "network table missing, will create" );
@@ -863,6 +911,15 @@ public final class DatabaseHelper extends Thread {
      * reopen afterwards.
      */
     public void close() {
+        synchronized (OWNER_LOCK) {
+            closeExclusive();
+            if (owner == this) {
+                owner = null;
+            }
+        }
+    }
+
+    private void closeExclusive() {
         synchronized (closeLock) {
             if (fullyClosed) {
                 return;
@@ -1189,24 +1246,36 @@ public final class DatabaseHelper extends Thread {
     }
 
     private void applyNow(final DBUpdate update) throws DBException {
-        synchronized (TRANS_LOCK) {
-            checkDB();
-            if (update.op == DBUpdate.Op.CLEAR_DATABASE) {
-                final int cleared = applyClearDatabase();
-                completeWaiter(update, cleared, null);
-                return;
-            }
-            db.beginTransaction();
+        SQLiteDatabaseLockedException lastLocked = null;
+        for (int attempt = 0; attempt < BUSY_RETRIES; attempt++) {
             try {
-                applyUpdate(update, 1);
-                db.setTransactionSuccessful();
-            } finally {
-                if (db.inTransaction()) {
-                    db.endTransaction();
+                synchronized (TRANS_LOCK) {
+                    checkDB();
+                    if (update.op == DBUpdate.Op.CLEAR_DATABASE) {
+                        final int cleared = applyClearDatabase();
+                        completeWaiter(update, cleared, null);
+                        return;
+                    }
+                    db.beginTransaction();
+                    try {
+                        applyUpdate(update, 1);
+                        db.setTransactionSuccessful();
+                    } finally {
+                        if (db.inTransaction()) {
+                            db.endTransaction();
+                        }
+                    }
+                    completeWaiter(update, 1, null);
+                    return;
                 }
+            } catch (final SQLiteDatabaseLockedException ex) {
+                lastLocked = ex;
+                Logging.warn("applyNow locked, attempt " + (attempt + 1) + "/" + BUSY_RETRIES + " ex: " + ex);
+                MainActivity.sleep(100L);
             }
-            completeWaiter(update, 1, null);
         }
+        completeWaiter(update, 0, lastLocked);
+        throw new DBException("db locked", lastLocked);
     }
 
     @SuppressWarnings("deprecation")

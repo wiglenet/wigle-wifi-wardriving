@@ -47,6 +47,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.CursorWrapper;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
@@ -192,6 +193,7 @@ public final class DatabaseHelper extends Thread {
     private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<>(MAX_QUEUE);
     private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<>(MAX_QUEUE); // how to size this better?
     private final AtomicBoolean done = new AtomicBoolean(false);
+    private final AtomicInteger openTrackedCursors = new AtomicInteger();
     /** Held for the whole close sequence so a second caller waits until the file is actually released. */
     private final Object closeLock = new Object();
     private boolean fullyClosed = false;
@@ -374,6 +376,44 @@ public final class DatabaseHelper extends Thread {
     public SQLiteDatabase getDB() throws DBException {
         checkDB();
         return db;
+    }
+
+    /**
+     * Tracked read used by {@link net.wigle.wigleandroid.background.PooledQueryExecutor} so a
+     * checkpoint can see live readers. Prefer this over {@link #getDB()} plus a raw query.
+     */
+    public Cursor query(final String sql, final String[] args) throws DBException {
+        checkDB();
+        return trackedQuery(sql, args);
+    }
+
+    /**
+     * Count is best-effort; a leaked cursor is still a leak. Close is idempotent so adapter
+     * swap/update paths that close twice do not drive the count negative.
+     */
+    private Cursor trackedQuery(final String sql, final String[] args) {
+        final Cursor inner = db.rawQuery(sql, args);
+        openTrackedCursors.incrementAndGet();
+        return new TrackedCursor(inner);
+    }
+
+    private final class TrackedCursor extends CursorWrapper {
+        private final AtomicBoolean closed = new AtomicBoolean(false);
+
+        TrackedCursor(final Cursor cursor) {
+            super(cursor);
+        }
+
+        @Override
+        public void close() {
+            if (closed.compareAndSet(false, true)) {
+                try {
+                    super.close();
+                } finally {
+                    openTrackedCursors.decrementAndGet();
+                }
+            }
+        }
     }
 
     private static class DeathHandler extends Handler {
@@ -769,15 +809,32 @@ public final class DatabaseHelper extends Thread {
 
     /**
      * Fold WAL frames into the main file. The cursor must be stepped or SQLite never
-     * runs the pragma. TRUNCATE also resets the WAL so a copy of the main file is complete;
-     * FULL is the fallback if a reader is still holding a snapshot.
+     * runs the pragma. TRUNCATE also resets the WAL so a copy of the main file is complete,
+     * but it cannot finish while a reader still holds a snapshot — use FULL in that case.
      */
     private void checkpointWal() {
         if (db == null || !db.isOpen() || !db.isWriteAheadLoggingEnabled()) {
             return;
         }
+        final int readers = openTrackedCursors.get();
+        if (readers > 0) {
+            Logging.info("WAL TRUNCATE skipped, " + readers + " readers open");
+            runWalCheckpoint("FULL");
+            return;
+        }
         if (!runWalCheckpoint("TRUNCATE")) {
             runWalCheckpoint("FULL");
+        }
+    }
+
+    private void waitForReaders(final long timeoutMs) {
+        final long deadline = System.currentTimeMillis() + timeoutMs;
+        while (openTrackedCursors.get() > 0 && System.currentTimeMillis() < deadline) {
+            MainActivity.sleep(50L);
+        }
+        final int remaining = openTrackedCursors.get();
+        if (remaining > 0) {
+            Logging.warn("still " + remaining + " DB readers after " + timeoutMs + " ms");
         }
     }
 
@@ -815,6 +872,7 @@ public final class DatabaseHelper extends Thread {
             if (Thread.currentThread() != this) {
                 waitForWorkerExit();
             }
+            waitForReaders(2000L);
             synchronized (this) {
                 checkpointWal();
                 closeCompiledStatements();
@@ -1192,7 +1250,7 @@ public final class DatabaseHelper extends Thread {
             // cache miss, get the last values from the db, if any
             long start = System.currentTimeMillis();
             // SELECT: can't precompile, as it has more than 1 result value
-            final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon,mfgrid FROM network WHERE bssid = ?", bssidArgs );
+            final Cursor cursor = trackedQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon,mfgrid FROM network WHERE bssid = ?", bssidArgs );
             logTime( start, "db network queried " + bssid );
             if ( cursor.getCount() == 0 ) {
                 insertNetwork.bindString( 1, bssid );
@@ -1641,7 +1699,7 @@ public final class DatabaseHelper extends Thread {
     public long getRoutePointCount(long routeId) {
         try {
             checkDB();
-            try (Cursor cursor = db.rawQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)})) {
+            try (Cursor cursor = trackedQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)})) {
                 cursor.moveToFirst();
                 return cursor.getLong(0);
             }
@@ -1711,7 +1769,7 @@ public final class DatabaseHelper extends Thread {
 
     private long getMaxIdFromDB( final String table ) throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery("select MAX(_id) FROM " + table, null)) {
+        try (Cursor cursor = trackedQuery("select MAX(_id) FROM " + table, null)) {
             cursor.moveToFirst();
             final long count = cursor.getLong(0);
             return count;
@@ -1719,7 +1777,7 @@ public final class DatabaseHelper extends Thread {
     }
     public long getWiFiNetsWthLocCountFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
+        try (Cursor cursor = trackedQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
         }
@@ -1730,7 +1788,7 @@ public final class DatabaseHelper extends Thread {
      */
     public NetworkCatTotals getNetworkTotalsByKindFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(NETWORK_TOTALS_BY_KIND_QUERY, null)) {
+        try (Cursor cursor = trackedQuery(NETWORK_TOTALS_BY_KIND_QUERY, null)) {
             cursor.moveToFirst();
             return new NetworkCatTotals(cursor.getLong(0), cursor.getLong(1), cursor.getLong(2));
         }
@@ -1745,7 +1803,7 @@ public final class DatabaseHelper extends Thread {
             try {
                 checkDB();
                 final String[] args = new String[]{ bssid };
-                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service,bestlevel,lasttime FROM "
+                cursor = trackedQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service,bestlevel,lasttime FROM "
                         + NETWORK_TABLE
                         + " WHERE bssid = ?", args);
                 if ( cursor.getCount() > 0 ) {
@@ -1797,21 +1855,21 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         Logging.info( "locationIterator fromId: " + fromId );
         final String[] args = new String[]{ Long.toString( fromId ) };
-        return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time,mfgrid FROM location WHERE _id > ? AND external = 0", args );
+        return trackedQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time,mfgrid FROM location WHERE _id > ? AND external = 0", args );
     }
 
     public Cursor networkIterator(final NetworkFilter filter) throws DBException {
         checkDB();
         Logging.info( "networkIterator (filtered)" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE "+filter.getFilter(), args );
+        return trackedQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE "+filter.getFilter(), args );
     }
 
     public Cursor routeIterator(final long routeId) throws DBException {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{String.valueOf(routeId)};
-        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = ?", args );
+        return trackedQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = ?", args );
     }
 
     public Cursor routeMetaIterator() throws DBException {
@@ -1819,14 +1877,14 @@ public final class DatabaseHelper extends Thread {
         Logging.info( "routeMetaIterator" );
         final String[] args = new String[]{};
         //ALIBI: we'd love to parameterize min observations here, but SQLite rawQuery doesn't seem to respect ? parameterization in HAVING statements.
-        return db.rawQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
+        return trackedQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
     }
 
     public Cursor currentRouteIterator() throws DBException {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
+        return trackedQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
     }
 
     public void clearDefaultRoute() throws DBException {
@@ -1862,13 +1920,13 @@ public final class DatabaseHelper extends Thread {
             boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
             final long visibleRouteId = logRoutes ? prefs.getLong(PreferenceKeys.PREF_ROUTE_DB_RUN, 0L) : 0L;
             final String[] args = new String[]{String.valueOf(visibleRouteId)};
-            return db.rawQuery("SELECT lat,lon FROM route WHERE run_id = ?", args);
+            return trackedQuery("SELECT lat,lon FROM route WHERE run_id = ?", args);
     }
 
     public Cursor getSingleNetwork( final String bssid, final NetworkFilter filter ) throws DBException {
         checkDB();
         final String[] args = new String[]{bssid};
-        return db.rawQuery(
+        return trackedQuery(
                 "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE bssid = ? AND "+ filter.getFilter(), args );
     }
 

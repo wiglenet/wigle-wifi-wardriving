@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid.background;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -49,9 +48,8 @@ public class PooledQueryExecutor {
         public void run() {
             Cursor cursor = null;
             try {
-                final SQLiteDatabase db = dbHelper.getDB();
-                if ( db != null ) {
-                    cursor = db.rawQuery( sql, args );
+                if ( dbHelper != null ) {
+                    cursor = dbHelper.query( sql, args );
                     while ( cursor.moveToNext() ) {
                         if (!handler.handleRow( cursor )) {
                             break;

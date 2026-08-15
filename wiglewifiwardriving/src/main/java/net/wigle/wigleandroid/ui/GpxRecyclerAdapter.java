@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,9 @@ import net.wigle.wigleandroid.util.RouteExportSelector;
 import net.wigle.wigleandroid.util.RouteDeleteSelector;
 
 import java.text.DateFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.ViewHolder>  {
     public static final int EXPORT_GPX_DIALOG = 130;
@@ -45,6 +50,9 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     private final DateFormat dateFormat;
     private final DateFormat timeFormat;
     private int selectedPos = RecyclerView.NO_POSITION;
+    private final ExecutorService routeLoadExecutor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final AtomicInteger routeLoadGeneration = new AtomicInteger();
 
     public GpxRecyclerAdapter(Context context, FragmentActivity fragmentActivity, Cursor cursor, RouteConfigurable configurable, RouteExportSelector routeSelector,
                               RouteDeleteSelector routeDeleteSelector, SharedPreferences prefs, DateFormat dateFormat, DateFormat timeFormat) {
@@ -154,27 +162,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
             notifyItemChanged(selectedPos);
             selectedPos = position; //.getLayoutPosition();
             notifyItemChanged(selectedPos);
-            //DEBUG: MainActivity.info("get route "+clickedId);
-            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId)) {
-                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
-                if (null == routeCursor) {
-                    Logging.info("null route cursor; not mapping");
-                } else {
-                    RouteDescriptor newRoute = new RouteDescriptor();
-                    for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-                        final float lat = routeCursor.getFloat(0);
-                        final float lon = routeCursor.getFloat(1);
-                        //final float ele = routeCursor.getFloat(2);
-                        //final long time = routeCursor.getLong(3);
-                        newRoute.addLatLng(lat, lon, mapMode, nightMode);
-                    }
-                    Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
-                    configurable.configureMapForRoute(newRoute);
-                }
-            } catch (Exception e) {
-                Logging.error("Unable to add route: ",e);
-            }
+            loadAndShowRoute(clickedId);
         });
         holder.shareButton.setOnClickListener(v -> {
             Logging.info("share route "+clickedId);
@@ -218,6 +206,50 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
             return cursor.getCount();
         }
         return 0;
+    }
+
+    /**
+     * Load a route's points off the UI thread, then configure the map. A newer request
+     * cancels drawing an older one so rapid taps cannot apply a stale polyline.
+     */
+    public void loadAndShowRoute(final long runId) {
+        if (routeLoadExecutor.isShutdown()) {
+            return;
+        }
+        final int generation = routeLoadGeneration.incrementAndGet();
+        final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+        final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
+        routeLoadExecutor.execute(() -> {
+            final RouteDescriptor newRoute = new RouteDescriptor();
+            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(runId)) {
+                if (routeCursor == null) {
+                    Logging.info("null route cursor; not mapping");
+                    return;
+                }
+                for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                    newRoute.addLatLng(routeCursor.getFloat(0), routeCursor.getFloat(1),
+                            mapMode, nightMode);
+                }
+            } catch (Exception e) {
+                Logging.error("Unable to add route: ", e);
+                return;
+            }
+            Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
+            mainHandler.post(() -> {
+                if (generation != routeLoadGeneration.get()) {
+                    return;
+                }
+                if (fragmentActivity.isFinishing()) {
+                    return;
+                }
+                configurable.configureMapForRoute(newRoute);
+            });
+        });
+    }
+
+    public void shutdown() {
+        routeLoadGeneration.incrementAndGet();
+        routeLoadExecutor.shutdownNow();
     }
 
     /**

@@ -3,14 +3,14 @@
     <string name="stats">החל</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - הגדרות</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
+    <string name="settings_app_name">הגדרות</string>
+    <string name="mapping_app_name">OpenStreetMap</string>
+    <string name="dashboard_app_name">Dashboard</string>
     <string name="error_report_name">דוח שגיאות אחרונות</string>
-    <string name="speech_name">WiGLE Wifi - הגדרות דיבור</string>
-    <string name="network_activity_name">WiGLE Wifi - רשת</string>
-    <string name="data_activity_name">WiGLE Wifi - Database</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - תוצאות חיפוש</string>
+    <string name="speech_name">הגדרות דיבור</string>
+    <string name="network_activity_name">רשת</string>
+    <string name="data_activity_name">Database</string>
+    <string name="dbresult_activity_name">תוצאות חיפוש</string>
     <string name="upload_button">טען\n WiGLE.net</string>
     <string name="username">WiGLE שם משתמש</string>
     <string name="password">WiGLE סיסמה</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(Querying&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">הצג סיסמה</string>
-    <string name="setting_db_marker">DB מרקר (שם שנוספו להתחיל):</string>
+    <string name="setting_db_marker">סמן מסד נתונים (הרשת האחרונה שהועלתה):</string>
     <string name="setting_high_up">Id נטען גבוהה ביותר:</string>
     <string name="setting_zero_out">אפס את סמן DB?</string>
     <string name="setting_max_id">מקס להעלות id:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (צ\'כית)</string>
     <string name="language_da">dansk (דנית)</string>
     <string name="language_de">Deutsch (גרמנית)</string>
+    <string name="language_el">Ελληνικά (יוונית)</string>
     <string name="language_es">español (ספרדית)</string>
     <string name="language_fi">suomi (פינית)</string>
     <string name="language_fr">français (צרפתית)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">אופטימיזציית סוללה</string>
     <string name="battery_opt_status_exempted">פטור</string>
     <string name="battery_opt_status_not_exempted">לא פטור (הקש לשינוי)</string>
+    <string name="phone_permission_detail">WiGLE יכול להשתיק את שמע האפליקציה כשאתה מקבל שיחה נכנסת במכשיר. ההרשאה הזו מודיעה לאפליקציה שעליה להפסיק להשמיע צלילים כדי שתוכל לדבר.</string>
+    <string name="database_stats">מאגר נתונים מקומי (במכשיר):</string>
+    <string name="export">ייצוא נתונים</string>
+    <string name="backup_restore">גיבוי ושחזור</string>
+    <string name="flag_whole_database">סמן את כל מסד הנתונים להעלאה</string>
+    <string name="file_size_warning">נדרשות העלאות מרובות.</string>
+    <string name="invalid_foss_config">נראה שתצורת מפת FOSS שלך אינה חוקית. אנא בדוק את ההגדרות שלך.</string>
+    <string name="menu_drawer_title">תפריט</string>
+    <string name="display_inline_histograms">הצג היסטוגרמות RSSI ברקע הרשימה</string>
+    <string name="anniversary_mode_enabled">מצב יום השנה ה-25 הופעל</string>
+    <string name="anniversary_mode_disabled">מצב יום השנה ה-25 הושבת</string>
 </resources>

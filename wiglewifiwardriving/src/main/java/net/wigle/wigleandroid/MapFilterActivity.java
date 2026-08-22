@@ -65,6 +65,10 @@ public class MapFilterActivity extends ScreenChildActivity {
         if (alertMfgrss != null) {
             alertMfgrss.setVisibility(GONE);
         }
+        Button exportAlertFilter = findViewById(R.id.export_alert_filter_button);
+        if (exportAlertFilter != null) {
+            exportAlertFilter.setVisibility(GONE);
+        }
 
         final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

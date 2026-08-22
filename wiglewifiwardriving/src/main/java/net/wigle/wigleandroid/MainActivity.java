@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PermissionInfo;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -61,6 +63,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 
 import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
@@ -96,6 +99,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.ui.WLogoDrawerArrowDrawable;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.BuildReleaseTag;
@@ -148,6 +152,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
         public DatabaseHelper dbHelper;
+        public net.wigle.wigleandroid.util.RssiHistoryCache rssiHistoryCache;
         ServiceConnection serviceConnection;
         WigleService wigleService;
         AtomicBoolean finishing;
@@ -176,6 +181,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private PowerManager.WakeLock scanWakeLock;
+        // Whether scanning is currently on + wants scan wake lock while the display is off.
+        private boolean wantsScanWakeLock = false;
         private int logPointer = 0;
         private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
@@ -226,6 +233,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final long FINISH_TIME_MILLIS = 10L;
     private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
 
+    // Timeout used for the scan-cycle PARTIAL_WAKE_LOCK. Refreshed from WifiReceiver.onReceive() so
+    // that as long as scans keep firing we hold the lock. Combat excessive wake-locks.
+    private static final long SCAN_WAKE_REFRESH_MS = 30_000L;
+
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
     public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
     public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
@@ -240,6 +251,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private static MainActivity mainActivity;
     private BatteryLevelReceiver batteryLevelReceiver;
+    private BroadcastReceiver screenStateReceiver;
     private boolean playServiceShown = false;
 
     private DrawerLayout mDrawerLayout;
@@ -452,6 +464,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setupDatabase(prefs);
         Logging.info("MAIN: setupBattery");
         setupBattery();
+        Logging.info("MAIN: setupScreenStateReceiver");
+        setupScreenStateReceiver();
         Logging.info("MAIN: setupSound");
         setupSound();
         Logging.info("MAIN: setupActivationDialog");
@@ -583,6 +597,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void setupPermissions() {
+        final SharedPreferences permPrefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+                && permPrefs.getBoolean(PreferenceKeys.PREF_PHONE_PERMISSION_DECLINED, false)) {
+            permPrefs.edit().putBoolean(PreferenceKeys.PREF_PHONE_PERMISSION_DECLINED, false).apply();
+        }
         final List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
         if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -592,7 +611,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
         }
         addPermission(permissionsList, Manifest.permission.BLUETOOTH);
-        addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+        if (!permPrefs.getBoolean(PreferenceKeys.PREF_PHONE_PERMISSION_DECLINED, false)) {
+            addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
@@ -619,10 +640,56 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             Logging.info("no permission for " + permissionsNeeded);
 
-            // Fire off an async request to actually get the permission
-            // This will show the standard permission request dialog UI
-            requestPermissions(permissionsList.toArray(new String[0]),
-                    PERMISSIONS_REQUEST);
+            final String[] permissionsArray = permissionsList.toArray(new String[0]);
+            if (permissionsList.contains(Manifest.permission.READ_PHONE_STATE)) {
+                showReadPhoneStatePermissionExplanation(permissionsArray);
+            } else {
+                requestPermissions(permissionsArray, PERMISSIONS_REQUEST);
+            }
+        }
+    }
+
+    /**
+     * This is a really common source of complaints from users. Let's be explicit.
+     */
+    private void showReadPhoneStatePermissionExplanation(final String[] permissionsArray) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        try {
+            final PermissionInfo permInfo = getPackageManager().getPermissionInfo(
+                    Manifest.permission.READ_PHONE_STATE, 0);
+            final CharSequence title = permInfo.loadLabel(getPackageManager());
+            if (title != null && title.length() > 0) {
+                builder.setTitle(title);
+            }
+        } catch (PackageManager.NameNotFoundException ex) {
+            Logging.info("READ_PHONE_STATE permission info not found: " + ex);
+        }
+        builder.setMessage(R.string.phone_permission_detail);
+        builder.setCancelable(true);
+        builder.setPositiveButton(R.string.ok, (dialog, which) -> {
+            requestPermissions(permissionsArray, PERMISSIONS_REQUEST);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton(R.string.battery_opt_not_now, (dialog, which) -> {
+            getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE).edit()
+                    .putBoolean(PreferenceKeys.PREF_PHONE_PERMISSION_DECLINED, true)
+                    .apply();
+            final ArrayList<String> withoutPhone = new ArrayList<>();
+            for (final String permission : permissionsArray) {
+                if (!Manifest.permission.READ_PHONE_STATE.equals(permission)) {
+                    withoutPhone.add(permission);
+                }
+            }
+            if (!withoutPhone.isEmpty()) {
+                requestPermissions(withoutPhone.toArray(new String[0]), PERMISSIONS_REQUEST);
+            }
+            dialog.dismiss();
+        });
+        try {
+            builder.show();
+        } catch (Exception ex) {
+            Logging.info("exception showing read phone state permission explanation: " + ex);
+            requestPermissions(permissionsArray, PERMISSIONS_REQUEST);
         }
     }
 
@@ -644,6 +711,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             case PERMISSIONS_REQUEST: {
                 Logging.info("location grant response permissions: " + Arrays.toString(permissions)
                         + " grantResults: " + Arrays.toString(grantResults));
+
+                final SharedPreferences permPrefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS,
+                        Context.MODE_PRIVATE);
+                Boolean phoneDeclined = null;
+                for (int i = 0; i < permissions.length; i++) {
+                    if (Manifest.permission.READ_PHONE_STATE.equals(permissions[i])) {
+                        phoneDeclined = grantResults[i] != PackageManager.PERMISSION_GRANTED;
+                    }
+                }
+                if (phoneDeclined != null) {
+                    permPrefs.edit().putBoolean(PreferenceKeys.PREF_PHONE_PERMISSION_DECLINED, phoneDeclined).apply();
+                }
 
                 boolean restart = false;
                 for (int i = 0; i < permissions.length; i++) {
@@ -680,13 +759,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
+                final CharSequence restored = getTitleForNavId(state.currentTab);
+                if (restored != null) {
+                    setTitle(restored);
+                }
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                final ActionBar actionBar = getSupportActionBar();
-                if (actionBar != null) actionBar.setTitle("Menu");
+                setTitle(getString(R.string.menu_drawer_title));
                 InputMethodManager inputMethodManager = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager != null && getCurrentFocus() != null) {
@@ -698,6 +780,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
             }
         };
+        applyCustomMenuIcon();
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         final NavigationView navigationView = findViewById(R.id.left_drawer);
@@ -809,18 +892,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null != navigationView) {
             applyExitBackground(navigationView);
         }
-        final Map<Integer, String> fragmentTitles = new HashMap<>();
-        fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
-        fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
-        fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
-        fragmentTitles.put(R.id.nav_search, getString(R.string.tab_search));
-        fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
-        fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
-        fragmentTitles.put(R.id.nav_stats, getString(R.string.tab_stats));
-        fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
-        fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
-        fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
-        //fragmentTitles.put(R.id.nav_, getString(R.string.site_stats_app_name));
 
         try {
             final FragmentManager fragmentManager = getSupportFragmentManager();
@@ -842,12 +913,38 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             // Highlight the selected item, update the title, and close the drawer
             state.currentTab = itemId;
-            setTitle(fragmentTitles.get(itemId));
+            final CharSequence title = getTitleForNavId(itemId);
+            if (title != null) {
+                setTitle(title);
+            }
         } catch (IllegalAccessException ex) {
             Logging.error("Unable to get fragment for id: " + itemId, ex);
         } catch (InstantiationException ex) {
             Logging.error("Unable to make fragment for id: " + itemId, ex);
         }
+    }
+
+    /**
+     * Look up the ActionBar title for a given navigation-drawer item id. Returns null if no
+     * mapping is known (e.g. the drawer has never selected anything). Used by
+     * {@link #selectFragment(int)} on tap and by the drawer-close listener to restore the
+     * per-tab title after the user dismisses the drawer without making a selection.
+     */
+    private CharSequence getTitleForNavId(final int itemId) {
+        if (itemId == R.id.nav_list) return getString(R.string.list_app_name);
+        if (itemId == R.id.nav_map) return getString(R.string.mapping_app_name);
+        if (itemId == R.id.nav_dash) return getString(R.string.dashboard_app_name);
+        if (itemId == R.id.nav_data) return getString(R.string.data_activity_name);
+        if (itemId == R.id.nav_search) return getString(R.string.tab_search);
+        if (itemId == R.id.nav_news) return getString(R.string.news_app_name);
+        if (itemId == R.id.nav_user_stats) return getString(R.string.user_stats_app_name);
+        if (itemId == R.id.nav_rank) return getString(R.string.rank_stats_app_name);
+        if (itemId == R.id.nav_site_stats) return getString(R.string.site_stats_app_name);
+        if (itemId == R.id.nav_stats) return getString(R.string.tab_stats);
+        if (itemId == R.id.nav_uploads) return getString(R.string.uploads_app_name);
+        if (itemId == R.id.nav_settings) return getString(R.string.settings_app_name);
+        if (itemId == R.id.nav_exit) return getString(R.string.menu_exit);
+        return null;
     }
 
     private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {
@@ -974,6 +1071,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.mxcDbHelper == null) {
             state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext(), prefs);
         }
+        final boolean histogramsEnabled = prefs.getBoolean(
+                PreferenceKeys.PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS, false);
+        if (state.rssiHistoryCache == null) {
+            state.rssiHistoryCache = new net.wigle.wigleandroid.util.RssiHistoryCache(histogramsEnabled);
+        } else {
+            state.rssiHistoryCache.setEnabled(histogramsEnabled);
+        }
     }
 
     public static State getStaticState() {
@@ -1039,13 +1143,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.bluetoothReceiver.stopScanning();
                 state.bluetoothReceiver.close();
             }
-            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
+            if (screenStateReceiver != null) {
                 try {
-                    state.scanWakeLock.release();
-                } catch (Exception ex) {
-                    Logging.info("exception releasing scanWakeLock in onDestroy: " + ex);
+                    Logging.info("unregister screenStateReceiver");
+                    unregisterReceiver(screenStateReceiver);
+                } catch (final IllegalArgumentException ex) {
+                    Logging.info("screenStateReceiver not registered: " + ex);
                 }
+                screenStateReceiver = null;
             }
+            if (state != null) {
+                state.wantsScanWakeLock = false;
+            }
+            releaseScanWakeLock();
             finishSoon(DESTROY_FINISH_MILLIS, false);
         } else {
             state.uiRestart.set(false);
@@ -1097,6 +1207,23 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 //                playServiceShown = true;
 //            }
 //        }
+    }
+
+    /**
+     * Apply or clear the custom W-logo hamburger watermark based on
+     * {@link PreferenceKeys#PREF_CUSTOM_MENU_ICON} (default false).
+     */
+    public void applyCustomMenuIcon() {
+        if (mDrawerToggle == null) {
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (prefs.getBoolean(PreferenceKeys.PREF_CUSTOM_MENU_ICON, false)) {
+            mDrawerToggle.setDrawerArrowDrawable(new WLogoDrawerArrowDrawable(this));
+        } else {
+            mDrawerToggle.setDrawerArrowDrawable(new DrawerArrowDrawable(this));
+        }
+        mDrawerToggle.syncState();
     }
 
     @Override
@@ -1264,7 +1391,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public boolean isMuted() {
         //noinspection SimplifiableIfStatement
-        if (state.phoneState != null && state.phoneState.isPhoneActive()) {
+        if (state != null && state.phoneState != null && state.phoneState.isPhoneActive()) {
             // always be quiet when the phone is active
             return true;
         }
@@ -1305,6 +1432,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     public static ConcurrentLinkedHashMap<String, Network> getNetworkCache() {
         return ListFragment.lameStatic.networkCache;
+    }
+
+    /**
+     * Record a timestamped RSSI sample into the global history cache.
+     * No-op when the cache is absent or disabled (pref off).
+     */
+    public static void recordRssiSample(final String bssid, final int level) {
+        final State s = getStaticState();
+        if (s != null && s.rssiHistoryCache != null) {
+            s.rssiHistoryCache.record(bssid, level);
+        }
     }
 
     public static void addNetworkToMap(final Network network) {
@@ -2070,6 +2208,33 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
+    /**
+     * Register a receiver for screen on/off so we can gate the scan PARTIAL_WAKE_LOCK on screen
+     * state. Combats "excessive wake lock" time as reported by Play Console.
+     */
+    private void setupScreenStateReceiver() {
+        if (screenStateReceiver != null) {
+            return;
+        }
+        screenStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(final Context context, final Intent intent) {
+                final String action = intent == null ? null : intent.getAction();
+                if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                    Logging.info("SCREEN_OFF: acquiring scan wake lock if scanning");
+                    acquireScanWakeLockIfNeeded();
+                } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                    Logging.info("SCREEN_ON: releasing scan wake lock");
+                    releaseScanWakeLock();
+                }
+            }
+        };
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenStateReceiver, filter);
+    }
+
     public void setTransferring() {
         Logging.info("setTransferring");
         state.transferring.set(true);
@@ -2195,7 +2360,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return null;
     }
 
-    @SuppressLint("WakelockTimeout")
     private void internalHandleScanChange(final boolean isScanning) {
         Logging.info("\tmain internalHandleScanChange: isScanning now: " + isScanning);
         ListFragment listFragment = getListFragmentIfCurrent();
@@ -2217,11 +2381,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (!state.wifiLock.isHeld()) {
                 state.wifiLock.acquire();
             }
-            // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off
-            if (state.scanWakeLock != null && !state.scanWakeLock.isHeld()) {
-                //TODO: are we allowed to do this?
-                state.scanWakeLock.acquire();
-            }
+            // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off. Actually acquired
+            // by acquireScanWakeLockIfNeeded() and by the SCREEN_OFF broadcast; refreshed each time
+            // WifiReceiver.onReceive() fires.
+            state.wantsScanWakeLock = true;
+            acquireScanWakeLockIfNeeded();
             optionalShowBatteryOptDialog();
         } else {
             if (listFragment != null) {
@@ -2242,16 +2406,53 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("\texception releasing wifilock: " + ex);
                 }
             }
-            if (state.scanWakeLock != null && state.scanWakeLock.isHeld()) {
-                try {
-                    state.scanWakeLock.release();
-                } catch (Exception ex) {
-                    Logging.info("\texception releasing scanWakeLock: " + ex);
-                }
-            }
+            state.wantsScanWakeLock = false;
+            releaseScanWakeLock();
         }
         if (null != state && null != state.wigleService) {
             state.wigleService.setupNotification();
+        }
+    }
+
+    /**
+     * Acquire (or refresh) the scan PARTIAL_WAKE_LOCK if scanning is on and the screen is off
+     */
+    @SuppressLint("Wakelock")
+    private void acquireScanWakeLockIfNeeded() {
+        if (state == null || state.scanWakeLock == null || !state.wantsScanWakeLock) {
+            return;
+        }
+        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm == null || pm.isInteractive()) {
+            // screen is on - display already keeps CPU up, no PARTIAL_WAKE_LOCK needed
+            return;
+        }
+        try {
+            // safe to call whether or not it's already held; refreshes the timeout
+            state.scanWakeLock.acquire(SCAN_WAKE_REFRESH_MS);
+        } catch (Exception ex) {
+            Logging.info("exception acquiring scanWakeLock: " + ex);
+        }
+    }
+
+    /**
+     * Called by WifiReceiver.onReceive() to bump the timed wake lock while scans are actively
+     * completing. If scans stop firing, the wake lock lapses on its own within SCAN_WAKE_REFRESH_MS.
+     */
+    public void refreshScanWakeLock() {
+        acquireScanWakeLockIfNeeded();
+    }
+
+    private void releaseScanWakeLock() {
+        if (state == null || state.scanWakeLock == null) {
+            return;
+        }
+        if (state.scanWakeLock.isHeld()) {
+            try {
+                state.scanWakeLock.release();
+            } catch (Exception ex) {
+                Logging.info("\texception releasing scanWakeLock: " + ex);
+            }
         }
     }
 

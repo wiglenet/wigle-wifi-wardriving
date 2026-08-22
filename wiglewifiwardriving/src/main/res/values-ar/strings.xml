@@ -3,14 +3,14 @@
     <string name="stats">بدءا</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - إعدادات</string>
-    <string name="mapping_app_name">WiGLE Wifi - خريطة الشارع المفتوح</string>
-    <string name="dashboard_app_name">WiGLE Wifi - لوحة القيادة</string>
+    <string name="settings_app_name">إعدادات</string>
+    <string name="mapping_app_name">خريطة الشارع المفتوح</string>
+    <string name="dashboard_app_name">لوحة القيادة</string>
     <string name="error_report_name">أحدث تقرير عن الخطأ</string>
-    <string name="speech_name">WiGLE Wifi - Speech Settings</string>
-    <string name="network_activity_name">WiGLE Wifi - شبكة</string>
-    <string name="data_activity_name">WiGLE Wifi - Database</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Search Result</string>
+    <string name="speech_name">Speech Settings</string>
+    <string name="network_activity_name">شبكة</string>
+    <string name="data_activity_name">Database</string>
+    <string name="dbresult_activity_name">Search Result</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE اسم المستخدم</string>
     <string name="password">WiGLE كلمة المرور</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(querying&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Show password</string>
-    <string name="setting_db_marker">DB Marker (where uploads start from):</string>
+    <string name="setting_db_marker">علامة قاعدة البيانات (آخر شبكة تم رفعها):</string>
     <string name="setting_high_up">Highest uploaded id:</string>
     <string name="setting_zero_out">Zero out DB marker?</string>
     <string name="setting_max_id">Max upload id:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (تشيكية)</string>
     <string name="language_da">dansk (دنماركية)</string>
     <string name="language_de">Deutsch (ألمانية)</string>
+    <string name="language_el">Ελληνικά (اليونانية)</string>
     <string name="language_es">español (إسبانية)</string>
     <string name="language_fi">suomi (فنلندية)</string>
     <string name="language_fr">français (فرنسية)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">تحسين البطارية</string>
     <string name="battery_opt_status_exempted">معفى</string>
     <string name="battery_opt_status_not_exempted">غير معفى (انقر للتغيير)</string>
+    <string name="phone_permission_detail">يمكن لتطبيق WiGLE كتم صوت التطبيق عندما تردّ على مكالمة واردة على جهازك. يُعلم هذا الإذن التطبيق بأنه يجب أن يتوقف عن تشغيل الأصوات حتى تتمكن من التحدث.</string>
+    <string name="database_stats">قاعدة بيانات محلية (على الجهاز):</string>
+    <string name="export">تصدير البيانات</string>
+    <string name="backup_restore">النسخ الاحتياطي والاستعادة</string>
+    <string name="flag_whole_database">تعيين قاعدة البيانات بالكامل للتحميل</string>
+    <string name="file_size_warning">ستكون عمليات رفع متعددة ضرورية.</string>
+    <string name="invalid_foss_config">يبدو أن إعدادات خريطة FOSS الخاصة بك غير صالحة. يرجى التحقق من الإعدادات.</string>
+    <string name="menu_drawer_title">القائمة</string>
+    <string name="display_inline_histograms">إظهار مخططات RSSI في خلفية القائمة</string>
+    <string name="anniversary_mode_enabled">تم تفعيل وضع الذكرى السنوية الـ25</string>
+    <string name="anniversary_mode_disabled">تم تعطيل وضع الذكرى السنوية الـ25</string>
 </resources>

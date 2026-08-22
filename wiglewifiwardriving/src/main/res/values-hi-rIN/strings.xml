@@ -2,14 +2,14 @@
     <string name="stats">शुरुआत</string>
     <string name="app_name">WiGLE WiFi वॉरड्राइविंग</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi - सेटिंग्स</string>
-    <string name="mapping_app_name">WiGLE - मानचित्र</string>
-    <string name="dashboard_app_name">WiGLE WiFi - डैशबोर्ड</string>
+    <string name="settings_app_name">सेटिंग्स</string>
+    <string name="mapping_app_name">मानचित्र</string>
+    <string name="dashboard_app_name">डैशबोर्ड</string>
     <string name="error_report_name">सबसे हाल की त्रुटि रिपोर्ट</string>
-    <string name="speech_name">WiGLE WiFi - भाषण सेटिंग्स</string>
-    <string name="network_activity_name">WiGLE WiFi - नेटवर्क</string>
-    <string name="data_activity_name">WiGLE WiFi - डेटाबेस</string>
-    <string name="dbresult_activity_name">WiGLE WiFi - खोज परिणाम</string>
+    <string name="speech_name">भाषण सेटिंग्स</string>
+    <string name="network_activity_name">नेटवर्क</string>
+    <string name="data_activity_name">डेटाबेस</string>
+    <string name="dbresult_activity_name">खोज परिणाम</string>
     <string name="upload_button">WiGLE.net \nपर अपलोड करें</string>
     <string name="username">WiGLE उपयोगकर्ता नाम</string>
     <string name="password">WiGLE पासवर्ड</string>
@@ -96,7 +96,7 @@
     <string name="network_querying">(क्वेरी उठाना…)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">पासवर्ड दिखाएँ</string>
-    <string name="setting_db_marker">DB मार्कर (जहाँ से अपलोड शुरू होते हैं):</string>
+    <string name="setting_db_marker">डीबी मार्कर (अंतिम अपलोड किया गया नेटवर्क):</string>
     <string name="setting_high_up">उच्चतम अपलोड की गई ID:</string>
     <string name="setting_zero_out">ज़ीरो आउट DB मार्कर?</string>
     <string name="setting_max_id">अधिकतम अपलोड ID:</string>
@@ -219,6 +219,7 @@
     <string name="language_cs">čeština (चेक)</string>
     <string name="language_da">dansk (डेनिश)</string>
     <string name="language_de">Deutsch (जर्मन)</string>
+    <string name="language_el">Ελληνικά (यूनानी)</string>
     <string name="language_es">español (स्पेनिश)</string>
     <string name="language_fi">suomi (फ़िनिश)</string>
     <string name="language_fr">français (फ्रेंच)</string>
@@ -490,4 +491,15 @@
     <string name="battery_opt_settings_title">बैटरी अनुकूलन</string>
     <string name="battery_opt_status_exempted">छूट प्राप्त</string>
     <string name="battery_opt_status_not_exempted">छूट प्राप्त नहीं (बदलने के लिए टैप करें)</string>
+    <string name="phone_permission_detail">जब आप अपने डिवाइस पर आने वाली कॉल स्वीकार करते हैं तो WiGLE एप्लिकेशन का ऑडियो म्यूट कर सकता है। यह अनुमति ऐप को बताती है कि आवाज़ें बंद करनी चाहिए ताकि आप बात कर सकें।</string>
+    <string name="database_stats">स्थानीय (डिवाइस पर) डेटाबेस:</string>
+    <string name="export">डेटा निर्यात</string>
+    <string name="backup_restore">बैकअप और पुनर्स्थापना</string>
+    <string name="flag_whole_database">अपलोड के लिए पूरा डेटाबेस सेट करें</string>
+    <string name="file_size_warning">एकाधिक अपलोड आवश्यक होंगे।</string>
+    <string name="invalid_foss_config">ऐसा प्रतीत होता है कि आपका FOSS मानचित्र कॉन्फ़िगरेशन अमान्य है। कृपया अपनी सेटिंग्स की जाँच करें।</string>
+    <string name="menu_drawer_title">मेन्यू</string>
+    <string name="display_inline_histograms">सूची पृष्ठभूमि में RSSI हिस्टोग्राम दिखाएँ</string>
+    <string name="anniversary_mode_enabled">25वीं वर्षगांठ मोड सक्षम</string>
+    <string name="anniversary_mode_disabled">25वीं वर्षगांठ मोड अक्षम</string>
 </resources>

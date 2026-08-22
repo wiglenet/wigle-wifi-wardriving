@@ -793,7 +793,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             }
         } catch ( IncompatibleClassChangeError ex ) {
             // yeah, saw this in the wild, who knows.
-            Logging.error( "wierd ex: " + ex, ex);
+            Logging.error( "weird ex: " + ex, ex);
         }
     }
 

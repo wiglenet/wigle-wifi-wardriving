@@ -309,6 +309,15 @@ public abstract class AbstractGpxManagementActivity extends ScreenChildActivity 
     @Override
     public void onDestroy() {
         Logging.info("GPX MGMT: onDestroy");
+        final RecyclerView recyclerView = findViewById(R.id.gpx_list);
+        if (recyclerView != null) {
+            final RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
+            if (adapter instanceof GpxRecyclerAdapter) {
+                // close the route-meta Cursor held by the adapter
+                ((GpxRecyclerAdapter) adapter).updateCursor(null);
+            }
+            recyclerView.setAdapter(null);
+        }
         destroyMapView();
         super.onDestroy();
         finish();

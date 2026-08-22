@@ -3,14 +3,14 @@
     <string name="stats">Start</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - Indstillinger</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
+    <string name="settings_app_name">Indstillinger</string>
+    <string name="mapping_app_name">OpenStreetMap</string>
+    <string name="dashboard_app_name">Dashboard</string>
     <string name="error_report_name">seneste Fejlrapport</string>
-    <string name="speech_name">WiGLE Wifi - taleindstillingerne</string>
-    <string name="network_activity_name">WiGLE Wifi - Netværk</string>
-    <string name="data_activity_name">WiGLE Wifi - Database</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Søgeresultat</string>
+    <string name="speech_name">taleindstillingerne</string>
+    <string name="network_activity_name">Netværk</string>
+    <string name="data_activity_name">Database</string>
+    <string name="dbresult_activity_name">Søgeresultat</string>
     <string name="upload_button">Upload til\nWiGLE.net</string>
     <string name="username">WiGLE Brugernavn</string>
     <string name="password">WiGLE kodeord</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(Forspøger)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Vis adgangskode</string>
-    <string name="setting_db_marker">DB Marker (hvor uploads starter fra):</string>
+    <string name="setting_db_marker">DB-markør (sidste uploadede netværk):</string>
     <string name="setting_high_up">Højeste uploadet id:</string>
     <string name="setting_zero_out">Nul ud DB markør?</string>
     <string name="setting_max_id">Max upload id:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (tjekkisk)</string>
     <string name="language_da">dansk</string>
     <string name="language_de">Deutsch (tysk)</string>
+    <string name="language_el">Ελληνικά (græsk)</string>
     <string name="language_es">español (spansk)</string>
     <string name="language_fi">suomi (finsk)</string>
     <string name="language_fr">français (fransk)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Batterioptimering</string>
     <string name="battery_opt_status_exempted">Fritaget</string>
     <string name="battery_opt_status_not_exempted">Ikke fritaget (tryk for at ændre)</string>
+    <string name="phone_permission_detail">WiGLE kan slå app-lyd fra, når du besvarer et indgående opkald på din enhed. Denne tilladelse fortæller appen, at den skal stoppe med at afspille lyde, så du kan tale.</string>
+    <string name="database_stats">Lokal (på enheden) database:</string>
+    <string name="export">Dataeksport</string>
+    <string name="backup_restore">Sikkerhedskopi og gendannelse</string>
+    <string name="flag_whole_database">Angiv hele databasen til upload</string>
+    <string name="file_size_warning">Flere uploads vil være nødvendige.</string>
+    <string name="invalid_foss_config">Det ser ud til, at din FOSS-kortkonfiguration er ugyldig. Tjek venligst dine indstillinger.</string>
+    <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">Vis RSSI-histogrammer i listebaggrunden</string>
+    <string name="anniversary_mode_enabled">25-års jubilæumstilstand aktiveret</string>
+    <string name="anniversary_mode_disabled">25-års jubilæumstilstand deaktiveret</string>
 </resources>

@@ -6,7 +6,6 @@ import android.os.StatFs;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class FileUtility {
 
-    //directory locations - centrally managed here, but must be in sync with fileprovider defs
+    //directory locations - centrally managed here, but must be in sync with fileProvider definitions
     private  final static String APP_DIR = "wiglewifi";
     private final static String APP_SUB_DIR = "/"+APP_DIR+"/";
     private static final String GPX_DIR = APP_SUB_DIR+"gpx/";
@@ -42,6 +41,11 @@ public class FileUtility {
 
     // Start warning if there isn't this much space left on the primary storage location for networks
     public final static long WARNING_THRESHOLD_BYTES = 131072;
+
+    public final static long WIGLE_MAX_UPLOAD_BYTES = 180000000;
+    public final static long MIN_BYTES_PER_CSV_ROW_EST = 130;
+    public final static long MAX_BYTES_PER_CSV_ROW_EST = 320;
+    public final static float LARGE_RECORD_PROBABILITY = 0.5f; //TODO: refine with research
 
     //based on the smart answer in https://stackoverflow.com/questions/7115016/how-to-find-the-amount-of-free-storage-disk-space-left-on-android
     public static long getFreeBytes(File path) {
@@ -345,7 +349,7 @@ public class FileUtility {
     }
 
     /**
-     * file inspection debugging method - probably should get moved into a utility class eventually
+     * file inspection debugging method
      * @param directory the directory to enumerate
      */
     public static void printDirContents(final File directory) {
@@ -357,7 +361,7 @@ public class FileUtility {
                 Logging.info("\t\t" + file.getName() + "\t" + file.getAbsoluteFile());
             }
         } else {
-            Logging.error("Null file listing for "+directory.toString());
+            Logging.error("Null file listing for "+directory);
         }
     }
 
@@ -368,12 +372,7 @@ public class FileUtility {
         if (null != location) {
             final File directory = new File(location);
             if (directory.exists()) {
-                File[] files = directory.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.endsWith(CSV_GZ_EXT);
-                    }
-                });
+                File[] files = directory.listFiles((dir, name) -> name.endsWith(CSV_GZ_EXT));
                 if (null != files) {
                     for (File file : files) {
                         if (file.getName().endsWith(CSV_GZ_EXT)) {
@@ -388,4 +387,24 @@ public class FileUtility {
         return rawFiles;
     }
 
+    /**
+     * Estimate whether the # of un-uploaded networks indicates whether upload file is likely too big for a single upload upload.
+     * @param outstanding the number of un-uploaded networks
+     * @return true if the upload file should likely be partitioned, otherwise false
+     */
+    public static boolean checkUploadOversize(final long outstanding) {
+        return outstanding > maxRowsPerUpload();
+    }
+
+    /**
+     * Estimate the maximum number of rows that can be included in a single upload
+     * @return the maximum estimated number of rows
+     */
+    public static long maxRowsPerUpload() {
+        // both bounds in checkUploadOversize must hold; use the more conservative cap.
+        final long minBoundCap = WIGLE_MAX_UPLOAD_BYTES / MIN_BYTES_PER_CSV_ROW_EST;
+        final long maxBoundCap = (long) (WIGLE_MAX_UPLOAD_BYTES
+                / (MAX_BYTES_PER_CSV_ROW_EST * LARGE_RECORD_PROBABILITY));
+        return Math.min(minBoundCap, maxBoundCap);
+    }
 }

@@ -3,14 +3,14 @@
     <string name="stats">Запуск</string>
     <string name="app_name">WiGLE исследование WiFi сетей</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi — Настройки</string>
-    <string name="mapping_app_name">WiGLE WiFi — Карта</string>
-    <string name="dashboard_app_name">WiGLE WiFi — Обзор</string>
+    <string name="settings_app_name">Настройки</string>
+    <string name="mapping_app_name">Карта</string>
+    <string name="dashboard_app_name">Обзор</string>
     <string name="error_report_name">Новые ошибки</string>
-    <string name="speech_name">WiGLE WiFi — звуковые параметры</string>
-    <string name="network_activity_name">WiGLE WiFi — Сети</string>
-    <string name="data_activity_name">WiGLE WiFi — База данных</string>
-    <string name="dbresult_activity_name">WiGLE WiFi — Результаты поиска</string>
+    <string name="speech_name">звуковые параметры</string>
+    <string name="network_activity_name">Сети</string>
+    <string name="data_activity_name">База данных</string>
+    <string name="dbresult_activity_name">Результаты поиска</string>
     <string name="upload_button">Загрузить на\nWiGLE.net</string>
     <string name="username">Имя пользователя WiGLE</string>
     <string name="password">Пароль WiGLE</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(осуществляется запрос&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Показывать пароль</string>
-    <string name="setting_db_marker">Настройки ID маркера в БД (там, где начинаются добавления):</string>
+    <string name="setting_db_marker">Маркер БД (последняя загруженная сеть):</string>
     <string name="setting_high_up">Текущий ID в БД:</string>
     <string name="setting_zero_out">Обнулить ID в БД?</string>
     <string name="setting_max_id">Максимальный загруженый ID:</string>
@@ -219,6 +219,7 @@
     <string name="language_cs">čeština (чешский)</string>
     <string name="language_da">dansk (датский)</string>
     <string name="language_de">Deutsch (немецкий)</string>
+    <string name="language_el">Ελληνικά (греческий)</string>
     <string name="language_es">español (испанский)</string>
     <string name="language_fi">suomi (финский)</string>
     <string name="language_fr">français (французский)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Оптимизация батареи</string>
     <string name="battery_opt_status_exempted">Исключено</string>
     <string name="battery_opt_status_not_exempted">Не исключено (нажмите для изменения)</string>
+    <string name="phone_permission_detail">WiGLE может приглушить звук приложения, когда вы принимаете входящий вызов на устройстве. Это разрешение сообщает приложению, что нужно прекратить воспроизведение звуков, чтобы вы могли говорить.</string>
+    <string name="database_stats">Локальная база данных (на устройстве):</string>
+    <string name="export">Экспорт данных</string>
+    <string name="backup_restore">Резервное копирование и восстановление</string>
+    <string name="flag_whole_database">Пометить всю базу для выгрузки</string>
+    <string name="file_size_warning">Потребуется несколько загрузок.</string>
+    <string name="invalid_foss_config">Похоже, ваша конфигурация карты FOSS недействительна. Пожалуйста, проверьте настройки.</string>
+    <string name="menu_drawer_title">Меню</string>
+    <string name="display_inline_histograms">Показывать гистограммы RSSI на фоне списка</string>
+    <string name="anniversary_mode_enabled">Режим 25-летия включён</string>
+    <string name="anniversary_mode_disabled">Режим 25-летия выключен</string>
 </resources>

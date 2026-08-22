@@ -3,14 +3,14 @@
     <string name="stats">Démarrage</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi - Paramètres</string>
-    <string name="mapping_app_name">WiGLE WiFi - Plan</string>
-    <string name="dashboard_app_name">WiGLE WiFi - Tableau de bord</string>
+    <string name="settings_app_name">Paramètres</string>
+    <string name="mapping_app_name">Plan</string>
+    <string name="dashboard_app_name">Tableau de bord</string>
     <string name="error_report_name">Rapport d\'erreur le plus récent</string>
-    <string name="speech_name">WiGLE WiFi - Paramètres vocaux</string>
-    <string name="network_activity_name">WiGLE WiFi - Réseau</string>
-    <string name="data_activity_name">WiGLE WiFi - Base de données</string>
-    <string name="dbresult_activity_name">WiGLE WiFi - Résultat de la recherche</string>
+    <string name="speech_name">Paramètres vocaux</string>
+    <string name="network_activity_name">Réseau</string>
+    <string name="data_activity_name">Base de données</string>
+    <string name="dbresult_activity_name">Résultat de la recherche</string>
     <string name="upload_button">Envoi vers\nWiGLE.net</string>
     <string name="username">Nom d\'utilisateur WiGLE</string>
     <string name="password">Mot de passe WiGLE</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(Requête en cours&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Montrer le mot de passe</string>
-    <string name="setting_db_marker">Marqueur de BDD (où commencer le téléchargement):</string>
+    <string name="setting_db_marker">Marqueur BDD (dernier réseau téléversé):</string>
     <string name="setting_high_up">ID uploadé le plus élevé :</string>
     <string name="setting_zero_out">Mettre a zéro le marqueur dans la BDD?</string>
     <string name="setting_max_id">ID maximum uploadé :</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (tchèque)</string>
     <string name="language_da">dansk (danois)</string>
     <string name="language_de">Deutsch (allemand)</string>
+    <string name="language_el">Ελληνικά (grec)</string>
     <string name="language_es">español (espagnol)</string>
     <string name="language_fi">suomi (finnois)</string>
     <string name="language_fr">français</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Optimisation de la batterie</string>
     <string name="battery_opt_status_exempted">Exempté</string>
     <string name="battery_opt_status_not_exempted">Non exempté (appuyer pour modifier)</string>
+    <string name="phone_permission_detail">WiGLE peut couper le son de l\'application lorsque vous acceptez un appel entrant sur votre appareil. Cette autorisation indique à l\'application qu\'elle doit cesser de jouer des sons pour vous laisser parler.</string>
+    <string name="database_stats">Base de données locale (sur l’appareil) :</string>
+    <string name="export">Exportation des données</string>
+    <string name="backup_restore">Sauvegarde et restauration</string>
+    <string name="flag_whole_database">Marquer toute la base pour l’envoi</string>
+    <string name="file_size_warning">Plusieurs envois seront nécessaires.</string>
+    <string name="invalid_foss_config">Il semble que votre configuration de carte FOSS soit invalide. Veuillez vérifier vos paramètres.</string>
+    <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">Afficher les histogrammes RSSI en arrière-plan de la liste</string>
+    <string name="anniversary_mode_enabled">Mode 25e anniversaire activé</string>
+    <string name="anniversary_mode_disabled">Mode 25e anniversaire désactivé</string>
 </resources>

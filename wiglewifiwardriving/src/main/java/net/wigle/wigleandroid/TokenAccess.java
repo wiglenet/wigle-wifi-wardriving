@@ -200,8 +200,14 @@ public class TokenAccess {
                     //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
                     return getApiTokenVersion2(prefs);
                 } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
-                    privateKeyEntry = (KeyStore.PrivateKeyEntry)
-                            keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
+                    try {
+                        privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                                keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
+                    } catch (NullPointerException npe) {
+                        Logging.warn("Non-recoverable v1 key on a modern install. Clearing broken entry.");
+                        //ALIBI: likely due to a restore of an OLD version on a new device -> upgrade but unable to access broken key.
+                        keyStore.deleteEntry(KEYSTORE_WIGLE_CREDS_KEY_V1);
+                    }
                 } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
                     privateKeyEntry = (KeyStore.PrivateKeyEntry)
                             keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V0, null);

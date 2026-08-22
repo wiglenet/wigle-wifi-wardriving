@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.net;
 
-import static net.wigle.wigleandroid.util.UrlConfig.API_DOMAIN;
 import static net.wigle.wigleandroid.util.UrlConfig.FILE_POST_URL;
 
 import android.content.Context;
@@ -15,9 +14,6 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.appmattus.certificatetransparency.CTInterceptorBuilder;
-import com.appmattus.certificatetransparency.CTLogger;
-import com.appmattus.certificatetransparency.VerificationResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -41,7 +37,6 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -102,19 +97,6 @@ public class WiGLEApiManager {
     private final OkHttpClient unauthedClient;
     private final Context context;
 
-    private static final CTInterceptorBuilder ctIB = new CTInterceptorBuilder();
-
-    private static final CTLogger ctLogger = new CTLogger() {
-        @Override
-        public void log(@NonNull String host, @NonNull VerificationResult result) {
-            Logging.info("[CERTTRANS] "+result);
-        }
-    };
-
-    // certificate transparency interceptor
-    private final static Interceptor certTransparencyInterceptor = ctIB.includeHost(API_DOMAIN)
-            .setLogger(ctLogger).build();
-
     /**
      * Build a WiGLEApiManager
      * @param prefs the preferences for the app to configure authentication
@@ -125,7 +107,6 @@ public class WiGLEApiManager {
         this.context = context;
         //authed connection to WiGLE
         this.authedClient = hasAuthed(prefs) ? new OkHttpClient.Builder()
-                .addNetworkInterceptor(certTransparencyInterceptor)
                 .addInterceptor(new BasicAuthInterceptor(prefs))
                 .addInterceptor(new Interceptor() {
                     @NotNull
@@ -143,7 +124,6 @@ public class WiGLEApiManager {
                 .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS).build():null;
         //un-authed connection to WiGLE
         this.unauthedClient = new OkHttpClient.Builder()
-                .addNetworkInterceptor(certTransparencyInterceptor)
                 .addInterceptor(new Interceptor() {
                     @NotNull
                     @Override

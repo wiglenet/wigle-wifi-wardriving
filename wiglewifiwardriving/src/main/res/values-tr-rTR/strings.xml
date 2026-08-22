@@ -3,14 +3,14 @@
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - Ayarlar</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Pano</string>
+    <string name="settings_app_name">Ayarlar</string>
+    <string name="mapping_app_name">OpenStreetMap</string>
+    <string name="dashboard_app_name">Pano</string>
     <string name="error_report_name">En Son Hata Raporu</string>
-    <string name="speech_name">WiGLE Wifi - Konuşma Ayarları</string>
-    <string name="network_activity_name">WiGLE Wifi - Ağ</string>
-    <string name="data_activity_name">WiGLE Wifi - Veritabanı</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Arama Sonucu</string>
+    <string name="speech_name">Konuşma Ayarları</string>
+    <string name="network_activity_name">Ağ</string>
+    <string name="data_activity_name">Veritabanı</string>
+    <string name="dbresult_activity_name">Arama Sonucu</string>
     <string name="upload_button">WiGLE.net`e\nYükle</string>
     <string name="username">WiGLE Kullanıcı Adı</string>
     <string name="password">WiGLE Şifre</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(sorgulama&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Parolayı Göster</string>
-    <string name="setting_db_marker">DB Marker (yükleme nerede başlıyor):</string>
+    <string name="setting_db_marker">DB işareti (son yüklenen ağ):</string>
     <string name="setting_high_up">En çok yüklenen:</string>
     <string name="setting_zero_out">DB İşsaretleyicisini sıfırla?</string>
     <string name="setting_max_id">En fazla yükleme:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (Çekçe)</string>
     <string name="language_da">dansk (Danca)</string>
     <string name="language_de">Deutsch (Almanca)</string>
+    <string name="language_el">Ελληνικά (Yunanca)</string>
     <string name="language_es">español (İspanyolca)</string>
     <string name="language_fi">suomi (Fince)</string>
     <string name="language_fr">français (Fransızca)</string>
@@ -491,5 +492,16 @@
     <string name="battery_opt_settings_title">Pil optimizasyonu</string>
     <string name="battery_opt_status_exempted">Muaf</string>
     <string name="battery_opt_status_not_exempted">Muaf değil (değiştirmek için dokunun)</string>
+    <string name="phone_permission_detail">WiGLE, cihazınızda gelen bir aramayı kabul ettiğinizde uygulama sesini susturabilir. Bu izin, uygulamaya konuşabilmeniz için sesleri durdurması gerektiğini bildirir.</string>
+    <string name="database_stats">Yerel (cihazdaki) veritabanı:</string>
+    <string name="export">Veri dışa aktarma</string>
+    <string name="backup_restore">Yedekleme ve geri yükleme</string>
+    <string name="flag_whole_database">Yükleme için tüm veritabanını işaretle</string>
+    <string name="file_size_warning">Birden fazla yükleme gerekecek.</string>
+    <string name="invalid_foss_config">FOSS harita yapılandırmanız geçersiz görünüyor. Lütfen ayarlarınızı kontrol edin.</string>
+    <string name="menu_drawer_title">Menü</string>
+    <string name="display_inline_histograms">Liste arka planında RSSI histogramlarını göster</string>
+    <string name="anniversary_mode_enabled">25. yıl dönümü modu etkin</string>
+    <string name="anniversary_mode_disabled">25. yıl dönümü modu devre dışı</string>
 </resources>
 

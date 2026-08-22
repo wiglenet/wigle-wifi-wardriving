@@ -2,14 +2,14 @@
     <string name="stats">Kuanza</string>
     <string name="app_name">Utafutaji wa WiGLE WiFi</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi - Mipangilio</string>
-    <string name="mapping_app_name">WiGLE - Ramani</string>
-    <string name="dashboard_app_name">WiGLE WiFi - Dashibodi</string>
+    <string name="settings_app_name">Mipangilio</string>
+    <string name="mapping_app_name">Ramani</string>
+    <string name="dashboard_app_name">Dashibodi</string>
     <string name="error_report_name">Ripoti ya Makosa ya Hivi Karibuni</string>
-    <string name="speech_name">WiGLE WiFi - Mipangilio ya Usemi</string>
-    <string name="network_activity_name">WiGLE WiFi - Mtandao</string>
-    <string name="data_activity_name">WiGLE WiFi - Hifadhidata</string>
-    <string name="dbresult_activity_name">WiGLE WiFi - Matokeo ya Utafutaji</string>
+    <string name="speech_name">Mipangilio ya Usemi</string>
+    <string name="network_activity_name">Mtandao</string>
+    <string name="data_activity_name">Hifadhidata</string>
+    <string name="dbresult_activity_name">Matokeo ya Utafutaji</string>
     <string name="upload_button">Pakia kwa\nWiGLE.net</string>
     <string name="username">Jina la mtumiaji la WiGLE</string>
     <string name="password">Nywila ya WiGLE</string>
@@ -96,7 +96,7 @@
     <string name="network_querying">(Kuuliza…)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Onyesha Nywila</string>
-    <string name="setting_db_marker">Alama ya DB (ambapo upakiaji unaanzia):</string>
+    <string name="setting_db_marker">Alama ya DB (mtandao wa mwisho uliopakiwa):</string>
     <string name="setting_high_up">Kitambulisho cha juu kabisa kilichopakiwa:</string>
     <string name="setting_zero_out">Punguza alama ya DB hadi Sufuri?</string>
     <string name="setting_max_id">Kiasi cha juu zaidi cha upakiaji kitambulisho</string>
@@ -219,6 +219,7 @@
     <string name="language_cs">čeština (Kicheki)</string>
     <string name="language_da">dansk (Kidenmarki)</string>
     <string name="language_de">Deutsch (Kijerumani)</string>
+    <string name="language_el">Ελληνικά (Kigiriki)</string>
     <string name="language_es">español (Kihispania)</string>
     <string name="language_fi">suomi (Kifini)</string>
     <string name="language_fr">français (Kifaransa)</string>
@@ -490,4 +491,15 @@
     <string name="battery_opt_settings_title">Uboreshaji wa betri</string>
     <string name="battery_opt_status_exempted">Umeondolewa</string>
     <string name="battery_opt_status_not_exempted">Haijaondolewa (gusa kubadilisha)</string>
+    <string name="phone_permission_detail">WiGLE inaweza kuzima sauti ya programu unapokubali simu inayoingia kwenye kifaa chako. Ruhusa hii inaambia programu inahitaji kuacha sauti ili uweze kuongea.</string>
+    <string name="database_stats">Hifadhidata ya ndani (kwenye kifaa):</string>
+    <string name="export">Hamisha data</string>
+    <string name="backup_restore">Hifadhi rudufu na kurejesha</string>
+    <string name="flag_whole_database">Weka hifadhidata nzima kwa upakiaji</string>
+    <string name="file_size_warning">Itahitajika kupakia mara kwa mara.</string>
+    <string name="invalid_foss_config">Inaonekana usanidi wa ramani ya FOSS si halali. Tafadhali angalia mipangilio yako.</string>
+    <string name="menu_drawer_title">Menyu</string>
+    <string name="display_inline_histograms">Onyesha histogramu za RSSI kwenye mandharinyuma ya orodha</string>
+    <string name="anniversary_mode_enabled">Hali ya maadhimisho ya miaka 25 imewezeshwa</string>
+    <string name="anniversary_mode_disabled">Hali ya maadhimisho ya miaka 25 imezimwa</string>
 </resources>

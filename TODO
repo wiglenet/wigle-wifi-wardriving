@@ -47,7 +47,7 @@ a widget
 * geofence for "don't record" and/or "do upload"
 
 
---- complete/obivated? ---
+--- complete/obviated? ---
 import files, instead of uploading to site and downloading to app
 rssi on kml export
 on networkactivity record more observations on that network (site survey)

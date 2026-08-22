@@ -3,14 +3,14 @@
     <string name="stats">Pornire</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi – Setări</string>
-    <string name="mapping_app_name">WiGLE – Hartă</string>
-    <string name="dashboard_app_name">WiGLE WiFi – Bord</string>
+    <string name="settings_app_name">Setări</string>
+    <string name="mapping_app_name">Hartă</string>
+    <string name="dashboard_app_name">Bord</string>
     <string name="error_report_name">Cel mai recent raport de eroare</string>
-    <string name="speech_name">WiGLE WiFi – Setări de vorbire</string>
-    <string name="network_activity_name">WiGLE WiFi – Reţea</string>
-    <string name="data_activity_name">WiGLE WiFi – Bază de date</string>
-    <string name="dbresult_activity_name">WiGLE WiFi – Rezultatul căutării</string>
+    <string name="speech_name">Setări de vorbire</string>
+    <string name="network_activity_name">Reţea</string>
+    <string name="data_activity_name">Bază de date</string>
+    <string name="dbresult_activity_name">Rezultatul căutării</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE nume de utilizator</string>
     <string name="password">WiGLE parola</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(interogarea&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Arata parola</string>
-    <string name="setting_db_marker">BD Marker (de unde încep încărcările):</string>
+    <string name="setting_db_marker">Marcator BD (ultima rețea încărcată):</string>
     <string name="setting_high_up">Cel mai mare ID încărcat:</string>
     <string name="setting_zero_out">Marker BD zero-out?</string>
     <string name="setting_max_id">Încărcare maximă id:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (Ceh)</string>
     <string name="language_da">dansk (Danez)</string>
     <string name="language_de">Deutsch (Germana)</string>
+    <string name="language_el">Ελληνικά (greacă)</string>
     <string name="language_es">español (Spaniolă)</string>
     <string name="language_fi">suomi (Finlandeză)</string>
     <string name="language_fr">français (Franceza)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Optimizare baterie</string>
     <string name="battery_opt_status_exempted">Exemptat</string>
     <string name="battery_opt_status_not_exempted">Neexemptat (apasă pentru a modifica)</string>
+    <string name="phone_permission_detail">WiGLE poate dezactiva sunetul aplicației când acceptați un apel primit pe dispozitiv. Această permisiune îi spune aplicației să nu mai redea sunete, astfel încât să puteți vorbi.</string>
+    <string name="database_stats">Bază de date locală (pe dispozitiv):</string>
+    <string name="export">Export de date</string>
+    <string name="backup_restore">Backup și restaurare</string>
+    <string name="flag_whole_database">Marchează întreaga bază pentru încărcare</string>
+    <string name="file_size_warning">Vor fi necesare mai multe încărcări.</string>
+    <string name="invalid_foss_config">Se pare că configurația hărții FOSS este invalidă. Vă rugăm să verificați setările.</string>
+    <string name="menu_drawer_title">Meniu</string>
+    <string name="display_inline_histograms">Afișați histogramele RSSI pe fundalul listei</string>
+    <string name="anniversary_mode_enabled">Modul aniversare 25 de ani activat</string>
+    <string name="anniversary_mode_disabled">Modul aniversare 25 de ani dezactivat</string>
 </resources>

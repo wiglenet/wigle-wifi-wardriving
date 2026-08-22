@@ -162,6 +162,13 @@ public final class DatabaseHelper extends Thread {
 
     private static final String LOCATED_WIFI_COUNT_QUERY = "SELECT count(*)" +LOCATED_WIFI_QUERY_STEM;
 
+    private static final String NETWORK_TOTALS_BY_KIND_QUERY =
+            "SELECT "
+                    + "COALESCE(SUM(CASE WHEN " + NetworkFilter.WIFI.getFilter() + " THEN 1 ELSE 0 END), 0),"
+                    + "COALESCE(SUM(CASE WHEN " + NetworkFilter.BT.getFilter() + " THEN 1 ELSE 0 END), 0),"
+                    + "COALESCE(SUM(CASE WHEN " + NetworkFilter.CELL.getFilter() + " THEN 1 ELSE 0 END), 0)"
+                    + " FROM " + NETWORK_TABLE;
+
     private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
 
     private static final String CLEAR_DEFAULT_ROUTE = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = 0";
@@ -206,6 +213,20 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
+    /**
+     * DTO for all-counts query
+     */
+    public static final class NetworkCatTotals {
+        public final long wifi;
+        public final long bluetooth;
+        public final long cell;
+
+        public NetworkCatTotals(final long wifi, final long bluetooth, final long cell) {
+            this.wifi = wifi;
+            this.bluetooth = bluetooth;
+            this.cell = cell;
+        }
+    }
 
     /** used in private addObservation */
     private final ConcurrentLinkedHashMap<String,CachedLocation> previousWrittenLocationsCache =
@@ -1349,6 +1370,17 @@ public final class DatabaseHelper extends Thread {
         try (Cursor cursor = db.rawQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
+        }
+    }
+
+    /**
+     * get counts for network categories
+     */
+    public NetworkCatTotals getNetworkTotalsByKindFromDB() throws DBException {
+        checkDB();
+        try (Cursor cursor = db.rawQuery(NETWORK_TOTALS_BY_KIND_QUERY, null)) {
+            cursor.moveToFirst();
+            return new NetworkCatTotals(cursor.getLong(0), cursor.getLong(1), cursor.getLong(2));
         }
     }
 

@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.FossConfigDialogUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -40,6 +41,8 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
 
 
     private MapView mapView;
+
+    private boolean inflationFailed = false;
 
     @Override
     protected void destroyMapView() {
@@ -91,14 +94,46 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        MapLibre.getInstance(this);
-        super.onCreate(savedInstanceState);
+        // ALIBI: MapLibre must be initialized before AbstractNetworkActivity#onCreate runs
+        // setContentView() on a layout that contains <org.maplibre.android.maps.MapView>;
+        // otherwise inflation throws and crashes the app.
+        try {
+            MapLibre.getInstance(this);
+        } catch (Throwable t) {
+            Logging.error("Failed to initialize MapLibre for FossNetworkActivity: ", t);
+        }
+        try {
+            super.onCreate(savedInstanceState);
+        } catch (RuntimeException re) {
+            // Most commonly an android.view.InflateException for the inline MapView when the
+            // user's FOSS map style/key configuration is invalid or MapLibre cannot start.
+            inflationFailed = true;
+            Logging.error("Failed to inflate FOSS network layout: ", re);
+            FossConfigDialogUtil.show(this, () -> {
+                if (!isFinishing()) {
+                    finish();
+                }
+            });
+        }
     }
 
     @Override
     protected void setupMap(final Network network, final Bundle savedInstanceState, final SharedPreferences prefs) {
+        if (inflationFailed) {
+            return;
+        }
         final RelativeLayout rlView = findViewById(R.id.foss_network_map_layout);
-        mapView = rlView.findViewById(R.id.mapLibreNetworkMap);
+        mapView = (rlView != null) ? rlView.findViewById(R.id.mapLibreNetworkMap) : null;
+        if (mapView == null) {
+            Logging.error("FOSS network mapView not found; FOSS map config likely invalid.");
+            inflationFailed = true;
+            FossConfigDialogUtil.show(this, () -> {
+                if (!isFinishing()) {
+                    finish();
+                }
+            });
+            return;
+        }
 
         try {
             mapView.onCreate(savedInstanceState);
@@ -114,35 +149,43 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
                 } else {
                     styleUrl = "https://demotiles.maplibre.org/style.json";
                 }
-                mapLibreMap.setStyle(styleUrl, style -> {
-                    if ((network != null) && (network.getLatLng() != null)) {
-                        final org.maplibre.android.geometry.LatLng focusOn =
-                                new org.maplibre.android.geometry.LatLng(
-                                        network.getLatLng().latitude, network.getLatLng().longitude);
-                        final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(focusOn).zoom(DEFAULT_ZOOM).build();
-                        mapLibreMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                try {
+                    mapLibreMap.setStyle(styleUrl, style -> {
+                        if ((network != null) && (network.getLatLng() != null)) {
+                            final org.maplibre.android.geometry.LatLng focusOn =
+                                    new org.maplibre.android.geometry.LatLng(
+                                            network.getLatLng().latitude, network.getLatLng().longitude);
+                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(focusOn).zoom(DEFAULT_ZOOM).build();
+                            mapLibreMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                        final String sourceId = "center-source";
-                        final GeoJsonSource source = new GeoJsonSource(
-                                sourceId, Point.fromLngLat(focusOn.getLongitude(), focusOn.getLatitude()));
-                        style.addSource(source);
-                        final String layerId = "circle-layer";
-                        final CircleLayer circleLayer = new CircleLayer(layerId, sourceId);
-                        circleLayer.setProperties(
-                                PropertyFactory.circleColor(Color.argb(128, 245, 245, 245)),
-                                PropertyFactory.circleStrokeColor(Color.argb(200, 255, 32, 32)),
-                                PropertyFactory.circleStrokeWidth(2f),
-                                PropertyFactory.circleRadius(10.0f)
-                        );
-                        style.addLayer(circleLayer);
-                    }
-                });
+                            final String sourceId = "center-source";
+                            final GeoJsonSource source = new GeoJsonSource(
+                                    sourceId, Point.fromLngLat(focusOn.getLongitude(), focusOn.getLatitude()));
+                            style.addSource(source);
+                            final String layerId = "circle-layer";
+                            final CircleLayer circleLayer = new CircleLayer(layerId, sourceId);
+                            circleLayer.setProperties(
+                                    PropertyFactory.circleColor(Color.argb(128, 245, 245, 245)),
+                                    PropertyFactory.circleStrokeColor(Color.argb(200, 255, 32, 32)),
+                                    PropertyFactory.circleStrokeWidth(2f),
+                                    PropertyFactory.circleRadius(10.0f)
+                            );
+                            style.addLayer(circleLayer);
+                        }
+                    });
+                } catch (RuntimeException styleEx) {
+                    Logging.error("Failed to apply FOSS map style '" + styleUrl + "': ", styleEx);
+                    FossConfigDialogUtil.show(FossNetworkActivity.this, null);
+                }
             });
             //TODO: day/night equivalent?
             //ThemeUtil.setMapTheme(mapLibre, mapView.getContext(), prefs, R.raw.night_style_json));
         } catch (NullPointerException ex) {
             Logging.error("npe in mapView.onCreate: " + ex, ex);
+        } catch (RuntimeException ex) {
+            Logging.error("Runtime exception setting up FOSS network map: ", ex);
+            FossConfigDialogUtil.show(this, null);
         }
     }
 

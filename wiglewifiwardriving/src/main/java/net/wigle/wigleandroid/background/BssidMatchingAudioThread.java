@@ -57,6 +57,10 @@ public class BssidMatchingAudioThread extends Thread {
 
     static float scaleLevel(final long level) {
         if (level > -80 && level < 0) {
+            //ALIBI: "that's inside the room!"
+            if (level >= -20) {
+                return 2.0f;
+            }
             float factor = (Math.abs(20/((float)level)));
             return 1.0f + factor;
         }

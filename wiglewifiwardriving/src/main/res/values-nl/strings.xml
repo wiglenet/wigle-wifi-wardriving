@@ -3,14 +3,14 @@
     <string name="stats">Starten</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - Instellingen</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
+    <string name="settings_app_name">Instellingen</string>
+    <string name="mapping_app_name">OpenStreetMap</string>
+    <string name="dashboard_app_name">Dashboard</string>
     <string name="error_report_name">Meest recent foutrapport</string>
-    <string name="speech_name">WiGLE Wifi - Spraakinstellingen</string>
-    <string name="network_activity_name">WiGLE Wifi - Netwerk</string>
-    <string name="data_activity_name">WiGLE Wifi - Database</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Zoekresultaat</string>
+    <string name="speech_name">Spraakinstellingen</string>
+    <string name="network_activity_name">Netwerk</string>
+    <string name="data_activity_name">Database</string>
+    <string name="dbresult_activity_name">Zoekresultaat</string>
     <string name="upload_button">Uploaden naar\nWiGLE.net</string>
     <string name="username">WiGLE-gebruikersnaam</string>
     <string name="password">WiGLE-wachtwoord</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(query uitvoeren&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Wachtwoord weergeven</string>
-    <string name="setting_db_marker">DB Marker (de upload start bij):</string>
+    <string name="setting_db_marker">DB-marker (laatst geüploade netwerk):</string>
     <string name="setting_high_up">Hoogste upload ID:</string>
     <string name="setting_zero_out">Reset DB marker?</string>
     <string name="setting_max_id">Max upload ID:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (Tsjechisch)</string>
     <string name="language_da">dansk (Deens)</string>
     <string name="language_de">Deutsch (Duits)</string>
+    <string name="language_el">Ελληνικά (Grieks)</string>
     <string name="language_es">español (Spaans)</string>
     <string name="language_fi">suomi (Fins)</string>
     <string name="language_fr">français (Frans)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Batterijoptimalisatie</string>
     <string name="battery_opt_status_exempted">Vrijgesteld</string>
     <string name="battery_opt_status_not_exempted">Niet vrijgesteld (tik om te wijzigen)</string>
+    <string name="phone_permission_detail">WiGLE kan app-audio dempen wanneer u een inkomend gesprek op uw apparaat aanneemt. Deze machtiging laat de app weten dat er geen geluiden meer mogen spelen, zodat u kunt praten.</string>
+    <string name="database_stats">Lokale (op het apparaat) database:</string>
+    <string name="export">Gegevens exporteren</string>
+    <string name="backup_restore">Back-up en herstel</string>
+    <string name="flag_whole_database">Gehele database markeren voor upload</string>
+    <string name="file_size_warning">Er zijn meerdere uploads nodig.</string>
+    <string name="invalid_foss_config">Het lijkt erop dat uw FOSS-kaartconfiguratie ongeldig is. Controleer uw instellingen.</string>
+    <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">RSSI-histogrammen op lijstachtergrond tonen</string>
+    <string name="anniversary_mode_enabled">25-jarig jubileummodus ingeschakeld</string>
+    <string name="anniversary_mode_disabled">25-jarig jubileummodus uitgeschakeld</string>
 </resources>

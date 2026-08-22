@@ -2,14 +2,14 @@
     <string name="stats">起動</string>
     <string name="app_name">WiGLE WiFiウォードライビング</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi – 設定</string>
-    <string name="mapping_app_name">WiGLE – マップ</string>
-    <string name="dashboard_app_name">WiGLE WiFi – ダッシュボード</string>
+    <string name="settings_app_name">設定</string>
+    <string name="mapping_app_name">マップ</string>
+    <string name="dashboard_app_name">ダッシュボード</string>
     <string name="error_report_name">最新のエラーレポート</string>
-    <string name="speech_name">WiGLE WiFi – 音声設定</string>
-    <string name="network_activity_name">WiGLE WiFi – ネットワーク</string>
-    <string name="data_activity_name">WiGLE WiFi – データベース</string>
-    <string name="dbresult_activity_name">WiGLE WiFi – 検索結果</string>
+    <string name="speech_name">音声設定</string>
+    <string name="network_activity_name">ネットワーク</string>
+    <string name="data_activity_name">データベース</string>
+    <string name="dbresult_activity_name">検索結果</string>
     <string name="upload_button">WiGLE.net &#13;\nにアップロード</string>
     <string name="username">WiGLEユーザー名</string>
     <string name="password">WiGLE パスワード</string>
@@ -97,7 +97,7 @@ KMLにエクスポート</string>
     <string name="network_querying">（クエリ…）</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">パスワードを表示</string>
-    <string name="setting_db_marker">DBマーカー（アップロードの開始元):</string>
+    <string name="setting_db_marker">DBマーカー（最後にアップロードされたネットワーク）:</string>
     <string name="setting_high_up">アップロードされた最高の ID：</string>
     <string name="setting_zero_out">DB マーカーをゼロにしますか？</string>
     <string name="setting_max_id">最大アップロード ID:</string>
@@ -220,6 +220,7 @@ KMLにエクスポート</string>
     <string name="language_cs">čeština（チェコ語）</string>
     <string name="language_da">dansk（デンマーク語）</string>
     <string name="language_de">Deutsch（ドイツ語）</string>
+    <string name="language_el">Ελληνικά（ギリシャ語）</string>
     <string name="language_es">español（スペイン語）</string>
     <string name="language_fi">suomi（フィンランド語）</string>
     <string name="language_fr">français（フランス語）</string>
@@ -494,4 +495,15 @@ KMLにエクスポート</string>
     <string name="battery_opt_settings_title">バッテリ最適化</string>
     <string name="battery_opt_status_exempted">除外済み</string>
     <string name="battery_opt_status_not_exempted">除外されていません（タップして変更）</string>
+    <string name="phone_permission_detail">WiGLE は、端末で着信に応答するときにアプリの音声をミュートできます。この権限は、通話できるようアプリに音を止める必要があることを伝えます。</string>
+    <string name="database_stats">端末内のローカルデータベース:</string>
+    <string name="export">データのエクスポート</string>
+    <string name="backup_restore">バックアップと復元</string>
+    <string name="flag_whole_database">アップロード用にデータベース全体を設定</string>
+    <string name="file_size_warning">複数回のアップロードが必要になります。</string>
+    <string name="invalid_foss_config">FOSS マップの設定が無効のようです。設定を確認してください。</string>
+    <string name="menu_drawer_title">メニュー</string>
+    <string name="display_inline_histograms">リスト背景にRSSIヒストグラムを表示</string>
+    <string name="anniversary_mode_enabled">25周年記念モードが有効になりました</string>
+    <string name="anniversary_mode_disabled">25周年記念モードが無効になりました</string>
 </resources>

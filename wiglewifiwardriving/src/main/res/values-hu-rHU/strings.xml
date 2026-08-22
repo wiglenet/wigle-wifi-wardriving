@@ -3,14 +3,14 @@
     <string name="stats">Indítás</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi – Beállítások</string>
-    <string name="mapping_app_name">WiGLE WiFi – Térkép</string>
-    <string name="dashboard_app_name">WiGLE WiFi – Áttekintés</string>
+    <string name="settings_app_name">Beállítások</string>
+    <string name="mapping_app_name">Térkép</string>
+    <string name="dashboard_app_name">Áttekintés</string>
     <string name="error_report_name">Legfrissebb hibajelentés</string>
-    <string name="speech_name">WiGLE Wifi – Beszédbeállítások</string>
-    <string name="network_activity_name">WiGLE WiFi – Hálózat</string>
-    <string name="data_activity_name">WiGLE WiFi – Adatbázis</string>
-    <string name="dbresult_activity_name">WiGLE WiFi – Keresési találatok</string>
+    <string name="speech_name">Beszédbeállítások</string>
+    <string name="network_activity_name">Hálózat</string>
+    <string name="data_activity_name">Adatbázis</string>
+    <string name="dbresult_activity_name">Keresési találatok</string>
     <string name="upload_button">Feltöltés a\nWiGLE.net-re</string>
     <string name="username">WiGLE felhasználónév</string>
     <string name="password">WiGLE jelszó</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(lekérés&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Jelszó megjelenítése</string>
-    <string name="setting_db_marker">Adatbázis-jelölő (ahol a feltöltés kezdődik):</string>
+    <string name="setting_db_marker">DB-jelölő (utolsó feltöltött hálózat):</string>
     <string name="setting_high_up">Legmagasabb feltöltésazonosító:</string>
     <string name="setting_zero_out">Biztos, hogy nullázza?</string>
     <string name="setting_max_id">Legnagyobb feltöltésazonosító:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (cseh)</string>
     <string name="language_da">dansk (dán)</string>
     <string name="language_de">Deutsch (német)</string>
+    <string name="language_el">Ελληνικά (görög)</string>
     <string name="language_es">español (spanyol)</string>
     <string name="language_fi">suomi (finn)</string>
     <string name="language_fr">français (francia)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Akkumulátor-optimalizálás</string>
     <string name="battery_opt_status_exempted">Mentesítve</string>
     <string name="battery_opt_status_not_exempted">Nincs mentesítve (érintse a módosításhoz)</string>
+    <string name="phone_permission_detail">A WiGLE elnémíthatja az alkalmazás hangját, ha fogad egy bejövő hívást az eszközén. Ez az engedély közli az alkalmazással, hogy le kell állítania a hangokat, hogy Ön beszélhessen.</string>
+    <string name="database_stats">Helyi (eszközön lévő) adatbázis:</string>
+    <string name="export">Adatexport</string>
+    <string name="backup_restore">Biztonsági mentés és visszaállítás</string>
+    <string name="flag_whole_database">A teljes adatbázis jelölése feltöltésre</string>
+    <string name="file_size_warning">Több feltöltésre lesz szükség.</string>
+    <string name="invalid_foss_config">Úgy tűnik, hogy a FOSS térkép konfigurációja érvénytelen. Kérjük, ellenőrizze a beállításait.</string>
+    <string name="menu_drawer_title">Menü</string>
+    <string name="display_inline_histograms">RSSI hisztogramok megjelenítése a lista háttérében</string>
+    <string name="anniversary_mode_enabled">25. évforduló mód bekapcsolva</string>
+    <string name="anniversary_mode_disabled">25. évforduló mód kikapcsolva</string>
 </resources>

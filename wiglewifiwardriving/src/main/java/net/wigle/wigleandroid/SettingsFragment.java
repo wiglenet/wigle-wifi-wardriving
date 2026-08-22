@@ -70,6 +70,7 @@ import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -81,6 +82,7 @@ import org.json.JSONObject;
 import kotlin.Unit;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -95,6 +97,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
     private static final int DEAUTHORIZE_DIALOG=114;
+    private static final int ANNIVERSARY_MODE_TAPS = 25;
+
+    private int anniversaryTapCount = 0;
 
     public boolean allowRefresh = false;
 
@@ -545,6 +550,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final Activity thisActivity = this.getActivity();
         if (null != thisActivity) {
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
+            PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.display_inline_histograms,
+                    PreferenceKeys.PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS, false, value -> {
+                        final MainActivity.State s = MainActivity.getStaticState();
+                        if (s != null && s.rssiHistoryCache != null) {
+                            s.rssiHistoryCache.setEnabled(value);
+                        }
+                    });
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.found_sound, PreferenceKeys.PREF_FOUND_SOUND, true);
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.found_new_sound, PreferenceKeys.PREF_FOUND_NEW_SOUND, true);
@@ -598,19 +610,20 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             });
             PrefsBackedCheckbox.prefBackedCheckBox(thisActivity, view, R.id.enable_map_theme, PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);
-            final String[] languages = new String[]{"", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
+            final String[] languages = new String[]{"", "en", "ar", "cs", "da", "de", "el-rGR", "es-rES", "fi", "fr", "fy",
                     "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
                     "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK"};
             final String[] languageName = new String[]{getString(R.string.auto), getString(R.string.language_en),
                     getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
-                    getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
-                    getString(R.string.language_fr), getString(R.string.language_fy), getString(R.string.language_he),
-                    getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
-                    getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
-                    getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
-                    getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO), getString(R.string.language_ru),
-                    getString(R.string.language_sv), getString(R.string.language_sw), getString(R.string.language_tr),
-                    getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
+                    getString(R.string.language_de), getString(R.string.language_el), getString(R.string.language_es),
+                    getString(R.string.language_fi), getString(R.string.language_fr), getString(R.string.language_fy),
+                    getString(R.string.language_he), getString(R.string.language_hi), getString(R.string.language_hu),
+                    getString(R.string.language_it), getString(R.string.language_ja), getString(R.string.language_ko),
+                    getString(R.string.language_nl), getString(R.string.language_no), getString(R.string.language_pl),
+                    getString(R.string.language_pt), getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO),
+                    getString(R.string.language_ru), getString(R.string.language_sv), getString(R.string.language_sw),
+                    getString(R.string.language_tr), getString(R.string.language_zh_cn), getString(R.string.language_zh_tw),
+                    getString(R.string.language_zh_hk),
             };
             SettingsUtil.doSpinner(R.id.language_spinner, view, PreferenceKeys.PREF_LANGUAGE, "", languages, languageName, getContext());
             setFossMapVisible(true, view);
@@ -695,6 +708,27 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             } catch (PackageManager.NameNotFoundException e) {
                 Logging.error("Unable to get version number: ",e);
             }
+            appVersion.setClickable(true);
+            appVersion.setFocusable(true);
+            appVersion.setOnClickListener(v -> {
+                anniversaryTapCount++;
+                if (anniversaryTapCount < ANNIVERSARY_MODE_TAPS) {
+                    return;
+                }
+                anniversaryTapCount = 0;
+                final boolean enabled = !prefs.getBoolean(PreferenceKeys.PREF_CUSTOM_MENU_ICON, false);
+                prefs.edit().putBoolean(PreferenceKeys.PREF_CUSTOM_MENU_ICON, enabled).apply();
+                final MainActivity mainActivity = MainActivity.getMainActivity();
+                if (mainActivity != null) {
+                    mainActivity.applyCustomMenuIcon();
+                }
+                final FragmentActivity fa = getActivity();
+                if (fa != null) {
+                    WiGLEToast.showOverFragment(fa, R.string.app_name,
+                            getString(enabled ? R.string.anniversary_mode_enabled
+                                    : R.string.anniversary_mode_disabled));
+                }
+            });
         }
     }
 
@@ -796,51 +830,68 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             verify.setOnClickListener(buttonView -> {
                 final Editable urlPart = fossMapStyleUrlEdit.getText();
                 final Editable keyPart = fossMapKeyEdit.getText();
-                if (null == urlPart || urlPart.toString().isEmpty()) {
+                final String urlCandidate = urlPart == null ? "" : urlPart.toString().trim();
+                final String keyCandidate = keyPart == null ? "" : keyPart.toString().trim();
+                if (urlCandidate.isEmpty()) {
                     fossMapStyleUrlEdit.setError("required");
-                } else if (null == keyPart || keyPart.toString().isEmpty()) {
+                } else if (keyCandidate.isEmpty()) {
                     fossMapKeyEdit.setError("required");
                 } else {
-                    showProgressCenter(verify);
-                    final String urlString = urlPart.toString() + keyPart.toString();
-                    OkHttpClient checkClient = new OkHttpClient.Builder()
-                            .connectTimeout(CONN_TIMEOUT_S, TimeUnit.SECONDS)
-                            .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
-                            .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS).build();
-                    Request request = new Request.Builder()
-                            .url(urlString)
-                            .build();
-                    checkClient.newCall(request).enqueue(new Callback() {
-                        final Handler mainHandler = new Handler(Looper.getMainLooper());
+                    final String concat = urlCandidate + keyCandidate;
+                    final HttpUrl httpUrl = HttpUrl.parse(concat);
+                    if (httpUrl == null) {
+                        fossMapStyleUrlEdit.setError("invalid");
+                    } else {
+                        final String scheme = httpUrl.scheme();
+                        if (!"http".equals(scheme) && !"https".equals(scheme)) {
+                            fossMapStyleUrlEdit.setError("invalid scheme: "+scheme);
+                        } else {
+                            showProgressCenter(verify);
+                            final OkHttpClient checkClient = new OkHttpClient.Builder()
+                                    .connectTimeout(CONN_TIMEOUT_S, TimeUnit.SECONDS)
+                                    .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
+                                    .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS).build();
+                            try {
+                                final Request request = new Request.Builder()
+                                        .url(httpUrl)
+                                        .build();
+                                checkClient.newCall(request).enqueue(new Callback() {
+                                    final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-                        @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                            mainHandler.post(() -> {
-                                fossMapStyleUrlEdit.setError("required");
+                                    @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                        mainHandler.post(() -> {
+                                            fossMapStyleUrlEdit.setError("required");
+                                            hideProgressCenterFail(verify);
+                                        });
+                                    }
+
+                                    @Override public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                                        if (response.isSuccessful()) {
+                                            mainHandler.post(() -> hideProgressCenterSuccess(verify));
+                                        } else {
+                                            if (response.code() == 404) {
+                                                mainHandler.post(() -> {
+                                                    fossMapStyleUrlEdit.setError("required");
+                                                    hideProgressCenterFail(verify);
+                                                });
+                                            } else if (response.code() == 401 || response.code() == 403) {
+                                                mainHandler.post(() -> {
+                                                    fossMapKeyEdit.setError("required");
+                                                    hideProgressCenterFail(verify);
+                                                });
+                                            } else {
+                                                mainHandler.post(() -> hideProgressCenterFail(verify));
+                                            }
+                                        }
+                                    }
+                                });
+                            } catch (final IllegalArgumentException ex) {
+                                Logging.warn("FOSS map verify URL rejected by OkHttp: " + ex.getMessage(), ex);
+                                fossMapStyleUrlEdit.setError("invalid");
                                 hideProgressCenterFail(verify);
-                            });
-                        }
-
-                        @Override public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                            if (response.isSuccessful()) {
-                                mainHandler.post(() -> hideProgressCenterSuccess(verify));
-                            } else {
-                                if (response.code() == 404) {
-                                    mainHandler.post(() -> {
-                                        fossMapStyleUrlEdit.setError("required");
-                                        hideProgressCenterFail(verify);
-                                    });
-                                } else if (response.code() == 401 || response.code() == 403) {
-                                    mainHandler.post(() -> {
-                                        fossMapKeyEdit.setError("required");
-                                        hideProgressCenterFail(verify);
-                                    });
-                                } else {
-                                    mainHandler.post(() -> hideProgressCenterFail(verify));
-                                }
                             }
                         }
-                    });
-
+                    }
                 }
             });
 

@@ -3,14 +3,14 @@
     <string name="stats">Włączanie</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - Ustawienia</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Informacje</string>
+    <string name="settings_app_name">Ustawienia</string>
+    <string name="mapping_app_name">OpenStreetMap</string>
+    <string name="dashboard_app_name">Informacje</string>
     <string name="error_report_name">Ostatnie raporty błędów</string>
-    <string name="speech_name">WiGLE Wifi - Ustawienia mowy</string>
-    <string name="network_activity_name">WiGLE Wifi - Sieć</string>
-    <string name="data_activity_name">WiGLE Wifi - Baza danych</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Wyniki szukania</string>
+    <string name="speech_name">Ustawienia mowy</string>
+    <string name="network_activity_name">Sieć</string>
+    <string name="data_activity_name">Baza danych</string>
+    <string name="dbresult_activity_name">Wyniki szukania</string>
     <string name="upload_button">Prześlij do\nWiGLE.net</string>
     <string name="username">Login WiGLE</string>
     <string name="password">Hasło WiGLE</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(Zapytanie&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Pokaż hasło</string>
-    <string name="setting_db_marker">Znacznik bazy (odkąd rozpocząć przesyłanie):</string>
+    <string name="setting_db_marker">Znacznik bazy (ostatnia przesłana sieć):</string>
     <string name="setting_high_up">Najwyższe przesłane id:</string>
     <string name="setting_zero_out">Wyzerować znacznik bazy?</string>
     <string name="setting_max_id">Max przesłany id:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (czeski)</string>
     <string name="language_da">dansk (duński)</string>
     <string name="language_de">Deutsch (niemiecki)</string>
+    <string name="language_el">Ελληνικά (grecki)</string>
     <string name="language_es">español (hiszpański)</string>
     <string name="language_fi">suomi (fiński)</string>
     <string name="language_fr">français (francuski)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Optymalizacja baterii</string>
     <string name="battery_opt_status_exempted">Zwolnione</string>
     <string name="battery_opt_status_not_exempted">Nie zwolnione (dotknij, aby zmienić)</string>
+    <string name="phone_permission_detail">WiGLE może wyciszyć dźwięk aplikacji po odebraniu połączenia przychodzącego na urządzeniu. To uprawnienie informuje aplikację, że ma przestać odtwarzać dźwięki, aby można było rozmawiać.</string>
+    <string name="database_stats">Lokalna baza danych (w urządzeniu):</string>
+    <string name="export">Eksport danych</string>
+    <string name="backup_restore">Kopia zapasowa i przywracanie</string>
+    <string name="flag_whole_database">Oznacz całą bazę do przesłania</string>
+    <string name="file_size_warning">Konieczne będzie kilka przesłań.</string>
+    <string name="invalid_foss_config">Wygląda na to, że konfiguracja mapy FOSS jest nieprawidłowa. Sprawdź swoje ustawienia.</string>
+    <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">Pokaż histogramy RSSI w tle listy</string>
+    <string name="anniversary_mode_enabled">Tryb 25. rocznicy włączony</string>
+    <string name="anniversary_mode_disabled">Tryb 25. rocznicy wyłączony</string>
 </resources>

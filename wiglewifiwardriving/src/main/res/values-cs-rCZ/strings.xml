@@ -3,14 +3,14 @@
     <string name="stats">Zapínání</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi – Nastavení</string>
-    <string name="mapping_app_name">WiGLE Wifi – Mapa</string>
-    <string name="dashboard_app_name">WiGLE Wifi – Přehled</string>
+    <string name="settings_app_name">Nastavení</string>
+    <string name="mapping_app_name">Mapa</string>
+    <string name="dashboard_app_name">Přehled</string>
     <string name="error_report_name">Poslední chybové hlášení</string>
-    <string name="speech_name">WiGLE Wifi – Nastavení TTS</string>
-    <string name="network_activity_name">WiGLE Wifi – Síť</string>
-    <string name="data_activity_name">WiGLE Wifi – Databáze</string>
-    <string name="dbresult_activity_name">WiGLE Wifi – Výsledky hledání</string>
+    <string name="speech_name">Nastavení TTS</string>
+    <string name="network_activity_name">Síť</string>
+    <string name="data_activity_name">Databáze</string>
+    <string name="dbresult_activity_name">Výsledky hledání</string>
     <string name="upload_button">Nahrát na\nWiGLE.net</string>
     <string name="username">Uživatelské jméno WiGLE</string>
     <string name="password">Heslo WiGLE</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(dotazování&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Ukázat heslo</string>
-    <string name="setting_db_marker">Značka DB (odkud začínají záznamy):</string>
+    <string name="setting_db_marker">Značka DB (poslední nahraná síť):</string>
     <string name="setting_high_up">Nejvyšší nahrané id:</string>
     <string name="setting_zero_out">Vynulovat značku DB?</string>
     <string name="setting_max_id">Maximální nahrané id:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">Čeština</string>
     <string name="language_da">Dansk (dánština)</string>
     <string name="language_de">Deutsch (němčina)</string>
+    <string name="language_el">Ελληνικά (řečtina)</string>
     <string name="language_es">español (španělština)</string>
     <string name="language_fi">Suomi (finština)</string>
     <string name="language_fr">Français (francouzština)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Optimalizace baterie</string>
     <string name="battery_opt_status_exempted">Vyloučeno</string>
     <string name="battery_opt_status_not_exempted">Nevyloučeno (klepněte pro změnu)</string>
+    <string name="phone_permission_detail">WiGLE může ztlumit zvuk aplikace, když na zařízení přijmete příchozí hovor. Toto oprávnění aplikaci sdělí, že má přestat přehrávat zvuky, abyste mohli mluvit.</string>
+    <string name="database_stats">Místní databáze (v zařízení):</string>
+    <string name="export">Export dat</string>
+    <string name="backup_restore">Zálohování a obnovení</string>
+    <string name="flag_whole_database">Označit celou databázi k nahrání</string>
+    <string name="file_size_warning">Bude nutné provést několik nahrání.</string>
+    <string name="invalid_foss_config">Zdá se, že konfigurace mapy FOSS je neplatná. Zkontrolujte prosím své nastavení.</string>
+    <string name="menu_drawer_title">Nabídka</string>
+    <string name="display_inline_histograms">Zobrazit histogramy RSSI na pozadí seznamu</string>
+    <string name="anniversary_mode_enabled">Režim 25. výročí povolen</string>
+    <string name="anniversary_mode_disabled">Režim 25. výročí zakázán</string>
 </resources>

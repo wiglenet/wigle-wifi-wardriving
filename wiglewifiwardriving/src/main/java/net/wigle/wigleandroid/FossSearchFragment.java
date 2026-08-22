@@ -23,6 +23,8 @@ import androidx.appcompat.widget.SearchView;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.MapBounds;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.util.FossConfigDialogUtil;
+import net.wigle.wigleandroid.util.GeocodingUtil;
 import net.wigle.wigleandroid.util.Logging;
 
 import org.maplibre.android.MapLibre;
@@ -31,7 +33,6 @@ import org.maplibre.android.camera.CameraUpdateFactory;
 import org.maplibre.android.geometry.LatLngBounds;
 import org.maplibre.android.maps.MapView;
 
-import java.io.IOException;
 import java.util.List;
 
 public class FossSearchFragment extends AbstractSearchFragment {
@@ -42,9 +43,31 @@ public class FossSearchFragment extends AbstractSearchFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final Activity a = getActivity();
         if (null != a) {
-            MapLibre.getInstance(a);
+            // ALIBI: MapLibre must be initialized before R.layout.foss_search_nets (which contains
+            // an inline <org.maplibre.android.maps.MapView/>) is inflated; otherwise inflation
+            // throws and crashes the app.
+            try {
+                MapLibre.getInstance(a);
+            } catch (Throwable t) {
+                Logging.error("Failed to initialize MapLibre for FossSearchFragment: ", t);
+            }
         }
-        final View view = inflater.inflate(R.layout.foss_search_nets, container, false);
+        final View view;
+        try {
+            view = inflater.inflate(R.layout.foss_search_nets, container, false);
+        } catch (RuntimeException re) {
+            Logging.error("Failed to inflate FOSS search layout: ", re);
+            FossConfigDialogUtil.show(a, () -> {
+                try {
+                    if (isAdded()) {
+                        getParentFragmentManager().popBackStack();
+                    }
+                } catch (Throwable t) {
+                    Logging.error("Failed to pop back stack after FOSS inflate failure: ", t);
+                }
+            });
+            return (a != null) ? new View(a) : null;
+        }
         super.onCreateView(inflater, container, savedInstanceState);
         return super.setupView(view, savedInstanceState);
     }
@@ -112,10 +135,15 @@ public class FossSearchFragment extends AbstractSearchFragment {
                     styleUrl = "https://demotiles.maplibre.org/style.json";
                 }
 
-                mapLibreMap.setStyle(styleUrl);
-                mapLibreMap.setCameraPosition(
-                        new CameraPosition.Builder().target(
-                                new org.maplibre.android.geometry.LatLng(0.0, 0.0)).zoom(1.0).build());
+                try {
+                    mapLibreMap.setStyle(styleUrl);
+                    mapLibreMap.setCameraPosition(
+                            new CameraPosition.Builder().target(
+                                    new org.maplibre.android.geometry.LatLng(0.0, 0.0)).zoom(1.0).build());
+                } catch (RuntimeException styleEx) {
+                    Logging.error("Failed to apply FOSS search map style '" + styleUrl + "': ", styleEx);
+                    FossConfigDialogUtil.show(getActivity(), null);
+                }
             });
             if ((center != null)) {
                 mapView.getMapAsync(mapLibreMap -> {
@@ -165,30 +193,36 @@ public class FossSearchFragment extends AbstractSearchFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                String location = searchView.getQuery().toString();
-                if (location != null || location.equals("")) {
-                    Geocoder geocoder = new Geocoder(context);
-                    try {
-                        List<Address> addressList = geocoder.getFromLocationName(location, 1);
-                        if (null != addressList && addressList.size() > 0) {
-                            Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
-                            if (null != address) {
-                                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                                mapView.getMapAsync(mapLibreMap -> {
-                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(
-                                                    new org.maplibre.android.geometry.LatLng(
-                                                            latLng.latitude, latLng.longitude))
-                                            .zoom(DEFAULT_ZOOM).build();
-                                    mapLibreMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                });
-                                }
-                        }
-                    } catch (IOException e) {
-                        Logging.error("Geocoding failed: ",e);
-                    }
+                final String location = searchView.getQuery().toString();
+                if (location == null || location.isEmpty()) {
+                    return false;
                 }
-                return false;
+                GeocodingUtil.getFromLocationName(context, location, 1, new GeocodingUtil.GeocodeCallback() {
+                    @Override
+                    public void onResult(@NonNull List<Address> addressList) {
+                        if (addressList.isEmpty() || mapView == null) {
+                            return;
+                        }
+                        Address address = addressList.get(0); // ALIBI: taking the first choice. We could also offer the choices in a drop-down.
+                        if (null == address) {
+                            return;
+                        }
+                        final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        mapView.getMapAsync(mapLibreMap -> {
+                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(new org.maplibre.android.geometry.LatLng(
+                                            latLng.latitude, latLng.longitude))
+                                    .zoom(DEFAULT_ZOOM).build();
+                            mapLibreMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        });
+                    }
+
+                    @Override
+                    public void onError(@NonNull Exception e) {
+                        Logging.error("Geocoding failed: ", e);
+                    }
+                });
+                return true;
             }
             @Override
             public boolean onQueryTextChange(String newText) {

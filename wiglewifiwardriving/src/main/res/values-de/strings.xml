@@ -3,14 +3,14 @@
     <string name="stats">Ab</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi - Einstellungen</string>
-    <string name="mapping_app_name">WiGLE WiFi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE WiFi - Dashboard</string>
+    <string name="settings_app_name">Einstellungen</string>
+    <string name="mapping_app_name">OpenStreetMap</string>
+    <string name="dashboard_app_name">Dashboard</string>
     <string name="error_report_name">Letzter Fehlerreport</string>
-    <string name="speech_name">WiGLE WiFi - Spracheinstellungen</string>
-    <string name="network_activity_name">WiGLE WiFi - Netzwerk</string>
-    <string name="data_activity_name">WiGLE WiFi - Datenbank</string>
-    <string name="dbresult_activity_name">WiGLE WiFi - Suchergebnis</string>
+    <string name="speech_name">Spracheinstellungen</string>
+    <string name="network_activity_name">Netzwerk</string>
+    <string name="data_activity_name">Datenbank</string>
+    <string name="dbresult_activity_name">Suchergebnis</string>
     <string name="upload_button">Hochladen zu\nWiGLE.net</string>
     <string name="username">WiGLE.net Benutzername</string>
     <string name="password">WiGLE.net Passwort</string>
@@ -97,7 +97,7 @@
     <string name="network_querying">(frage ab&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Passwort anzeigen</string>
-    <string name="setting_db_marker">DB Marker (Uploads ab …):</string>
+    <string name="setting_db_marker">DB-Marker (zuletzt hochgeladenes Netzwerk):</string>
     <string name="setting_high_up">Hochgeladen bis ID:</string>
     <string name="setting_zero_out">DB-Marker zurücksetzen?</string>
     <string name="setting_max_id">Max Upload-ID:</string>
@@ -220,6 +220,7 @@
     <string name="language_cs">čeština (Tschechisch)</string>
     <string name="language_da">dansk (Dänisch)</string>
     <string name="language_de">Deutsch</string>
+    <string name="language_el">Ελληνικά (Griechisch)</string>
     <string name="language_es">español (Spanisch)</string>
     <string name="language_fi">suomi (Finnisch)</string>
     <string name="language_fr">français (Französisch)</string>
@@ -491,4 +492,15 @@
     <string name="battery_opt_settings_title">Batterieoptimierung</string>
     <string name="battery_opt_status_exempted">Ausgenommen</string>
     <string name="battery_opt_status_not_exempted">Nicht ausgenommen (tippen zum Ändern)</string>
+    <string name="phone_permission_detail">WiGLE kann die App-Audioausgabe stumm schalten, wenn Sie einen eingehenden Anruf auf Ihrem Gerät annehmen. Mit dieser Berechtigung erfährt die App, dass sie keine Töne mehr abspielen soll, damit Sie sprechen können.</string>
+    <string name="database_stats">Lokale (geräteinterne) Datenbank:</string>
+    <string name="export">Datenexport</string>
+    <string name="backup_restore">Sichern und Wiederherstellen</string>
+    <string name="flag_whole_database">Gesamte Datenbank zum Upload markieren</string>
+    <string name="file_size_warning">Mehrere Uploads sind erforderlich.</string>
+    <string name="invalid_foss_config">Es scheint, dass Ihre FOSS-Kartenkonfiguration ungültig ist. Bitte überprüfen Sie Ihre Einstellungen.</string>
+    <string name="menu_drawer_title">Menü</string>
+    <string name="display_inline_histograms">RSSI-Histogramme im Listen-Hintergrund anzeigen</string>
+    <string name="anniversary_mode_enabled">25-Jahre-Jubiläumsmodus aktiviert</string>
+    <string name="anniversary_mode_disabled">25-Jahre-Jubiläumsmodus deaktiviert</string>
 </resources>

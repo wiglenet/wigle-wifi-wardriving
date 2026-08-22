@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
-public class StartWigleAtBootReciever extends BroadcastReceiver {
+public class StartWigleAtBootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

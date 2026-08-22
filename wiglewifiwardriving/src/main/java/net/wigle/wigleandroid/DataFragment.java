@@ -10,25 +10,31 @@ import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
+import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.NetworkFilterType;
 import net.wigle.wigleandroid.ui.LayoutUtil;
 import net.wigle.wigleandroid.ui.NetworkTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiFiSecurityTypeArrayAdapter;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SearchUtil;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -50,7 +56,10 @@ import static net.wigle.wigleandroid.background.GpxExportRunnable.EXPORT_GPX_DIA
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * configure database settings
@@ -69,6 +78,25 @@ public final class DataFragment extends Fragment implements DialogListener {
     private static final int DELETE_DIALOG = 128;
     private static final int EXPORT_M8B_DIALOG = 129;
 
+    /**
+     * lock to prevent multiple count queries
+     */
+    private static final AtomicBoolean DB_TOTALS_QUERY_IN_FLIGHT = new AtomicBoolean(false);
+    private boolean uploadCompleteReceiverRegistered = false;
+    private final BroadcastReceiver uploadCompleteReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            if (intent == null) {
+                return;
+            }
+            final String action = intent.getAction();
+            if (WigleService.UPLOAD_COMPLETE_INTENT.equals(action)) {
+                Logging.info("received upload complete");
+                scheduleRefreshMarkerInfoOnUiThread();
+            }
+        }
+    };
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState) {
@@ -85,7 +113,7 @@ public final class DataFragment extends Fragment implements DialogListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.data, container, false);
-
+        setupDbInfo( view );
         setupQueryInputs( view );
         setupQueryButtons( view );
         setupCsvButtons( view );
@@ -117,6 +145,94 @@ public final class DataFragment extends Fragment implements DialogListener {
                 ViewCompat.requestApplyInsets(view);
             }
         });
+    }
+
+    private void setupDbInfo(final View view) {
+        final TextView totalWifi = view.findViewById(R.id.database_wifi);
+        final TextView totalBt = view.findViewById(R.id.database_bt);
+        final TextView totalCell = view.findViewById(R.id.database_cell);
+        if (null != totalWifi) {
+            totalWifi.setText("-");
+        }
+        if (null != totalBt) {
+            totalBt.setText("-");
+        }
+        if (null != totalCell) {
+            totalCell.setText("-");
+        }
+
+        if (ListFragment.lameStatic == null || ListFragment.lameStatic.dbHelper == null
+                || ListFragment.lameStatic.executorService == null) {
+            return;
+        }
+
+        if (!DB_TOTALS_QUERY_IN_FLIGHT.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            ListFragment.lameStatic.executorService.submit(() -> {
+                try {
+                    final DatabaseHelper helper =
+                            ListFragment.lameStatic != null ? ListFragment.lameStatic.dbHelper : null;
+                    if (helper == null) {
+                        return;
+                    }
+                    final DatabaseHelper.NetworkCatTotals totals = helper.getNetworkTotalsByKindFromDB();
+                    final MainActivity main = MainActivity.getMainActivity();
+                    if (main != null) {
+                        main.runOnUiThread(() -> applyDbCatTotals(totals));
+                    }
+                } catch (final DBException ex) {
+                    Logging.error("getNetworkTotalsByKindFromDB: " + ex, ex);
+                    final MainActivity main = MainActivity.getMainActivity();
+                    if (main != null) {
+                        main.runOnUiThread(() -> applyDbCatTotals(null));
+                    }
+                } finally {
+                    DB_TOTALS_QUERY_IN_FLIGHT.set(false);
+                }
+            });
+        } catch (final RuntimeException ex) {
+            DB_TOTALS_QUERY_IN_FLIGHT.set(false);
+            throw ex;
+        }
+    }
+
+    /**
+     * safe update for long-running DB totals query; survives rotation/screen off
+     * @param totalsOrNull last-known return value from query
+     */
+    private static void applyDbCatTotals(@Nullable final DatabaseHelper.NetworkCatTotals totalsOrNull) {
+        final MainActivity main = MainActivity.getMainActivity();
+        if (main == null || main.isFinishing() || main.isDestroyed()) {
+            return;
+        }
+        final TextView totalWifi = main.findViewById(R.id.database_wifi);
+        final TextView totalBt = main.findViewById(R.id.database_bt);
+        final TextView totalCell = main.findViewById(R.id.database_cell);
+        if (totalsOrNull == null) {
+            if (null != totalWifi) {
+                totalWifi.setText("-");
+            }
+            if (null != totalBt) {
+                totalBt.setText("-");
+            }
+            if (null != totalCell) {
+                totalCell.setText("-");
+            }
+            return;
+        }
+        final Locale locale = main.getResources().getConfiguration().getLocales().get(0);
+        final NumberFormat nf = NumberFormat.getIntegerInstance(locale);
+        if (null != totalWifi) {
+            totalWifi.setText(nf.format(totalsOrNull.wifi));
+        }
+        if (null != totalBt) {
+            totalBt.setText(nf.format(totalsOrNull.bluetooth));
+        }
+        if (null != totalCell) {
+            totalCell.setText(nf.format(totalsOrNull.cell));
+        }
     }
 
     private void setupQueryInputs( final View view ) {
@@ -208,17 +324,25 @@ public final class DataFragment extends Fragment implements DialogListener {
         Button button = view.findViewById( R.id.perform_search_button);
         button.setOnClickListener(buttonView -> {
 
-        final String fail = SearchUtil.setupQuery(view, getActivity(), true);
-        if (null != ListFragment.lameStatic.queryArgs) {
-            ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
-        }
-        if (fail != null) {
-            WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
-        } else {
-            // start db result activity
-            final Intent settingsIntent = new Intent(getActivity(), FossDBResultActivity.class);
-            startActivity(settingsIntent);
-        }
+        SearchUtil.setupQuery(view, getActivity(), true, fail -> {
+            final FragmentActivity activity = getActivity();
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
+            if (null != ListFragment.lameStatic.queryArgs) {
+                ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
+            }
+            if (fail != null) {
+                WiGLEToast.showOverFragment(activity, R.string.error_general, fail);
+            } else {
+                MainActivity m = MainActivity.getMainActivity();
+                if (null != m) {
+                    // start db result activity
+                    final Intent settingsIntent = new Intent(activity, FossDBResultActivity.class);
+                    startActivity(settingsIntent);
+                }
+            }
+        });
     });
 
     button = view.findViewById( R.id.reset_button );
@@ -343,7 +467,8 @@ public final class DataFragment extends Fragment implements DialogListener {
                         }
                         mainActivity.transferComplete();
                     }
-                });
+                },
+                this::refreshDataTabOnUiThread);
         try {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
@@ -354,15 +479,18 @@ public final class DataFragment extends Fragment implements DialogListener {
     @SuppressLint("SetTextI18n")
     private void setupMarkerButtons( final View view ) {
         SharedPreferences prefs = null;
+
         final Activity a = getActivity();
         if (null != a) {
             prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
 
-        // db marker reset button and text
-        final TextView tv = view.findViewById(R.id.reset_maxid_text);
+        // db marker maxout button and text
         if (null != prefs) {
-            tv.setText(getString(R.string.setting_high_up) + " " + prefs.getLong(PreferenceKeys.PREF_DB_MARKER, 0L));
+            refreshMarkerInfo(view, prefs);
+            final TextView maxText = view.findViewById(R.id.maxout_maxid_text);
+            final long maxDB = prefs.getLong(PreferenceKeys.PREF_MAX_DB, 0L);
+            maxText.setText(getString(R.string.setting_max_start) + " " + maxDB);
         }
 
         final Button resetMaxidButton = view.findViewById(R.id.reset_maxid_button);
@@ -375,13 +503,6 @@ public final class DataFragment extends Fragment implements DialogListener {
                 Logging.error("unable to get fragment activity");
             }
         });
-
-        // db marker maxout button and text
-        if (null != prefs) {
-            final TextView maxtv = view.findViewById(R.id.maxout_maxid_text);
-            final long maxDB = prefs.getLong(PreferenceKeys.PREF_MAX_DB, 0L);
-            maxtv.setText(getString(R.string.setting_max_start) + " " + maxDB);
-        }
 
         final Button maxoutMaxidButton = view.findViewById(R.id.maxout_maxid_button);
         maxoutMaxidButton.setOnClickListener(buttonView -> {
@@ -449,6 +570,78 @@ public final class DataFragment extends Fragment implements DialogListener {
         });
     }
 
+    /**
+    * complete refresh of dynamic stats.
+    */
+    private void refreshDataTabOnUiThread() {
+        final FragmentActivity activity = getActivity();
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        activity.runOnUiThread(() -> {
+            if (!isAdded() || activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+            final View v = getView();
+            if (v == null) {
+                return;
+            }
+            setupDbInfo(v);
+            setupImportObservedButton(v);
+            setupMarkerButtons(v);
+        });
+    }
+
+    /**
+     * post a marker UI refresh on maxout/zero, or chunked upload completion.
+     */
+    private void scheduleRefreshMarkerInfoOnUiThread() {
+        final FragmentActivity activity = getActivity();
+        if (activity == null) {
+            Logging.error("null activity/cannot update on marker infos");
+            return;
+        }
+        activity.runOnUiThread(() -> {
+            if (!isAdded()) {
+                Logging.error("not added/cannot update on marker infos");
+                return;
+            }
+            final View v = getView();
+            if (v == null) {
+                Logging.error("null view/cannot update on marker infos");
+                return;
+            }
+            final SharedPreferences p = activity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            refreshMarkerInfo(v, p);
+        });
+    }
+
+    private void refreshMarkerInfo( final View view, final SharedPreferences prefs ) {
+        final MainActivity main = MainActivity.getMainActivity();
+        if (main != null && !main.isFinishing() && !main.isDestroyed()) {
+
+            if (null != prefs) {
+                // db marker text
+                final TextView tvCurr = view.findViewById(R.id.current_id);
+                Long current = prefs.getLong(PreferenceKeys.PREF_DB_MARKER, 0L);
+                final Locale locale = main.getResources().getConfiguration().getLocales().get(0);
+                final NumberFormat nf = NumberFormat.getIntegerInstance(locale);
+                tvCurr.setText(nf.format(current));
+
+                // db remaining text
+                final TextView tvOut = view.findViewById(R.id.upload_outstanding);
+                Long outstanding = prefs.getLong(PreferenceKeys.PREF_MAX_DB, 0L) - current;
+                tvOut.setText("("+nf.format(outstanding)+")");
+
+                Logging.info("marker update complete");
+                if (FileUtility.checkUploadOversize(outstanding)) {
+                    final View warning = view.findViewById(R.id.warn_filesize);
+                    warning.setVisibility(VISIBLE);
+                }
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public void handleDialog(final int dialogId) {
@@ -512,6 +705,7 @@ public final class DataFragment extends Fragment implements DialogListener {
                         final TextView tv = view.findViewById(R.id.reset_maxid_text);
                         tv.setText(getString(R.string.setting_max_id) + " 0");
                     }
+                    scheduleRefreshMarkerInfoOnUiThread();
                 } else {
                     Logging.error("Null editor - unable to update DB marker");
                 }
@@ -527,6 +721,7 @@ public final class DataFragment extends Fragment implements DialogListener {
                         final TextView tv = view.findViewById(R.id.reset_maxid_text);
                         tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
                     }
+                    scheduleRefreshMarkerInfoOnUiThread();
                 } else {
                     Logging.error("Null prefs/editor - unable to update DB marker");
                 }
@@ -553,14 +748,17 @@ public final class DataFragment extends Fragment implements DialogListener {
                 } else {
                     Logging.error("Null editor - unable to update DB marker");
                 }
-
+                refreshDataTabOnUiThread();
                 break;
             }
             case EXPORT_M8B_DIALOG: {
                 if (!exportM8bFile()) {
                     Logging.warn("Failed to export m8b.");
-                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
-                            getActivity().getResources().getString(R.string.m8b_failed));
+                    Activity a = getActivity();
+                    if (null != a) {
+                        WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
+                                a.getResources().getString(R.string.m8b_failed));
+                    }
                 }
                 break;
             }
@@ -583,6 +781,7 @@ public final class DataFragment extends Fragment implements DialogListener {
     public void onResume() {
         Logging.info( "resume data." );
         super.onResume();
+        registerUploadCompleteReceiverIfNeeded();
         try {
             final FragmentActivity fa = getActivity();
             if (null != fa) {
@@ -596,8 +795,51 @@ public final class DataFragment extends Fragment implements DialogListener {
     }
 
     @Override
+    public void onPause() {
+        unregisterUploadCompleteReceiverIfNeeded();
+        super.onPause();
+    }
+
+    @Override
     public void onDestroy() {
+        unregisterUploadCompleteReceiverIfNeeded();
         super.onDestroy();
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private void registerUploadCompleteReceiverIfNeeded() {
+        if (uploadCompleteReceiverRegistered) {
+            return;
+        }
+        final FragmentActivity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+        final IntentFilter uploadCompleteFilter = new IntentFilter(WigleService.UPLOAD_COMPLETE_INTENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            activity.registerReceiver(uploadCompleteReceiver, uploadCompleteFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            activity.registerReceiver(uploadCompleteReceiver, uploadCompleteFilter);
+        }
+        uploadCompleteReceiverRegistered = true;
+    }
+
+    private void unregisterUploadCompleteReceiverIfNeeded() {
+        if (!uploadCompleteReceiverRegistered) {
+            return;
+        }
+        final FragmentActivity activity = getActivity();
+        if (activity == null) {
+            uploadCompleteReceiverRegistered = false;
+            return;
+        }
+        try {
+            activity.unregisterReceiver(uploadCompleteReceiver);
+        } catch (IllegalArgumentException iae) {
+            Logging.info("uploadCompleteReceiver not registered when unregistering", iae);
+        } finally {
+            uploadCompleteReceiverRegistered = false;
+        }
     }
 
     /**

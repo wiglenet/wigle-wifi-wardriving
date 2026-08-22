@@ -62,6 +62,22 @@ public class NetworkListUtil {
     private static final int COLOR_6A = Color.argb(128, 255, 85, 0);
     private static final int COLOR_7A = Color.argb(128, 255, 0, 0);
 
+    /** {@code random_address[47:46]} for resolvable-private random (BT Core Spec Vol 6 Part B §1.3.2); matches BluetoothReceiver logic. */
+    private static final int TOP_BITS_RESOLVABLE_PRIVATE = 0b01;
+
+    private static boolean isBleResolvablePrivateBssid(final String address) {
+        if (address == null || address.length() < 2) {
+            return false;
+        }
+        try {
+            final int firstByte = Integer.parseInt(address.substring(0, 2), 16);
+            final int top2 = (firstByte >> 6) & 0x03;
+            return top2 == TOP_BITS_RESOLVABLE_PRIVATE;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
+    }
+
     public static String getTime(@NonNull  final Network network, final boolean historical, @NonNull final Context context) {
         final Long last = network.getLastTime();
         if (null == last) {
@@ -319,13 +335,20 @@ public class NetworkListUtil {
         return resource;
     }
 
-    public static Integer getBleAddrTypeImage(final Integer type) {
+    /**
+     * provide an image indicator for anonymous/random BLE addresses
+     * @param type the detected address type
+     * @param bssid the BSSID of the network (used for resolving private random addresses)
+     * @return the image resource ID for the address type
+     */
+    public static Integer getBleAddrTypeImage(final Integer type, final String bssid) {
         switch (type) {
             case ADDRESS_TYPE_ANONYMOUS:
                 return drawable.balaclava;
-            //case ADDRESS_TYPE_ PRIVATE_RESOLVABLE / PRIVATE_NONRESOLVABLE: - not yet in Android API
-                //return drawable.groucho
             case ADDRESS_TYPE_RANDOM:
+                if (isBleResolvablePrivateBssid(bssid)) {
+                    return drawable.groucho;
+                }
                 return drawable.d6;
             default:
                 return null;

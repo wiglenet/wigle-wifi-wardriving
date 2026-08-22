@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -32,6 +33,7 @@ import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.ClipboardManager;
 import android.text.InputType;
@@ -44,6 +46,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,7 +78,9 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.Observation;
+import net.wigle.wigleandroid.model.RssiSample;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
+import net.wigle.wigleandroid.ui.RssiHistogramDrawable;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
@@ -83,11 +88,14 @@ import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.RssiHistoryCache;
 
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -107,6 +115,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     protected static final int MSG_OBS_UPDATE = 1;
     protected static final int MSG_OBS_DONE = 2;
     protected static final int DEFAULT_ZOOM = 18;
+    /** Faster than the scan period, so the sparkline scrolls smoothly between samples. */
+    private static final long SPARKLINE_REFRESH_MS = 1000L;
     // used for shutting extraneous activities down on an error
     protected final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
     protected final ConcurrentLinkedHashMap<LatLng, Observation> localObsMap = new ConcurrentLinkedHashMap<>(1024);
@@ -114,6 +124,20 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     protected int observations = 0;
     protected boolean isDbResult = false;
     protected NumberFormat numberFormat;
+    private ObservationQueryHandler observationQueryHandler;
+    private View rssiSparklineRow;
+    private RssiHistogramDrawable rssiSparkline;
+    private Handler sparklineHandler;
+    private final Runnable sparklineTick = new Runnable() {
+        @Override
+        public void run() {
+            refreshRssiSparkline();
+            final Handler handler = sparklineHandler;
+            if (handler != null) {
+                handler.postDelayed(this, SPARKLINE_REFRESH_MS);
+            }
+        }
+    };
 
     /**
      * Observation query for network
@@ -284,34 +308,26 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         }
 
         View bleToolsLayout = findViewById(R.id.ble_tools_row);
-        if (null != bleToolsLayout) {
-            ViewCompat.setOnApplyWindowInsetsListener(bleToolsLayout, new OnApplyWindowInsetsListener() {
-                @Override
-                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
-                    final Insets innerPadding = insets.getInsets(
-                            WindowInsetsCompat.Type.navigationBars());
-                    v.setPadding(
-                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
-                    );
-                    return insets;
+
+        final View toolsWrapper = findViewById(R.id.bottom_tools_wrapper);
+        if (null != toolsWrapper) {
+            ViewCompat.setOnApplyWindowInsetsListener(toolsWrapper, (v, insets) -> {
+                // against the end edge in landscape this can meet a cutout as well as the nav bar
+                final Insets innerPadding = insets.getInsets(
+                        WindowInsetsCompat.Type.navigationBars() |
+                                WindowInsetsCompat.Type.displayCutout());
+                // insets are reported against the window, so padding every row by the bottom
+                // value wedges a nav-bar-sized gap between them; only the spacer gets it
+                v.setPadding(innerPadding.left, 0, innerPadding.right, 0);
+                final View spacer = v.findViewById(R.id.na_tools_inset_spacer);
+                if (null != spacer) {
+                    spacer.setPadding(0, 0, 0, innerPadding.bottom);
                 }
+                return insets;
             });
         }
 
-        View filterToolsLayout = findViewById(R.id.filter_row);
-        if (null != filterToolsLayout) {
-            ViewCompat.setOnApplyWindowInsetsListener(filterToolsLayout, new OnApplyWindowInsetsListener() {
-                @Override
-                public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
-                    final Insets innerPadding = insets.getInsets(
-                            WindowInsetsCompat.Type.navigationBars());
-                    v.setPadding(
-                            innerPadding.left, innerPadding.top, innerPadding.right, innerPadding.bottom
-                    );
-                    return insets;
-                }
-            });
-        }
+        applyOverlayPanelLayout();
 
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra(ListFragment.NETWORK_EXTRA_BSSID);
@@ -406,18 +422,16 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             tv.setText(network.getCapabilities().replace("][", "]  ["));
 
             final ImageView ppImg = findViewById(R.id.passpoint_logo_net);
+            final View passpointRow = findViewById(R.id.passpoint_row);
             if (network.isPasspoint()) {
                 ppImg.setVisibility(VISIBLE);
+                passpointRow.setVisibility(VISIBLE);
             } else {
                 ppImg.setVisibility(GONE);
+                passpointRow.setVisibility(GONE);
             }
             tv = findViewById(R.id.na_rcois);
-            if (network.getRcois() != null) {
-                tv.setText(network.getRcois());
-            } else {
-                TextView row = findViewById(R.id.na_rcoi_label);
-                row.setVisibility(View.INVISIBLE);
-            }
+            tv.setText(network.getRcois());
 
             if (NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
@@ -488,6 +502,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                     bleToolsLayout.setVisibility(GONE);
                 }
             }
+            // now that the network type has decided which tool rows exist
+            updateToolsInsetSpacer();
             setupQuery();
         }
     }
@@ -495,6 +511,18 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     @Override
     public void onDestroy() {
         Logging.info("NET: onDestroy");
+        if (observationQueryHandler != null) {
+            observationQueryHandler.removeCallbacksAndMessages(null);
+            observationQueryHandler = null;
+        }
+        stopRssiSparkline();
+        sparklineHandler = null;
+
+        // WifiReceiver outlives this activity, so a survey left running would pin it forever
+        final MainActivity.State state = MainActivity.getStaticState();
+        if (state != null && state.wifiReceiver != null) {
+            state.wifiReceiver.unregisterWiFiScanUpdater(this);
+        }
         destroyMapView();
         super.onDestroy();
     }
@@ -503,14 +531,26 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
     public void onResume() {
         Logging.info("NET: onResume");
         super.onResume();
+        // re-read the pref here so toggling it in settings takes effect on the way back
+        setupRssiSparkline();
+        startRssiSparkline();
         resumeMapView();
     }
 
     @Override
     public void onPause() {
         Logging.info("NET: onPause");
+        stopRssiSparkline();
         pauseMapView();
         super.onPause();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull final Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // configChanges keeps this activity alive across rotation, so nothing re-reads the
+        // layout for us
+        applyOverlayPanelLayout();
     }
 
     @Override
@@ -527,21 +567,135 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
         super.onLowMemory();
     }
 
-    @SuppressLint("HandlerLeak")
+    /**
+     * Attach (or detach) the sparkline drawable to match the current pref. Idempotent, so
+     * it can run on every resume.
+     */
+    private void setupRssiSparkline() {
+        final View row = findViewById(R.id.na_rssi_sparkline_row);
+        final View graph = findViewById(R.id.na_rssi_sparkline);
+        if (null == row || null == graph || null == network) {
+            return;
+        }
+        rssiSparklineRow = row;
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        if (!prefs.getBoolean(PreferenceKeys.PREF_DISPLAY_INLINE_LIST_SIGNAL_HISTOGRAMS, false)) {
+            rssiSparkline = null;
+            graph.setBackground(null);
+            row.setVisibility(GONE);
+            return;
+        }
+        if (null == rssiSparkline) {
+            // list rows have to stay legible over this, but here it owns the strip, so it can
+            // carry the same signal color the list uses for text
+            rssiSparkline = RssiHistogramDrawable.forOwnStrip(
+                    NetworkListUtil.getTextColorForSignal(this, network.getLevel()));
+            graph.setBackground(rssiSparkline);
+        }
+    }
+
+    private void startRssiSparkline() {
+        if (null == rssiSparkline) {
+            return;
+        }
+        if (null == sparklineHandler) {
+            sparklineHandler = new Handler(Looper.getMainLooper());
+        }
+        sparklineHandler.removeCallbacks(sparklineTick);
+        sparklineHandler.post(sparklineTick);
+    }
+
+    private void stopRssiSparkline() {
+        if (null != sparklineHandler) {
+            sparklineHandler.removeCallbacks(sparklineTick);
+        }
+    }
+
+    /**
+     * Pull the current window of samples for this network. The row stays hidden until the
+     * cache actually holds something, so historical-only networks don't show an empty strip.
+     */
+    private void refreshRssiSparkline() {
+        if (null == rssiSparkline || null == rssiSparklineRow || null == network) {
+            return;
+        }
+        final MainActivity.State state = MainActivity.getStaticState();
+        final RssiHistoryCache cache = null != state ? state.rssiHistoryCache : null;
+        final List<RssiSample> samples = (null != cache && cache.isEnabled())
+                ? cache.getSeries(network.getBssid()) : Collections.emptyList();
+        if (samples.isEmpty()) {
+            rssiSparkline.clear();
+            rssiSparklineRow.setVisibility(GONE);
+            updateToolsInsetSpacer();
+            return;
+        }
+        rssiSparklineRow.setVisibility(VISIBLE);
+        rssiSparkline.setFillColor(NetworkListUtil.getTextColorForSignal(
+                this, samples.get(samples.size() - 1).level));
+        rssiSparkline.setSamples(samples, System.currentTimeMillis());
+        updateToolsInsetSpacer();
+    }
+
+    /**
+     * Full-width overlays waste most of a landscape window, so once the window is wider than it
+     * is tall, cap both at the window's minor dimension and drive them into opposite corners:
+     * detail at the top start, tools at the bottom end. That cap leaves each filter column the
+     * same width it gets in portrait, so nothing inside has to reflow. Params are rewritten in
+     * place because re-inflating would tear down the live MapView.
+     */
+    private void applyOverlayPanelLayout() {
+        final Configuration conf = getResources().getConfiguration();
+        final boolean wide = conf.screenWidthDp > conf.screenHeightDp;
+        // recomputed every time: a multi-window resize changes the minor dimension
+        final int panelWidth = wide
+                ? Math.round(Math.min(conf.screenWidthDp, conf.screenHeightDp)
+                        * getResources().getDisplayMetrics().density)
+                : RelativeLayout.LayoutParams.MATCH_PARENT;
+        constrainPanel(R.id.na_detail_panel, panelWidth, RelativeLayout.ALIGN_PARENT_START);
+        constrainPanel(R.id.bottom_tools_wrapper, panelWidth,
+                wide ? RelativeLayout.ALIGN_PARENT_END : RelativeLayout.ALIGN_PARENT_START);
+    }
+
+    /**
+     * Vertical rules are left alone, so each panel keeps the edge it was laid out against.
+     */
+    private void constrainPanel(final int panelId, final int width, final int edgeRule) {
+        final View panel = findViewById(panelId);
+        if (null == panel) {
+            return;
+        }
+        final RelativeLayout.LayoutParams params =
+                (RelativeLayout.LayoutParams) panel.getLayoutParams();
+        params.width = width;
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START == edgeRule
+                ? RelativeLayout.ALIGN_PARENT_END : RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(edgeRule);
+        panel.setLayoutParams(params);
+    }
+
+    /**
+     * The spacer only exists to hold the navigation bar inset under the tools, so on a network
+     * with no tool rows at all it would be a bare strip of overlay across the map.
+     */
+    private void updateToolsInsetSpacer() {
+        final View spacer = findViewById(R.id.na_tools_inset_spacer);
+        if (null == spacer) {
+            return;
+        }
+        final boolean anyTools = isViewVisible(R.id.filter_row)
+                || isViewVisible(R.id.ble_tools_row)
+                || isViewVisible(R.id.na_rssi_sparkline_row);
+        spacer.setVisibility(anyTools ? VISIBLE : GONE);
+    }
+
+    private boolean isViewVisible(final int viewId) {
+        final View view = findViewById(viewId);
+        return null != view && view.getVisibility() == VISIBLE;
+    }
+
     protected void setupQuery() {
-        // what runs on the gui thread
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage( final Message msg ) {
-                final TextView tv = findViewById( R.id.na_observe );
-                if ( msg.what == MSG_OBS_UPDATE ) {
-                    tv.setText( numberFormat.format( observations ));
-                } else if ( msg.what == MSG_OBS_DONE ) {
-                    tv.setText( numberFormat.format( observations ) );
-                    mapObservations();
-                }
-            }
-        };
+        // Static handler + WeakReference so a long DB query cannot pin this Activity
+        observationQueryHandler = new ObservationQueryHandler(this);
 
         PooledQueryExecutor.enqueue( new PooledQueryExecutor.Request( OBSERVATION_QUERY_SQL,
                 new String[]{network.getBssid(), obsMap.maxSize()+""}, new PooledQueryExecutor.ResultHandler() {
@@ -551,17 +705,50 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                 obsMap.put( new net.wigle.wigleandroid.model.LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
                 if ( ( observations % 10 ) == 0 ) {
                     // change things on the gui thread
-                    handler.sendEmptyMessage( MSG_OBS_UPDATE );
+                    final ObservationQueryHandler handler = observationQueryHandler;
+                    if (handler != null) {
+                        handler.sendEmptyMessage( MSG_OBS_UPDATE );
+                    }
                 }
                 return true;
             }
 
             @Override
             public void complete() {
-                handler.sendEmptyMessage( MSG_OBS_DONE );
+                final ObservationQueryHandler handler = observationQueryHandler;
+                if (handler != null) {
+                    handler.sendEmptyMessage( MSG_OBS_DONE );
+                }
             }
         }, ListFragment.lameStatic.dbHelper ));
         //ListFragment.lameStatic.dbHelper.addToQueue( request );
+    }
+
+    private static final class ObservationQueryHandler extends Handler {
+        private final WeakReference<AbstractNetworkActivity> activityRef;
+
+        ObservationQueryHandler(final AbstractNetworkActivity activity) {
+            super(Looper.getMainLooper());
+            this.activityRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(final Message msg) {
+            final AbstractNetworkActivity activity = activityRef.get();
+            if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+            final TextView tv = activity.findViewById(R.id.na_observe);
+            if (tv == null || activity.numberFormat == null) {
+                return;
+            }
+            if (msg.what == MSG_OBS_UPDATE) {
+                tv.setText(activity.numberFormat.format(activity.observations));
+            } else if (msg.what == MSG_OBS_DONE) {
+                tv.setText(activity.numberFormat.format(activity.observations));
+                activity.mapObservations();
+            }
+        }
     }
 
     /**

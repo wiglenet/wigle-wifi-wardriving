@@ -330,6 +330,7 @@ public abstract class AbstractMappingFragment extends Fragment {
     protected static class State {
         protected boolean locked = true;
         protected boolean firstMove = true;
+        protected boolean cameraInitialized = false;
         protected LatLng oldCenter = null;
     }
 

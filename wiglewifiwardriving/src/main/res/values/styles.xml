@@ -120,6 +120,20 @@
     <style name="NetworkViewOverlay">
         <item name="android:background">#AA353535</item>
     </style>
+    <!-- Section titles on the Data tab (replaces ?android:attr/listSeparatorTextViewStyle). -->
+    <style name="WiGLESectionHeader" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textAllCaps">true</item>
+        <!-- Match list-separator weight: plain TextAppearance.AppCompat body reads lighter than ?listSeparatorTextViewStyle. -->
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="WiGLESectionHeader.Large" parent="WiGLESectionHeader">
+        <item name="android:textSize">20sp</item>
+        <item name="android:padding">4dp</item>
+    </style>
     <style name="NetDetailSsid">
         <item name="android:textSize">26sp</item>
         <item name="android:textColor">#AAEE50</item>

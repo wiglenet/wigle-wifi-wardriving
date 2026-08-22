@@ -2,6 +2,10 @@ package net.wigle.wigleandroid.background;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -28,12 +32,21 @@ import java.io.IOException;
 public class ObservationImporter extends AbstractProgressApiRequest {
 
     private Status status;
+    @Nullable
+    private final Runnable onImportSuccessMainThread;
 
     public ObservationImporter(final FragmentActivity context,
                                final DatabaseHelper dbHelper, final ApiListener listener) {
+        this(context, dbHelper, listener, null);
+    }
+
+    public ObservationImporter(final FragmentActivity context,
+                               final DatabaseHelper dbHelper, final ApiListener listener,
+                               @Nullable final Runnable onImportSuccessMainThread) {
         super(context, dbHelper, "HttpDL", "observed-cache.json", UrlConfig.OBSERVED_URL, false,
                 true, true, false,
                 AbstractApiRequest.REQUEST_GET, listener, true);
+        this.onImportSuccessMainThread = onImportSuccessMainThread;
     }
 
     @Override
@@ -153,6 +166,9 @@ public class ObservationImporter extends AbstractProgressApiRequest {
             } catch (WiGLEAuthException waex) {
                 Logging.error("Unable to download data - authorization failed");
                 status = Status.BAD_LOGIN;
+            }
+            if (onImportSuccessMainThread != null && Status.SUCCESS.equals(status)) {
+                new Handler(Looper.getMainLooper()).post(onImportSuccessMainThread);
             }
         }
         return status.toString();

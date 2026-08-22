@@ -29,9 +29,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_ident_head"
-        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingHorizontal="4dp"
+        style="@style/WiGLESectionHeader"
         />
-
     <TextView
         android:id="@+id/register"
         android:layout_width="fill_parent"
@@ -102,13 +102,20 @@
         android:layout_height="wrap_content"
         android:text="@string/donate" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        style="@style/DividerColor"
+        android:layout_marginBottom="4dip"
+        />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_gen_head"
-        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingHorizontal="4dp"
+        style="@style/WiGLESectionHeader"
         />
-
     <CheckBox android:id="@+id/found_sound"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -123,6 +130,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
+
+    <CheckBox android:id="@+id/display_inline_histograms"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/display_inline_histograms" />
 
     <CheckBox android:id="@+id/use_metric"
         android:layout_width="fill_parent"
@@ -250,11 +262,19 @@
             android:textSize="14sp"
             android:layout_marginEnd="8dip" />
     </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        style="@style/DividerColor"
+        android:layout_marginBottom="4dip"
+        />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_map_head"
-        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingHorizontal="4dp"
+        style="@style/WiGLESectionHeader"
         />
 
     <CheckBox android:id="@+id/circle_size_map"
@@ -337,11 +357,19 @@
                 android:layout_weight="1"/>
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        style="@style/DividerColor"
+        android:layout_marginBottom="4dip"
+        />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_scan_head"
-        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingHorizontal="4dp"
+        style="@style/WiGLESectionHeader"
         />
 
     <CheckBox android:id="@+id/bluetooth_ena"
@@ -481,15 +509,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/guess_le_address_type" />
-
-
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        style="@style/DividerColor"
+        android:layout_marginBottom="4dip"
+        />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_gps_head"
-        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingHorizontal="4dp"
+        style="@style/WiGLESectionHeader"
         />
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -571,6 +604,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/gnss_full" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        style="@style/DividerColor"
+        android:layout_marginBottom="4dip"
+        />
 
     <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"

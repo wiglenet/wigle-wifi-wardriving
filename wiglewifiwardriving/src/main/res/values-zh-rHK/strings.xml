@@ -3,14 +3,14 @@
     <string name="stats">啟動</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi 位置記錄</string>
-    <string name="settings_app_name">WiGLE WiFi - 設定</string>
-    <string name="mapping_app_name">WiGLE - 地圖</string>
-    <string name="dashboard_app_name">WiGLE WiFi - 控制面板</string>
+    <string name="settings_app_name">設定</string>
+    <string name="mapping_app_name">地圖</string>
+    <string name="dashboard_app_name">控制面板</string>
     <string name="error_report_name">最近錯誤報告</string>
-    <string name="speech_name">WiGLE WiFi - 語言</string>
-    <string name="network_activity_name">WiGLE WiFi - 網路</string>
-    <string name="data_activity_name">WiGLE WiFi - 資料庫</string>
-    <string name="dbresult_activity_name">WiGLE WiFi - 搜尋結果</string>
+    <string name="speech_name">語言</string>
+    <string name="network_activity_name">網路</string>
+    <string name="data_activity_name">資料庫</string>
+    <string name="dbresult_activity_name">搜尋結果</string>
     <string name="upload_button">上傳到WiGLE.net</string>
     <string name="username">WiGLE 使用者名稱</string>
     <string name="password">WiGLE 密碼</string>
@@ -96,7 +96,7 @@
     <string name="network_querying">（正查詢&#8230;）</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">顯示密碼</string>
-    <string name="setting_db_marker">數據庫標記（從此開始上傳）：</string>
+    <string name="setting_db_marker">數據庫標記（最後上傳的網絡）：</string>
     <string name="setting_high_up">最高上傳ID：</string>
     <string name="setting_zero_out">要清零數據庫的標記嗎？</string>
     <string name="setting_max_id">最大上傳ID：</string>
@@ -219,6 +219,7 @@
     <string name="language_cs">čeština (捷克語)</string>
     <string name="language_da">dansk (丹麥語)</string>
     <string name="language_de">Deutsch (德語)</string>
+    <string name="language_el">Ελληνικά (希臘語)</string>
     <string name="language_es">español (西班牙語)</string>
     <string name="language_fi">suomi (芬蘭語)</string>
     <string name="language_fr">français (法語)</string>
@@ -490,4 +491,15 @@
     <string name="battery_opt_settings_title">電池優化</string>
     <string name="battery_opt_status_exempted">已豁免</string>
     <string name="battery_opt_status_not_exempted">未豁免（點擊更改）</string>
+    <string name="phone_permission_detail">WiGLE 可在您於裝置上接聽來電時將應用程式音訊靜音。此權限會告知應用程式需停止播放聲音，以便您通話。</string>
+    <string name="database_stats">本機（裝置上）數據庫：</string>
+    <string name="export">數據匯出</string>
+    <string name="backup_restore">備份與還原</string>
+    <string name="flag_whole_database">將整個數據庫設為上傳</string>
+    <string name="file_size_warning">需要多次上傳。</string>
+    <string name="invalid_foss_config">您的 FOSS 地圖設定似乎無效。請檢查您的設定。</string>
+    <string name="menu_drawer_title">選單</string>
+    <string name="display_inline_histograms">在列表背景顯示 RSSI 直方圖</string>
+    <string name="anniversary_mode_enabled">25週年紀念模式已啟用</string>
+    <string name="anniversary_mode_disabled">25週年紀念模式已停用</string>
 </resources>

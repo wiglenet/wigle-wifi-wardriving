@@ -11,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -48,9 +47,9 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedByInterruptException;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
@@ -66,7 +65,7 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLException;
 
 /**
- * replacement file upload task
+ * Output files as WiGLE.net CSV v1.6 ( <a href="https://api.wigle.net/csvFormat-1_6.html">specified on the site</a> ) with progress state
  * Created by arkasha on 2/6/17.
  */
 
@@ -74,24 +73,26 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     private static final String COMMA = ",";
     private static final String NEWLINE = "\n";
-
-    private static final String ENCODING = "UTF-8";
-
     private static final CSVFormat CSV_FORMAT;
 
-    private final boolean justWriteFile;
-    private final boolean writeEntireDb;
-    private final boolean writeRun;
+    private final boolean justWriteFile; // flag indicating that this is export to FS-only
+    private final boolean writeEntireDb; // flag indicating output of the entire DB
+    private final boolean writeRun; // flag indicating output of the current run only
+    private final boolean limitFileForUpload; // if this is for upload, respect server upload cap
 
     Status status;
 
+    // WiGLE CSV format 1.6 rows header
     public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,Frequency,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,RCOIs,MfgrId,Type";
 
+    // state object for upload progress
     private static class CountStats {
         int byteCount;
         int lineCount;
+        boolean rowsCapped;
     }
 
+    // CSV output configuration
     static {
         // Use the default (RFC4180) settings, except no carriage return on line end
         final CSVFormat.Builder builder = CSVFormat.Builder.create();
@@ -115,6 +116,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         }
         this.writeEntireDb = writeEntireDb;
         this.writeRun = writeRun;
+        this.limitFileForUpload = !justWriteFile && !writeEntireDb;
     }
 
     @Override
@@ -159,7 +161,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
     /**
-     * override base startDownload - but instead perform an upload
+     * override base startDownload from {@link AbstractProgressApiRequest} - (but instead we perform an upload)
      * TODO: a misnomer, really
      * @param fragment the fragment from which the upload was started
      */
@@ -177,7 +179,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 Logging.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
             }
         } else {
-            prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
+            prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
         if (prefs != null) {
             final boolean hasApiToken = TokenAccess.hasApiToken(prefs);
@@ -266,19 +268,27 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                             status = Status.SUCCESS;
                             final SharedPreferences.Editor editor = prefs.edit();
                             editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
-                            editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
+                            if (!countStats.rowsCapped) {
+                                editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
+                            }
                             editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
                             editor.apply();
                             final UploadReseponse.UploadResultsResponse uploadResults = response.getResults();
                             List<String> transIds = uploadResults.getTransids().stream()
                                     .map(UploadReseponse.UploadTransaction::getTransId)
                                     .collect(Collectors.toList());
-                            if (transIds.size() > 0) {
+                            if (!transIds.isEmpty()) {
                                 final String transIdListStr = transIds.toString();
+                                Logging.info("upload resulted in transIds: "+transIdListStr);
+                                intent.putExtra(PreferenceKeys.PREF_MAX_DB, maxId);
+                                intent.putExtra(PreferenceKeys.PREF_DB_MARKER, maxId);
                                 intent.putExtra("transIds", transIdListStr);
                                 intent.setAction(UPLOAD_COMPLETE_INTENT);
+                                intent.setPackage(context.getPackageName());
                                 //NB: we'll still update the DB marker if no transIDs were generated.
                                 bundle.putString(BackgroundGuiHandler.TRANSIDS, transIdListStr);
+                            } else {
+                                Logging.warn("empty transIds on successful upload.");
                             }
                             //TODO: eventually learn about server-side donate=Y here
                         } else {
@@ -306,8 +316,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                         : "Uploads: Too many within timeframe";
                                 bundle.putString( BackgroundGuiHandler.ERROR, translated);
                             } else {
-                                final String translated = context != null? context.getString(R.string.no_wigle_conn): "Unable to connect.";
-                                bundle.putString( BackgroundGuiHandler.ERROR, translated+" (data: "+WiGLEApiManager.hasDataConnection(context)+")");
+                                final String translated = context != null ? context.getString(R.string.no_wigle_conn): "Unable to connect.";
+                                bundle.putString( BackgroundGuiHandler.ERROR, translated+" (data: " +
+                                        (context != null ? WiGLEApiManager.hasDataConnection(context):"unknown")
+                                        + ")");
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -316,27 +328,23 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                         context.sendBroadcast(intent);
                     }
                 });
-            };
+            }
         } catch ( final InterruptedException ex ) {
             Logging.info("ObservationUploader interrupted");
             throw ex;
         } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {
             Logging.error( "Upload connection problem: " + ex, ex );
-            ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn) );
         } catch (final SSLException ex) {
             Logging.error( "Upload security problem: " + ex, ex );
-            ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_secure_wigle_conn) );
         } catch ( final IOException ex ) {
-            ex.printStackTrace();
             Logging.error( "Upload io problem: " + ex, ex );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         } catch ( final Exception ex ) {
-            ex.printStackTrace();
             Logging.error( "Upload problem: " + ex, ex );
             MainActivity.writeError( this, ex, context, "Has data connection: " + WiGLEApiManager.hasDataConnection(context) );
             status = Status.EXCEPTION;
@@ -366,14 +374,12 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             Logging.info("justWriteFile interrupted: " + ex);
         }
         catch ( IOException ex ) {
-            ex.printStackTrace();
             Logging.error( "io problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         }
         catch ( final Exception ex ) {
-            ex.printStackTrace();
             Logging.error( "ex problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
@@ -414,7 +420,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
     /**
-     * (lifted directly from FileUploaderTask)
+     * Write a WiGLE CSV-formatted output file. Row count is capped at the server batch limit only for
+     * incremental uploads; filesystem and whole-database exports write all matching rows.
      */
     private long writeFileWithCursor(final Context context, final OutputStream fos, final Bundle bundle,
                                      final ObservationUploader.CountStats countStats,
@@ -426,7 +433,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         countStats.lineCount = 0;
-        final int total = cursor.getCount();
+        countStats.rowsCapped = false;
+        final long rowCap = limitFileForUpload ? FileUtility.maxRowsPerUpload() : Long.MAX_VALUE;
+        final int cursorCount = cursor.getCount();
+        final int total = (!limitFileForUpload || cursorCount <= rowCap) ? cursorCount : (int) rowCap;
         long fileWriteMillis = 0;
         long netMillis = 0;
 
@@ -453,7 +463,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 "subBody=0"
         );
         headerBuffer.append(CSV_COLUMN_HEADERS).append(NEWLINE);
-        final byte[] headerBytes = headerBuffer.toString().getBytes(ENCODING);
+        final byte[] headerBytes = headerBuffer.toString().getBytes(StandardCharsets.UTF_8);
         fos.write( headerBytes );
         countStats.byteCount = headerBytes.length;
         // Logging.debug("headerBuffer: " + headerBuffer);
@@ -465,7 +475,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             //noinspection resource
             final CSVPrinter printer = new CSVPrinter(charBuffer, CSV_FORMAT);
 
-            final CharsetEncoder encoder = Charset.forName( ENCODING ).newEncoder();
+            final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
             // don't stop when a goofy character is found
             encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
             final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
@@ -483,6 +493,12 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
                 if ( wasInterrupted() ) {
                     throw new InterruptedException( "we were interrupted" );
+                }
+                if ( limitFileForUpload && countStats.lineCount >= rowCap ) {
+                    countStats.rowsCapped = true;
+                    Logging.info("upload row cap (" + rowCap + ") reached; truncating batch. "
+                            + "Total cursor rows: " + cursorCount + ", lastId written: " + maxId);
+                    break;
                 }
                 // _id,bssid,level,lat,lon,time
                 final long id = cursor.getLong(0);
@@ -594,7 +610,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 // debug logging
                 // byte[] dst = new byte[end];
                 // System.arraycopy(byteBuffer.array(), offset, dst, 0, end);
-                // final String out = new String(dst, ENCODING);
+                // final String out = new String(dst, StandardCharsets.UTF_8);
                 // Logging.debug("bytes! " + out);
 
                 // update UI

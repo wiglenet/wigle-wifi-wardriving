@@ -4,14 +4,14 @@
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE WiFi Wardriving FOSS</string>
     <string name="list_app_name">WiGLE WiFi FOSS</string>
-    <string name="settings_app_name">WiGLE WiFi – Settings</string>
-    <string name="mapping_app_name">WiGLE – Map</string>
-    <string name="dashboard_app_name">WiGLE WiFi – Dashboard</string>
+    <string name="settings_app_name">Settings</string>
+    <string name="mapping_app_name">Map</string>
+    <string name="dashboard_app_name">Dashboard</string>
     <string name="error_report_name">Most Recent Error Report</string>
-    <string name="speech_name">WiGLE WiFi – Speech Settings</string>
-    <string name="network_activity_name">WiGLE WiFi – Network</string>
-    <string name="data_activity_name">WiGLE WiFi – Database</string>
-    <string name="dbresult_activity_name">WiGLE WiFi – Search Result</string>
+    <string name="speech_name">Speech Settings</string>
+    <string name="network_activity_name">Network</string>
+    <string name="data_activity_name">Database</string>
+    <string name="dbresult_activity_name">Search Result</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE username</string>
     <string name="password">WiGLE password</string>
@@ -98,7 +98,7 @@
     <string name="network_querying">(querying&#8230;)</string>
     <string name="network_rcois">RCOIs:</string>
     <string name="setting_show_password">Show Password</string>
-    <string name="setting_db_marker">DB Marker (where uploads start from):</string>
+    <string name="setting_db_marker">DB Marker (last uploaded network):</string>
     <string name="setting_high_up">Highest uploaded id:</string>
     <string name="setting_zero_out">Zero out DB marker?</string>
     <string name="setting_max_id">Max upload id:</string>
@@ -221,6 +221,7 @@
     <string name="language_cs">čeština (Czech)</string>
     <string name="language_da">dansk (Danish)</string>
     <string name="language_de">Deutsch (German)</string>
+    <string name="language_el">Ελληνικά (Greek)</string>
     <string name="language_es">español (Spanish)</string>
     <string name="language_fi">suomi (Finnish)</string>
     <string name="language_fr">français (French)</string>
@@ -496,4 +497,18 @@
     <string name="battery_opt_settings_title">Battery optimization</string>
     <string name="battery_opt_status_exempted">Exempted</string>
     <string name="battery_opt_status_not_exempted">Not exempted (click to change)</string>
+    <string name="phone_permission_detail">WiGLE can mute application audio when you accept an incoming call on your device. This permission informs the app that it needs to stop making sounds and let you talk.</string>
+    <string name="database_stats">Local (on-device) database:</string>
+    <string name="export">Data export</string>
+    <string name="backup_restore">Backup and restore</string>
+    <string name="flag_whole_database">Set entire database for upload</string>
+    <string name="file_size_warning">Multiple uploads will be necessary.</string>
+    <string name="invalid_foss_config">It appears your FOSS map configuration is invalid. Please check your settings.</string>
+    <string name="menu_drawer_title">Menu</string>
+    <string name="display_inline_histograms">Show list background RSSI histograms</string>
+    <string name="anniversary_mode_enabled">25th anniversary mode enabled</string>
+    <string name="anniversary_mode_disabled">25th anniversary mode disabled</string>
+    <string name="export_alert_filter">Export alert filter</string>
+    <string name="export_alert_filter_description_hint">Filter description</string>
+    <string name="export_alert_filter_empty">No alert addresses or BLE manufacturer IDs to export</string>
 </resources>

@@ -244,30 +244,36 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         //ALIBI: the number of async requests to perform.
         final Handler handler = new Handler(Looper.getMainLooper());
         executor.execute(() -> {
-            final long count = state.dbHelper.getNewWifiCount();
-            handler.post(() -> {
-                TextView text = view.findViewById( R.id.stats_wifi );
-                text.setText( UINumberFormat.counterFormat(count) );
-            });
+            if (null != state.dbHelper) {
+                final long count = state.dbHelper.getNewWifiCount();
+                handler.post(() -> {
+                    TextView text = view.findViewById(R.id.stats_wifi);
+                    text.setText(UINumberFormat.counterFormat(count));
+                });
+            }
         });
         TextView tv = view.findViewById( R.id.stats_cell );
         tv.setText( UINumberFormat.counterFormat(lameStatic.newCells));
         executor.execute(() -> {
-            final long count = state.dbHelper.getNewBtCount();
-            handler.post(() -> {
-                TextView text = view.findViewById( R.id.stats_bt );
-                text.setText( UINumberFormat.counterFormat(count) );
-            });
+            if (null != state.dbHelper) {
+                final long count = state.dbHelper.getNewBtCount();
+                handler.post(() -> {
+                    TextView text = view.findViewById(R.id.stats_bt);
+                    text.setText(UINumberFormat.counterFormat(count));
+                });
+            }
         });
         final long unUploaded = StatsUtil.newNetsSinceUpload(prefs);
         tv = view.findViewById( R.id.stats_unuploaded );
         tv.setText( UINumberFormat.counterFormat(unUploaded));
         executor.execute(() -> {
-            final long count = state.dbHelper.getNetworkCount();
-            handler.post(() -> {
-                TextView text = view.findViewById( R.id.stats_dbnets );
-                text.setText(dbFormat.format(count)); //
-            });
+            if (null != state.dbHelper) {
+                final long count = state.dbHelper.getNetworkCount();
+                handler.post(() -> {
+                    TextView text = view.findViewById(R.id.stats_dbnets);
+                    text.setText(dbFormat.format(count)); //
+                });
+            }
         });
     }
     public void setDBStatusUI(final View view, final String status, final long queueDepth ) {

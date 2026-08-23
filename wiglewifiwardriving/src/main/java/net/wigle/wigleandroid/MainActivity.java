@@ -2838,10 +2838,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             // close the db. not in destroy, because it'll still write after that.
             if (state.dbHelper != null) {
                 state.dbHelper.close();
-                if (ListFragment.lameStatic.dbHelper == state.dbHelper) {
-                    ListFragment.lameStatic.dbHelper = null;
-                }
-                state.dbHelper = null;
             }
             if (state.mxcDbHelper != null) state.mxcDbHelper.close();
 

@@ -1,6 +1,8 @@
 package net.wigle.wigleandroid.listener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
@@ -22,6 +24,8 @@ import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
+
+import androidx.annotation.NonNull;
 
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.ListFragment;
@@ -154,79 +158,124 @@ public class CellReceiver {
             return;
         }
         final GNSSListener gpsListener = mainActivity.getGPSListener();
-        final android.content.SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        final SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         Location location = null;
         if (gpsListener != null) {
             location = gpsListener.checkGetLocation(prefs);
         }
         final Location loc = location;
         final Context ctx = mainActivity;
-        //ALIBI: moving into executor due to ANRs caused by the TelephonyManager binder calls in
-        // getRawCellData then posting processCellData back onto main
-        cellExecutor.execute(() -> {
-            final RawCellData raw = getRawCellData(ctx);
-            mainHandler.post(() -> {
-                if (mainActivity == null || mainActivity.isFinishing()) {
-                    return;
-                }
-                Map<String, Network> cellNetworks = processCellData(raw, loc);
-                if (cellNetworks == null) {
-                    cellNetworks = Collections.emptyMap();
-                }
-                final int newCellForRun = cellNetworks.size();
-                if (loc == null && newCellForRun > 0) {
-                    ListFragment.lameStatic.pendingCellCount = Math.min(25,
-                            ListFragment.lameStatic.pendingCellCount + newCellForRun);
-                } else if (loc != null) {
-                    ListFragment.lameStatic.pendingCellCount = 0;
-                }
-                ListFragment.lameStatic.runCells = runCells.size();
-                ListFragment.lameStatic.newCells = dbHelper.getNewCellCount();
-                ListFragment.lameStatic.currCells = cellNetworks.size();
-                ListFragment.lameStatic.currNets = ListFragment.lameStatic.currWifi + ListFragment.lameStatic.currCells;
-                final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
-                if (showCurrent && listAdapter != null) {
-                    final java.util.regex.Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher(prefs, PreferenceKeys.FILTER_PREF_PREFIX);
-                    final java.util.regex.Matcher bssidMatcher = mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
-                    for (Network cellNetwork : cellNetworks.values()) {
-                        if (cellNetwork != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, PreferenceKeys.FILTER_PREF_PREFIX, cellNetwork)) {
-                            listAdapter.addCell(cellNetwork);
-                        }
+        cellExecutor.execute(() -> collectRawCellData(ctx, raw -> mainHandler.post(() -> {
+            if (mainActivity == null || mainActivity.isFinishing()) {
+                return;
+            }
+            Map<String, Network> cellNetworks = processCellData(raw, loc);
+            if (cellNetworks == null) {
+                cellNetworks = Collections.emptyMap();
+            }
+            final int newCellForRun = cellNetworks.size();
+            if (loc == null && newCellForRun > 0) {
+                ListFragment.lameStatic.pendingCellCount = Math.min(25,
+                        ListFragment.lameStatic.pendingCellCount + newCellForRun);
+            } else if (loc != null) {
+                ListFragment.lameStatic.pendingCellCount = 0;
+            }
+            ListFragment.lameStatic.runCells = runCells.size();
+            ListFragment.lameStatic.newCells = dbHelper.getNewCellCount();
+            ListFragment.lameStatic.currCells = cellNetworks.size();
+            ListFragment.lameStatic.currNets = ListFragment.lameStatic.currWifi + ListFragment.lameStatic.currCells;
+            final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
+            if (showCurrent && listAdapter != null) {
+                final java.util.regex.Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher(prefs, PreferenceKeys.FILTER_PREF_PREFIX);
+                final java.util.regex.Matcher bssidMatcher = mainActivity.getBssidFilterMatcher(PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
+                for (Network cellNetwork : cellNetworks.values()) {
+                    if (cellNetwork != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, PreferenceKeys.FILTER_PREF_PREFIX, cellNetwork)) {
+                        listAdapter.addCell(cellNetwork);
                     }
                 }
-                NetworkListUtil.sort(prefs, listAdapter);
-                mainActivity.setNetCountUI();
-            });
-        });
+            }
+            NetworkListUtil.sort(prefs, listAdapter);
+            mainActivity.setNetCountUI();
+        })));
+    }
+
+    private interface RawCellCallback {
+        void onRaw(RawCellData raw);
     }
 
     /**
-     * binder-call - do not perform on main thread
-     * @param context the context of the request
-     * @return a RawCellData object with the current scan's cell and operator information
+     * Binder-call — do not perform on the main thread. On Q+ this requests a modem
+     * refresh; older APIs (and request failures) read the cached {@code getAllCellInfo}.
      */
-    private static RawCellData getRawCellData(final Context context) {
+    @SuppressLint("MissingPermission")
+    private void collectRawCellData(final Context context, final RawCellCallback callback) {
         if (context == null) {
-            return new RawCellData(null, null, null, null, -1, null);
+            callback.onRaw(emptyRaw());
+            return;
         }
-        TelephonyManager tele = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        final TelephonyManager tele = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (tele == null) {
-            return new RawCellData(null, null, null, null, -1, null);
+            callback.onRaw(emptyRaw());
+            return;
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                tele.requestCellInfoUpdate(cellExecutor, new TelephonyManager.CellInfoCallback() {
+                    @Override
+                    public void onCellInfo(@NonNull final List<CellInfo> cellInfo) {
+                        callback.onRaw(snapshotRaw(tele, cellInfo, null));
+                    }
+
+                    @Override
+                    public void onError(final int errorCode, final Throwable detail) {
+                        Logging.warn("requestCellInfoUpdate error " + errorCode
+                                + (detail != null ? ": " + detail : ""));
+                        callback.onRaw(readCachedCellData(tele));
+                    }
+                });
+                return;
+            } catch (final SecurityException sex) {
+                Logging.warn("unable to scan cells due to permission issue: ", sex);
+                callback.onRaw(emptyRaw());
+                return;
+            } catch (final Exception ex) {
+                Logging.warn("requestCellInfoUpdate failed, using cache: ", ex);
+            }
+        }
+        callback.onRaw(readCachedCellData(tele));
+    }
+
+    private static RawCellData emptyRaw() {
+        return new RawCellData(null, null, null, null, -1, null);
+    }
+
+    @SuppressLint("MissingPermission")
+    private static RawCellData readCachedCellData(final TelephonyManager tele) {
         try {
-            List<CellInfo> infos = tele.getAllCellInfo();
+            final List<CellInfo> infos = tele.getAllCellInfo();
             CellLocation cellLocation = null;
             if (infos == null && Build.VERSION.SDK_INT < 26) {
                 cellLocation = tele.getCellLocation();
             }
+            return snapshotRaw(tele, infos, cellLocation);
+        } catch (final SecurityException sex) {
+            Logging.warn("unable to scan cells due to permission issue: ", sex);
+            return emptyRaw();
+        } catch (final NullPointerException ex) {
+            Logging.warn("NPE on cell scan: ", ex);
+            return emptyRaw();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private static RawCellData snapshotRaw(final TelephonyManager tele, final List<CellInfo> infos,
+            final CellLocation cellLocation) {
+        try {
             return new RawCellData(infos, cellLocation, tele.getNetworkOperator(), tele.getNetworkOperatorName(),
                     tele.getNetworkType(), tele.getNetworkCountryIso());
-        } catch (SecurityException sex) {
-            Logging.warn("unable to scan cells due to permission issue: ", sex);
-            return new RawCellData(null, null, null, null, -1, null);
-        } catch (NullPointerException ex) {
-            Logging.warn("NPE on cell scan: ", ex);
-            return new RawCellData(null, null, null, null, -1, null);
+        } catch (final SecurityException sex) {
+            Logging.warn("unable to read operator for cell scan: ", sex);
+            return new RawCellData(infos, cellLocation, null, null, -1, null);
         }
     }
 
@@ -241,25 +290,28 @@ public class CellReceiver {
         if (mainActivity == null || raw == null) {
             return networks;
         }
-        try {
-            List<CellInfo> infos = raw.cellInfo;
-            if (infos != null) {
-                for (final CellInfo cell : infos) {
-                    Network network = handleSingleCellInfo(cell, raw.networkOperator, location);
+        final List<CellInfo> infos = raw.cellInfo;
+        if (infos != null) {
+            for (final CellInfo cell : infos) {
+                try {
+                    final Network network = handleSingleCellInfo(cell, raw.networkOperator, location);
                     if (network != null) {
                         networks.put(network.getBssid(), network);
                     }
+                } catch (final Exception ex) {
+                    Logging.warn("skipping cell: " + ex, ex);
                 }
-            } else if (raw.cellLocation != null) {
-                Network currentNetwork = handleSingleCellLocation(raw.cellLocation, raw.networkOperator, raw.networkOperatorName, raw.networkTypeId, raw.networkCountryIso, location);
+            }
+        } else if (raw.cellLocation != null) {
+            try {
+                final Network currentNetwork = handleSingleCellLocation(raw.cellLocation, raw.networkOperator,
+                        raw.networkOperatorName, raw.networkTypeId, raw.networkCountryIso, location);
                 if (currentNetwork != null) {
                     networks.put(currentNetwork.getBssid(), currentNetwork);
                 }
+            } catch (final Exception ex) {
+                Logging.warn("skipping cell location: " + ex, ex);
             }
-        } catch (SecurityException sex) {
-            Logging.warn("unable to scan cells due to permission issue: ", sex);
-        } catch (NullPointerException ex) {
-            Logging.warn("NPE on cell scan: ", ex);
         }
         return networks;
     }

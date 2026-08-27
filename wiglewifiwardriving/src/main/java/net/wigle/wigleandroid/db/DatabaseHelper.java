@@ -24,10 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.wigle.wigleandroid.ErrorReportActivity;
 import net.wigle.wigleandroid.MainActivity;
@@ -46,10 +47,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.CursorWrapper;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
@@ -72,6 +75,10 @@ public final class DatabaseHelper extends Thread {
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
+    /** Native SQLITE_BUSY wait per statement (checkpoint, leaked connection, API≤29 SD). */
+    private static final int BUSY_TIMEOUT_MS = 5000;
+    /** Extra worker attempts after busy_timeout expires. */
+    private static final int BUSY_RETRIES = 3;
     private static final Object TRANS_LOCK = new Object();
 
     private static final long QUEUE_CULL_TIMEOUT = 10000L;
@@ -147,6 +154,13 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATION_BSSID_ID_INDEX_CREATE =
             "CREATE INDEX IF NOT EXISTS idx_location_bssid__id ON " + LOCATION_TABLE + "(bssid, _id)";
 
+    /**
+     * {@code DELETE FROM route WHERE run_id = ?} is otherwise a full table scan, and run 0 is
+     * the visualization slot that can accumulate a long trail.
+     */
+    private static final String ROUTE_RUN_ID_INDEX_CREATE =
+            "CREATE INDEX IF NOT EXISTS idx_route_run_id ON " + ROUTE_TABLE + "(run_id)";
+
     private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
         + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
@@ -184,6 +198,16 @@ public final class DatabaseHelper extends Thread {
     private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<>(MAX_QUEUE);
     private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<>(MAX_QUEUE); // how to size this better?
     private final AtomicBoolean done = new AtomicBoolean(false);
+    private final AtomicInteger openTrackedCursors = new AtomicInteger();
+    /** Held for the whole close sequence so a second caller waits until the file is actually released. */
+    private final Object closeLock = new Object();
+    private boolean fullyClosed = false;
+    /**
+     * Process-wide owner of the on-disk file. WAL cannot have two writers; acquire() waits for
+     * the previous helper to finish closing before opening another.
+     */
+    private static final Object OWNER_LOCK = new Object();
+    private static DatabaseHelper owner;
     private final AtomicLong networkCount = new AtomicLong();
     private final AtomicLong currentRoutePointCount = new AtomicLong();
     private final AtomicLong locationCount = new AtomicLong();
@@ -242,6 +266,15 @@ public final class DatabaseHelper extends Thread {
 
     /** class for queueing updates to the database */
     final static class DBUpdate {
+        enum Op {
+            OBSERVATION,
+            ROUTE_POINT,
+            CLEAR_DEFAULT_ROUTE,
+            DELETE_ROUTE,
+            CLEAR_DATABASE
+        }
+
+        public final Op op;
         public final Network network;
         public final int level;
         public final Location location;
@@ -249,12 +282,20 @@ public final class DatabaseHelper extends Thread {
         public final boolean frequencyChanged;
         public final boolean typeMorphed;
         public final int external;
+        public final int wifiVisible;
+        public final int cellVisible;
+        public final int btVisible;
+        public final long runId;
+        public final CountDownLatch completion;
+        public final AtomicInteger result;
+        public final AtomicReference<Exception> error;
 
         public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed ) {
-            this(network, level, location, newForRun, false, false, 0);
+            this(network, level, location, newForRun, frequencyChanged, typeMorphed, 0);
         }
 
         public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed, final int external ) {
+            this.op = Op.OBSERVATION;
             this.network = network;
             this.level = level;
             this.location = location;
@@ -262,6 +303,58 @@ public final class DatabaseHelper extends Thread {
             this.frequencyChanged = frequencyChanged;
             this.typeMorphed = typeMorphed;
             this.external = external;
+            this.wifiVisible = 0;
+            this.cellVisible = 0;
+            this.btVisible = 0;
+            this.runId = 0L;
+            this.completion = null;
+            this.result = null;
+            this.error = null;
+        }
+
+        private DBUpdate(final Op op, final Location location, final int wifiVisible,
+                         final int cellVisible, final int btVisible, final long runId,
+                         final CountDownLatch completion, final AtomicInteger result,
+                         final AtomicReference<Exception> error) {
+            this.op = op;
+            this.network = null;
+            this.level = 0;
+            this.location = location;
+            this.newForRun = true;
+            this.frequencyChanged = false;
+            this.typeMorphed = false;
+            this.external = 0;
+            this.wifiVisible = wifiVisible;
+            this.cellVisible = cellVisible;
+            this.btVisible = btVisible;
+            this.runId = runId;
+            this.completion = completion;
+            this.result = result;
+            this.error = error;
+        }
+
+        static DBUpdate routePoint(final Location location, final int wifiVisible,
+                                   final int cellVisible, final int btVisible, final long runId) {
+            return new DBUpdate(Op.ROUTE_POINT, location, wifiVisible, cellVisible, btVisible,
+                    runId, null, null, null);
+        }
+
+        static DBUpdate clearDefaultRoute() {
+            return new DBUpdate(Op.CLEAR_DEFAULT_ROUTE, null, 0, 0, 0, 0L, null, null, null);
+        }
+
+        static DBUpdate deleteRoute(final long runId, final CountDownLatch completion,
+                                    final AtomicReference<Exception> error) {
+            return new DBUpdate(Op.DELETE_ROUTE, null, 0, 0, 0, runId, completion, null, error);
+        }
+
+        static DBUpdate clearDatabase(final CountDownLatch completion, final AtomicInteger result,
+                                      final AtomicReference<Exception> error) {
+            return new DBUpdate(Op.CLEAR_DATABASE, null, 0, 0, 0, 0L, completion, result, error);
+        }
+
+        boolean isObservation() {
+            return op == Op.OBSERVATION;
         }
     }
 
@@ -284,7 +377,34 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
-    public DatabaseHelper( final Context context, final SharedPreferences prefs ) {
+    /**
+     * Return a new live helper after the previous one (if any) has fully released the file.
+     * Never reuses a still-running helper: a finishing activity would close it under a new
+     * activity that had borrowed it.
+     * <p>
+     * Lock order: {@link #OWNER_LOCK} then {@code closeLock}. Never reverse.
+     */
+    public static DatabaseHelper acquire(final Context context, final SharedPreferences prefs) {
+        synchronized (OWNER_LOCK) {
+            if (owner != null) {
+                Logging.info("closing previous DatabaseHelper before opening another");
+                owner.closeExclusive();
+                owner = null;
+            }
+            final DatabaseHelper helper = new DatabaseHelper(context, prefs);
+            helper.start();
+            owner = helper;
+            return helper;
+        }
+    }
+
+    public boolean isFullyClosed() {
+        synchronized (closeLock) {
+            return fullyClosed;
+        }
+    }
+
+    private DatabaseHelper( final Context context, final SharedPreferences prefs ) {
         this.context = context.getApplicationContext();
         this.prefs = prefs;
         setName("dbworker-" + getName());
@@ -294,6 +414,44 @@ public final class DatabaseHelper extends Thread {
     public SQLiteDatabase getDB() throws DBException {
         checkDB();
         return db;
+    }
+
+    /**
+     * Tracked read used by {@link net.wigle.wigleandroid.background.PooledQueryExecutor} so a
+     * checkpoint can see live readers. Prefer this over {@link #getDB()} plus a raw query.
+     */
+    public Cursor query(final String sql, final String[] args) throws DBException {
+        checkDB();
+        return trackedQuery(sql, args);
+    }
+
+    /**
+     * Count is best-effort; a leaked cursor is still a leak. Close is idempotent so adapter
+     * swap/update paths that close twice do not drive the count negative.
+     */
+    private Cursor trackedQuery(final String sql, final String[] args) {
+        final Cursor inner = db.rawQuery(sql, args);
+        openTrackedCursors.incrementAndGet();
+        return new TrackedCursor(inner);
+    }
+
+    private final class TrackedCursor extends CursorWrapper {
+        private final AtomicBoolean closed = new AtomicBoolean(false);
+
+        TrackedCursor(final Cursor cursor) {
+            super(cursor);
+        }
+
+        @Override
+        public void close() {
+            if (closed.compareAndSet(false, true)) {
+                try {
+                    super.close();
+                } finally {
+                    openTrackedCursors.decrementAndGet();
+                }
+            }
+        }
     }
 
     private static class DeathHandler extends Handler {
@@ -375,32 +533,36 @@ public final class DatabaseHelper extends Thread {
                     final int drainSize = drain.size();
 
                     int countdown = 10;
+                    int busyCountdown = BUSY_RETRIES;
                     while ( countdown > 0 && ! done.get() ) {
-                        // doubt this will help the exclusive lock problems, but trying anyway
-                        synchronized(TRANS_LOCK) {
-                            try {
-                                // do a transaction for everything
-                                db.beginTransaction();
-                                for ( int i = 0; i < drainSize; i++ ) {
-                                    addObservation( drain.get( i ), drainSize );
-                                }
-                                db.setTransactionSuccessful();
-                                db.endTransaction();
-                                countdown = 0;
+                        try {
+                            synchronized(TRANS_LOCK) {
+                                applyDrain(drain);
                             }
-                            catch ( SQLiteConstraintException ex ) {
-                                Logging.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
-                                countdown--;
+                            countdown = 0;
+                        }
+                        catch ( SQLiteConstraintException ex ) {
+                            Logging.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
+                            countdown--;
+                        }
+                        catch ( SQLiteDatabaseLockedException ex ) {
+                            Logging.warn("DB run loop locked, retries left: " + busyCountdown + " ex: " + ex );
+                            busyCountdown--;
+                            if ( busyCountdown <= 0 ) {
+                                failWaiters(drain, ex);
+                                throw ex;
                             }
-                            catch ( Exception ex ) {
-                                Logging.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
-                                countdown--;
-                                if ( countdown <= 0 ) {
-                                    // give up
-                                    throw ex;
-                                }
-                                MainActivity.sleep(100L);
+                            MainActivity.sleep(100L);
+                        }
+                        catch ( Exception ex ) {
+                            Logging.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
+                            countdown--;
+                            if ( countdown <= 0 ) {
+                                failWaiters(drain, ex);
+                                // give up
+                                throw ex;
                             }
+                            MainActivity.sleep(100L);
                         }
                     }
 
@@ -440,6 +602,7 @@ public final class DatabaseHelper extends Thread {
         }
 
         Logging.info("db worker thread shutting down");
+        failQueuedWaiters(new DBException("db worker shutting down", null));
     }
 
     public void deathDialog( String message, Exception ex ) {
@@ -484,6 +647,18 @@ public final class DatabaseHelper extends Thread {
         else {
             db = context.openOrCreateDatabase( dbFilename, Context.MODE_PRIVATE, null );
         }
+
+        // Android's API also grows the connection pool so readers can proceed during a write.
+        // Returns false on filesystems that cannot host the WAL (old FAT/SD); we then keep
+        // the platform rollback journal rather than forcing PERSIST.
+        if (db.enableWriteAheadLogging()) {
+            Logging.info("WAL enabled");
+            // WAL already fsyncs the log; FULL would fsync the main file on every drain too
+            execPragma("PRAGMA synchronous = NORMAL");
+        } else {
+            Logging.warn("WAL not available; using rollback journal");
+        }
+        execPragma("PRAGMA busy_timeout = " + BUSY_TIMEOUT_MS);
 
         if ( ! tableExists( db, NETWORK_TABLE ) ) {
             Logging.info( "network table missing, will create" );
@@ -558,8 +733,6 @@ public final class DatabaseHelper extends Thread {
         db.execSQL( "PRAGMA count_changes = false" );
         // keep transactions in memory until committed
         db.execSQL( "PRAGMA temp_store = MEMORY" );
-        // keep around the journal file, don't create and delete a ton of times
-        db.rawQuery( "PRAGMA journal_mode = PERSIST", null).close();
 
         Logging.info( "database version: " + db.getVersion() );
         if ( db.getVersion() == 0 ) {
@@ -619,7 +792,12 @@ public final class DatabaseHelper extends Thread {
         // drop index, was never publicly released
         db.execSQL("DROP INDEX IF EXISTS type");
 
-        // compile statements
+        createRouteRunIdIndex();
+        compileStatements();
+    }
+
+    private void compileStatements() {
+        closeCompiledStatements();
         insertNetwork = db.compileStatement( "INSERT INTO "+NETWORK_TABLE
                 + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon,rcois,mfgrid,service) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)" );
 
@@ -639,6 +817,26 @@ public final class DatabaseHelper extends Thread {
                 + " (run_id,wifi_visible,cell_visible,bt_visible,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?,?,?)" );
     }
 
+    private void closeCompiledStatements() {
+        insertNetwork = closeQuietly(insertNetwork);
+        insertLocationExternal = closeQuietly(insertLocationExternal);
+        updateNetwork = closeQuietly(updateNetwork);
+        updateNetworkMetadata = closeQuietly(updateNetworkMetadata);
+        insertRoute = closeQuietly(insertRoute);
+        updateNetworkType = closeQuietly(updateNetworkType);
+    }
+
+    private static SQLiteStatement closeQuietly(final SQLiteStatement statement) {
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (final Exception ex) {
+                Logging.info("statement close: " + ex);
+            }
+        }
+        return null;
+    }
+
     private void createFreshLocationObservationIndex() {
         try {
             db.execSQL( LOCATION_BSSID_ID_INDEX_CREATE );
@@ -648,59 +846,144 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
+    private void createRouteRunIdIndex() {
+        try {
+            db.execSQL( ROUTE_RUN_ID_INDEX_CREATE );
+        }
+        catch ( final SQLiteException ex ) {
+            Logging.warn( "route run_id index: " + ex );
+        }
+    }
+
     /**
-     * close db, shut down thread
+     * Fold WAL frames into the main file. The cursor must be stepped or SQLite never
+     * runs the pragma. TRUNCATE also resets the WAL so a copy of the main file is complete,
+     * but it cannot finish while a reader still holds a snapshot — use FULL in that case.
+     */
+    private void checkpointWal() {
+        if (db == null || !db.isOpen() || !db.isWriteAheadLoggingEnabled()) {
+            return;
+        }
+        final int readers = openTrackedCursors.get();
+        if (readers > 0) {
+            Logging.info("WAL TRUNCATE skipped, " + readers + " readers open");
+            runWalCheckpoint("FULL");
+            return;
+        }
+        if (!runWalCheckpoint("TRUNCATE")) {
+            runWalCheckpoint("FULL");
+        }
+    }
+
+    private void waitForReaders(final long timeoutMs) {
+        final long deadline = System.currentTimeMillis() + timeoutMs;
+        while (openTrackedCursors.get() > 0 && System.currentTimeMillis() < deadline) {
+            MainActivity.sleep(50L);
+        }
+        final int remaining = openTrackedCursors.get();
+        if (remaining > 0) {
+            Logging.warn("still " + remaining + " DB readers after " + timeoutMs + " ms");
+        }
+    }
+
+    /** Assignment PRAGMAs still return a row; {@link SQLiteDatabase#execSQL} rejects that. */
+    private void execPragma(final String sql) {
+        try (Cursor cursor = db.rawQuery(sql, null)) {
+            cursor.moveToFirst();
+        }
+    }
+
+    private boolean runWalCheckpoint(final String mode) {
+        try (Cursor cursor = db.rawQuery("PRAGMA wal_checkpoint(" + mode + ")", null)) {
+            if (!cursor.moveToFirst()) {
+                Logging.warn("WAL checkpoint " + mode + " returned no row");
+                return false;
+            }
+            final int busy = cursor.getInt(0);
+            Logging.info("WAL checkpoint " + mode
+                    + " busy=" + busy
+                    + " log=" + cursor.getInt(1)
+                    + " checkpointed=" + cursor.getInt(2));
+            return busy == 0;
+        } catch (final SQLiteException ex) {
+            Logging.warn("WAL checkpoint " + mode + " failed: " + ex);
+            return false;
+        }
+    }
+
+    /**
+     * Stop the worker, wait until it has exited, then close the SQLite connection and drop the
+     * reference. Returns only once the file is released (or this is the worker thread itself).
+     * A second call waits for the first to finish, then returns; {@link #checkDB()} will not
+     * reopen afterwards.
      */
     public void close() {
-        done.set( true );
-
-        // interrupt the take, if any
-        this.interrupt();
-        // give time for db to finish any writes
-        int countdown = 30;
-        while ( this.isAlive() && countdown > 0 ) {
-            Logging.info( "db still alive. countdown: " + countdown );
-            MainActivity.sleep( 100L );
-            countdown--;
-            this.interrupt();
+        synchronized (OWNER_LOCK) {
+            closeExclusive();
+            if (owner == this) {
+                owner = null;
+            }
         }
+    }
 
-        countdown = 50;
-        while ( db != null && db.isOpen() && countdown > 0 ) {
-            try {
-                synchronized ( this ) {
-                    if ( insertNetwork != null ) {
-                        insertNetwork.close();
+    private void closeExclusive() {
+        synchronized (closeLock) {
+            if (fullyClosed) {
+                return;
+            }
+            done.set(true);
+            interrupt();
+            if (Thread.currentThread() != this) {
+                waitForWorkerExit();
+            }
+            waitForReaders(2000L);
+            synchronized (this) {
+                checkpointWal();
+                closeCompiledStatements();
+                if (db != null) {
+                    try {
+                        if (db.isOpen()) {
+                            db.close();
+                        }
+                    } catch (final SQLiteException ex) {
+                        Logging.error("db close after worker exit: " + ex, ex);
                     }
-                    if ( insertLocationExternal != null) {
-                        insertLocationExternal.close();
-                    }
-                    if ( updateNetwork != null ) {
-                        updateNetwork.close();
-                    }
-                    if ( updateNetworkMetadata != null ) {
-                        updateNetworkMetadata.close();
-                    }
-                    if ( insertRoute != null ) {
-                        insertRoute.close();
-                    }
-                    if ( updateNetworkType != null ) {
-                        updateNetworkType.close();
-                    }
-                    if ( db.isOpen() ) {
-                        db.close();
-                    }
+                    db = null;
                 }
             }
-            catch ( SQLiteException ex ) {
-                Logging.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
-                MainActivity.sleep( 100L );
+            failQueuedWaiters(new DBException("db closed", null));
+            fullyClosed = true;
+        }
+    }
+
+    /**
+     * Interrupt {@code take()} until the worker leaves {@link #run()}. Does not hold
+     * {@code this}, so the worker can still finish a {@link #checkDB()} that needs that lock.
+     */
+    private void waitForWorkerExit() {
+        boolean closerInterrupted = false;
+        long waitedMs = 0L;
+        while (isAlive()) {
+            interrupt();
+            try {
+                join(250L);
+            } catch (final InterruptedException ex) {
+                closerInterrupted = true;
             }
-            countdown--;
+            waitedMs += 250L;
+            if (isAlive() && waitedMs % 5000L == 0L) {
+                Logging.warn("waiting for db worker to exit, waited " + waitedMs + " ms");
+            }
+        }
+        if (closerInterrupted) {
+            Thread.currentThread().interrupt();
         }
     }
 
     public synchronized void checkDB() throws DBException {
+        if (done.get()) {
+            throw new DBException("db closed", null);
+        }
         if ( db == null || ! db.isOpen() ) {
             Logging.info( "re-opening db in checkDB" );
             try {
@@ -715,6 +998,9 @@ public final class DatabaseHelper extends Thread {
     public void blockingAddExternalObservation(final Network network, final Location location, final boolean newForRun )
             throws InterruptedException {
 
+        if (done.get()) {
+            throw new InterruptedException("db closed");
+        }
         final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun, false, false, 1 );
         queue.put(update);
     }
@@ -755,9 +1041,10 @@ public final class DatabaseHelper extends Thread {
                 for ( Iterator<DBUpdate> it = queue.iterator(); it.hasNext(); ) {
                     final DBUpdate val = it.next();
 
-                    if ( ! val.newForRun && !val.typeMorphed && !val.frequencyChanged) {
-                        it.remove();
+                    if ( ! val.isObservation() || val.newForRun || val.typeMorphed || val.frequencyChanged) {
+                        continue;
                     }
+                    it.remove();
                 }
                 Logging.info("culled queue. size now: " + queue.size() );
                 added = queue.offer( update );
@@ -769,6 +1056,233 @@ public final class DatabaseHelper extends Thread {
 
         }
         return added;
+    }
+
+    /**
+     * Run a drain batch as one transaction, then any CLEAR_DATABASE after that commit so DROP TABLE
+     * does not invalidate compiled statements mid-batch. Observation waiters are released as soon as
+     * their transaction commits so a later clear failure cannot cause a retry that would insert twice.
+     */
+    private void applyDrain(final List<DBUpdate> drain) throws DBException {
+        boolean clearDatabase = false;
+        db.beginTransaction();
+        try {
+            final int drainSize = drain.size();
+            for (int i = 0; i < drainSize; i++) {
+                final DBUpdate update = drain.get(i);
+                if (update.op == DBUpdate.Op.CLEAR_DATABASE) {
+                    clearDatabase = true;
+                    continue;
+                }
+                applyUpdate(update, drainSize);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            if (db.inTransaction()) {
+                db.endTransaction();
+            }
+        }
+        for (final DBUpdate update : drain) {
+            if (update.op != DBUpdate.Op.CLEAR_DATABASE) {
+                completeWaiter(update, 1, null);
+            }
+        }
+        if (clearDatabase) {
+            try {
+                final int cleared = applyClearDatabase();
+                for (final DBUpdate update : drain) {
+                    if (update.op == DBUpdate.Op.CLEAR_DATABASE) {
+                        completeWaiter(update, cleared, null);
+                    }
+                }
+            } catch (final Exception ex) {
+                for (final DBUpdate update : drain) {
+                    if (update.op == DBUpdate.Op.CLEAR_DATABASE) {
+                        completeWaiter(update, 0, ex);
+                    }
+                }
+                Logging.error("clear database after queued writes failed: " + ex, ex);
+            }
+        }
+    }
+
+    private void applyUpdate(final DBUpdate update, final int drainSize) throws DBException {
+        switch (update.op) {
+            case OBSERVATION:
+                addObservation(update, drainSize);
+                break;
+            case ROUTE_POINT:
+                applyRoutePoint(update);
+                break;
+            case CLEAR_DEFAULT_ROUTE:
+                applyClearDefaultRoute();
+                break;
+            case DELETE_ROUTE:
+                applyDeleteRoute(update.runId);
+                break;
+            case CLEAR_DATABASE:
+                // deferred until after the observation transaction commits
+                break;
+        }
+    }
+
+    private void applyRoutePoint(final DBUpdate update) {
+        if (done.get() || insertRoute == null || update.location == null) {
+            return;
+        }
+        final Location location = update.location;
+        if (location.getTime() == 0L) {
+            return;
+        }
+        final double accuracy = location.getAccuracy();
+        if (accuracy >= MIN_ROUTE_LOCATION_PRECISION_METERS || accuracy <= 0.0d) {
+            return;
+        }
+        if (lastLoggedLocation != null
+                && !(lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS
+                && (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME))) {
+            return;
+        }
+        insertRoute.bindLong(1, update.runId);
+        insertRoute.bindLong(2, update.wifiVisible);
+        insertRoute.bindLong(3, update.cellVisible);
+        insertRoute.bindLong(4, update.btVisible);
+        insertRoute.bindDouble(5, location.getLatitude());
+        insertRoute.bindDouble(6, location.getLongitude());
+        insertRoute.bindDouble(7, location.getAltitude());
+        insertRoute.bindDouble(8, location.getAccuracy());
+        insertRoute.bindLong(9, location.getTime());
+        final long start = System.currentTimeMillis();
+        try {
+            insertRoute.execute();
+            lastLoggedLocation = location;
+            currentRoutePointCount.incrementAndGet();
+            logTime(start, "db route point added");
+        } catch (IllegalStateException | SQLException ex) {
+            logTime(start, "db route point add failed: " + ex);
+        }
+    }
+
+    private void applyClearDefaultRoute() throws DBException {
+        checkDB();
+        if (null != db) {
+            db.execSQL(CLEAR_DEFAULT_ROUTE);
+        }
+    }
+
+    private void applyDeleteRoute(final long runId) throws DBException {
+        checkDB();
+        if (null != db) {
+            db.execSQL(DELETE_ROUTE_BY_ID, new Object[]{runId});
+            Logging.info("Deleted route run_id=" + runId);
+        }
+    }
+
+    private void completeWaiter(final DBUpdate update, final int result, final Exception error) {
+        if (update.completion == null) {
+            return;
+        }
+        if (error != null && update.error != null) {
+            update.error.set(error);
+        }
+        if (update.result != null) {
+            update.result.set(result);
+        }
+        update.completion.countDown();
+    }
+
+    private void failWaiters(final List<DBUpdate> drain, final Exception error) {
+        for (final DBUpdate update : drain) {
+            completeWaiter(update, 0, error);
+        }
+    }
+
+    private void failQueuedWaiters(final Exception error) {
+        DBUpdate update;
+        while ((update = queue.poll()) != null) {
+            completeWaiter(update, 0, error);
+        }
+    }
+
+    private void enqueue(final DBUpdate update) {
+        if (done.get()) {
+            Logging.warn("db closed, dropping " + update.op);
+            completeWaiter(update, 0, new DBException("db closed", null));
+            return;
+        }
+        if (!queue.offer(update)) {
+            Logging.warn("db queue full, dropping " + update.op);
+            completeWaiter(update, 0, new DBException("db queue full", null));
+        }
+    }
+
+    private void enqueueAndWait(final DBUpdate update) throws DBException {
+        if (done.get()) {
+            throw new DBException("db closed", null);
+        }
+        if (!isAlive() || Thread.currentThread() == this) {
+            applyNow(update);
+            final Exception error = update.error != null ? update.error.get() : null;
+            if (error instanceof DBException) {
+                throw (DBException) error;
+            }
+            if (error != null) {
+                throw new DBException("db write failed", error);
+            }
+            return;
+        }
+        try {
+            queue.put(update);
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new DBException("interrupted waiting to enqueue db write", ex);
+        }
+        try {
+            update.completion.await();
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new DBException("interrupted waiting for db write", ex);
+        }
+        final Exception error = update.error != null ? update.error.get() : null;
+        if (error instanceof DBException) {
+            throw (DBException) error;
+        }
+        if (error != null) {
+            throw new DBException("db write failed", error);
+        }
+    }
+
+    private void applyNow(final DBUpdate update) throws DBException {
+        SQLiteDatabaseLockedException lastLocked = null;
+        for (int attempt = 0; attempt < BUSY_RETRIES; attempt++) {
+            try {
+                synchronized (TRANS_LOCK) {
+                    checkDB();
+                    if (update.op == DBUpdate.Op.CLEAR_DATABASE) {
+                        final int cleared = applyClearDatabase();
+                        completeWaiter(update, cleared, null);
+                        return;
+                    }
+                    db.beginTransaction();
+                    try {
+                        applyUpdate(update, 1);
+                        db.setTransactionSuccessful();
+                    } finally {
+                        if (db.inTransaction()) {
+                            db.endTransaction();
+                        }
+                    }
+                    completeWaiter(update, 1, null);
+                    return;
+                }
+            } catch (final SQLiteDatabaseLockedException ex) {
+                lastLocked = ex;
+                Logging.warn("applyNow locked, attempt " + (attempt + 1) + "/" + BUSY_RETRIES + " ex: " + ex);
+                MainActivity.sleep(100L);
+            }
+        }
+        completeWaiter(update, 0, lastLocked);
+        throw new DBException("db locked", lastLocked);
     }
 
     @SuppressWarnings("deprecation")
@@ -812,7 +1326,7 @@ public final class DatabaseHelper extends Thread {
             // cache miss, get the last values from the db, if any
             long start = System.currentTimeMillis();
             // SELECT: can't precompile, as it has more than 1 result value
-            final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon,mfgrid FROM network WHERE bssid = ?", bssidArgs );
+            final Cursor cursor = trackedQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon,mfgrid FROM network WHERE bssid = ?", bssidArgs );
             logTime( start, "db network queried " + bssid );
             if ( cursor.getCount() == 0 ) {
                 insertNetwork.bindString( 1, bssid );
@@ -1205,53 +1719,25 @@ public final class DatabaseHelper extends Thread {
     }
 
     /**
-     * insert a new point for the specified route
-     * @param location location of current measurement
-     * @param wifiVisible # wifi nets visible
-     * @param cellVisible # cells visible
-     * @param btVisible # bt devices visible
-     * @param runId # the current, monotonic run ID
+     * Queue a new point for the specified route. The insert runs on the db worker so it
+     * shares the connection and transaction with observation writes.
      */
     public void logRouteLocation (final Location location, final int wifiVisible, final int cellVisible, final int btVisible, final long runId) {
         if (location == null) {
             Logging.error("Null location in logRouteLocation");
             return;
         }
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            if (!done.get()) {
-                final double accuracy = location.getAccuracy();
-                if (insertRoute != null && location.getTime() != 0L &&
-                        accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS &&
-                        accuracy > 0.0d && //ALIBI: should never happen?
-                        (lastLoggedLocation == null ||
-                                ((lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS &&
-                                        (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
-                                )) )) {
-                    insertRoute.bindLong(1, runId);
-                    insertRoute.bindLong(2, wifiVisible);
-                    insertRoute.bindLong(3, cellVisible);
-                    insertRoute.bindLong(4, btVisible);
-                    insertRoute.bindDouble(5, location.getLatitude());
-                    insertRoute.bindDouble(6, location.getLongitude());
-                    insertRoute.bindDouble(7, location.getAltitude());
-                    insertRoute.bindDouble(8, location.getAccuracy());
-                    insertRoute.bindLong(9, location.getTime());
-                    long start = System.currentTimeMillis();
-
-                    try {
-                        insertRoute.execute();
-                        lastLoggedLocation = location;
-                        currentRoutePointCount.incrementAndGet();
-                        logTime(start, "db route point added");
-                    } catch (IllegalStateException | SQLException ex) {
-                        logTime(start, "db route point add failed: " + ex);
-                    }
-                }
-            } else {
-                Logging.error("unable to log route point due to closing DB");
-            }
-        });
+        if (done.get()) {
+            Logging.error("unable to log route point due to closing DB");
+            return;
+        }
+        final double accuracy = location.getAccuracy();
+        if (location.getTime() == 0L
+                || accuracy >= MIN_ROUTE_LOCATION_PRECISION_METERS
+                || accuracy <= 0.0d) {
+            return;
+        }
+        enqueue(DBUpdate.routePoint(location, wifiVisible, cellVisible, btVisible, runId));
     }
 
     public boolean isFastMode() {
@@ -1289,7 +1775,7 @@ public final class DatabaseHelper extends Thread {
     public long getRoutePointCount(long routeId) {
         try {
             checkDB();
-            try (Cursor cursor = db.rawQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)})) {
+            try (Cursor cursor = trackedQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)})) {
                 cursor.moveToFirst();
                 return cursor.getLong(0);
             }
@@ -1359,7 +1845,7 @@ public final class DatabaseHelper extends Thread {
 
     private long getMaxIdFromDB( final String table ) throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery("select MAX(_id) FROM " + table, null)) {
+        try (Cursor cursor = trackedQuery("select MAX(_id) FROM " + table, null)) {
             cursor.moveToFirst();
             final long count = cursor.getLong(0);
             return count;
@@ -1367,7 +1853,7 @@ public final class DatabaseHelper extends Thread {
     }
     public long getWiFiNetsWthLocCountFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
+        try (Cursor cursor = trackedQuery(LOCATED_WIFI_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
         }
@@ -1378,7 +1864,7 @@ public final class DatabaseHelper extends Thread {
      */
     public NetworkCatTotals getNetworkTotalsByKindFromDB() throws DBException {
         checkDB();
-        try (Cursor cursor = db.rawQuery(NETWORK_TOTALS_BY_KIND_QUERY, null)) {
+        try (Cursor cursor = trackedQuery(NETWORK_TOTALS_BY_KIND_QUERY, null)) {
             cursor.moveToFirst();
             return new NetworkCatTotals(cursor.getLong(0), cursor.getLong(1), cursor.getLong(2));
         }
@@ -1393,7 +1879,7 @@ public final class DatabaseHelper extends Thread {
             try {
                 checkDB();
                 final String[] args = new String[]{ bssid };
-                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service,bestlevel,lasttime FROM "
+                cursor = trackedQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon,rcois,mfgrid,service,bestlevel,lasttime FROM "
                         + NETWORK_TABLE
                         + " WHERE bssid = ?", args);
                 if ( cursor.getCount() > 0 ) {
@@ -1445,21 +1931,21 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         Logging.info( "locationIterator fromId: " + fromId );
         final String[] args = new String[]{ Long.toString( fromId ) };
-        return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time,mfgrid FROM location WHERE _id > ? AND external = 0", args );
+        return trackedQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time,mfgrid FROM location WHERE _id > ? AND external = 0", args );
     }
 
     public Cursor networkIterator(final NetworkFilter filter) throws DBException {
         checkDB();
         Logging.info( "networkIterator (filtered)" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE "+filter.getFilter(), args );
+        return trackedQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE "+filter.getFilter(), args );
     }
 
     public Cursor routeIterator(final long routeId) throws DBException {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{String.valueOf(routeId)};
-        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = ?", args );
+        return trackedQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = ?", args );
     }
 
     public Cursor routeMetaIterator() throws DBException {
@@ -1467,34 +1953,38 @@ public final class DatabaseHelper extends Thread {
         Logging.info( "routeMetaIterator" );
         final String[] args = new String[]{};
         //ALIBI: we'd love to parameterize min observations here, but SQLite rawQuery doesn't seem to respect ? parameterization in HAVING statements.
-        return db.rawQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
+        return trackedQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
     }
 
     public Cursor currentRouteIterator() throws DBException {
         checkDB();
         Logging.info( "routeIterator" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
+        return trackedQuery( "SELECT lat,lon,altitude,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
     }
 
     public void clearDefaultRoute() throws DBException {
-        checkDB();
-        if (null != db) {
-            db.execSQL(CLEAR_DEFAULT_ROUTE);
+        if (done.get()) {
+            throw new DBException("db closed", null);
+        }
+        try {
+            queue.put(DBUpdate.clearDefaultRoute());
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new DBException("interrupted waiting to enqueue default-route clear", ex);
         }
     }
 
     /**
-     * Delete a route and all its points by run_id.
+     * Delete a route and all its points by run_id. Blocks until the worker has applied the delete
+     * so callers can refresh UI against the new contents.
      * @param runId the run_id of the route to delete
      * @throws DBException if the database is unavailable
      */
     public void deleteRoute(long runId) throws DBException {
-        checkDB();
-        if (null != db) {
-            db.execSQL(DELETE_ROUTE_BY_ID, new Object[]{runId});
-            Logging.info("Deleted route run_id=" + runId);
-        }
+        final CountDownLatch completion = new CountDownLatch(1);
+        final AtomicReference<Exception> error = new AtomicReference<>();
+        enqueueAndWait(DBUpdate.deleteRoute(runId, completion, error));
     }
 
     public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{
@@ -1506,13 +1996,13 @@ public final class DatabaseHelper extends Thread {
             boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
             final long visibleRouteId = logRoutes ? prefs.getLong(PreferenceKeys.PREF_ROUTE_DB_RUN, 0L) : 0L;
             final String[] args = new String[]{String.valueOf(visibleRouteId)};
-            return db.rawQuery("SELECT lat,lon FROM route WHERE run_id = ?", args);
+            return trackedQuery("SELECT lat,lon FROM route WHERE run_id = ?", args);
     }
 
     public Cursor getSingleNetwork( final String bssid, final NetworkFilter filter ) throws DBException {
         checkDB();
         final String[] args = new String[]{bssid};
-        return db.rawQuery(
+        return trackedQuery(
                 "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type,rcois,mfgrid,service FROM network WHERE bssid = ? AND "+ filter.getFilter(), args );
     }
 
@@ -1523,6 +2013,17 @@ public final class DatabaseHelper extends Thread {
 
         if (hasSD()) {
             file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
+        }
+        // fold committed WAL frames into the main file before we copy only that file
+        synchronized (TRANS_LOCK) {
+            try {
+                if (!done.get()) {
+                    checkDB();
+                    checkpointWal();
+                }
+            } catch (final DBException ex) {
+                Logging.warn("WAL checkpoint before backup skipped: " + ex);
+            }
         }
         Pair<Boolean,String> result;
         try (InputStream input = new FileInputStream(file)){
@@ -1550,7 +2051,23 @@ public final class DatabaseHelper extends Thread {
     }
 
     public int clearDatabase() {
+        final CountDownLatch completion = new CountDownLatch(1);
+        final AtomicInteger result = new AtomicInteger(0);
+        final AtomicReference<Exception> error = new AtomicReference<>();
         try {
+            enqueueAndWait(DBUpdate.clearDatabase(completion, result, error));
+        } catch (final DBException ex) {
+            Logging.error("queued clear database failed: " + ex, ex);
+            return 0;
+        }
+        return result.get();
+    }
+
+    private int applyClearDatabase() {
+        boolean ok = false;
+        try {
+            checkDB();
+            closeCompiledStatements();
             db.beginTransaction();
             Logging.info( "deleting location table" );
             db.execSQL(LOCATION_DELETE);
@@ -1575,17 +2092,28 @@ public final class DatabaseHelper extends Thread {
             db.execSQL(LOCATION_CREATE);
             createFreshLocationObservationIndex();
             db.execSQL(ROUTE_CREATE);
+            createRouteRunIdIndex();
             db.setTransactionSuccessful();
             networkCount.set( 0 );
             locationCount.set( 0 );
             currentRoutePointCount.set( 0 );
+            lastLoggedLocation = null;
+            previousWrittenLocationsCache.clear();
+            ok = true;
             //TODO: update list header count
-        } catch ( final SQLiteException ex ) {
+        } catch ( final SQLiteException | DBException ex ) {
             Logging.error( "sqlite exception: " + ex, ex );
-            return 0;
         } finally {
-            db.endTransaction();
+            if ( db != null && db.inTransaction() ) {
+                db.endTransaction();
+            }
         }
-        return 1;
+        try {
+            compileStatements();
+        } catch (final Exception compileEx) {
+            Logging.error("unable to recompile statements after clear: " + compileEx, compileEx);
+            return 0;
+        }
+        return ok ? 1 : 0;
     }
 }

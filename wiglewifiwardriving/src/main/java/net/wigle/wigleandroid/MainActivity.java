@@ -1082,10 +1082,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private void setupDatabase(final SharedPreferences prefs) {
         // could be set by nonconfig retain
-        if (state.dbHelper == null) {
-            state.dbHelper = new DatabaseHelper(getApplicationContext(), prefs);
-            //state.dbHelper.checkDB();
-            state.dbHelper.start();
+        if (state.dbHelper == null || state.dbHelper.isFullyClosed()) {
+            state.dbHelper = DatabaseHelper.acquire(getApplicationContext(), prefs);
             ListFragment.lameStatic.dbHelper = state.dbHelper;
         }
         if (state.mxcDbHelper == null) {
@@ -2838,7 +2836,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
 
             // close the db. not in destroy, because it'll still write after that.
-            if (state.dbHelper != null) state.dbHelper.close();
+            if (state.dbHelper != null) {
+                state.dbHelper.close();
+            }
             if (state.mxcDbHelper != null) state.mxcDbHelper.close();
 
             final LocationManager locationManager = (LocationManager) this.getApplicationContext().getSystemService(Context.LOCATION_SERVICE); //ALIBI: avoid activity context-based leaks
@@ -3005,16 +3005,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         //ALIBI: we'll piggyback off the current route, if we're logging it
         if (!logRoutes) {
             if (state != null && state.dbHelper != null) {
-                final DatabaseHelper dbHelper = state.dbHelper;
-                try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
-                    executor.execute(() -> {
-                        try {
-                            dbHelper.clearDefaultRoute();
-                        } catch (DBException dbe) {
-                            Logging.warn("unable to clear default route on startRouteMapping: ", dbe);
-                        }
-                    });
-                    executor.shutdown();
+                try {
+                    state.dbHelper.clearDefaultRoute();
+                } catch (DBException dbe) {
+                    Logging.warn("unable to clear default route on startRouteMapping: ", dbe);
                 }
             }
         }

@@ -253,7 +253,11 @@ public class GsmOperator {
                 return operator;
             }
 
-            MainActivity.State s = MainActivity.getMainActivity().getState();
+            final MainActivity activity = MainActivity.getMainActivity();
+            if (activity == null) {
+                return null;
+            }
+            MainActivity.State s = activity.getState();
             if (null != s && null != s.mxcDbHelper) {
                 operator = s.mxcDbHelper.networkNameForMccMnc(mcc,mnc);
                 mccMap.put(mnc, operator);
@@ -276,7 +280,11 @@ public class GsmOperator {
                 //DEBUG: MainActivity.info("matched operator L1: "+operator+" ("+mcc+":"+mnc+")");
                 return true;
             }
-            MainActivity.State s = MainActivity.getMainActivity().getState();
+            final MainActivity activity = MainActivity.getMainActivity();
+            if (activity == null) {
+                return false;
+            }
+            MainActivity.State s = activity.getState();
             if ((null != s) && (null != s.mxcDbHelper)) {
                 try {
                     operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);

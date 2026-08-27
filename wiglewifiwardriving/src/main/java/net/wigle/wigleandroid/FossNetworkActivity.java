@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -153,8 +154,12 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
                     mapLibreMap.setStyle(styleUrl, style -> {
                         if ((network != null) && (network.getLatLng() != null)) {
                             final org.maplibre.android.geometry.LatLng focusOn =
-                                    new org.maplibre.android.geometry.LatLng(
-                                            network.getLatLng().latitude, network.getLatLng().longitude);
+                                    toMapLibreLatLng(network.getLatLng());
+                            if (focusOn == null) {
+                                Logging.warn("Skipping FOSS network map focus; invalid coordinates: "
+                                        + network.getLatLng());
+                                return;
+                            }
                             final CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(focusOn).zoom(DEFAULT_ZOOM).build();
                             mapLibreMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -195,6 +200,9 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
         // we could check and perform multi-cluster here
         // (get arithmetic mean, std-dev, try to do sigma-based partitioning)
         // but that seems less likely w/ one individual's observations
+        if (mapView == null) {
+            return;
+        }
         final net.wigle.wigleandroid.model.LatLng estCentroid = computeBasicLocation(obsMap);
         final int zoomLevel = computeZoom(obsMap, estCentroid);
         mapView.getMapAsync(mapLibre -> {
@@ -204,8 +212,11 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
                 final int level = obs.getValue();
 
                 // default to initial position
-                final org.maplibre.android.geometry.LatLng targetLatLon =
-                        new org.maplibre.android.geometry.LatLng(latLon.latitude, latLon.longitude);
+                final org.maplibre.android.geometry.LatLng targetLatLon = toMapLibreLatLng(latLon);
+                if (targetLatLon == null) {
+                    Logging.warn("Skipping observation with invalid coordinates: " + latLon);
+                    continue;
+                }
                 if (count == 0 && network.getLatLng() == null) {
                     final CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(targetLatLon).zoom(DEFAULT_ZOOM).build();
@@ -220,10 +231,9 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
                 count++;
             }
             // if we got a good centroid, display it and center on it
-            if (estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
+            final org.maplibre.android.geometry.LatLng llCentroid = toMapLibreLatLng(estCentroid);
+            if (llCentroid != null && estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
                 //TODO: improve zoom based on obs distances?
-                final org.maplibre.android.geometry.LatLng llCentroid =
-                        new org.maplibre.android.geometry.LatLng(estCentroid.latitude, estCentroid.longitude);
                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(llCentroid).zoom(zoomLevel).build();
                 mapLibre.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -239,9 +249,15 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
 
     @Override
     protected void mapWifiSeen(Network network, int zoomLevel, net.wigle.wigleandroid.model.LatLng latest, int rssi) {
+        if (mapView == null) {
+            return;
+        }
+        final org.maplibre.android.geometry.LatLng latestObs = toMapLibreLatLng(latest);
+        if (latestObs == null) {
+            Logging.warn("Skipping survey observation with invalid coordinates: " + latest);
+            return;
+        }
         mapView.getMapAsync(mapLibre -> {
-            final org.maplibre.android.geometry.LatLng latestObs =
-                    new org.maplibre.android.geometry.LatLng(latest.latitude, latest.longitude);
             if (network.getLatLng() == null) {
                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(latestObs).zoom(zoomLevel).build();
@@ -259,6 +275,27 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
 
     @Override
     protected void clearMap() {
-        mapView.getMapAsync(MapLibreMap::clear);
+        if (mapView != null) {
+            mapView.getMapAsync(MapLibreMap::clear);
+        }
+    }
+
+    /**
+     * utility function that safely wraps MapLibre LatLng creation to prevent IllegalArgumentExceptions
+     * @param latLon WiGLE lat/lon
+     * @return a valid MapLibre LatLon if possible - otherwise null
+     */
+    @Nullable
+    private static org.maplibre.android.geometry.LatLng toMapLibreLatLng(
+            final net.wigle.wigleandroid.model.LatLng latLon) {
+        if (latLon == null) {
+            return null;
+        }
+        final double lat = latLon.latitude;
+        final double lon = latLon.longitude;
+        if (!Double.isFinite(lat) || !Double.isFinite(lon) || Math.abs(lat) > 90.0) {
+            return null;
+        }
+        return new org.maplibre.android.geometry.LatLng(lat, lon);
     }
 }

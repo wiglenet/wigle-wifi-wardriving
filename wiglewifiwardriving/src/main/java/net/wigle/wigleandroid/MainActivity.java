@@ -301,7 +301,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
 
         ThemeUtil.setTheme(prefs);
-        ThemeUtil.setNavTheme(this.getWindow(), this, prefs);
         mainActivity = this;
 
         // set language

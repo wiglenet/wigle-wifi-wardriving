@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
-import android.util.TypedValue;
-import android.view.Window;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -29,24 +27,6 @@ public class ThemeUtil {
         } else {
             //Force night mode
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-    }
-
-    public static void setNavTheme(final Window w, final Context c, final SharedPreferences prefs) {
-        if (w == null || c == null) {
-            return;
-        }
-        final int displayMode = prefs.getInt(PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-        final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
-                (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
-                        nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
-            w.setNavigationBarColor(0x80000000);
-        } else {
-            final TypedValue tv = new TypedValue();
-            if (c.getTheme().resolveAttribute(android.R.attr.navigationBarColor, tv, true)) {
-                w.setNavigationBarColor(tv.data);
-            }
         }
     }
 

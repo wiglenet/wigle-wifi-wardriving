@@ -82,7 +82,6 @@ import net.wigle.wigleandroid.model.RssiSample;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.RssiHistogramDrawable;
 import net.wigle.wigleandroid.ui.ScreenChildActivity;
-import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.BluetoothUtil;
@@ -288,7 +287,6 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
 
         EdgeToEdge.enable(this);
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-        ThemeUtil.setNavTheme(getWindow(), this, prefs);
 
         View titleLayout = findViewById(R.id.na_network_detail_overlay);
         if (null != titleLayout) {

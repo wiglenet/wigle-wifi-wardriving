@@ -281,7 +281,8 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
     }
 
     /**
-     * utility function that safely wraps MapLibre LatLng creation to prevent IllegalArgumentExceptions
+     * utility function that safely wraps MapLibre LatLng creation to prevent IllegalArgumentExceptions.
+     * MapLibre 12.x setLongitude throws on NaN/Inf (not ±180); wrap lon defensively anyway.
      * @param latLon WiGLE lat/lon
      * @return a valid MapLibre LatLon if possible - otherwise null
      */
@@ -292,10 +293,21 @@ public class FossNetworkActivity extends AbstractNetworkActivity {
             return null;
         }
         final double lat = latLon.latitude;
-        final double lon = latLon.longitude;
+        double lon = latLon.longitude;
         if (!Double.isFinite(lat) || !Double.isFinite(lon) || Math.abs(lat) > 90.0) {
             return null;
         }
-        return new org.maplibre.android.geometry.LatLng(lat, lon);
+        if (lon < -180.0 || lon >= 180.0) {
+            lon = ((lon - 180.0) % 360.0 + 360.0) % 360.0 - 180.0;
+            if (!Double.isFinite(lon)) {
+                return null;
+            }
+        }
+        try {
+            return new org.maplibre.android.geometry.LatLng(lat, lon);
+        } catch (IllegalArgumentException iae) {
+            Logging.warn("Rejected MapLibre LatLng " + latLon + ": " + iae.getMessage());
+            return null;
+        }
     }
 }

@@ -129,6 +129,10 @@ public class WifiReceiver extends BroadcastReceiver {
         if (mainActivity != null) {
             mainActivity.refreshScanWakeLock();
         }
+        if (intent != null && !intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, true)) {
+            Logging.debug("wifi receive: results not updated, skipping getScanResults");
+            return;
+        }
         // final long start = now;
         final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         final PendingResult pending = goAsync();

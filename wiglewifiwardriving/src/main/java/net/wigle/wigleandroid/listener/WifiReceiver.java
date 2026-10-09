@@ -129,19 +129,41 @@ public class WifiReceiver extends BroadcastReceiver {
         if (mainActivity != null) {
             mainActivity.refreshScanWakeLock();
         }
+        if (intent != null && !intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, true)) {
+            Logging.debug("wifi receive: results not updated, skipping getScanResults");
+            return;
+        }
         // final long start = now;
         final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        List<ScanResult> results = null;
-        try {
-            results = wifiManager.getScanResults(); // return can be null!
-        }
-        catch (final SecurityException ex) {
-            Logging.info("security exception getting scan results: " + ex, ex);
-        }
-        catch (final Exception ex) {
-            // ignore, happens on some vm's
-            Logging.info("exception getting scan results: " + ex, ex);
-        }
+        final PendingResult pending = goAsync();
+        wifiScanExecutor.execute(() -> {
+            List<ScanResult> results = null;
+            try {
+                results = wifiManager.getScanResults(); // return can be null!
+            } catch (final SecurityException ex) {
+                Logging.info("security exception getting scan results: " + ex, ex);
+            } catch (final Exception ex) {
+                // ignore, happens on some vm's
+                Logging.info("exception getting scan results: " + ex, ex);
+            }
+            final List<ScanResult> fetched = results;
+            mainHandler.post(() -> {
+                try {
+                    processScanResults(fetched, now);
+                } finally {
+                    pending.finish();
+                }
+            });
+        });
+    }
+
+    /**
+     * offload scan results from the wifiScanExecutor off-thread.
+     * NB: there's a queue depth risk here in continuous scan/jammed
+     * @param results the List of ScanResults
+     * @param now time of scan in ms
+     */
+    private void processScanResults(final List<ScanResult> results, final long now) {
         Logging.debug("wifi receive, results: " + (results == null ? null : results.size()));
 
         long nonstopScanRequestTime = Long.MIN_VALUE;

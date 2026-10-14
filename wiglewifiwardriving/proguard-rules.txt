@@ -1,0 +1,2 @@
+# SnakeYAML references optional JVM bean-introspection APIs that are absent on Android.
+-dontwarn java.beans.**

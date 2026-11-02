@@ -226,7 +226,8 @@ public class GsmOperator {
     }
 
     private boolean validMccMncValues(final int mcc, final int mnc) {
-        return (mcc > 0) && (mcc < 1000) && (mnc > 0) && (mnc < 1000);
+        // MNC 0 is a real assignment ("00" and "000"). Unknown is Integer.MAX_VALUE or a null string.
+        return (mcc > 0) && (mcc < 1000) && (mnc >= 0) && (mnc < 1000);
     }
 
     /**

@@ -118,6 +118,16 @@ public class FilterUtil {
         return builder.build();
     }
 
+    /**
+     * Number of non-empty entries in a JSON string-array preference (MAC/OUI or BLE mfgr lists).
+     */
+    public static int prefListCount(final SharedPreferences prefs, final String key) {
+        if (prefs == null || key == null) {
+            return 0;
+        }
+        return prefStringList(prefs, key).size();
+    }
+
     private static List<String> prefStringList(final SharedPreferences prefs, final String key) {
         final String[] values = new Gson().fromJson(prefs.getString(key, "[]"), String[].class);
         if (values == null || values.length == 0) {

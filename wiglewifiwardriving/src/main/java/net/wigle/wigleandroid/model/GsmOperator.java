@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.model;
 
 import android.annotation.TargetApi;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Build;
 import android.telephony.CellIdentityGsm;
@@ -14,6 +15,9 @@ import net.wigle.wigleandroid.util.Logging;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * GSM Operator normalization and lookup tools.
+ */
 public class GsmOperator {
 
     private static final String KEY_SEP = "_";
@@ -24,20 +28,23 @@ public class GsmOperator {
     private final long cellId;
     private final int fcn;
 
-    private static Map<String, Map<String,String>> OPERATOR_CACHE;
-    static {
-        OPERATOR_CACHE = new HashMap<>();
-    }
+    private static final Map<String, Map<String, MccMncRecord>> OPERATOR_CACHE = new HashMap<>();
 
 
     public GsmOperator(final CellIdentityGsm cellIdentG) throws GsmOperatorException {
         cellId = cellIdentG.getCid();
         xac = cellIdentG.getLac();
-        mcc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentG.getMccString():cellIdentG.getMcc()+"";
-        mnc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentG.getMncString():determineMnc(cellIdentG.getMnc(), mcc);
+        if (Build.VERSION.SDK_INT >= 28) {
+            mcc = MccMnc.normalizeMcc(cellIdentG.getMccString());
+            mnc = MccMnc.normalizeMnc(cellIdentG.getMncString());
+        } else {
+            mcc = MccMnc.mccFor(cellIdentG.getMcc());
+            mnc = MccMnc.mncFor(cellIdentG.getMnc());
+        }
 
         fcn = cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
 
+        /*DEBUG: disabled.
         if (MainActivity.DEBUG_CELL_DATA) {
             String res = "GSM Cell:" +
                     "\n\tCID: " + cellId +
@@ -50,8 +57,9 @@ public class GsmOperator {
                     "\n\tARFCN: " + fcn;
 
             res += "\n\tBSIC: " + cellIdentG.getBsic();
-        }
-        if (!validCellId(this.cellId, "GSM") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+            Logging.info(res);
+        }*/
+        if (!validCellId(this.cellId, "GSM") || !validXac(xac) || mcc == null || mnc == null) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 Logging.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
             }
@@ -62,8 +70,13 @@ public class GsmOperator {
     public GsmOperator(final CellIdentityLte cellIdentL) throws GsmOperatorException{
         cellId = cellIdentL.getCi();
         xac = cellIdentL.getTac();
-        mcc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentL.getMccString():cellIdentL.getMcc()+"";
-        mnc = android.os.Build.VERSION.SDK_INT >= 28?cellIdentL.getMncString():determineMnc(cellIdentL.getMnc(), mcc);
+        if (Build.VERSION.SDK_INT >= 28) {
+            mcc = MccMnc.normalizeMcc(cellIdentL.getMccString());
+            mnc = MccMnc.normalizeMnc(cellIdentL.getMncString());
+        } else {
+            mcc = MccMnc.mccFor(cellIdentL.getMcc());
+            mnc = MccMnc.mncFor(cellIdentL.getMnc());
+        }
 
         fcn = cellIdentL.getEarfcn() != Integer.MAX_VALUE ? cellIdentL.getEarfcn() : 0;
         if (MainActivity.DEBUG_CELL_DATA) {
@@ -85,7 +98,7 @@ public class GsmOperator {
         }
 
 
-        if (!validCellId(this.cellId, "LTE") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+        if (!validCellId(this.cellId, "LTE") || !validXac(xac) || mcc == null || mnc == null) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
             }
@@ -97,8 +110,8 @@ public class GsmOperator {
     public GsmOperator(final CellIdentityNr cellIdentN) throws GsmOperatorException{
         cellId = cellIdentN.getNci();
         xac = cellIdentN.getTac();
-        mcc = cellIdentN.getMccString();
-        mnc = cellIdentN.getMncString();
+        mcc = MccMnc.normalizeMcc(cellIdentN.getMccString());
+        mnc = MccMnc.normalizeMnc(cellIdentN.getMncString());
 
         fcn = cellIdentN.getNrarfcn() != Integer.MAX_VALUE ? cellIdentN.getNrarfcn() : 0;
         if (MainActivity.DEBUG_CELL_DATA) {
@@ -119,7 +132,7 @@ public class GsmOperator {
             Logging.info(res);
         }
 
-        if (!validCellId(this.cellId, "NR") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+        if (!validCellId(this.cellId, "NR") || !validXac(xac) || mcc == null || mnc == null) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 Logging.info("Discarding NR cell with invalid ID for NRARFCN: " + cellIdentN.getNrarfcn());
             }
@@ -130,8 +143,13 @@ public class GsmOperator {
     public GsmOperator(final CellIdentityWcdma cellIdentW) throws GsmOperatorException {
         cellId = cellIdentW.getCid();
         xac = cellIdentW.getLac();
-        mcc = android.os.Build.VERSION.SDK_INT >= 28 ? cellIdentW.getMccString() : cellIdentW.getMcc() + "";
-        mnc = android.os.Build.VERSION.SDK_INT >= 28 ? cellIdentW.getMncString() : determineMnc(cellIdentW.getMnc(), mcc);
+        if (Build.VERSION.SDK_INT >= 28) {
+            mcc = MccMnc.normalizeMcc(cellIdentW.getMccString());
+            mnc = MccMnc.normalizeMnc(cellIdentW.getMncString());
+        } else {
+            mcc = MccMnc.mccFor(cellIdentW.getMcc());
+            mnc = MccMnc.mncFor(cellIdentW.getMnc());
+        }
 
         fcn = cellIdentW.getUarfcn() != Integer.MAX_VALUE ? cellIdentW.getUarfcn() : 0;
 
@@ -148,7 +166,7 @@ public class GsmOperator {
             Logging.info(res);
         }
 
-        if (!validCellId(this.cellId, "WCDMA") || !validXac(xac) || !validMccMnc(mcc, mnc)) {
+        if (!validCellId(this.cellId, "WCDMA") || !validXac(xac) || mcc == null || mnc == null) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 Logging.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
             }
@@ -158,12 +176,10 @@ public class GsmOperator {
 
     public String getOperatorString() {
         return mcc+mnc;
-
     }
 
     public String getOperatorKeyString() {
         return getOperatorString()+KEY_SEP+xac+KEY_SEP+cellId;
-
     }
 
     public int getXfcn() {
@@ -191,118 +207,78 @@ public class GsmOperator {
         return (lacOrTac > 0) && (lacOrTac < Integer.MAX_VALUE);
     }
 
-    private String determineMnc(final int mncInt, final String mcc) {
-        if (mncInt > 99) {
-            //safe
-            return mncInt+"";
+    /**
+     * Operator name for an uploaded PLMN, nullsafe wrapper
+     */
+    public static String getOperatorName(final String operatorCode) {
+        final MccMncRecord record = recordForOperator(operatorCode);
+        if (record == null) {
+            return null;
         }
-        String mncBase = ""+mncInt;
-        if (mncInt < 10) {
-            mncBase = "0"+mncBase;
-        }
-        if (recognizedMnc(mcc, mncBase)) {
-            return mncBase;
-        } else {
-            mncBase = "0"+mncBase;
-            if (recognizedMnc(mcc, mncBase)) {
-                return mncBase;
-            }
-        }
-
-        return null;
-    }
-
-    private boolean validMccMnc(final String mcc, final String mnc) {
-        try {
-            int mccInt = Integer.parseInt(mcc);
-            int mncInt = Integer.parseInt(mnc);
-            if (validMccMncValues(mccInt, mncInt)) {
-                return true;
-            }
-        } catch (Exception ignored) {
-
-        }
-        return false;
-    }
-
-    private boolean validMccMncValues(final int mcc, final int mnc) {
-        // MNC 0 is a real assignment ("00" and "000"). Unknown is Integer.MAX_VALUE or a null string.
-        return (mcc > 0) && (mcc < 1000) && (mnc >= 0) && (mnc < 1000);
+        return record.getOperator();
     }
 
     /**
-     * Map the 5-6 digit operator PLMN code against the database of operator names
+     * Operator record for a PLMN or a cell key such as "310260_253_22671".
+     * Returns null when the token is missing *or* no candidate pair is known.
      */
-    public static String getOperatorName(final String operatorCode) {
-        //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
-        if (null != operatorCode && operatorCode.length() >= 5) {
-
-
-            final String mnc = operatorCode.substring(3, operatorCode.length());
-            final String mcc = operatorCode.substring(0, 3);
-            //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
-
-            Map<String, String> mccMap = OPERATOR_CACHE.get(mcc);
-            if (null == mccMap) {
-                mccMap = new HashMap<>();
-                OPERATOR_CACHE.put(mcc, mccMap);
+    public static MccMncRecord recordForOperator(final String operatorId) {
+        final String token = MccMnc.operatorToken(operatorId);
+        if (token == null) {
+            return null;
+        }
+        final String mcc = token.substring(0, 3);
+        final Map<String, MccMncRecord> mccMap = cacheFor(mcc);
+        for (final String candidate : MccMnc.mncCandidates(token.substring(3))) {
+            if (mccMap.containsKey(candidate)) {
+                final MccMncRecord cached = mccMap.get(candidate);
+                if (cached != null) {
+                    return cached;
+                }
+                continue;
             }
-
-            String operator = mccMap.get(mnc);
-            if (null != operator) {
-                //DEBUG: MainActivity.info("matched operator: "+operator+" ("+mcc+":"+mnc+")");
-                return operator;
+            final boolean[] cacheable = new boolean[] {false};
+            final MccMncRecord record = lookupRecord(mcc, candidate, cacheable);
+            if (cacheable[0]) {
+                mccMap.put(candidate, record);
             }
-
-            final MainActivity activity = MainActivity.getMainActivity();
-            if (activity == null) {
-                return null;
-            }
-            MainActivity.State s = activity.getState();
-            if (null != s && null != s.mxcDbHelper) {
-                operator = s.mxcDbHelper.networkNameForMccMnc(mcc,mnc);
-                mccMap.put(mnc, operator);
-                return operator;
+            if (record != null) {
+                return record;
             }
         }
         return null;
     }
 
-    private static boolean recognizedMnc(final String mcc, final String mnc) {
-        if (null != mcc && null != mnc && mcc.length() == 3 && mnc.length() > 1) {
-            Map<String, String> mccMap = OPERATOR_CACHE.get(mcc);
-            if (null == mccMap) {
-                mccMap = new HashMap<>();
-                OPERATOR_CACHE.put(mcc, mccMap);
-            }
-
-            String operator = mccMap.get(mnc);
-            if (null != operator) {
-                //DEBUG: MainActivity.info("matched operator L1: "+operator+" ("+mcc+":"+mnc+")");
-                return true;
-            }
-            final MainActivity activity = MainActivity.getMainActivity();
-            if (activity == null) {
-                return false;
-            }
-            MainActivity.State s = activity.getState();
-            if ((null != s) && (null != s.mxcDbHelper)) {
-                try {
-                    operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
-                } catch (SQLiteDatabaseCorruptException sqldbex) {
-                    // this case seems isolated to LG android 4.4 devices
-                    Logging.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
-                    //attempt to recopy the MccMnc DB file to see whether we can recover.
-                    s.mxcDbHelper.implantMxcDatabase(MainActivity.getMainActivity(), false);
-                }
-                if (operator != null) {
-                    //DEBUG: MainActivity.info("matched operator L2: "+operator+" ("+mcc+":"+mnc+")");
-                    mccMap.put(mnc, operator);
-                    return true;
-                }
-            }
+    private static Map<String, MccMncRecord> cacheFor(final String mcc) {
+        Map<String, MccMncRecord> mccMap = OPERATOR_CACHE.get(mcc);
+        if (mccMap == null) {
+            mccMap = new HashMap<>();
+            OPERATOR_CACHE.put(mcc, mccMap);
         }
-        return false;
+        return mccMap;
+    }
+
+    private static MccMncRecord lookupRecord(final String mcc, final String mnc, final boolean[] cacheable) {
+        final MainActivity activity = MainActivity.getMainActivity();
+        if (activity == null) {
+            return null;
+        }
+        final MainActivity.State state = activity.getState();
+        if (state == null || state.mxcDbHelper == null) {
+            return null;
+        }
+        try {
+            final MccMncRecord record = state.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+            cacheable[0] = true;
+            return record;
+        } catch (SQLiteDatabaseCorruptException sqldbex) {
+            // this case seems isolated to LG android 4.4 devices
+            Logging.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
+            state.mxcDbHelper.implantMxcDatabase(activity, false);
+        } catch (SQLException sex) {
+            Logging.error("Unable to access Mxc Database: ", sex);
+        }
+        return null;
     }
 
 }

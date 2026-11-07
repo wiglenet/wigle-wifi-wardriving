@@ -250,12 +250,7 @@ public class GsmOperator {
     }
 
     private static Map<String, MccMncRecord> cacheFor(final String mcc) {
-        Map<String, MccMncRecord> mccMap = OPERATOR_CACHE.get(mcc);
-        if (mccMap == null) {
-            mccMap = new HashMap<>();
-            OPERATOR_CACHE.put(mcc, mccMap);
-        }
-        return mccMap;
+        return OPERATOR_CACHE.computeIfAbsent(mcc, k -> new HashMap<>());
     }
 
     private static MccMncRecord lookupRecord(final String mcc, final String mnc, final boolean[] cacheable) {
@@ -269,8 +264,10 @@ public class GsmOperator {
         }
         try {
             final MccMncRecord record = state.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
-            cacheable[0] = true;
-            return record;
+            if (null != cacheable && cacheable.length > 0) {
+                cacheable[0] = true;
+                return record;
+            }
         } catch (SQLiteDatabaseCorruptException sqldbex) {
             // this case seems isolated to LG android 4.4 devices
             Logging.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);

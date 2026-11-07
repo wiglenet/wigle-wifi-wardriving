@@ -450,6 +450,8 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
                         tv.setText(rec.getNotes());
                     }
                 } else if (MccMnc.operatorToken(bssid) == null) {
+                    Logging.warn("null operatorCode for " + bssid);
+                } else {
                     Logging.warn("unable to get operatorCode for " + bssid);
                 }
             }

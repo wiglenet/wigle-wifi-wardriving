@@ -26,7 +26,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.graphics.Color;
 import android.location.Location;
 import android.Manifest;
@@ -72,7 +71,9 @@ import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.listener.WiFiScanUpdater;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.GsmOperator;
 import net.wigle.wigleandroid.model.LatLng;
+import net.wigle.wigleandroid.model.MccMnc;
 import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -432,39 +433,24 @@ public abstract class AbstractNetworkActivity extends ScreenChildActivity implem
             tv.setText(network.getRcois());
 
             if (NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
-                if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
-                    final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
-
-                    MccMncRecord rec = null;
-                    if (operatorCode.length() == 6) {
-                        final String mnc = operatorCode.substring(3);
-                        final String mcc = operatorCode.substring(0, 3);
-
-                        try {
-                            final MainActivity.State s = MainActivity.getStaticState();
-                            if (s != null && s.mxcDbHelper != null) {
-                                rec = s.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
-                            }
-                        } catch (SQLException sqex) {
-                            Logging.error("Unable to access Mxc Database: ", sqex);
-                        }
-                        if (rec != null) {
-                            View v = findViewById(R.id.cell_info);
-                            v.setVisibility(VISIBLE);
-                            tv = findViewById(R.id.na_cell_status);
-                            tv.setText(rec.getStatus());
-                            tv = findViewById(R.id.na_cell_brand);
-                            tv.setText(rec.getBrand());
-                            tv = findViewById(R.id.na_cell_bands);
-                            tv.setText(rec.getBands());
-                            if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
-                                v = findViewById(R.id.cell_notes_row);
-                                v.setVisibility(VISIBLE);
-                                tv = findViewById(R.id.na_cell_notes);
-                                tv.setText(rec.getNotes());
-                            }
-                        }
+                final MccMncRecord rec = GsmOperator.recordForOperator(bssid);
+                if (rec != null) {
+                    View v = findViewById(R.id.cell_info);
+                    v.setVisibility(VISIBLE);
+                    tv = findViewById(R.id.na_cell_status);
+                    tv.setText(rec.getStatus());
+                    tv = findViewById(R.id.na_cell_brand);
+                    tv.setText(rec.getBrand());
+                    tv = findViewById(R.id.na_cell_bands);
+                    tv.setText(rec.getBands());
+                    if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
+                        v = findViewById(R.id.cell_notes_row);
+                        v.setVisibility(VISIBLE);
+                        tv = findViewById(R.id.na_cell_notes);
+                        tv.setText(rec.getNotes());
                     }
+                } else if (MccMnc.operatorToken(bssid) == null) {
+                    Logging.warn("null operatorCode for " + bssid);
                 } else {
                     Logging.warn("unable to get operatorCode for " + bssid);
                 }

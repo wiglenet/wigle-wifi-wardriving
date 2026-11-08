@@ -9,4 +9,6 @@
     <attr name ="colorNavigationItemExitFg" format="color"/>
     <attr name ="drawableNavigationItemBackground" format="reference"/>
     <attr name ="drawableNavigationItemExitBackground" format="reference"/>
+    <attr name="filterCountActiveTextColor" format="color"/>
+    <attr name="filterCountEmptyTextColor" format="color"/>
 </resources>

@@ -11,8 +11,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.OnApplyWindowInsetsListener;
@@ -173,6 +175,59 @@ public class FilterActivity extends ScreenChildActivity {
         if (null != finishButton) {
             finishButton.setOnClickListener(v -> finish());
         }
+
+        refreshFilterCounts(prefs);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshFilterCounts(getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0));
+    }
+
+    private void refreshFilterCounts(final SharedPreferences prefs) {
+        showFilterCount(R.id.display_filter_button, R.id.display_filter_count,
+                prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
+        showFilterCount(R.id.log_filter_button, R.id.log_filter_count,
+                prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
+        showFilterCount(R.id.alert_filter_button, R.id.alert_filter_count,
+                prefs, PreferenceKeys.PREF_ALERT_ADDRS);
+        showFilterCount(R.id.alert_ble_mfgr_filter_button, R.id.alert_ble_mfgr_filter_count,
+                prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS);
+    }
+
+    /**
+     * Show {@code (n)} immediately beside a filter button. Cap the button width so a long
+     * translation wraps instead of pushing the count off-screen.
+     */
+    private void showFilterCount(final int buttonId, final int countViewId,
+                                  final SharedPreferences prefs, final String prefKey) {
+        final TextView countView = findViewById(countViewId);
+        if (countView != null) {
+            final int count = FilterUtil.prefListCount(prefs, prefKey);
+            countView.setText(getString(R.string.filter_item_count, count));
+            countView.setTextColor(themeColor(count > 0
+                    ? R.attr.filterCountActiveTextColor
+                    : R.attr.filterCountEmptyTextColor));
+            countView.setVisibility(View.VISIBLE);
+        }
+        final Button button = findViewById(buttonId);
+        if (button != null) {
+            final int reservedForCount = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 96f, getResources().getDisplayMetrics());
+            button.setMaxWidth(Math.max(0,
+                    getResources().getDisplayMetrics().widthPixels - reservedForCount));
+        }
+    }
+
+    private int themeColor(final int attr) {
+        final TypedValue value = new TypedValue();
+        if (getTheme().resolveAttribute(attr, value, true)
+                && value.type >= TypedValue.TYPE_FIRST_COLOR_INT
+                && value.type <= TypedValue.TYPE_LAST_COLOR_INT) {
+            return value.data;
+        }
+        return ContextCompat.getColor(this, android.R.color.darker_gray);
     }
 
     private void promptExportAlertFilter(final SharedPreferences prefs) {

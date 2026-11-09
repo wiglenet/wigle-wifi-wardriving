@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/filter_base"
+        android:drawable="@drawable/filter" />
+    <item
+        android:id="@+id/display_exclude_on"
+        android:drawable="@drawable/display_exclude_on" />
+    <item
+        android:id="@+id/log_exclude_on"
+        android:drawable="@drawable/log_exclude_on" />
+    <item
+        android:id="@+id/alert_filter_on"
+        android:drawable="@drawable/alert_filter_on" />
+</layer-list>

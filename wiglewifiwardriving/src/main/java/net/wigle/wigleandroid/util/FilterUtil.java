@@ -4,6 +4,8 @@ import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.BT_SUB_BOX_IDS;
 import static net.wigle.wigleandroid.ui.PrefsBackedCheckbox.WIFI_SUB_BOX_IDS;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.view.View;
 import android.widget.CheckBox;
 
@@ -23,6 +25,38 @@ import java.util.List;
 public class FilterUtil {
     /** Stored full MAC form, e.g. {@code AA:BB:CC:DD:EE:FF}. Shorter alert-addr entries are OUIs. */
     private static final int FULL_MAC_LENGTH = 17;
+
+    /** Alpha of the filter bar vectors, read on first use so hiding can restore it. */
+    private static int filterBarAlpha = -1;
+
+    /**
+     * Show each list-filter bar when the corresponding address list has > 0 entries.
+     * For alerts, adds PREF_ALERT_ADDRS + PREF_ALERT_BLE_MFGR_IDS counts
+     * A {@link LayerDrawable} still draws children marked not visible, so the bar alpha is the switch.
+     */
+    public static void setFilterBarVisibility(final LayerDrawable icon, final SharedPreferences prefs) {
+        if (icon == null) {
+            return;
+        }
+        setBarVisible(icon.findDrawableByLayerId(R.id.display_exclude_on),
+                prefListCount(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS) > 0);
+        setBarVisible(icon.findDrawableByLayerId(R.id.log_exclude_on),
+                prefListCount(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS) > 0);
+        setBarVisible(icon.findDrawableByLayerId(R.id.alert_filter_on),
+                (prefListCount(prefs, PreferenceKeys.PREF_ALERT_ADDRS) +
+                        prefListCount(prefs, PreferenceKeys.PREF_ALERT_BLE_MFGR_IDS)) > 0);
+    }
+
+    private static void setBarVisible(final Drawable bar, final boolean visible) {
+        if (bar == null) {
+            return;
+        }
+        if (filterBarAlpha < 0) {
+            final int current = bar.getAlpha();
+            filterBarAlpha = current == 0 ? 255 : current;
+        }
+        bar.setAlpha(visible ? filterBarAlpha : 0);
+    }
 
     public static void updateWifiGroupCheckbox(final View view) {
         PrefsBackedCheckbox.checkBoxGroupControl(view, R.id.showwifi,

@@ -1960,9 +1960,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // register wifi receiver
         setupWifiReceiverIntent();
 
-        if (state.wifiLock == null && wifiManager != null) {
+        /* WIFI_MODE_SCAN_ONLY only keeps the radio up on Pie and below.
+         * On later releases it holds a useless reference in the wifi service for the whole session.
+         */
+        if (state.wifiLock == null && wifiManager != null && Build.VERSION.SDK_INT <= 28) {
             Logging.info("\tlock wifi radio on");
-            // lock the radio on (only works in 28 (P) and lower)
             state.wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, ListFragment.WIFI_LOCK_NAME);
             state.wifiLock.acquire();
         }
@@ -2395,7 +2397,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             // turn on location updates
             this.setLocationUpdates(getLocationSetPeriod(), 0f);
 
-            if (!state.wifiLock.isHeld()) {
+            if (state.wifiLock != null && !state.wifiLock.isHeld()) {
                 state.wifiLock.acquire();
             }
             // PARTIAL_WAKE_LOCK keep-alive for scan callbacks when screen is off. Actually acquired
@@ -2415,7 +2417,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             // turn off location updates
             this.setLocationUpdates(0L, 0f);
             state.GNSSListener.handleScanStop();
-            if (state.wifiLock.isHeld()) {
+            if (state.wifiLock != null && state.wifiLock.isHeld()) {
                 try {
                     state.wifiLock.release();
                 } catch (SecurityException ex) {

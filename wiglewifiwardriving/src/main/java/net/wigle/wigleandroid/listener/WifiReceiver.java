@@ -69,6 +69,10 @@ public class WifiReceiver extends BroadcastReceiver {
     private long prevNewNetCount;
     private long prevScanPeriod;
     private boolean scanInFlight = false;
+    /** Last startScan binder call submission. */
+    private long lastStartScanAttemptMs = Long.MIN_VALUE;
+    /** True when the previous startScan returned false or threw. Holds the next attempt to the platform floor. */
+    private boolean lastStartScanFailed = false;
 
     private final Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
 
@@ -674,18 +678,23 @@ public class WifiReceiver extends BroadcastReceiver {
         boolean submitted = false;
 
         if (mainActivity.isScanning()) {
-            if ( ! scanInFlight ) {
+            final long now = System.currentTimeMillis();
+            if ( ! scanInFlight && startScanAllowed(now) ) {
                 scanInFlight = true;
                 submitted = true;
+                lastStartScanAttemptMs = now;
                 wifiScanExecutor.execute(() -> {
                     boolean success = false;
                     try {
-                        success = wifiManager.startScan();
+                        if (wifiManager != null) {
+                            success = wifiManager.startScan();
+                        }
                     } catch (Exception ex) {
                         Logging.warn("exception starting scan: " + ex, ex);
                     }
                     final boolean scanSuccess = success;
                     mainHandler.post(() -> {
+                        lastStartScanFailed = !scanSuccess;
                         if (!scanSuccess) {
                             scanInFlight = false;
                         }
@@ -694,7 +703,6 @@ public class WifiReceiver extends BroadcastReceiver {
                 });
             }
 
-            final long now = System.currentTimeMillis();
             if ( lastScanResponseTime < 0 ) {
                 // use now, since we made a request
                 lastScanResponseTime = now;
@@ -713,19 +721,28 @@ public class WifiReceiver extends BroadcastReceiver {
                             handler.post(() -> WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed)));
                         }
                         scanInFlight = false;
-                        try {
-                            if (wifiManager != null) {
-                                wifiManager.setWifiEnabled(false);
-                                wifiManager.setWifiEnabled(true);
+                        /* NB: setWifiEnabled is a binder into the wifi service.
+                         * On API 29+ a normal app cannot toggle wifi, and the call wedges the IMS stack (Wi-Fi Calling).
+                         */
+                        if (Build.VERSION.SDK_INT <= 28) {
+                            wifiScanExecutor.execute(() -> {
+                                try {
+                                    if (wifiManager != null) {
+                                        wifiManager.setWifiEnabled(false);
+                                        wifiManager.setWifiEnabled(true);
+                                    }
+                                } catch (Exception ex) {
+                                    Logging.info("exception resetting wifi: " + ex, ex);
+                                }
+                            });
+                            if (prefs.getBoolean(PreferenceKeys.PREF_SPEAK_WIFI_RESTART, true)) {
+                                mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " "
+                                        + (sinceLastScan / 1000L) + " " + mainActivity.getString(R.string.wifi_restart_2));
                             }
-                        } catch (SecurityException ex) {
-                            Logging.info("exception resetting wifi: " + ex, ex);
+                        } else {
+                            Logging.warn("wifi scan stalled; not toggling radio on API " + Build.VERSION.SDK_INT);
                         }
                         lastWifiUnjamTime = now;
-                        if (prefs.getBoolean(PreferenceKeys.PREF_SPEAK_WIFI_RESTART, true)) {
-                            mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " "
-                                    + (sinceLastScan / 1000L) + " " + mainActivity.getString(R.string.wifi_restart_2));
-                        }
                     }
                 }
             }
@@ -739,6 +756,9 @@ public class WifiReceiver extends BroadcastReceiver {
             scanRequestTime = System.currentTimeMillis();
             // reset this
             lastScanResponseTime = Long.MIN_VALUE;
+            lastStartScanAttemptMs = Long.MIN_VALUE;
+            lastStartScanFailed = false;
+            scanInFlight = false;
         }
 
         // battery kill
@@ -770,5 +790,21 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         return submitted;
+    }
+
+    /**
+     * Foreground startScan is capped at four calls per two minutes. After a rejection, wait
+     * that floor out instead of hammering the wifi service. API 36 and above keep the floor
+     * even when startScan returns true: a successful call is enough to wedge the wifi/IMS stack.
+     */
+    private boolean startScanAllowed(final long now) {
+        if (lastStartScanAttemptMs == Long.MIN_VALUE) {
+            return true;
+        }
+        final boolean holdToFloor = Build.VERSION.SDK_INT >= 36 || lastStartScanFailed;
+        if (!holdToFloor) {
+            return true;
+        }
+        return now - lastStartScanAttemptMs >= MainActivity.SCAN_P_DEFAULT;
     }
 }

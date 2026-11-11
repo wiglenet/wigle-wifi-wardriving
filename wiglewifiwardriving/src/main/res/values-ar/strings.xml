@@ -435,6 +435,7 @@
     <string name="manage_gpx">إدارة مسارات GPX المحفوظة</string>
     <string name="enable_map_theme">تطابق موضوع الخريطة مع التطبيق</string>
     <string name="throttle">مسح WiFi محدود. قم بتعطيل WiFi Scan Throttle ضمن إعدادات المطور للحصول على أداء أفضل.</string>
+    <string name="samsung_wifi_calling">قد تؤدي مكالمات Wi-Fi إلى تعطيل المسح على جهاز Samsung هذا. أوقف مكالمات Wi-Fi أثناء المسح: الإعدادات -> الاتصالات -> مكالمات Wi-Fi.</string>
     <string name="no_individual_nets_map">تعطيل عرض شبكة الخريطة</string>
     <string name="filter_show_btle">عرض Bluetooth LE</string>
     <string name="settings_gps_head">إعدادات GPS</string>

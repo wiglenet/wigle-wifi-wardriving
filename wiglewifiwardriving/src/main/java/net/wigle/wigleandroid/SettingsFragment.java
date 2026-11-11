@@ -313,6 +313,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
 
         final TextView scanThrottleHelp = view.findViewById(R.id.scan_throttle_help);
+        boolean throttleDisabled = false;
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
             scanThrottleHelp.setText(R.string.pie_bad);
             scanThrottleHelp.setVisibility(VISIBLE);
@@ -327,13 +328,23 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             final Context mainActivity = MainActivity.getMainActivity();
             if (mainActivity != null) {
                 final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                if (wifiManager.isScanThrottleEnabled()) {
+                if (wifiManager != null && wifiManager.isScanThrottleEnabled()) {
                     final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
                     addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
                     scanThrottleHelp.setText(builder.toString());
                     scanThrottleHelp.setVisibility(VISIBLE);
+                } else if (wifiManager != null) {
+                    throttleDisabled = true;
                 }
             }
+        }
+        // Same slot as the throttle banner. Samsung IMS on API 36+ can still wedge scanning
+        // once the user has turned throttling off and this banner would otherwise stay hidden.
+        if (scanThrottleHelp.getVisibility() != VISIBLE && throttleDisabled
+                && Build.VERSION.SDK_INT >= 36
+                && "samsung".equalsIgnoreCase(Build.MANUFACTURER)) {
+            scanThrottleHelp.setText(R.string.samsung_wifi_calling);
+            scanThrottleHelp.setVisibility(VISIBLE);
         }
 
         final String authUser = prefs.getString(PreferenceKeys.PREF_AUTHNAME,"");

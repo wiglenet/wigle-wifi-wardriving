@@ -435,6 +435,7 @@
     <string name="manage_gpx">Kaydedilmiş GPX rotalarını yönetin</string>
     <string name="enable_map_theme">Harita temasını uygulamayla eşleştirin</string>
     <string name="throttle">WiFi-skanning är begränsad. Inaktivera WiFi Scan Throttle under utvecklarinställningar för bättre prestanda.</string>
+    <string name="samsung_wifi_calling">Wi-Fi Araması bu Samsung cihazda taramayı çökertebilir. Tarama sırasında Wi-Fi Aramasını kapatın: Ayarlar -> Bağlantılar -> Wi-Fi Araması.</string>
     <string name="no_individual_nets_map">Harita net görüntüsünü devre dışı bırak</string>
     <string name="filter_show_btle">Bluetooth LE\'yi göster</string>
     <string name="settings_gps_head">GPS Ayarları</string>

@@ -435,6 +435,7 @@
     <string name="manage_gpx">Hantera sparade GPX-rutter</string>
     <string name="enable_map_theme">Matcha karttema till app</string>
     <string name="throttle">WiFi-skanning är begränsad. Inaktivera WiFi Scan Throttle under utvecklarinställningar för bättre prestanda.</string>
+    <string name="samsung_wifi_calling">Wi-Fi-samtal kan krascha skanningen på den här Samsung-enheten. Stäng av Wi-Fi-samtal medan du skannar: Inställningar -> Anslutningar -> Wi-Fi-samtal.</string>
     <string name="no_individual_nets_map">Inaktivera kartnätsvisning</string>
     <string name="filter_show_btle">Visa Bluetooth LE</string>
     <string name="settings_gps_head">GPS-inställningar</string>

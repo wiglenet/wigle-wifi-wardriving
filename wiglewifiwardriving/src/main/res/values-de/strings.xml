@@ -434,6 +434,7 @@
     <string name="manage_gpx">Gespeicherte GPX-Routen verwalten</string>
     <string name="enable_map_theme">Kartentheme wie Apptheme</string>
     <string name="throttle">WiFi-Scannen wird begrenzt. Deaktivieren Sie die WLAN-Scan-Drosselung in den Entwicklereinstellungen, um eine bessere Leistung zu erzielen.</string>
+    <string name="samsung_wifi_calling">WLAN-Anrufe können das Scannen auf diesem Samsung-Gerät abstürzen lassen. Schalten Sie WLAN-Anrufe während des Scannens aus: Einstellungen -> Verbindungen -> WLAN-Anrufe.</string>
     <string name="no_individual_nets_map">Karten-Netzanzeige deaktivieren</string>
     <string name="filter_show_btle">Bluetooth LE anzeigen</string>
     <string name="settings_gps_head">GPS-Einstellungen</string>

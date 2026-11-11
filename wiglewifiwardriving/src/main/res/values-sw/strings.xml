@@ -434,6 +434,7 @@
     <string name="manage_gpx">Dhibiti njia za GPX zilizohifadhiwa</string>
     <string name="enable_map_theme">Linganisha mandhari ya ramani na programu</string>
     <string name="throttle">Uchanganuzi wa WiFi ni mdogo. Zima Wifi Scan Throttle chini ya Mipangilio ya Wasanidi Programu kwa utendakazi bora.</string>
+    <string name="samsung_wifi_calling">Wi-Fi Calling inaweza kuharibu utambazaji kwenye kifaa hiki cha Samsung. Zima Wi-Fi Calling unapotambaza: Mipangilio -> Miunganisho -> Wi-Fi Calling.</string>
     <string name="no_individual_nets_map">Lemaza onyesho la wavu la ramani</string>
     <string name="filter_show_btle">Onyesha Bluetooth LE</string>
     <string name="settings_gps_head">Mipangilio ya GPS</string>

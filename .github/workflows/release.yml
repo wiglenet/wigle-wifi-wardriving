@@ -1,0 +1,71 @@
+name: GitHub Release
+
+# Publishes the APK committed in a release commit to a GitHub release when its version tag
+# (e.g. "2.112") is pushed. Nothing is built here: the attached APK is exactly the one in the
+# tagged commit, after checking that it matches the tag. Fails if the release already exists.
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.repository == 'wiglenet/wigle-wifi-wardriving'
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+      APK: wiglewifiwardriving/release/wiglewifiwardriving-release.apk
+      MANIFEST: wiglewifiwardriving/src/main/AndroidManifest.xml
+      GH_TOKEN: ${{ github.token }}
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Check tag matches the manifest
+      run: |
+        version_name=$(sed -n 's/.*android:versionName="\([^"]*\)".*/\1/p' "$MANIFEST")
+        version_code=$(sed -n 's/.*android:versionCode="\([^"]*\)".*/\1/p' "$MANIFEST")
+        if [ "$version_name" != "$TAG" ]; then
+          echo "::error::Tag $TAG does not match versionName $version_name in $MANIFEST"
+          exit 1
+        fi
+        echo "VERSION_CODE=$version_code" >> "$GITHUB_ENV"
+
+    - name: Check committed APK matches the tag
+      run: |
+        if [ ! -f "$APK" ]; then
+          echo "::error::$APK is not in the tagged commit"
+          exit 1
+        fi
+        build_tools=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+        badging=$("$build_tools/aapt2" dump badging "$APK" | head -1)
+        echo "$badging"
+        expected="package: name='net.wigle.wigleandroid' versionCode='$VERSION_CODE' versionName='$TAG'"
+        if [[ "$badging" != "$expected"* ]]; then
+          echo "::error::Committed APK is not net.wigle.wigleandroid $TAG ($VERSION_CODE)"
+          exit 1
+        fi
+        "$build_tools/apksigner" verify --print-certs "$APK" > certs.txt
+        cat certs.txt
+
+    - name: Write release notes
+      run: |
+        {
+          echo "## Changes"
+          if ! bash .github/scripts/changelog-section.sh "$TAG"; then
+            echo "See [CHANGELOG]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$TAG/CHANGELOG)."
+          fi
+          echo
+          echo "## Verifying the APK"
+          echo "- APK SHA-256: \`$(sha256sum "$APK" | cut -d' ' -f1)\`"
+          sed -n 's/^\(Signer .*certificate SHA-256 digest\): \(.*\)/- \1: `\2`/p' certs.txt
+          echo
+          echo "Check with \`sha256sum\` and \`apksigner verify --print-certs\`."
+        } > notes.md
+        cat notes.md
+
+    - name: Create release
+      run: gh release create "$TAG" "$APK" --verify-tag --latest --title "$TAG" --notes-file notes.md

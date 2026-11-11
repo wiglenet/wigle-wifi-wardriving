@@ -1,0 +1,50 @@
+name: GitHub Release (FOSS)
+
+# Creates a notes-only GitHub release when a foss-* tag (e.g. "foss-2.112") is pushed.
+# F-Droid builds and signs the FOSS APK itself from these tags, so no APK is attached, and the
+# release is never marked latest so releases/latest keeps pointing at the release with the APK.
+# Tag-push workflows run from the tagged commit, so this only takes effect on foss-main.
+
+on:
+  push:
+    tags:
+      - 'foss-*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.repository == 'wiglenet/wigle-wifi-wardriving'
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+      MANIFEST: wiglewifiwardriving/src/main/AndroidManifest.xml
+      GH_TOKEN: ${{ github.token }}
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Check tag matches the manifest
+      run: |
+        version_name=$(sed -n 's/.*android:versionName="\([^"]*\)".*/\1/p' "$MANIFEST")
+        if [ "$version_name" != "${TAG#foss-}" ]; then
+          echo "::error::Tag $TAG does not match versionName $version_name in $MANIFEST"
+          exit 1
+        fi
+
+    - name: Write release notes
+      run: |
+        {
+          echo "## Changes"
+          if ! bash .github/scripts/changelog-section.sh "${TAG#foss-}"; then
+            echo "See [CHANGELOG]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$TAG/CHANGELOG)."
+          fi
+          echo
+          echo "## Download"
+          echo "The FOSS build is built and signed by F-Droid:"
+          echo "https://f-droid.org/packages/net.wigle.wigleandroid/"
+        } > notes.md
+        cat notes.md
+
+    - name: Create release
+      run: gh release create "$TAG" --verify-tag --latest=false --title "$TAG" --notes-file notes.md

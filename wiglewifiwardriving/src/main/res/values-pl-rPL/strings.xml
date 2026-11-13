@@ -435,6 +435,7 @@
     <string name="manage_gpx">Zarządzaj zapisanymi trasami GPX</string>
     <string name="enable_map_theme">Dopasuj motyw map do motywu aplikacji</string>
     <string name="throttle">Skanowanie Wi-Fi jest ograniczone. Wyłącz funkcję WiFi Scan Throttle w ustawieniach programisty, aby uzyskać lepszą wydajność.</string>
+    <string name="samsung_wifi_calling">Połączenia Wi-Fi mogą zawiesić skanowanie na tym urządzeniu Samsung. Wyłącz połączenia Wi-Fi podczas skanowania: Ustawienia -> Połączenia -> Połączenia Wi-Fi.</string>
     <string name="no_individual_nets_map">Wyłącz siatkę mapy</string>
     <string name="filter_show_btle">Pokaż Bluetooth LE</string>
     <string name="settings_gps_head">Ustawienia GPS</string>

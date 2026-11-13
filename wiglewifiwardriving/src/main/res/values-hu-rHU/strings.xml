@@ -435,6 +435,7 @@
     <string name="manage_gpx">Mentett GPX-útvonalak kezelése</string>
     <string name="enable_map_theme">Párosítsa a térképtémát az alkalmazáshoz</string>
     <string name="throttle">A WiFi szkennelés korlátozott. A jobb teljesítmény érdekében kapcsolja ki a WiFi Scan Throttle funkciót a Fejlesztői beállítások alatt.</string>
+    <string name="samsung_wifi_calling">A Wi-Fi-hívás összeomlaszthatja a keresést ezen a Samsung-eszközön. Kapcsolja ki a Wi-Fi-hívást keresés közben: Beállítások -> Kapcsolatok -> Wi-Fi-hívás.</string>
     <string name="no_individual_nets_map">A térképháló megjelenítésének letiltása</string>
     <string name="filter_show_btle">Bluetooth LE megjelenítése</string>
     <string name="settings_gps_head">GPS beállítások</string>

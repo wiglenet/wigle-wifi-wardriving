@@ -69,6 +69,13 @@ public class WifiReceiver extends BroadcastReceiver {
     private long prevNewNetCount;
     private long prevScanPeriod;
     private boolean scanInFlight = false;
+    /** Last startScan binder call submission. */
+    private long lastStartScanAttemptMs = Long.MIN_VALUE;
+    /** True when the previous startScan returned false or threw. Holds the next attempt to the platform floor. */
+    private boolean lastStartScanFailed = false;
+    /** Cached WifiManager.isScanThrottleEnabled, refreshed at most every SCAN_P_DEFAULT. */
+    private long scanThrottleCheckedMs = Long.MIN_VALUE;
+    private boolean scanThrottleEnabled = true;
 
     private final Set<String> safeWatchSsids = Collections.synchronizedSet(new HashSet<>());
 
@@ -674,18 +681,23 @@ public class WifiReceiver extends BroadcastReceiver {
         boolean submitted = false;
 
         if (mainActivity.isScanning()) {
-            if ( ! scanInFlight ) {
+            final long now = System.currentTimeMillis();
+            if ( ! scanInFlight && startScanAllowed(now) ) {
                 scanInFlight = true;
                 submitted = true;
+                lastStartScanAttemptMs = now;
                 wifiScanExecutor.execute(() -> {
                     boolean success = false;
                     try {
-                        success = wifiManager.startScan();
+                        if (wifiManager != null) {
+                            success = wifiManager.startScan();
+                        }
                     } catch (Exception ex) {
                         Logging.warn("exception starting scan: " + ex, ex);
                     }
                     final boolean scanSuccess = success;
                     mainHandler.post(() -> {
+                        lastStartScanFailed = !scanSuccess;
                         if (!scanSuccess) {
                             scanInFlight = false;
                         }
@@ -694,7 +706,6 @@ public class WifiReceiver extends BroadcastReceiver {
                 });
             }
 
-            final long now = System.currentTimeMillis();
             if ( lastScanResponseTime < 0 ) {
                 // use now, since we made a request
                 lastScanResponseTime = now;
@@ -713,19 +724,28 @@ public class WifiReceiver extends BroadcastReceiver {
                             handler.post(() -> WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed)));
                         }
                         scanInFlight = false;
-                        try {
-                            if (wifiManager != null) {
-                                wifiManager.setWifiEnabled(false);
-                                wifiManager.setWifiEnabled(true);
+                        /* NB: setWifiEnabled is a binder into the wifi service.
+                         * On API 29+ a normal app cannot toggle wifi, and the call wedges the IMS stack (Wi-Fi Calling).
+                         */
+                        if (Build.VERSION.SDK_INT <= 28) {
+                            wifiScanExecutor.execute(() -> {
+                                try {
+                                    if (wifiManager != null) {
+                                        wifiManager.setWifiEnabled(false);
+                                        wifiManager.setWifiEnabled(true);
+                                    }
+                                } catch (Exception ex) {
+                                    Logging.info("exception resetting wifi: " + ex, ex);
+                                }
+                            });
+                            if (prefs.getBoolean(PreferenceKeys.PREF_SPEAK_WIFI_RESTART, true)) {
+                                mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " "
+                                        + (sinceLastScan / 1000L) + " " + mainActivity.getString(R.string.wifi_restart_2));
                             }
-                        } catch (SecurityException ex) {
-                            Logging.info("exception resetting wifi: " + ex, ex);
+                        } else {
+                            Logging.warn("wifi scan stalled; not toggling radio on API " + Build.VERSION.SDK_INT);
                         }
                         lastWifiUnjamTime = now;
-                        if (prefs.getBoolean(PreferenceKeys.PREF_SPEAK_WIFI_RESTART, true)) {
-                            mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " "
-                                    + (sinceLastScan / 1000L) + " " + mainActivity.getString(R.string.wifi_restart_2));
-                        }
                     }
                 }
             }
@@ -739,6 +759,10 @@ public class WifiReceiver extends BroadcastReceiver {
             scanRequestTime = System.currentTimeMillis();
             // reset this
             lastScanResponseTime = Long.MIN_VALUE;
+            lastStartScanAttemptMs = Long.MIN_VALUE;
+            lastStartScanFailed = false;
+            scanThrottleCheckedMs = Long.MIN_VALUE;
+            scanInFlight = false;
         }
 
         // battery kill
@@ -770,5 +794,53 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         return submitted;
+    }
+
+    /**
+     * NB: Foreground startScan is capped at four calls per two minutes while Wi-Fi scan throttling
+     * is on. User is advised to disable Scan throttling in developer mode - then a successful
+     * startScan occurs on their configured period.. A rejected startScan still waits out the floor,
+     * so a wedged wifi service is not polled on every timer tick.
+     */
+    private boolean startScanAllowed(final long now) {
+        if (lastStartScanAttemptMs == Long.MIN_VALUE) {
+            return true;
+        }
+        if (now - lastStartScanAttemptMs >= MainActivity.SCAN_P_DEFAULT) {
+            return true;
+        }
+        if (lastStartScanFailed) {
+            return false;
+        }
+        // Inside the floor window after a successful scan. Only hold when the platform throttle
+        // is still enabled; the user turned it off to scan at the configured period.
+        return Build.VERSION.SDK_INT < 36 || !isScanThrottleEnabled();
+    }
+
+    /**
+     * @return true when the platform is still limiting startScan. API 29 and below have no query,
+     * so they are treated as throttled.
+     */
+    private boolean isScanThrottleEnabled() {
+        final long now = System.currentTimeMillis();
+        if (scanThrottleCheckedMs != Long.MIN_VALUE
+                && now - scanThrottleCheckedMs < MainActivity.SCAN_P_DEFAULT) {
+            return scanThrottleEnabled;
+        }
+        scanThrottleCheckedMs = now;
+        if (Build.VERSION.SDK_INT < 30 || mainActivity == null) {
+            scanThrottleEnabled = true;
+            return true;
+        }
+        try {
+            final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
+            // binder into the wifi service; cached above so the scan timer does not call it every tick
+            scanThrottleEnabled = wifiManager == null || wifiManager.isScanThrottleEnabled();
+        } catch (RuntimeException ex) {
+            Logging.warn("exception reading scan throttle: " + ex, ex);
+            scanThrottleEnabled = true;
+        }
+        return scanThrottleEnabled;
     }
 }

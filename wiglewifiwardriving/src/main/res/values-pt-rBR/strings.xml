@@ -435,6 +435,7 @@
     <string name="manage_gpx">Gerenciar rotas GPX salvas</string>
     <string name="enable_map_theme">Combine o tema do mapa com o aplicativo</string>
     <string name="throttle">A varredura WiFi é limitada. Desative o Acelerador de Varredura WiFi nas Configurações do Desenvolvedor para um melhor desempenho.</string>
+    <string name="samsung_wifi_calling">Chamadas Wi-Fi podem travar a varredura neste dispositivo Samsung. Desative as Chamadas Wi-Fi durante a varredura: Configurações -> Conexões -> Chamadas Wi-Fi.</string>
     <string name="no_individual_nets_map">Desabilitar a exibição da rede do mapa</string>
     <string name="filter_show_btle">Mostrar Bluetooth LE</string>
     <string name="settings_gps_head">Configurações de GPS</string>

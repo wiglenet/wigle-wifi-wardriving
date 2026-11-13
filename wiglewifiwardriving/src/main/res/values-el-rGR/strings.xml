@@ -435,6 +435,7 @@
     <string name="manage_gpx">Διαχείριση αποθηκευμένων διαδρομών GPX</string>
     <string name="enable_map_theme">Ταύτιση θέματος χάρτη με την εφαρμογή</string>
     <string name="throttle">Η σάρωση WiFi είναι περιορισμένη. Απενεργοποιήστε τον \"Περιορισμό σάρωσης WiFi\" στις Ρυθμίσεις Προγραμματιστή για καλύτερη απόδοση.</string>
+    <string name="samsung_wifi_calling">Οι κλήσεις Wi-Fi μπορεί να προκαλέσουν κατάρρευση της σάρωσης σε αυτή τη συσκευή Samsung. Απενεργοποιήστε τις κλήσεις Wi-Fi κατά τη σάρωση: Ρυθμίσεις -> Συνδέσεις -> Κλήσεις Wi-Fi.</string>
     <string name="no_individual_nets_map">Απενεργοποίηση εμφάνισης δικτύων στον χάρτη</string>
     <string name="filter_show_btle">Εμφάνιση Bluetooth LE</string>
     <string name="settings_gps_head">Ρυθμίσεις GPS</string>

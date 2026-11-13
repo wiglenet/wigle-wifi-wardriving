@@ -435,6 +435,7 @@
     <string name="manage_gpx">Beheer opgeslagen GPX-routes</string>
     <string name="enable_map_theme">Match kaartthema met app</string>
     <string name="throttle">WiFi-scannen is beperkt. Schakel WiFi Scan Throttle uit onder Ontwikkelaarsinstellingen voor betere prestaties.</string>
+    <string name="samsung_wifi_calling">Wi-Fi-oproppen kin it scannen op dit Samsung-apparaat crashje litte. Skeakelje Wi-Fi-oproppen út wylst it scannen: Ynstellings -> Ferbinings -> Wi-Fi-oproppen.</string>
     <string name="no_individual_nets_map">Kaartnetweergave uitschakelen</string>
     <string name="filter_show_btle">Toon Bluetooth LE</string>
     <string name="settings_gps_head">GPS-instellingen</string>

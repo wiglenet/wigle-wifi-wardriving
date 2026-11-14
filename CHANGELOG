@@ -1,3 +1,10 @@
+* 2.112 (11/14/2026)
+DB interaction modernization & indexing
+Filter display and counts
+Reduce WiFi receive ANRs
+Allow MNC 00
+Various bug fixes
+
 * 2.111 (08/06/2026)
 Dashboard layout by width
 Filters export

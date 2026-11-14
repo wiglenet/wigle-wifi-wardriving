@@ -6,7 +6,7 @@ Network stumbling client for Android, from [wigle.net](https://wigle.net).
 
 This client provides geolocated detection and logging for WiFi, Bluetooth, and cellular signals using Android devices.
 
-As of January 2023, this application supports Android SDK versions 24 (Nougat) and up. For older versions, see the [2.67 release tag](https://github.com/wiglenet/wigle-wifi-wardriving/releases/tag/2.67) to build your own copy or side-load [the compiled artifact](https://github.com/wiglenet/wigle-wifi-wardriving/blob/2.67/dist/release/wiglewifiwardriving-release.apk).
+As of January 2023, this application supports Android SDK versions 24 (Nougat) and up. For older versions, see the [2.67 release tag](https://github.com/cheeseonamonkey/wigle-wifi-wardriving/releases/tag/2.67) to build your own copy or side-load [the compiled artifact](https://github.com/wiglenet/wigle-wifi-wardriving/blob/2.67/dist/release/wiglewifiwardriving-release.apk).
 
 **Please note** that older releases will fail certificate transparency checks for calls to WiGLE.net's API.
 
@@ -78,3 +78,9 @@ Sounds for proximity detection by Balcoran:
  - Blip: https://freesound.org/people/Balcoran/sounds/478187/
 
 This project is maintained by the WiGLE.net team
+
+## Automated debug builds
+
+Debug APKs are attached to [GitHub Releases](https://github.com/wiglenet/wigle-wifi-wardriving/releases). Default-branch builds are prereleases; version-tag builds publish their debug APKs to releases. Each build uses a temporary CI debug signing key, so installing a newer build may require uninstalling the previous one.
+
+CI APKs use a build-only Maps key; Google Maps features may be unavailable unless the project configures a valid key.

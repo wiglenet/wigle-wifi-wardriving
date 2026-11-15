@@ -44,6 +44,7 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 
 /**
  * Primary receiver logic for WiFi scan results.
@@ -73,6 +74,12 @@ public class WifiReceiver extends BroadcastReceiver {
     private long lastStartScanAttemptMs = Long.MIN_VALUE;
     /** True when the previous startScan returned false or threw. Holds the next attempt to the platform floor. */
     private boolean lastStartScanFailed = false;
+    /** Consecutive rejected startScan calls. Main thread. Drives the throttle-off backoff. */
+    private int rejectStreak = 0;
+    /** Allowance for timer jitter when comparing a tick against the backoff. */
+    private static final long BACKOFF_SLACK_MS = 100L;
+    /** Rejection backoff doubles at most this many times before the SCAN_P_DEFAULT cap. */
+    private static final int BACKOFF_MAX_SHIFT = 4;
     /** Cached WifiManager.isScanThrottleEnabled, refreshed at most every SCAN_P_DEFAULT. */
     private long scanThrottleCheckedMs = Long.MIN_VALUE;
     private boolean scanThrottleEnabled = true;
@@ -180,6 +187,10 @@ public class WifiReceiver extends BroadcastReceiver {
             // treat as "continuous", so request scan in here
             doWifiScan();
             nonstopScanRequestTime = now;
+        } else if (isNextScanOverdue(period)) {
+            // results took longer than the period, so the timer tick that wanted the next scan
+            // was skipped as in-flight. Start it now instead of waiting out another tick.
+            doWifiScan();
         }
 
         final long setPeriod = mainActivity.getLocationSetPeriod();
@@ -648,6 +659,44 @@ public class WifiReceiver extends BroadcastReceiver {
         wifiTimer.post(this::doWifiScan);
     }
 
+    /**
+     * True when the last startScan attempt was at least one period ago, so the next scan is due.
+     * Only after a successful attempt; a rejection's backoff stays with the timer.
+     */
+    private boolean isNextScanOverdue(final long period) {
+        if (lastStartScanAttemptMs == Long.MIN_VALUE || lastStartScanFailed || scanInFlight) {
+            return false;
+        }
+        return System.currentTimeMillis() - lastStartScanAttemptMs + BACKOFF_SLACK_MS >= period;
+    }
+
+    /**
+     * Deep Doze. The wifi service refuses startScan while the device is idle (it answers with a
+     * results-not-updated broadcast), whatever our importance or battery exemption.
+     */
+    private boolean isDeviceIdle() {
+        if (mainActivity == null) {
+            return false;
+        }
+        final PowerManager pm = (PowerManager) mainActivity.getSystemService(Context.POWER_SERVICE);
+        return pm != null && pm.isDeviceIdleMode();
+    }
+
+    /**
+     * Main thread, from ACTION_DEVICE_IDLE_MODE_CHANGED. On leaving idle, drop any rejection
+     * backoff and scan right away so a short maintenance window is not spent waiting.
+     */
+    public void onDeviceIdleChanged(final boolean idle) {
+        if (idle || wifiTimer == null || mainActivity == null || !mainActivity.isScanning()) {
+            return;
+        }
+        rejectStreak = 0;
+        lastStartScanFailed = false;
+        // idle held every tick, so no responses came in; don't let the jam check fire on that
+        lastScanResponseTime = System.currentTimeMillis();
+        scheduleScan();
+    }
+
     public synchronized void registerWiFiScanUpdater(final WiFiScanUpdater updater, final Set<String> watchBssids) {
         // only one updater at a time, so the watch set belongs to the incoming registration alone
         safeWatchSsids.clear();
@@ -682,7 +731,12 @@ public class WifiReceiver extends BroadcastReceiver {
 
         if (mainActivity.isScanning()) {
             final long now = System.currentTimeMillis();
-            if ( ! scanInFlight && startScanAllowed(now) ) {
+            final boolean deviceIdle = isDeviceIdle();
+            if (deviceIdle) {
+                // every call would be refused; hold until ACTION_DEVICE_IDLE_MODE_CHANGED
+                // no responses arrive while held, so keep the jam check from tripping
+                lastScanResponseTime = now;
+            } else if ( ! scanInFlight && startScanAllowed(now) ) {
                 scanInFlight = true;
                 submitted = true;
                 lastStartScanAttemptMs = now;
@@ -700,13 +754,20 @@ public class WifiReceiver extends BroadcastReceiver {
                         lastStartScanFailed = !scanSuccess;
                         if (!scanSuccess) {
                             scanInFlight = false;
+                            rejectStreak++;
+                            Logging.debug("startScan rejection streak " + rejectStreak
+                                    + ", backoff ms " + rejectBackoffMs());
+                        } else {
+                            rejectStreak = 0;
                         }
                         Logging.debug("startScan returned " + scanSuccess + ". last response seconds ago: " + (System.currentTimeMillis() - lastScanResponseTime) / 1000d);
                     });
                 });
             }
 
-            if ( lastScanResponseTime < 0 ) {
+            if ( deviceIdle ) {
+                // held above; nothing was requested
+            } else if ( lastScanResponseTime < 0 ) {
                 // use now, since we made a request
                 lastScanResponseTime = now;
             } else {
@@ -761,6 +822,7 @@ public class WifiReceiver extends BroadcastReceiver {
             lastScanResponseTime = Long.MIN_VALUE;
             lastStartScanAttemptMs = Long.MIN_VALUE;
             lastStartScanFailed = false;
+            rejectStreak = 0;
             scanThrottleCheckedMs = Long.MIN_VALUE;
             scanInFlight = false;
         }
@@ -799,22 +861,39 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * NB: Foreground startScan is capped at four calls per two minutes while Wi-Fi scan throttling
      * is on. User is advised to disable Scan throttling in developer mode - then a successful
-     * startScan occurs on their configured period.. A rejected startScan still waits out the floor,
-     * so a wedged wifi service is not polled on every timer tick.
+     * startScan occurs on their configured period. A rejected startScan waits out the floor while
+     * the throttle is on. With the throttle off, a rejection backs off one scan period, doubling
+     * per consecutive rejection up to the floor, so a wedged wifi service is still not polled on
+     * every timer tick but a one-off rejection does not cost half a minute.
      */
     private boolean startScanAllowed(final long now) {
         if (lastStartScanAttemptMs == Long.MIN_VALUE) {
             return true;
         }
-        if (now - lastStartScanAttemptMs >= MainActivity.SCAN_P_DEFAULT) {
+        final long sinceAttempt = now - lastStartScanAttemptMs;
+        if (sinceAttempt >= MainActivity.SCAN_P_DEFAULT) {
             return true;
         }
         if (lastStartScanFailed) {
-            return false;
+            // isScanThrottleEnabled() is true below API 30, which keeps the full floor there
+            return !isScanThrottleEnabled() && sinceAttempt + BACKOFF_SLACK_MS >= rejectBackoffMs();
         }
         // Inside the floor window after a successful scan. Only hold when the platform throttle
         // is still enabled; the user turned it off to scan at the configured period.
         return Build.VERSION.SDK_INT < 36 || !isScanThrottleEnabled();
+    }
+
+    /**
+     * Wait after the latest rejection while the throttle is off: the scan period for the first
+     * rejection, doubling per consecutive rejection, capped at SCAN_P_DEFAULT.
+     */
+    private long rejectBackoffMs() {
+        long base = getScanPeriod();
+        if (base <= 0L) {
+            base = MainActivity.SCAN_DEFAULT;
+        }
+        final int shift = Math.min(Math.max(rejectStreak - 1, 0), BACKOFF_MAX_SHIFT);
+        return Math.min(base << shift, MainActivity.SCAN_P_DEFAULT);
     }
 
     /**

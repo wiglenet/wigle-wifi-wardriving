@@ -437,6 +437,7 @@
     <string name="enable_map_theme">Match map theme to app</string>
     <string name="throttle">WiFi scanning is limited. Disable "WiFi Scan Throttle" under Developer Settings for better performance.</string>
     <string name="samsung_wifi_calling">Wi-Fi Calling can crash scanning on this Samsung device. Turn Wi-Fi Calling off while scanning: Settings -> Connections -> Wi-Fi Calling.</string>
+    <string name="quick_doze_warning">This phone goes into deep sleep within minutes of the screen turning off, which stops WiFi scanning. On Pixel phones, turn off Settings -> Battery -> Adaptive preferences -> Adaptive Battery, then restart the phone.</string>
     <string name="no_individual_nets_map">Disable map net display</string>
     <string name="filter_show_btle">Show Bluetooth LE</string>
     <string name="settings_gps_head">GPS Settings</string>

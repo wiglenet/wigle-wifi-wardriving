@@ -436,6 +436,7 @@
     <string name="enable_map_theme">Yhdistä karttateema sovellukseen</string>
     <string name="throttle">WiFi-skannaus on rajoitettu. Poista WiFi Scan Throttle käytöstä kehittäjäasetuksista parantaaksesi suorituskykyä.</string>
     <string name="samsung_wifi_calling">Wi-Fi-puhelut voivat kaataa skannauksen tällä Samsung-laitteella. Poista Wi-Fi-puhelut käytöstä skannauksen ajaksi: Asetukset -> Yhteydet -> Wi-Fi-puhelut.</string>
+    <string name="quick_doze_warning">Tämä puhelin siirtyy syvään lepotilaan muutamassa minuutissa näytön sammumisesta, mikä pysäyttää WiFi-haun. Pixel-puhelimissa poista käytöstä Asetukset -> Akku -> Mukautuvat asetukset -> Mukautuva akku ja käynnistä puhelin uudelleen.</string>
     <string name="no_individual_nets_map">Poista karttaverkon näyttö käytöstä</string>
     <string name="filter_show_btle">Näytä Bluetooth LE</string>
     <string name="settings_gps_head">GPS-asetukset</string>

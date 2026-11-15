@@ -436,6 +436,7 @@
     <string name="enable_map_theme">Сопоставьте тему карты с приложением</string>
     <string name="throttle">Сканирование WiFi ограничено. Отключите дроссель сканирования WiFi в настройках разработчика для повышения производительности.</string>
     <string name="samsung_wifi_calling">Звонки по Wi-Fi могут привести к сбою сканирования на этом устройстве Samsung. Отключите звонки по Wi-Fi во время сканирования: Настройки -> Подключения -> Звонки по Wi-Fi.</string>
+    <string name="quick_doze_warning">Этот телефон переходит в глубокий сон через несколько минут после выключения экрана, и поиск WiFi останавливается. На телефонах Pixel отключите Настройки -> Батарея -> Адаптивные настройки -> Адаптивная батарея и перезагрузите телефон.</string>
     <string name="no_individual_nets_map">Отключить отображение сети карты</string>
     <string name="filter_show_btle">Показать Bluetooth LE</string>
     <string name="settings_gps_head">Настройки GPS</string>

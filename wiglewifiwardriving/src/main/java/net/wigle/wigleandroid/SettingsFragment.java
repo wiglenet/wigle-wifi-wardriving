@@ -346,6 +346,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             scanThrottleHelp.setText(R.string.samsung_wifi_calling);
             scanThrottleHelp.setVisibility(VISIBLE);
         }
+        // Quick doze seen while scanning (see QuickDozeDetector). Added to whatever the slot
+        // already shows, since it stops scanning outright with the screen off.
+        if (prefs.contains(PreferenceKeys.PREF_QUICK_DOZE_SEEN)) {
+            if (scanThrottleHelp.getVisibility() == VISIBLE) {
+                scanThrottleHelp.setText(scanThrottleHelp.getText() + "\n\n"
+                        + getString(R.string.quick_doze_warning));
+            } else {
+                scanThrottleHelp.setText(R.string.quick_doze_warning);
+                scanThrottleHelp.setVisibility(VISIBLE);
+            }
+        }
 
         final String authUser = prefs.getString(PreferenceKeys.PREF_AUTHNAME,"");
         final EditText user = view.findViewById(R.id.edit_username);

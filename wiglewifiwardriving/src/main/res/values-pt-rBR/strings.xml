@@ -436,6 +436,7 @@
     <string name="enable_map_theme">Combine o tema do mapa com o aplicativo</string>
     <string name="throttle">A varredura WiFi é limitada. Desative o Acelerador de Varredura WiFi nas Configurações do Desenvolvedor para um melhor desempenho.</string>
     <string name="samsung_wifi_calling">Chamadas Wi-Fi podem travar a varredura neste dispositivo Samsung. Desative as Chamadas Wi-Fi durante a varredura: Configurações -> Conexões -> Chamadas Wi-Fi.</string>
+    <string name="quick_doze_warning">Este telefone entra em suspensão profunda poucos minutos depois que a tela desliga, o que interrompe a varredura WiFi. Em telefones Pixel, desative Configurações -> Bateria -> Preferências adaptáveis -> Bateria adaptável e reinicie o telefone.</string>
     <string name="no_individual_nets_map">Desabilitar a exibição da rede do mapa</string>
     <string name="filter_show_btle">Mostrar Bluetooth LE</string>
     <string name="settings_gps_head">Configurações de GPS</string>

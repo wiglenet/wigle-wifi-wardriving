@@ -436,6 +436,7 @@
     <string name="enable_map_theme">Match karttemaet til appen</string>
     <string name="throttle">WiFi-skanning er begrenset. Deaktiver WiFi Scan Throttle under utviklerinnstillinger for bedre ytelse.</string>
     <string name="samsung_wifi_calling">Wi-Fi-anrop kan krasje skanninga på denne Samsung-eininga. Slå av Wi-Fi-anrop mens du skannar: Innstillingar -> Tilkoplingar -> Wi-Fi-anrop.</string>
+    <string name="quick_doze_warning">Denne telefonen går i djup dvale få minutt etter at skjermen slår seg av, og det stoppar WiFi-skanninga. På Pixel-telefonar slår du av Innstillingar -> Batteri -> Adaptive innstillingar -> Adaptivt batteri og startar telefonen på nytt.</string>
     <string name="no_individual_nets_map">Deaktiver kartnettvisning</string>
     <string name="filter_show_btle">Vis Bluetooth LE</string>
     <string name="settings_gps_head">GPS-innstillinger</string>

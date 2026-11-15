@@ -436,6 +436,7 @@
     <string name="enable_map_theme">Potrivirea temei hărții cu aplicația</string>
     <string name="throttle">Scanarea WiFi este limitată. Dezactivează WiFi Scan Throttle din Setările dezvoltatorului pentru o performanță mai bună.</string>
     <string name="samsung_wifi_calling">Apelarea Wi-Fi poate bloca scanarea pe acest dispozitiv Samsung. Dezactivați apelarea Wi-Fi în timpul scanării: Setări -> Conexiuni -> Apelare Wi-Fi.</string>
+    <string name="quick_doze_warning">Acest telefon intră în somn profund la câteva minute după stingerea ecranului, ceea ce oprește scanarea WiFi. Pe telefoanele Pixel, dezactivați Setări -> Baterie -> Preferințe adaptive -> Baterie adaptivă, apoi reporniți telefonul.</string>
     <string name="no_individual_nets_map">Dezactivați afișarea rețelei hărții</string>
     <string name="filter_show_btle">Afișați Bluetooth LE</string>
     <string name="settings_gps_head">Setări GPS</string>

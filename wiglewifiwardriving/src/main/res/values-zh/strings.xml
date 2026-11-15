@@ -436,6 +436,7 @@
     <string name="enable_map_theme">将地图主题与应用程序匹配</string>
     <string name="throttle">WiFi 扫描是有限的。在开发者设置下禁用 WiFi 扫描油门以获得更好的性能。</string>
     <string name="samsung_wifi_calling">Wi-Fi 通话可能导致此 Samsung 设备上的扫描崩溃。扫描时请关闭 Wi-Fi 通话：设置 -> 连接 -> Wi-Fi 通话。</string>
+    <string name="quick_doze_warning">此手机在屏幕关闭几分钟内就会进入深度休眠，导致 WiFi 扫描停止。在 Pixel 手机上，请关闭 设置 -> 电池 -> 自动调节偏好设置 -> 自动调节电池，然后重启手机。</string>
     <string name="no_individual_nets_map">禁用地图网络显示</string>
     <string name="filter_show_btle">显示低功耗蓝牙（BLE）</string>
     <string name="settings_gps_head">GPS 设置</string>

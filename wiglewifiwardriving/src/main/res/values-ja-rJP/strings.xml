@@ -439,6 +439,7 @@ KMLにエクスポート</string>
     <string name="enable_map_theme">マップのテーマをアプリに一致させる</string>
     <string name="throttle">WiFiスキャンは制限されています。パフォーマンスを向上させるには、開発者設定でWiFiスキャンスロットルを無効にします。</string>
     <string name="samsung_wifi_calling">このSamsung端末ではWi-Fi通話がスキャンをクラッシュさせることがあります。スキャン中はWi-Fi通話をオフにしてください: 設定 -> 接続 -> Wi-Fi通話。</string>
+    <string name="quick_doze_warning">この端末は画面オフから数分でディープスリープに入り、Wi-Fiスキャンが止まります。Pixelでは 設定 -> バッテリー -> 自動調整設定 -> 自動調整バッテリー をオフにして、端末を再起動してください。</string>
     <string name="no_individual_nets_map">マップネット表示を無効にする</string>
     <string name="filter_show_btle">BluetoothLEを表示する</string>
     <string name="enable_kalman">GPSノイズをフィルターする</string>

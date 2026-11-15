@@ -35,12 +35,14 @@ import android.net.TrafficStats;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
@@ -107,6 +109,7 @@ import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.QuickDozeDetector;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -185,6 +188,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private boolean wantsScanWakeLock = false;
         private int logPointer = 0;
         private final String[] logs = new String[25];
+        final QuickDozeDetector quickDozeDetector = new QuickDozeDetector();
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
         Matcher bssidAlertList;
@@ -1104,6 +1108,32 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public State getState() {
         return state;
+    }
+
+    /** True when no charger is plugged in; false when the battery state is not known yet. */
+    private boolean isOnBattery() {
+        // plug state, not charge status: an unplugged phone at 100% keeps reporting FULL
+        final Intent battery = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        return battery != null && battery.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) == 0;
+    }
+
+    /**
+     * Records or clears the quick-doze warning that SettingsFragment shows. Kept in preferences
+     * because the user usually finds out later, after the screen-off stretch that lost scans.
+     */
+    private void handleQuickDozeVerdict(final QuickDozeDetector.Verdict verdict) {
+        if (verdict == QuickDozeDetector.Verdict.NONE) {
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        if (verdict == QuickDozeDetector.Verdict.QUICK_DOZE) {
+            Logging.warn("deep Doze within " + (QuickDozeDetector.QUICK_LIMIT_MS / 60_000L)
+                    + " minutes of screen-off while scanning; WiFi scans are refused until it ends");
+            prefs.edit().putLong(PreferenceKeys.PREF_QUICK_DOZE_SEEN, System.currentTimeMillis()).apply();
+        } else if (prefs.contains(PreferenceKeys.PREF_QUICK_DOZE_SEEN)) {
+            Logging.info("long screen-off on battery without deep Doze; clearing quick-doze warning");
+            prefs.edit().remove(PreferenceKeys.PREF_QUICK_DOZE_SEEN).apply();
+        }
     }
 
     static MainActivity getMainActivity(Fragment fragment) {
@@ -2242,15 +2272,35 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (Intent.ACTION_SCREEN_OFF.equals(action)) {
                     Logging.info("SCREEN_OFF: acquiring scan wake lock if scanning");
                     acquireScanWakeLockIfNeeded();
+                    if (state != null) {
+                        state.quickDozeDetector.onScreenOff(SystemClock.elapsedRealtime(),
+                                isScanning(), isOnBattery());
+                    }
                 } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                     Logging.info("SCREEN_ON: releasing scan wake lock");
                     releaseScanWakeLock();
+                    if (state != null) {
+                        handleQuickDozeVerdict(state.quickDozeDetector.onScreenOn(
+                                SystemClock.elapsedRealtime(), isScanning(), isOnBattery()));
+                    }
+                } else if (PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED.equals(action)) {
+                    final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                    final boolean idle = pm != null && pm.isDeviceIdleMode();
+                    Logging.info("DEVICE_IDLE_MODE_CHANGED: idle " + idle);
+                    if (idle && state != null) {
+                        handleQuickDozeVerdict(state.quickDozeDetector.onIdleOn(
+                                SystemClock.elapsedRealtime(), isScanning()));
+                    }
+                    if (state != null && state.wifiReceiver != null) {
+                        state.wifiReceiver.onDeviceIdleChanged(idle);
+                    }
                 }
             }
         };
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
         registerReceiver(screenStateReceiver, filter);
     }
 

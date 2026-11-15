@@ -436,6 +436,7 @@
     <string name="enable_map_theme">Abbina il tema della mappa all\'app</string>
     <string name="throttle">La scansione Wi-Fi è limitata. Disattiva WiFi Scan Throttle in Impostazioni sviluppatore per prestazioni migliori.</string>
     <string name="samsung_wifi_calling">Le chiamate Wi-Fi possono bloccare la scansione su questo dispositivo Samsung. Disattiva le chiamate Wi-Fi durante la scansione: Impostazioni -> Connessioni -> Chiamate Wi-Fi.</string>
+    <string name="quick_doze_warning">Questo telefono entra in sospensione profonda pochi minuti dopo lo spegnimento dello schermo, interrompendo la scansione WiFi. Sui telefoni Pixel, disattiva Impostazioni -> Batteria -> Preferenze adattive -> Batteria adattiva, quindi riavvia il telefono.</string>
     <string name="no_individual_nets_map">Disabilita la visualizzazione della rete della mappa</string>
     <string name="filter_show_btle">Mostra Bluetooth LE</string>
     <string name="settings_gps_head">Impostazioni GPS</string>

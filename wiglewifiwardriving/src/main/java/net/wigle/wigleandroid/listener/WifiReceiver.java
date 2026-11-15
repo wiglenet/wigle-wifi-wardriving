@@ -32,7 +32,9 @@ import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.ScanUtil;
+import net.wigle.wigleandroid.util.WifiScanRate;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +47,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.os.SystemClock;
 
 /**
  * Primary receiver logic for WiFi scan results.
@@ -72,6 +75,12 @@ public class WifiReceiver extends BroadcastReceiver {
     private boolean scanInFlight = false;
     /** Last startScan binder call submission. */
     private long lastStartScanAttemptMs = Long.MIN_VALUE;
+    /** When the outstanding request (regular or idle probe) was submitted. Main thread. */
+    private long scanInFlightSinceMs = Long.MIN_VALUE;
+    /** Last deep-idle probe submission. Main thread. */
+    private long lastIdleProbeMs = Long.MIN_VALUE;
+    /** While in deep idle, one real startScan per this interval to record whether the platform refuses it. */
+    private static final long IDLE_PROBE_MS = 30_000L;
     /** True when the previous startScan returned false or threw. Holds the next attempt to the platform floor. */
     private boolean lastStartScanFailed = false;
     /** Consecutive rejected startScan calls. Main thread. Drives the throttle-off backoff. */
@@ -136,6 +145,7 @@ public class WifiReceiver extends BroadcastReceiver {
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onReceive( final Context context, final Intent intent ) {
+        final boolean outstanding = scanInFlight;
         scanInFlight = false;
         final long now = System.currentTimeMillis();
         lastScanResponseTime = now;
@@ -143,7 +153,9 @@ public class WifiReceiver extends BroadcastReceiver {
         if (mainActivity != null) {
             mainActivity.refreshScanWakeLock();
         }
-        if (intent != null && !intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, true)) {
+        final boolean updated = intent == null || intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, true);
+        noteScanResult(updated, outstanding, now);
+        if (!updated) {
             Logging.debug("wifi receive: results not updated, skipping getScanResults");
             return;
         }
@@ -599,6 +611,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     // make sure the app isn't trying to finish
                     if ( ! mainActivity.isFinishing() ) {
                         // info( "timer start scan" );
+                        rollScanRate(false);
                         doWifiScan();
                         if ( scanRequestTime <= 0 ) {
                             scanRequestTime = System.currentTimeMillis();
@@ -613,6 +626,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         wifiTimer.postDelayed( this, period );
                     }
                     else {
+                        rollScanRate(true);
                         Logging.info( "finishing timer" );
                     }
                 }
@@ -660,6 +674,21 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     /**
+     * This process's {@code RunningAppProcessInfo.importance}, the value the wifi service's
+     * foreground check reads for us. Binder call into the activity manager: scan executor only.
+     */
+    private static int readProcessImportance() {
+        try {
+            final ActivityManager.RunningAppProcessInfo info = new ActivityManager.RunningAppProcessInfo();
+            ActivityManager.getMyMemoryState(info);
+            return info.importance;
+        } catch (RuntimeException ex) {
+            Logging.info("exception reading process importance: " + ex);
+            return WifiScanRate.IMPORTANCE_UNKNOWN;
+        }
+    }
+
+    /**
      * True when the last startScan attempt was at least one period ago, so the next scan is due.
      * Only after a successful attempt; a rejection's backoff stays with the timer.
      */
@@ -695,6 +724,63 @@ public class WifiReceiver extends BroadcastReceiver {
         // idle held every tick, so no responses came in; don't let the jam check fire on that
         lastScanResponseTime = System.currentTimeMillis();
         scheduleScan();
+    }
+
+    /** True while a startScan has been submitted and its broadcast has not arrived. */
+    public boolean isWifiScanInFlight() {
+        return scanInFlight;
+    }
+
+    /** Cached platform scan throttle. May refresh the cache, same as the scan timer. */
+    public boolean isWifiScanThrottled() {
+        return isScanThrottleEnabled();
+    }
+
+    /** Close the open scan-rate minute if the timer is stopping. Main thread. */
+    public void sealScanRate() {
+        rollScanRate(true);
+    }
+
+    private WifiScanRate scanRate() {
+        if (mainActivity == null) {
+            return null;
+        }
+        final MainActivity.State state = mainActivity.getState();
+        return state == null ? null : state.wifiScanRate;
+    }
+
+    private void noteScanResult(final boolean updated, final boolean outstanding, final long now) {
+        final WifiScanRate rate = scanRate();
+        if (rate == null) {
+            return;
+        }
+        int latency = -1;
+        if (outstanding && scanInFlightSinceMs != Long.MIN_VALUE) {
+            final long delta = now - scanInFlightSinceMs;
+            if (delta >= 0 && delta <= Integer.MAX_VALUE) {
+                latency = (int) delta;
+            }
+        }
+        rate.noteResult(updated, latency);
+    }
+
+    /** Main thread. {@code seal} writes the open minute even if a full minute has not elapsed. */
+    private void rollScanRate(final boolean seal) {
+        if (mainActivity == null) {
+            return;
+        }
+        final WifiScanRate rate = scanRate();
+        if (rate == null) {
+            return;
+        }
+        final WifiScanRate.Sample sample = mainActivity.captureWifiScanSample();
+        final long nowElapsed = SystemClock.elapsedRealtime();
+        final long nowWall = System.currentTimeMillis();
+        if (seal) {
+            rate.sealPartial(nowElapsed, nowWall, sample);
+        } else {
+            rate.rollIfDue(nowElapsed, nowWall, sample);
+        }
     }
 
     public synchronized void registerWiFiScanUpdater(final WiFiScanUpdater updater, final Set<String> watchBssids) {
@@ -733,21 +819,52 @@ public class WifiReceiver extends BroadcastReceiver {
             final long now = System.currentTimeMillis();
             final boolean deviceIdle = isDeviceIdle();
             if (deviceIdle) {
-                // every call would be refused; hold until ACTION_DEVICE_IDLE_MODE_CHANGED
+                // every call would be refused; hold until ACTION_DEVICE_IDLE_MODE_CHANGED,
+                // apart from a periodic probe that records whether the platform really refuses
+                if (!scanInFlight && (lastIdleProbeMs == Long.MIN_VALUE
+                        || now - lastIdleProbeMs >= IDLE_PROBE_MS)) {
+                    lastIdleProbeMs = now;
+                    submitIdleProbe(wifiManager, now);
+                } else {
+                    final WifiScanRate rate = scanRate();
+                    if (rate != null) {
+                        rate.noteSuppressed(scanInFlight);
+                    }
+                }
                 // no responses arrive while held, so keep the jam check from tripping
                 lastScanResponseTime = now;
             } else if ( ! scanInFlight && startScanAllowed(now) ) {
                 scanInFlight = true;
+                scanInFlightSinceMs = now;
                 submitted = true;
                 lastStartScanAttemptMs = now;
+                final WifiScanRate rate = scanRate();
                 wifiScanExecutor.execute(() -> {
+                    if (rate != null) {
+                        rate.noteCall();
+                    }
                     boolean success = false;
+                    boolean threw = false;
                     try {
                         if (wifiManager != null) {
                             success = wifiManager.startScan();
                         }
                     } catch (Exception ex) {
+                        threw = true;
                         Logging.warn("exception starting scan: " + ex, ex);
+                    }
+                    if (rate != null) {
+                        if (threw) {
+                            rate.noteThrow();
+                        } else if (success) {
+                            rate.noteReturn(true);
+                        } else {
+                            // how the wifi service is likely ranking us: above
+                            // IMPORTANCE_FOREGROUND_SERVICE means background throttling applies
+                            final int importance = readProcessImportance();
+                            Logging.debug("startScan rejected; process importance " + importance);
+                            rate.noteReturn(false, importance);
+                        }
                     }
                     final boolean scanSuccess = success;
                     mainHandler.post(() -> {
@@ -763,6 +880,11 @@ public class WifiReceiver extends BroadcastReceiver {
                         Logging.debug("startScan returned " + scanSuccess + ". last response seconds ago: " + (System.currentTimeMillis() - lastScanResponseTime) / 1000d);
                     });
                 });
+            } else {
+                final WifiScanRate rate = scanRate();
+                if (rate != null) {
+                    rate.noteSuppressed(scanInFlight);
+                }
             }
 
             if ( deviceIdle ) {
@@ -821,6 +943,8 @@ public class WifiReceiver extends BroadcastReceiver {
             // reset this
             lastScanResponseTime = Long.MIN_VALUE;
             lastStartScanAttemptMs = Long.MIN_VALUE;
+            scanInFlightSinceMs = Long.MIN_VALUE;
+            lastIdleProbeMs = Long.MIN_VALUE;
             lastStartScanFailed = false;
             rejectStreak = 0;
             scanThrottleCheckedMs = Long.MIN_VALUE;
@@ -881,6 +1005,38 @@ public class WifiReceiver extends BroadcastReceiver {
         // Inside the floor window after a successful scan. Only hold when the platform throttle
         // is still enabled; the user turned it off to scan at the configured period.
         return Build.VERSION.SDK_INT < 36 || !isScanThrottleEnabled();
+    }
+
+    /**
+     * Main thread, while the device is in deep idle. One real startScan, counted only as a probe:
+     * it does not touch the rejection backoff or the regular attempt time, so the idle hold and
+     * the scan cadence after idle are unchanged. A refusal comes back with a results-not-updated
+     * broadcast, which shows up as stale.
+     */
+    private void submitIdleProbe(final WifiManager wifiManager, final long now) {
+        scanInFlight = true;
+        scanInFlightSinceMs = now;
+        final WifiScanRate rate = scanRate();
+        wifiScanExecutor.execute(() -> {
+            boolean success = false;
+            try {
+                if (wifiManager != null) {
+                    success = wifiManager.startScan();
+                }
+            } catch (Exception ex) {
+                Logging.warn("exception starting idle probe scan: " + ex, ex);
+            }
+            if (rate != null) {
+                rate.noteProbe(success);
+            }
+            final boolean probeSuccess = success;
+            mainHandler.post(() -> {
+                if (!probeSuccess) {
+                    scanInFlight = false;
+                }
+                Logging.info("idle probe startScan returned " + probeSuccess);
+            });
+        });
     }
 
     /**

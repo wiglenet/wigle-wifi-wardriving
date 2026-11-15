@@ -303,6 +303,14 @@ public final class WigleService extends Service {
         }
     }
 
+    /** Same as {@link #isServiceForeground()} without the log line, for once-a-second sampling. */
+    boolean isForegroundQuiet() {
+        if (SDK_INT < Build.VERSION_CODES.Q) {
+            return false;
+        }
+        return getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
+    }
+
     private boolean isServiceForeground() {
         if (SDK_INT < Build.VERSION_CODES.Q) {
             // no such thing as foreground back then

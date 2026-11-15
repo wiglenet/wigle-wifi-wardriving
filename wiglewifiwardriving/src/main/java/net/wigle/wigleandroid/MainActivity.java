@@ -103,6 +103,7 @@ import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WLogoDrawerArrowDrawable;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.ui.WifiScanRateOverlay;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.BuildReleaseTag;
 import net.wigle.wigleandroid.util.FileUtility;
@@ -110,6 +111,7 @@ import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.QuickDozeDetector;
+import net.wigle.wigleandroid.util.WifiScanRate;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -188,6 +190,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private boolean wantsScanWakeLock = false;
         private int logPointer = 0;
         private final String[] logs = new String[25];
+        public final WifiScanRate wifiScanRate = new WifiScanRate();
+        /** Live WiFi scan-rate overlay requested from the settings menu. Process lifetime. */
+        public boolean wifiScanRateOverlay = false;
         final QuickDozeDetector quickDozeDetector = new QuickDozeDetector();
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
@@ -208,6 +213,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private State state;
+    /** True between onStart and onStop. Sampled into the WiFi scan-rate minute. */
+    private boolean activityStarted = false;
+    private WifiScanRateOverlay wifiScanRateOverlay;
     // *** end of state that is retained ***
     private GnssStatus.Callback gnssStatusCallback = null;
     private GnssMeasurementsEvent.Callback gnssMeasurementsCallback = null;
@@ -1110,6 +1118,60 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return state;
     }
 
+    /**
+     * Current scanning, foreground, screen, idle, battery-exemption, and throttle state
+     * for the open WiFi scan-rate minute.
+     */
+    public WifiScanRate.Sample captureWifiScanSample() {
+        boolean inFlight = false;
+        boolean throttle = true;
+        long period = SCAN_DEFAULT;
+        if (state != null && state.wifiReceiver != null) {
+            inFlight = state.wifiReceiver.isWifiScanInFlight();
+            throttle = state.wifiReceiver.isWifiScanThrottled();
+            period = state.wifiReceiver.getScanPeriod();
+        }
+        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        final boolean screenOn = pm != null && pm.isInteractive();
+        final boolean idle = pm != null && pm.isDeviceIdleMode();
+        boolean batteryUnrestricted = false;
+        if (pm != null) {
+            try {
+                batteryUnrestricted = pm.isIgnoringBatteryOptimizations(getPackageName());
+            } catch (final RuntimeException ex) {
+                Logging.info("exception reading battery optimization: " + ex);
+            }
+        }
+        final boolean serviceForeground = state != null && state.wigleService != null
+                && state.wigleService.isForegroundQuiet();
+        return new WifiScanRate.Sample(isScanning(), activityStarted, screenOn, idle,
+                batteryUnrestricted, throttle, inFlight, period, serviceForeground);
+    }
+
+    public boolean isWifiScanRateOverlayEnabled() {
+        return state != null && state.wifiScanRateOverlay;
+    }
+
+    /** Toggle the live scan-rate overlay. Shown immediately while the activity is started. */
+    public void setWifiScanRateOverlayEnabled(final boolean enabled) {
+        if (state != null) {
+            state.wifiScanRateOverlay = enabled;
+        }
+        syncWifiScanRateOverlay();
+    }
+
+    private void syncWifiScanRateOverlay() {
+        final boolean want = activityStarted && isWifiScanRateOverlayEnabled();
+        if (want) {
+            if (wifiScanRateOverlay == null) {
+                wifiScanRateOverlay = new WifiScanRateOverlay(this);
+            }
+            wifiScanRateOverlay.show();
+        } else if (wifiScanRateOverlay != null) {
+            wifiScanRateOverlay.hide();
+        }
+    }
+
     /** True when no charger is plugged in; false when the battery state is not known yet. */
     private boolean isOnBattery() {
         // plug state, not charge status: an unplugged phone at 100% keeps reporting FULL
@@ -1129,10 +1191,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (verdict == QuickDozeDetector.Verdict.QUICK_DOZE) {
             Logging.warn("deep Doze within " + (QuickDozeDetector.QUICK_LIMIT_MS / 60_000L)
                     + " minutes of screen-off while scanning; WiFi scans are refused until it ends");
+            noteWifiScanLife("quick_doze");
             prefs.edit().putLong(PreferenceKeys.PREF_QUICK_DOZE_SEEN, System.currentTimeMillis()).apply();
         } else if (prefs.contains(PreferenceKeys.PREF_QUICK_DOZE_SEEN)) {
             Logging.info("long screen-off on battery without deep Doze; clearing quick-doze warning");
             prefs.edit().remove(PreferenceKeys.PREF_QUICK_DOZE_SEEN).apply();
+        }
+    }
+
+    private void noteWifiScanLife(final String mark) {
+        if (state != null && state.wifiScanRate != null) {
+            state.wifiScanRate.noteLife(mark);
         }
     }
 
@@ -1154,6 +1223,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE)
                     .unregisterOnSharedPreferenceChangeListener(mutedPreferenceListener);
             mutedPreferenceListener = null;
+        }
+        if (state != null && !state.uiRestart.get() && state.wifiReceiver != null) {
+            state.wifiReceiver.sealScanRate();
         }
         super.onDestroy();
         stopHeartbeat();
@@ -1316,11 +1388,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
         super.onStart();
         mainActivity = this;
+        activityStarted = true;
+        noteWifiScanLife("foreground");
+        syncWifiScanRateOverlay();
     }
 
     @Override
     public void onStop() {
         Logging.info("MAIN: stop.");
+        activityStarted = false;
+        noteWifiScanLife("background");
+        syncWifiScanRateOverlay();
         super.onStop();
     }
 
@@ -2272,6 +2350,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (Intent.ACTION_SCREEN_OFF.equals(action)) {
                     Logging.info("SCREEN_OFF: acquiring scan wake lock if scanning");
                     acquireScanWakeLockIfNeeded();
+                    noteWifiScanLife("screen_off");
                     if (state != null) {
                         state.quickDozeDetector.onScreenOff(SystemClock.elapsedRealtime(),
                                 isScanning(), isOnBattery());
@@ -2279,6 +2358,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                     Logging.info("SCREEN_ON: releasing scan wake lock");
                     releaseScanWakeLock();
+                    noteWifiScanLife("screen_on");
                     if (state != null) {
                         handleQuickDozeVerdict(state.quickDozeDetector.onScreenOn(
                                 SystemClock.elapsedRealtime(), isScanning(), isOnBattery()));
@@ -2287,6 +2367,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
                     final boolean idle = pm != null && pm.isDeviceIdleMode();
                     Logging.info("DEVICE_IDLE_MODE_CHANGED: idle " + idle);
+                    noteWifiScanLife(idle ? "idle_on" : "idle_off");
                     if (idle && state != null) {
                         handleQuickDozeVerdict(state.quickDozeDetector.onIdleOn(
                                 SystemClock.elapsedRealtime(), isScanning()));
@@ -2431,6 +2512,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private void internalHandleScanChange(final boolean isScanning) {
         Logging.info("\tmain internalHandleScanChange: isScanning now: " + isScanning);
+        noteWifiScanLife(isScanning ? "scan_on" : "scan_off");
         ListFragment listFragment = getListFragmentIfCurrent();
 
         if (isScanning) {

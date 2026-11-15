@@ -94,6 +94,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
     private static final int MENU_ERROR_REPORT = 13;
     private static final int MENU_DEBUG = 14;
+    private static final int MENU_WIFI_SCAN_RATE = 15;
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
     private static final int DEAUTHORIZE_DIALOG=114;
@@ -969,7 +970,21 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
         item.setIcon( android.R.drawable.ic_menu_report_image );
 
+        item = menu.add(0, MENU_WIFI_SCAN_RATE, 0, getString(R.string.menu_wifi_scan_rate));
+        item.setIcon(android.R.drawable.ic_menu_recent_history);
+        item.setCheckable(true);
+
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull final Menu menu) {
+        final MenuItem item = menu.findItem(MENU_WIFI_SCAN_RATE);
+        final FragmentActivity activity = getActivity();
+        if (item != null && activity instanceof MainActivity) {
+            item.setChecked(((MainActivity) activity).isWifiScanRateOverlayEnabled());
+        }
+        super.onPrepareOptionsMenu(menu);
     }
 
     /* Handles item selections */
@@ -983,6 +998,14 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
                 this.startActivity( errorReportIntent );
+                return true;
+            case MENU_WIFI_SCAN_RATE:
+                final FragmentActivity activity = getActivity();
+                if (activity instanceof MainActivity) {
+                    final boolean enable = !item.isChecked();
+                    ((MainActivity) activity).setWifiScanRateOverlayEnabled(enable);
+                    item.setChecked(enable);
+                }
                 return true;
         }
         return false;

@@ -397,6 +397,8 @@
     <string name="btloc_title">WiGLE.net Bluetooth Devices with Location</string>
     <string name="total_bt">Total Bluetooth</string>
     <string name="menu_debug">Debug</string>
+    <string name="menu_wifi_scan_rate">WiFi Scan Rate Overlay</string>
+    <string name="wifi_scan_rate_empty">No scan minutes yet</string>
     <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
     <string name="q_bad">Android 10 throttles WiFi scans unless disabled in Developer Settings.</string>
     <string name="enable_developer">To enable developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>

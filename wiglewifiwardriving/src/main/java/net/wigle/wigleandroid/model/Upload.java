@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.model;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 /**
  * upload. not thread-safe.
  */
+@Keep
 public final class Upload {
     private final String transid;
     @SerializedName("totalGps")
@@ -174,6 +176,7 @@ public final class Upload {
         return newCellGps;
     }
 
+    @Keep
     public enum Status {
         @SerializedName("W")
         QUEUED("W"),

@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import android.os.Bundle;
 
 import net.wigle.wigleandroid.model.NewsItem;
@@ -10,6 +12,7 @@ import java.util.List;
  * response from WiGLE news API call
  * @author arkasha
  */
+@Keep
 public class WiGLENews {
     private Boolean success;
     private List<NewsItem> results;

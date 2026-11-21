@@ -1,7 +1,10 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import java.util.List;
 
+@Keep
 public class RankResponse {
     private boolean eventView;
     private String myUsername;
@@ -58,6 +61,7 @@ public class RankResponse {
         this.selected = selected;
     }
 
+    @Keep
     public class RankResponseRow {
         private long discoveredCell;
         private long discoveredCellGPS;

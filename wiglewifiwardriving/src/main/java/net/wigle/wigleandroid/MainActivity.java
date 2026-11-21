@@ -66,6 +66,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
+import androidx.appcompat.view.menu.MenuBuilder;
 
 import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
@@ -118,7 +119,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -1024,21 +1024,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
+    // ALIBI: MenuBuilder is AppCompat-internal (RestrictTo), but a direct call is R8-safe where the
+    // old reflective lookup by class/method name was not.
+    @SuppressLint("RestrictedApi")
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-                try {
-                    Method m = menu.getClass().getDeclaredMethod(
-                            "setOptionalIconsVisible", Boolean.TYPE);
-                    m.setAccessible(true);
-                    m.invoke(menu, true);
-                } catch (NoSuchMethodException ex) {
-                    Logging.error("onMenuOpened no such method: " + ex, ex);
-                } catch (Exception ex) {
-                    Logging.error("onMenuOpened ex: " + ex, ex);
-                }
-            }
+        if (featureId == Window.FEATURE_ACTION_BAR && menu instanceof MenuBuilder) {
+            ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
         return super.onMenuOpened(featureId, menu);
     }

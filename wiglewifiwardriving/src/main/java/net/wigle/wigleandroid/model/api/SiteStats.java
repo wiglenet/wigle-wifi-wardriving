@@ -1,7 +1,10 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.SerializedName;
 
+@Keep
 public class SiteStats {
     private long netloc;
     private long loctotal;

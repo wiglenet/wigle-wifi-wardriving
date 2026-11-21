@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import java.util.List;
  * v0.0.1
  * @author rksh
  */
+@Keep
 public class FilterSet {
     public static final int CURRENT_SCHEMA_VERSION = 1;
 

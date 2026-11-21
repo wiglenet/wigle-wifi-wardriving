@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -10,6 +12,7 @@ import java.util.Locale;
 /**
  * WiGLE v2 API WiFi Search Response model object
  */
+@Keep
 public class WiFiSearchResponse {
     private boolean success;
     private List<WiFiNetwork> results;
@@ -31,6 +34,7 @@ public class WiFiSearchResponse {
     }
 
     //ALIBI: while these have some things in common w/ Network, we don't need all of that.
+    @Keep
     public class WiFiNetwork {
         private String netid;
         private Double trilat;

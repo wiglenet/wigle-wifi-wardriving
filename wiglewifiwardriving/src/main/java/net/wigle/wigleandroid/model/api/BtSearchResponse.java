@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -8,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+@Keep
 public class BtSearchResponse {
     private boolean success;
     private List<BtNetwork> results;
@@ -28,6 +31,7 @@ public class BtSearchResponse {
         this.results = results;
     }
 
+    @Keep
     public class BtNetwork {
         private String netid;
         private Double trilat;

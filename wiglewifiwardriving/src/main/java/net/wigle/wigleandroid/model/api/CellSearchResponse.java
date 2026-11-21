@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -7,6 +9,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import java.util.List;
 import java.util.Locale;
 
+@Keep
 public class CellSearchResponse {
     private boolean success;
     private List<CellNetwork> results;
@@ -27,6 +30,7 @@ public class CellSearchResponse {
         this.results = results;
     }
 
+    @Keep
     public class CellNetwork {
         private String id;
         private Double trilat;

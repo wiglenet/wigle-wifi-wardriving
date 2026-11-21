@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ import java.util.Map;
  * v0.0.1
  * @author rksh
  */
+@Keep
 public class Filter
 {
     private String description; // text description of this filter.
@@ -221,6 +224,7 @@ public class Filter
     /**
      * BLE-specific matching: Manufacturer IDs and service UUIDs
      */
+    @Keep
     public static class BleFilter {
         @SerializedName("mfgrIds")
         List<String> bleMfgrIds;   // list of BLE manufacturer IDs
@@ -320,6 +324,7 @@ public class Filter
     /**
      * match-all/match-any service UUID criteria
      */
+    @Keep
     public static class BleServiceFilter {
         List<BleSingleFilter> any;
         Map<String, List<String>> all;
@@ -484,6 +489,7 @@ public class Filter
         }
     }
 
+    @Keep
     public static class BleSingleFilter {
         private String description;
         private String uuid;

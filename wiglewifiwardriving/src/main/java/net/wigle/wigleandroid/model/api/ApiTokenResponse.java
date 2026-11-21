@@ -1,8 +1,11 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 /**
  * API Token response object
  */
+@Keep
 public class ApiTokenResponse {
     private boolean success;
     private String authname;
@@ -32,6 +35,7 @@ public class ApiTokenResponse {
         this.token = token;
     }
 
+    @Keep
     public enum ApiTokenType {
         API, COMMAPI, ANDROID
     }

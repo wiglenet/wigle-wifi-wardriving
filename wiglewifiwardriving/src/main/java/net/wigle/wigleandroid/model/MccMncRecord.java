@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model;
 
+import androidx.annotation.Keep;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 //TODO: DRY up with server-side?
+@Keep
 public class MccMncRecord {
     /**
      * example:

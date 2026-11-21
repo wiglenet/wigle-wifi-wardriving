@@ -1,9 +1,12 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 /**
  * Response from the WiGLE API v2 user stats call
  * @author arkasha
  */
+@Keep
 public class UserStats {
     private String imageBadgeUrl;
     private long monthRank;
@@ -12,6 +15,7 @@ public class UserStats {
     private String user;
     private Statistics statistics;
 
+    @Keep
     public class Statistics {
         private long discoveredCell;
         private long discoveredCellGPS;

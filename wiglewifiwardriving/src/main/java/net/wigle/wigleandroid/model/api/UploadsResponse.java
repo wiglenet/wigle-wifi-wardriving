@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import net.wigle.wigleandroid.model.Upload;
 
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.List;
 /**
  * Model of the API upload list response
  */
+@Keep
 public class UploadsResponse {
     private boolean success;
     private List<Upload> results;

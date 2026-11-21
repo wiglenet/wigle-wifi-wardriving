@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resources looked up by name via getIdentifier(); keep them through shrinkResources. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/upload_*" />

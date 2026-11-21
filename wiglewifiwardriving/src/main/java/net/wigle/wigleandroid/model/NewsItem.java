@@ -1,11 +1,14 @@
 package net.wigle.wigleandroid.model;
 
+import androidx.annotation.Keep;
+
 import android.text.Html;
 import android.text.Spanned;
 
 /**
  * news. not thread-safe.
  */
+@Keep
 public final class NewsItem {
     private String subject;
     private String postDate;

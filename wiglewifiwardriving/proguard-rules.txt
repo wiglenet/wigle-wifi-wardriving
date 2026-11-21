@@ -1,0 +1,27 @@
+# R8 rules for WiGLE WiFi Wardriving (release builds).
+#
+# First pass: shrink + optimize everything, obfuscate only third-party code.
+# Our own class/member names are kept so emailed errorstack files stay readable
+# without a mapping.txt. If Play's obfuscation score is still under threshold,
+# narrow or drop the -keepnames rule below.
+
+# --- Readable stack traces -------------------------------------------------
+-keepattributes SourceFile,LineNumberTable
+-keepnames class net.wigle.** { *; }
+
+# --- Gson / Jackson models --------------------------------------------------
+# Gson (2.11+) ships its own R8 rules. Every class Gson or Jackson fills by
+# reflection carries @androidx.annotation.Keep in source, which AndroidX's
+# consumer rules honor. New API/model classes (and their nested classes)
+# need @Keep too, or their reflectively-written fields can be stripped.
+
+# --- Fragments created via Class.newInstance() in MainActivity ------------
+-keep public class * extends androidx.fragment.app.Fragment {
+    public <init>();
+}
+
+# --- Libraries referencing JVM-only classes absent on Android --------------
+-dontwarn java.beans.**
+-dontwarn org.w3c.dom.bootstrap.DOMImplementationRegistry
+-dontwarn javax.annotation.**
+-dontwarn org.slf4j.impl.**

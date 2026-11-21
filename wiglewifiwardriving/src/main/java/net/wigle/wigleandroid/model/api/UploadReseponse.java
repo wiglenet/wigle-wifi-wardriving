@@ -1,10 +1,13 @@
 package net.wigle.wigleandroid.model.api;
 
+import androidx.annotation.Keep;
+
 import java.util.List;
 
 /**
  * API response for uploads
  */
+@Keep
 public class UploadReseponse {
     private Boolean success;
     private String warning;
@@ -42,6 +45,7 @@ public class UploadReseponse {
         this.observer = observer;
     }
 
+    @Keep
     public class UploadResultsResponse {
         private String timeTaken;
         private Long filesize;
@@ -80,6 +84,7 @@ public class UploadReseponse {
             this.transids = transids;
         }
     }
+    @Keep
     public class UploadTransaction {
         private String file;
         private Long size;

@@ -773,8 +773,7 @@ public final class MappingFragment extends AbstractMappingFragment {
                 case MENU_WAKELOCK: {
                     boolean screenLocked = !MainActivity.isScreenLocked(this);
                     MainActivity.setLockScreen(this, screenLocked);
-                    final String wake = screenLocked ? getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
-                    item.setTitle(wake);
+                    item.setChecked(screenLocked);
                     return true;
                 }
             }

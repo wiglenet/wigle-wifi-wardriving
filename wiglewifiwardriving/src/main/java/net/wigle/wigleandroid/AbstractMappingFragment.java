@@ -318,10 +318,9 @@ public abstract class AbstractMappingFragment extends Fragment {
             item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
             item.setIcon(android.R.drawable.ic_menu_edit);
         }
-        final String wake = MainActivity.isScreenLocked(this) ?
-                getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
-        item = menu.add(0, MENU_WAKELOCK, 0, wake);
-        item.setIcon(android.R.drawable.ic_menu_gallery);
+        item = menu.add(0, MENU_WAKELOCK, 0, getString(R.string.menu_screen_wake));
+        item.setCheckable(true);
+        item.setChecked(MainActivity.isScreenLocked(this));
 
         super.onCreateOptionsMenu(menu, inflater);
         this.menu = menu;

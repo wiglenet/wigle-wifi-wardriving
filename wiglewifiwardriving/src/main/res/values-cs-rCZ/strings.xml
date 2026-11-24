@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Ukončit, když je baterie na</string>
     <string name="reset_wifi_text">Detekce zaseknuté WiFi</string>
     <string name="speech_gps">Oznamovat změny GPS</string>
-    <string name="mute">Ztlumit</string>
-    <string name="play">Přehrávat</string>
     <string name="sort_text">Možnosti řazení</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Zpět</string>
     <string name="menu_sort">Možnosti řazení</string>
     <string name="menu_ssid_filter">SSID filtr</string>
-    <string name="menu_screen_sleep">Povolit uspání displeje</string>
     <string name="menu_screen_wake">Zakázat uspání displeje</string>
+    <string name="menu_scanning">Skenování</string>
+    <string name="menu_audio">Zvuk</string>
     <string name="menu_labels_off">Popisky vypnuty</string>
     <string name="menu_labels_on">Popisky zapnuty</string>
     <string name="menu_turn_off_lockon">Vypnout centrování</string>

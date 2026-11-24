@@ -45,8 +45,6 @@
     <string name="battery_kill_text">低於次電池電量時退出</string>
     <string name="reset_wifi_text">決定無線網絡卡住</string>
     <string name="speech_gps">GPS狀態改變</string>
-    <string name="mute">靜音</string>
-    <string name="play">播放</string>
     <string name="sort_text">排序選項</string>
     <string name="listdialog_button">確定</string>
     <string name="cryptodialog_button">確定</string>
@@ -175,8 +173,9 @@
     <string name="menu_return">返回</string>
     <string name="menu_sort">排序選項</string>
     <string name="menu_ssid_filter">SSID標記過濾</string>
-    <string name="menu_screen_sleep">讓屏幕休眠</string>
     <string name="menu_screen_wake">保持屏幕開啓</string>
+    <string name="menu_scanning">掃描</string>
+    <string name="menu_audio">音訊</string>
     <string name="menu_labels_off">關閉標籤</string>
     <string name="menu_labels_on">開啓標籤</string>
     <string name="menu_turn_off_lockon">關閉跟蹤</string>

@@ -46,8 +46,6 @@
     <string name="battery_kill_text">יציאה ברמה זו סוללה</string>
     <string name="reset_wifi_text">החלט WiFi נתקע</string>
     <string name="speech_gps">הכרז על מצב השינויים GPS</string>
-    <string name="mute">להשתיק</string>
-    <string name="play">משחק</string>
     <string name="sort_text">אפשרויות מיון</string>
     <string name="listdialog_button">בסדר</string>
     <string name="cryptodialog_button">בסדר</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">לחזור</string>
     <string name="menu_sort">אפשרויות מיון</string>
     <string name="menu_ssid_filter">לייבל SSID סינון</string>
-    <string name="menu_screen_sleep">תנו לישון מסך</string>
     <string name="menu_screen_wake">שמור על המסך</string>
+    <string name="menu_scanning">סריקה</string>
+    <string name="menu_audio">שמע</string>
     <string name="menu_labels_off">תוויות כבוי</string>
     <string name="menu_labels_on">התוויות על</string>
     <string name="menu_turn_off_lockon">כיבוי Lockon</string>

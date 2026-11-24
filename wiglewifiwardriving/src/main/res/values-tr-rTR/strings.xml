@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Bu Batarya seviyesinde uygulamadan çık</string>
     <string name="reset_wifi_text">WiFi engellendiğinde karar ver</string>
     <string name="speech_gps">GPS durum değişikliklerinde uyar</string>
-    <string name="mute">Sessiz</string>
-    <string name="play">Çal</string>
     <string name="sort_text">Sıralama Seçenekleri</string>
     <string name="listdialog_button">Tamam</string>
     <string name="cryptodialog_button">Tamam</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Geri</string>
     <string name="menu_sort">Sıralama ayarları</string>
     <string name="menu_ssid_filter">SSID Etiket filtresi</string>
-    <string name="menu_screen_sleep">Ekran uykusuna izin ver</string>
     <string name="menu_screen_wake">Ekranı açık tut</string>
+    <string name="menu_scanning">Tarama</string>
+    <string name="menu_audio">Ses</string>
     <string name="menu_labels_off">Etiketler kapalı</string>
     <string name="menu_labels_on">Etiketler açık</string>
     <string name="menu_turn_off_lockon">Kilitlemeyi Kapat</string>

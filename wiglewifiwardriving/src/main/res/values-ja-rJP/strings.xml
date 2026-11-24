@@ -46,8 +46,6 @@ KMLにエクスポート</string>
     <string name="battery_kill_text">このバッテリーレベルで終了</string>
     <string name="reset_wifi_text">WiFiが詰まっていると判断</string>
     <string name="speech_gps">GPSステータスの変更</string>
-    <string name="mute">オーディオをミュート</string>
-    <string name="play">オーディオを再生</string>
     <string name="sort_text">オプションを並べ替え</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@ KMLにエクスポート</string>
     <string name="menu_return">戻る</string>
     <string name="menu_sort">オプションを並べ替え</string>
     <string name="menu_ssid_filter">SSID ラベルフィルタ</string>
-    <string name="menu_screen_sleep">画面をスリープ状態にする</string>
     <string name="menu_screen_wake">画面をオンにしておく</string>
+    <string name="menu_scanning">スキャン</string>
+    <string name="menu_audio">オーディオ</string>
     <string name="menu_labels_off">ラベルオフ</string>
     <string name="menu_labels_on">ラベルオン</string>
     <string name="menu_turn_off_lockon">画面ロックを無効にする</string>

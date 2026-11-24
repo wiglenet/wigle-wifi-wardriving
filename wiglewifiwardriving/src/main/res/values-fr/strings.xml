@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Quitter à ce niveau de la batterie</string>
     <string name="reset_wifi_text">Temps après lequel le Wifi est considéré comme bloqué</string>
     <string name="speech_gps">Annoncer les changements d\'état GPS</string>
-    <string name="mute">Muet</string>
-    <string name="play">Jouer</string>
     <string name="sort_text">Options de tri</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Retour</string>
     <string name="menu_sort">Options de tri</string>
     <string name="menu_ssid_filter">Filtre par SSID</string>
-    <string name="menu_screen_sleep">Laissez l\'écran en veille</string>
     <string name="menu_screen_wake">Gardez l\'écran allumé</string>
+    <string name="menu_scanning">Scan</string>
+    <string name="menu_audio">Audio</string>
     <string name="menu_labels_off">Étiquettes désactivées</string>
     <string name="menu_labels_on">Étiquettes activées</string>
     <string name="menu_turn_off_lockon">Verrouillage désactivé</string>

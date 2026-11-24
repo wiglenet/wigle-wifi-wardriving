@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Ieșiți la acest nivel de baterie</string>
     <string name="reset_wifi_text">Decideți că WiFi este blocat</string>
     <string name="speech_gps">Se modifică starea GPS</string>
-    <string name="mute">Dezactivați sunetul</string>
-    <string name="play">Redați audio</string>
     <string name="sort_text">Opțiuni de sortare</string>
     <string name="listdialog_button">Bine</string>
     <string name="cryptodialog_button">Bine</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Întoarcere</string>
     <string name="menu_sort">Opțiuni de sortare</string>
     <string name="menu_ssid_filter">Filtru de etichete SSID</string>
-    <string name="menu_screen_sleep">Lasă ecranul să doarmă</string>
     <string name="menu_screen_wake">Tine ecranul aprins</string>
+    <string name="menu_scanning">Scanare</string>
+    <string name="menu_audio">Audio</string>
     <string name="menu_labels_off">Etichetele dezactivate</string>
     <string name="menu_labels_on">Etichete activate</string>
     <string name="menu_turn_off_lockon">Dezactivați Blocarea</string>

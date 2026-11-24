@@ -45,8 +45,6 @@
     <string name="battery_kill_text">Toka wakati betri inapofika kiwango hiki</string>
     <string name="reset_wifi_text">Amua WiFi imekwama</string>
     <string name="speech_gps">Mabadiliko ya hali ya GPS</string>
-    <string name="mute">Nyamazisha Sauti</string>
-    <string name="play">Cheza Sauti</string>
     <string name="sort_text">Chaguzi za Kupanga</string>
     <string name="listdialog_button">SAWA</string>
     <string name="cryptodialog_button">SAWA</string>
@@ -175,8 +173,9 @@
     <string name="menu_return">Rudi</string>
     <string name="menu_sort">Chaguzi za Kupanga</string>
     <string name="menu_ssid_filter">Kichujio cha Lebo ya SSID</string>
-    <string name="menu_screen_sleep">Acha Skrini Isinzie</string>
     <string name="menu_screen_wake">Acha Skrini Iwake</string>
+    <string name="menu_scanning">Kutambaza</string>
+    <string name="menu_audio">Sauti</string>
     <string name="menu_labels_off">Lebo Zimezimwa</string>
     <string name="menu_labels_on">Lebo Zimewashwa</string>
     <string name="menu_turn_off_lockon">Zima Lockon</string>

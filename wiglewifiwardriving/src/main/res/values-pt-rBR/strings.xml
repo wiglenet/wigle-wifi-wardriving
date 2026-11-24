@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Sair quando o nivel da bateria atingir</string>
     <string name="reset_wifi_text">Verificar se o WiFi Travou</string>
     <string name="speech_gps">Anunciar mudança de estado do GPS</string>
-    <string name="mute">Desativar som</string>
-    <string name="play">Ativar som</string>
     <string name="sort_text">Ordenar por</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Retornar</string>
     <string name="menu_sort">Ordenar por</string>
     <string name="menu_ssid_filter">Filtrar por SSID</string>
-    <string name="menu_screen_sleep">Não manter a tela ligada</string>
     <string name="menu_screen_wake">Manter a tela ligada</string>
+    <string name="menu_scanning">Escaneamento</string>
+    <string name="menu_audio">Som</string>
     <string name="menu_labels_off">Esconder Nomes</string>
     <string name="menu_labels_on">Mostrar Nomes</string>
     <string name="menu_turn_off_lockon">Destravar o Mapa</string>

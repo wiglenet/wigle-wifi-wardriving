@@ -45,8 +45,6 @@
     <string name="battery_kill_text">इस बैटरी स्तर पर बाहर निकलें</string>
     <string name="reset_wifi_text">तय करें कि WiFi जाम हो गया है</string>
     <string name="speech_gps">GPS की स्थिति बदल जाती है</string>
-    <string name="mute">ऑडियो को म्यूट करें</string>
-    <string name="play">ऑडियो चलाएँ</string>
     <string name="sort_text">सॉर्ट विकल्प</string>
     <string name="listdialog_button">ठीक</string>
     <string name="cryptodialog_button">ठीक</string>
@@ -175,8 +173,9 @@
     <string name="menu_return">वापसी</string>
     <string name="menu_sort">सॉर्ट विकल्प</string>
     <string name="menu_ssid_filter">SSID लेबल फ़िल्टर</string>
-    <string name="menu_screen_sleep">स्क्रीन को स्लीप होने दें</string>
     <string name="menu_screen_wake">स्क्रीन को चालू रखें</string>
+    <string name="menu_scanning">स्कैनिंग</string>
+    <string name="menu_audio">ऑडियो</string>
     <string name="menu_labels_off">लेबल बंद</string>
     <string name="menu_labels_on">लेबल चालू</string>
     <string name="menu_turn_off_lockon">लॉकऑन बंद करें</string>

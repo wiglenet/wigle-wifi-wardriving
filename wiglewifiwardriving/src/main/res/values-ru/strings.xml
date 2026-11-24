@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Выйти при уровне заряда</string>
     <string name="reset_wifi_text">Считать Wi-Fi зависшим после</string>
     <string name="speech_gps">Анонс изменений GPS статуса</string>
-    <string name="mute">Выкл. звук</string>
-    <string name="play">Проигрывать звук</string>
     <string name="sort_text">Параметры сортировки</string>
     <string name="listdialog_button">ОК</string>
     <string name="cryptodialog_button">ОК</string>
@@ -175,8 +173,9 @@
     <string name="menu_return">Назад</string>
     <string name="menu_sort">Параметры сортировки</string>
     <string name="menu_ssid_filter">Фильтрация по SSID</string>
-    <string name="menu_screen_sleep">Разрешить блокировку экрана</string>
     <string name="menu_screen_wake">Не выключать экран</string>
+    <string name="menu_scanning">Сканирование</string>
+    <string name="menu_audio">Звук</string>
     <string name="menu_labels_off">Скрыть подписи</string>
     <string name="menu_labels_on">Показать подписи</string>
     <string name="menu_turn_off_lockon">Выключить привязкку</string>

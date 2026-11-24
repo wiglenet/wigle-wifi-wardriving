@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Kilépés adott akkumulátorszintnél</string>
     <string name="reset_wifi_text">WiFi-zavarás érzékelése</string>
     <string name="speech_gps">GPS állapotváltozás</string>
-    <string name="mute">Némítás be</string>
-    <string name="play">Némítás ki</string>
     <string name="sort_text">Rendezési beállítások</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Vissza</string>
     <string name="menu_sort">Rendezési beállítások</string>
     <string name="menu_ssid_filter">SSID szűrő</string>
-    <string name="menu_screen_sleep">A kijelző elaludhat</string>
     <string name="menu_screen_wake">A kijelző maradjon bekapcsolva</string>
+    <string name="menu_scanning">Letapogatás</string>
+    <string name="menu_audio">Hang</string>
     <string name="menu_labels_off">Cimkék ki</string>
     <string name="menu_labels_on">Cimkék be</string>
     <string name="menu_turn_off_lockon">Követés ki</string>

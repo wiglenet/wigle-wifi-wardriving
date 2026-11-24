@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Exit på dette Batterinivå</string>
     <string name="reset_wifi_text">Bestem WiFi sitter fast</string>
     <string name="speech_gps">Kunngjøre GPS endres</string>
-    <string name="mute">Lydløs</string>
-    <string name="play">Spill</string>
     <string name="sort_text">Sorter Alternativer</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Return</string>
     <string name="menu_sort">Sorter Alternativer</string>
     <string name="menu_ssid_filter">SSID Etikett Filter</string>
-    <string name="menu_screen_sleep">La Screen Sleep</string>
     <string name="menu_screen_wake">Hold skjermen på</string>
+    <string name="menu_scanning">Skanning</string>
+    <string name="menu_audio">Lyd</string>
     <string name="menu_labels_off">Etiketter Off</string>
     <string name="menu_labels_on">Etiketter på</string>
     <string name="menu_turn_off_lockon">Turn Off Lockon</string>

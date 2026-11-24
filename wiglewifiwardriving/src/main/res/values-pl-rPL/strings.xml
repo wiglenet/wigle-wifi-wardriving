@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Wyłącz, gdy poziom baterii wynosi</string>
     <string name="reset_wifi_text">Zresetuj WiFi, gdy zacięło się na</string>
     <string name="speech_gps">Powiedz o zmianie statusu GPS</string>
-    <string name="mute">Wyciszenie</string>
-    <string name="play">Mów</string>
     <string name="sort_text">Opcje sortowania</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Powrót</string>
     <string name="menu_sort">Opcje sortowania</string>
     <string name="menu_ssid_filter">Filtr SSID</string>
-    <string name="menu_screen_sleep">Pozwól wył. ekran</string>
     <string name="menu_screen_wake">Ekran zawsze wł.</string>
+    <string name="menu_scanning">Skanowanie</string>
+    <string name="menu_audio">Dźwięk</string>
     <string name="menu_labels_off">Etykiety wył.</string>
     <string name="menu_labels_on">Etykiety wł.</string>
     <string name="menu_turn_off_lockon">Moja pozycja</string>

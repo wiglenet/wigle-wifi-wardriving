@@ -46,8 +46,6 @@
     <string name="battery_kill_text">이 배터리 수준에서 출구</string>
     <string name="reset_wifi_text">와이파이가 열려요 결정</string>
     <string name="speech_gps">GPS 상태 변경을 발표</string>
-    <string name="mute">음소거</string>
-    <string name="play">놀이</string>
     <string name="sort_text">정렬 옵션</string>
     <string name="listdialog_button">확인</string>
     <string name="cryptodialog_button">확인</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">반환</string>
     <string name="menu_sort">정렬 옵션</string>
     <string name="menu_ssid_filter">SSID 레이블 필터</string>
-    <string name="menu_screen_sleep">화면 자게</string>
     <string name="menu_screen_wake">화면 계속</string>
+    <string name="menu_scanning">스캔</string>
+    <string name="menu_audio">오디오</string>
     <string name="menu_labels_off">오프 라벨</string>
     <string name="menu_labels_on">레이블</string>
     <string name="menu_turn_off_lockon">Lockon 끄기</string>

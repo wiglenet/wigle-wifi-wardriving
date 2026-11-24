@@ -493,31 +493,40 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         item.setIcon(R.drawable.sort);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        final MainActivity main = MainActivity.getMainActivity(this);
-        final String scan = (main == null || main.isScanning()) ? getString(R.string.off) : getString(R.string.on);
-        item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
-        item.setIcon((main == null || main.isScanning()) ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
-
-        final String wake = MainActivity.isScreenLocked(this) ?
-                getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
-        item = menu.add(0, MENU_WAKELOCK, 0, wake);
-        item.setIcon( android.R.drawable.ic_menu_gallery );
-
-        final Activity a = getActivity();
-        if (null != a) {
-            boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
-            item = menu.add(0, MENU_MUTE, 0,
-                    muted ? getString(R.string.play) : getString(R.string.mute));
-            item.setIcon(muted ? android.R.drawable.ic_media_play
-                    : android.R.drawable.ic_media_pause);
+        menu.add(0, MENU_SCAN, 0, getString(R.string.menu_scanning)).setCheckable(true);
+        menu.add(0, MENU_WAKELOCK, 0, getString(R.string.menu_screen_wake)).setCheckable(true);
+        if (null != getActivity()) {
+            menu.add(0, MENU_MUTE, 0, getString(R.string.menu_audio)).setCheckable(true);
         }
+        applyToggleStates(menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onPrepareOptionsMenu(@NonNull final Menu menu) {
         applyFilterBars(menu.findItem(MENU_FILTER));
+        applyToggleStates(menu);
         super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * Sync the checkable toggle items with current state; scanning and the wake lock can be
+     * changed from other screens, so this runs every time the menu is shown.
+     */
+    private void applyToggleStates(final Menu menu) {
+        final MenuItem scanItem = menu.findItem(MENU_SCAN);
+        if (scanItem != null) {
+            final MainActivity main = MainActivity.getMainActivity(this);
+            scanItem.setChecked(main == null || main.isScanning());
+        }
+        final MenuItem wakeItem = menu.findItem(MENU_WAKELOCK);
+        if (wakeItem != null) {
+            wakeItem.setChecked(MainActivity.isScreenLocked(this));
+        }
+        final MenuItem audioItem = menu.findItem(MENU_MUTE);
+        if (audioItem != null && prefs != null) {
+            audioItem.setChecked(!prefs.getBoolean(PreferenceKeys.PREF_MUTED, true));
+        }
     }
 
     private void applyFilterBars(final MenuItem item) {
@@ -551,8 +560,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             case MENU_WAKELOCK: {
                 boolean screenLocked = ! MainActivity.isScreenLocked( this );
                 MainActivity.setLockScreen( this, screenLocked );
-                final String wake = screenLocked ? getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
-                item.setTitle( wake );
+                item.setChecked(screenLocked);
                 return true;
             }
             case MENU_SORT: {
@@ -564,9 +572,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 if (main != null) {
                     final boolean scanning = !main.isScanning();
                     main.handleScanChange(scanning);
-                    String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
-                    item.setTitle(name);
-                    item.setIcon(scanning ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+                    item.setChecked(scanning);
                     handleScanChange(main, getView());
                 }
 
@@ -595,9 +601,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     Editor editor = prefs.edit();
                     editor.putBoolean(PreferenceKeys.PREF_MUTED, muted);
                     editor.apply();
-                item.setTitle(muted ? getString(R.string.play) : getString(R.string.mute));
-                item.setIcon(muted ? android.R.drawable.ic_media_play
-                        : android.R.drawable.ic_media_pause);
+                    item.setChecked(!muted);
                 }
                 return true;
         }

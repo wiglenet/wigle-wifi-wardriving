@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Scan stoppen op dit batterijniveau</string>
     <string name="reset_wifi_text">WiFi-resettimer</string>
     <string name="speech_gps">GPS-statusverandering met geluid melden</string>
-    <string name="mute">Stil</string>
-    <string name="play">Geluid</string>
     <string name="sort_text">Sorteerinstellingen</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Terug</string>
     <string name="menu_sort">Sorteerinstellingen</string>
     <string name="menu_ssid_filter">SSID-labelfilter</string>
-    <string name="menu_screen_sleep">Scherm automatisch</string>
     <string name="menu_screen_wake">Scherm aanlaten</string>
+    <string name="menu_scanning">Scannen</string>
+    <string name="menu_audio">Geluid</string>
     <string name="menu_labels_off">Labels uit</string>
     <string name="menu_labels_on">Labels aan</string>
     <string name="menu_turn_off_lockon">Locatie ontgr.</string>

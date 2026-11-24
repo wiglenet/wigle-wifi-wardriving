@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Poistu tällä Akun</string>
     <string name="reset_wifi_text">Päätä WiFi on juuttunut</string>
     <string name="speech_gps">Ilmoita GPS tila muuttuu</string>
-    <string name="mute">Mykistä</string>
-    <string name="play">Pelaa</string>
     <string name="sort_text">Lajittele Options</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Palata</string>
     <string name="menu_sort">Lajittele Options</string>
     <string name="menu_ssid_filter">SSID Label Filter</string>
-    <string name="menu_screen_sleep">Let Screen Sleep</string>
     <string name="menu_screen_wake">Pidä Screen</string>
+    <string name="menu_scanning">Skannaus</string>
+    <string name="menu_audio">Ääni</string>
     <string name="menu_labels_off">Labels Off</string>
     <string name="menu_labels_on">Tarroja</string>
     <string name="menu_turn_off_lockon">Sammuta Lockon</string>

@@ -46,8 +46,6 @@
     <string name="battery_kill_text">Afslut på dette batteri niveau</string>
     <string name="reset_wifi_text">Beslut når WiFi er blokeret</string>
     <string name="speech_gps">Meddel GPS-status ændres</string>
-    <string name="mute">Lydløs</string>
-    <string name="play">Spil</string>
     <string name="sort_text">Sorter Optioner</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -176,8 +174,9 @@
     <string name="menu_return">Tilbage</string>
     <string name="menu_sort">Sorter Optioner</string>
     <string name="menu_ssid_filter">SSID Label Filter</string>
-    <string name="menu_screen_sleep">Tilad at skærmen slukker</string>
     <string name="menu_screen_wake">Hold skærmen tændt</string>
+    <string name="menu_scanning">Scanning</string>
+    <string name="menu_audio">Lyd</string>
     <string name="menu_labels_off">Etiketter fra</string>
     <string name="menu_labels_on">Etiketter til</string>
     <string name="menu_turn_off_lockon">Sluk Lokation</string>
